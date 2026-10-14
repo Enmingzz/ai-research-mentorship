@@ -15,6 +15,6 @@ assert.equal(schedule.length,24,'24 suggested weeks');
 schedule.forEach((w,i)=>{assert.equal(w.week,i+1);assert(w.title&&w.focus&&w.deliverable);for(const id of [...w.moduleIds,...w.readingModuleIds])assert(ids.has(id),`Unknown schedule module ${id}`);for(const id of w.readingIds||[])assert(papers.some(p=>p.id===id),`Unknown week ${w.week} reading: ${id}`);});
 for(const id of ids)assert(schedule.some(w=>w.moduleIds.includes(id)),`Schedule covers module ${id}`);
 const html=await readFile('index.html','utf8');
-assert(html.includes('lang="zh-CN"')&&html.includes('name="viewport"'));
+assert(html.includes('lang="en"')&&html.includes('name="viewport"'));
 execFileSync(process.execPath,['--check','app.js']);
 console.log(`PASS · ${modules.length} modules · ${topics.length} topics · ${papers.length} readings · ${schedule.length} weeks · valid references and JavaScript`);

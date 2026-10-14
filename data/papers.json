@@ -8,7 +8,7 @@
     "kind": "book",
     "url": "https://www.deeplearningbook.org/",
     "level": "essential",
-    "note": "先读第 2–5 章补数学与概率，再用第 6–8 章串联网络、正则化与优化。"
+    "note": "Read chapters 2–5 for math and probability, then connect networks, regularization, and optimization in chapters 6–8."
   },
   {
     "id": "adam",
@@ -19,7 +19,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1412.6980",
     "level": "essential",
-    "note": "手写一阶、二阶矩更新与偏差修正，解释 Adam 和 SGD 的差别。"
+    "note": "Write out the first and second moment updates and bias correction, then explain how Adam differs from SGD."
   },
   {
     "id": "pytorch-basics",
@@ -30,7 +30,7 @@
     "kind": "guide",
     "url": "https://docs.pytorch.org/tutorials/beginner/basics/intro.html",
     "level": "essential",
-    "note": "跟做 Tensor、DataLoader、Autograd、训练循环与模型保存的完整流程。"
+    "note": "Follow the complete workflow: tensors, DataLoader, autograd, training loops, and saving models."
   },
   {
     "id": "pytorch-amp",
@@ -41,7 +41,7 @@
     "kind": "guide",
     "url": "https://docs.pytorch.org/tutorials/recipes/recipes/amp_recipe.html",
     "level": "further",
-    "note": "在自己的训练循环里加入 autocast 与 GradScaler，并测量速度和显存。"
+    "note": "Add autocast and GradScaler to your training loop, then measure speed and GPU memory use."
   },
   {
     "id": "resnet",
@@ -52,7 +52,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1512.03385",
     "level": "essential",
-    "note": "理解 ResNet 的残差映射，检查 skip connection 前后的 shape 与梯度路径。"
+    "note": "Understand residual mappings in ResNet, then check tensor shapes and gradient paths across skip connections."
   },
   {
     "id": "layernorm",
@@ -63,7 +63,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1607.06450",
     "level": "further",
-    "note": "画出归一化所沿的维度，对比 LayerNorm 与 BatchNorm 的统计量。"
+    "note": "Mark the dimensions used for normalization and compare the statistics in LayerNorm and BatchNorm."
   },
   {
     "id": "attention",
@@ -74,7 +74,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1706.03762",
     "level": "essential",
-    "note": "逐项推导 Q/K/V、缩放因子、多头注意力与 FFN，并标注所有 Tensor Shapes。"
+    "note": "Work through Q/K/V, the scaling factor, multi-head attention, and the FFN, labeling every tensor shape."
   },
   {
     "id": "rope",
@@ -85,7 +85,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2104.09864",
     "level": "essential",
-    "note": "从二维旋转理解 RoPE，推导位置差如何进入 Q 与 K 的内积。"
+    "note": "Understand RoPE through 2D rotations and derive how relative position enters the Q–K dot product."
   },
   {
     "id": "flashattention",
@@ -96,7 +96,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2205.14135",
     "level": "further",
-    "note": "区分算术复杂度与显存 I/O，理解 tiling 和重计算为什么能降低内存开销。"
+    "note": "Distinguish arithmetic complexity from GPU memory I/O, and explain how tiling and recomputation reduce memory costs."
   },
   {
     "id": "llama",
@@ -107,7 +107,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2302.13971",
     "level": "essential",
-    "note": "梳理 decoder-only 模型的数据、归一化、位置编码和预训练流程。"
+    "note": "Trace the data, normalization, positional encoding, and pretraining pipeline of a decoder-only model."
   },
   {
     "id": "scaling-laws",
@@ -118,7 +118,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2001.08361",
     "level": "further",
-    "note": "阅读参数量、数据量和计算预算的实验曲线，讨论经验规律的适用范围。"
+    "note": "Read the curves for model size, dataset size, and compute budget, then discuss the limits of these empirical laws."
   },
   {
     "id": "lora",
@@ -129,7 +129,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2106.09685",
     "level": "essential",
-    "note": "推导低秩更新的参数量，实现 LoRA Linear，并比较 rank 与插入位置。"
+    "note": "Derive the parameter count of a low-rank update, implement a LoRA linear layer, and compare ranks and target layers."
   },
   {
     "id": "qlora",
@@ -140,7 +140,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2305.14314",
     "level": "essential",
-    "note": "区分冻结的量化权重与可训练适配器，理解 NF4、双重量化及显存组成。"
+    "note": "Separate frozen quantized weights from trainable adapters, and understand NF4, double quantization, and memory use."
   },
   {
     "id": "switch-transformer",
@@ -151,7 +151,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2101.03961",
     "level": "essential",
-    "note": "理解 Top-1 routing、容量限制和负载均衡，用路由直方图检查 expert collapse。"
+    "note": "Understand top-1 routing, capacity limits, and load balancing; use routing histograms to check for expert collapse."
   },
   {
     "id": "mixtral",
@@ -162,7 +162,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2401.04088",
     "level": "essential",
-    "note": "对比稀疏专家与 dense FFN，解释总参数量、激活参数量和计算成本。"
+    "note": "Compare sparse experts with dense FFNs, and explain total parameters, active parameters, and compute costs."
   },
   {
     "id": "vit",
@@ -173,7 +173,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2010.11929",
     "level": "essential",
-    "note": "从 patch embedding 追踪 ViT 的序列长度、CLS token 与位置编码。"
+    "note": "Start with patch embeddings and trace ViT's sequence length, CLS token, and positional encodings."
   },
   {
     "id": "clip",
@@ -184,7 +184,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2103.00020",
     "level": "essential",
-    "note": "写出 CLIP 的双向对比损失，并说明文本提示如何实现 zero-shot classification。"
+    "note": "Write out CLIP's bidirectional contrastive loss and explain how text prompts enable zero-shot classification."
   },
   {
     "id": "dino",
@@ -195,7 +195,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2104.14294",
     "level": "further",
-    "note": "比较 DINO 的自蒸馏目标与 CLIP 的图文对齐，观察 patch 特征的用途。"
+    "note": "Compare DINO's self-distillation objective with CLIP's image–text alignment, and explore uses for patch features."
   },
   {
     "id": "vae",
@@ -206,7 +206,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1312.6114",
     "level": "essential",
-    "note": "推导 VAE 的 ELBO，解释重参数化如何让随机潜变量参与反向传播。"
+    "note": "Derive the VAE's ELBO and explain how reparameterization enables backpropagation through stochastic latent variables."
   },
   {
     "id": "ddpm",
@@ -217,7 +217,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2006.11239",
     "level": "essential",
-    "note": "连接加噪过程、噪声预测损失与反向采样，亲手画出一个 noise schedule。"
+    "note": "Connect the forward noising process, noise prediction loss, and reverse sampling; plot a noise schedule yourself."
   },
   {
     "id": "flow-matching",
@@ -228,7 +228,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2210.02747",
     "level": "further",
-    "note": "用二维 toy distribution 理解概率路径、速度场回归与 ODE 采样。"
+    "note": "Use a 2D toy distribution to understand probability paths, velocity field regression, and ODE sampling."
   },
   {
     "id": "llava",
@@ -239,7 +239,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2304.08485",
     "level": "essential",
-    "note": "画出 LLaVA 的 vision encoder → projector → LLM，区分对齐与指令微调。"
+    "note": "Draw LLaVA's vision encoder → projector → LLM pipeline, and distinguish alignment from instruction tuning."
   },
   {
     "id": "blip2",
@@ -250,7 +250,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2301.12597",
     "level": "essential",
-    "note": "理解 Q-Former 的 query 如何连接冻结的视觉编码器与语言模型。"
+    "note": "Understand how Q-Former queries connect a frozen vision encoder with a frozen language model."
   },
   {
     "id": "qwen25vl",
@@ -261,7 +261,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2502.13923",
     "level": "further",
-    "note": "关注动态分辨率、视觉 token 与时间编码，并追踪图像输入到答案的路径。"
+    "note": "Focus on dynamic resolution, visual tokens, and temporal encoding; trace the path from an image to an answer."
   },
   {
     "id": "distillation",
@@ -272,7 +272,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1503.02531",
     "level": "essential",
-    "note": "理解 soft targets 和 temperature，写出蒸馏损失并说明 teacher/student 的角色。"
+    "note": "Understand soft targets and temperature, write the distillation loss, and explain the teacher and student roles."
   },
   {
     "id": "llm-int8",
@@ -283,7 +283,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2208.07339",
     "level": "further",
-    "note": "理解异常值对量化误差的影响，同时报告精度、推理延迟与峰值显存。"
+    "note": "Understand how outliers affect quantization error, and report accuracy, inference latency, and peak GPU memory."
   },
   {
     "id": "ppo",
@@ -294,7 +294,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1707.06347",
     "level": "further",
-    "note": "画出 PPO clipped objective，解释 probability ratio、advantage 与更新限制。"
+    "note": "Plot PPO's clipped objective and explain the probability ratio, advantage, and limits on policy updates."
   },
   {
     "id": "dpo",
@@ -305,7 +305,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2305.18290",
     "level": "essential",
-    "note": "从偏好对理解 DPO 损失，比较 reference policy 的作用与 RLHF 训练流程。"
+    "note": "Build intuition for the DPO loss from preference pairs, explain the reference policy, and compare the workflow with RLHF."
   },
   {
     "id": "instructgpt",
@@ -316,7 +316,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2203.02155",
     "level": "essential",
-    "note": "按 InstructGPT 的 SFT、偏好数据、reward model、PPO 阶段梳理训练信号。"
+    "note": "Trace the training signals through InstructGPT's SFT, preference data, reward modeling, and PPO stages."
   },
   {
     "id": "moviechat",
@@ -327,7 +327,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2307.16449",
     "level": "essential",
-    "note": "对照短期与长期记忆设计，讨论视频 token 压缩后会丢失哪些信息。"
+    "note": "Compare short-term and long-term memory designs, and discuss what information video token compression may lose."
   },
   {
     "id": "ma-lmm",
@@ -338,7 +338,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2404.05726",
     "level": "further",
-    "note": "追踪在线处理中的 memory bank 更新，比较固定记忆预算下的精度与成本。"
+    "note": "Trace memory bank updates during online processing, and compare accuracy and cost under a fixed memory budget."
   },
   {
     "id": "diffusion-policy",
@@ -349,7 +349,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2303.04137",
     "level": "essential",
-    "note": "理解动作序列的条件扩散、receding horizon control 与闭环重新规划。"
+    "note": "Understand conditional diffusion over action sequences, receding horizon control, and closed-loop replanning."
   },
   {
     "id": "rt2",
@@ -360,7 +360,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2307.15818",
     "level": "essential",
-    "note": "解释机器人动作如何变成 token，以及图文预训练与轨迹数据如何共同训练。"
+    "note": "Explain how robot actions become tokens and how training combines image–text tasks with robot trajectories."
   },
   {
     "id": "dreamerv3",
@@ -371,7 +371,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2301.04104",
     "level": "further",
-    "note": "理解 DreamerV3 的潜空间动力学与 imagined rollouts，并讨论模型误差的传播。"
+    "note": "Understand DreamerV3's latent dynamics and imagined rollouts, then discuss how model errors propagate."
   },
   {
     "id": "how-to-read",
@@ -382,7 +382,7 @@
     "kind": "guide",
     "url": "https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf",
     "level": "essential",
-    "note": "使用三遍阅读法，为每篇论文写下问题、方法、证据、假设与尚未解决的疑问。"
+    "note": "Use the three-pass method; record each paper's problem, method, evidence, assumptions, and open questions."
   },
   {
     "id": "reproducibility",
@@ -393,6 +393,6 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2003.12206",
     "level": "essential",
-    "note": "为自己的实验制定复现清单，记录数据划分、随机种子、超参数与计算预算。"
+    "note": "Create a reproducibility checklist covering data splits, random seeds, hyperparameters, and compute budget."
   }
 ]

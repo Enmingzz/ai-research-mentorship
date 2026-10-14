@@ -1,36 +1,36 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f6f5f0">
-  <meta name="description" content="从数学基础到多模态研究：15 个模块、216 个知识点、经典论文与 24 周建议学习日程。AI Research Mentorship by Enmingzz。">
+  <meta name="description" content="From mathematical foundations to multimodal research: 15 modules, 216 topics, selected papers, and a suggested 24-week learning path. AI Research Mentorship by Enmingzz.">
   <title>Research Fieldnotes · AI Mentorship</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23272c25'/%3E%3Cpath d='M18 46V18h17a9 9 0 010 18H18m14 0 14 10' fill='none' stroke='%23dcf2a4' stroke-width='5'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="./style.css">
   <script type="module" src="./app.js"></script>
 </head>
 <body>
-  <a class="skip-link" href="#main">跳到主要内容</a>
-  <aside class="sidebar" aria-label="课程导航">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <aside class="sidebar" aria-label="Course navigation">
     <a class="brand" href="#overview"><span class="brand-mark">r<span>f</span></span><span>RESEARCH<br><b>FIELDNOTES</b></span></a>
     <div class="space-label">ENMINGZZ / MENTORSHIP</div>
     <nav id="navigation">
-      <a href="#overview" data-nav="overview"><span aria-hidden="true">◈</span>课程概览 <small>Overview</small></a>
-      <a href="#curriculum" data-nav="curriculum"><span aria-hidden="true">▤</span>知识地图 <small>Curriculum</small></a>
-      <a href="#schedule" data-nav="schedule"><span aria-hidden="true">▦</span>学习日程 <small>Schedule</small></a>
-      <a href="#papers" data-nav="papers"><span aria-hidden="true">↗</span>论文书架 <small>Reading</small></a>
+      <a href="#overview" data-nav="overview"><span aria-hidden="true">◈</span>Overview</a>
+      <a href="#curriculum" data-nav="curriculum"><span aria-hidden="true">▤</span>Curriculum</a>
+      <a href="#schedule" data-nav="schedule"><span aria-hidden="true">▦</span>Schedule</a>
+      <a href="#papers" data-nav="papers"><span aria-hidden="true">↗</span>Reading room</a>
     </nav>
-    <div class="side-path"><div class="eyebrow">YOUR LEARNING PATH</div><a href="#curriculum" data-stage-link="P0"><i class="dot sage"></i>打好基础 <span>P0</span></a><a href="#curriculum" data-stage-link="P1"><i class="dot lavender"></i>走进前沿 <span>P1</span></a><a href="#curriculum" data-stage-link="P2"><i class="dot peach"></i>探索方向 <span>P2</span></a></div>
-    <div class="sidebar-bottom"><div class="side-progress-head"><span>我的学习进度</span><strong id="side-percent">0%</strong></div><div class="progress-track"><span id="side-progress"></span></div><p id="side-count">正在载入课程…</p><a class="github-link" href="https://github.com/Enmingzz/ai-research-mentorship" target="_blank" rel="noopener noreferrer">GitHub 课程仓库 <span>↗</span></a></div>
+    <div class="side-path"><div class="eyebrow">YOUR LEARNING PATH</div><a href="#curriculum" data-stage-link="P0"><i class="dot sage"></i>Build foundations <span>P0</span></a><a href="#curriculum" data-stage-link="P1"><i class="dot lavender"></i>Develop core skills <span>P1</span></a><a href="#curriculum" data-stage-link="P2"><i class="dot peach"></i>Explore research <span>P2</span></a></div>
+    <div class="sidebar-bottom"><div class="side-progress-head"><span>My progress</span><strong id="side-percent">0%</strong></div><div class="progress-track"><span id="side-progress"></span></div><p id="side-count">Loading the course…</p><a class="github-link" href="https://github.com/Enmingzz/ai-research-mentorship" target="_blank" rel="noopener noreferrer">Course on GitHub <span>↗</span></a></div>
   </aside>
   <div class="workspace">
-    <header class="topbar"><div class="breadcrumb">Learning workspace <span>/</span> <b id="page-label">课程概览</b></div><div class="top-actions"><span class="live-label"><i></i> Learn. Build. Research.</span><button class="icon-button" id="backup-open" aria-label="管理学习进度" title="导出 / 导入学习进度">⇅</button><span class="avatar" title="Enmingzz">E</span></div></header>
-    <main id="main" tabindex="-1"><div class="loading">正在展开你的研究地图…</div></main>
+    <header class="topbar"><div class="breadcrumb">Learning workspace <span>/</span> <b id="page-label">Overview</b></div><div class="top-actions"><span class="live-label"><i></i> Learn. Build. Research.</span><button class="icon-button" id="backup-open" aria-label="Manage learning progress" title="Export / import progress">⇅</button><span class="avatar" title="Enmingzz">E</span></div></header>
+    <main id="main" tabindex="-1"><div class="loading">Loading your research roadmap…</div></main>
     <footer><span>RESEARCH FIELDNOTES <span class="footer-dot">·</span> A little progress, every week.</span><span>Designed for curious minds. <a href="https://github.com/Enmingzz/ai-research-mentorship" target="_blank" rel="noopener noreferrer">View source ↗</a></span></footer>
   </div>
-  <dialog id="backup-dialog"><div class="dialog-head"><h2>带上你的学习进度</h2><button class="icon-button" data-close-dialog aria-label="关闭">×</button></div><p>勾选、笔记与开课日期保存在当前浏览器，不会自动同步给 mentor。导出备份后，可以在其他设备导入。</p><div class="dialog-actions"><button class="button primary" id="export-progress">导出进度 JSON ↓</button><button class="button secondary" id="import-open">导入进度 ↑</button><input id="import-progress" type="file" accept="application/json,.json" hidden></div><p class="muted small">导入会覆盖当前浏览器的课程进度，建议先导出备份。</p></dialog>
+  <dialog id="backup-dialog"><div class="dialog-head"><h2>Take your progress with you</h2><button class="icon-button" data-close-dialog aria-label="Close">×</button></div><p>Checklists, notes, and your start date are saved in this browser. They do not sync with your mentor automatically. Export a backup to continue on another device.</p><div class="dialog-actions"><button class="button primary" id="export-progress">Export progress JSON ↓</button><button class="button secondary" id="import-open">Import progress ↑</button><input id="import-progress" type="file" accept="application/json,.json" hidden></div><p class="muted small">Importing replaces the progress in this browser. Export a backup first.</p></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
-  <noscript>本课程使用 JavaScript 展示知识清单与学习日程。请启用 JavaScript，或在 GitHub 仓库中阅读 data 文件。</noscript>
+  <noscript>This course uses JavaScript to display checklists and schedules. Enable JavaScript, or read the data files in the GitHub repository.</noscript>
 </body>
 </html>
