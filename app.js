@@ -13,7 +13,7 @@ const priorities = m => m.priorities.map(p => `<span class="priority ${p.toLower
 const external = (url, label, className = '') => `<a class="${className}" href="${escape(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
 const groupLabels = { foundations: 'FOUNDATIONS / 研究基础', core: 'CORE / 核心能力', frontiers: 'FRONTIERS / 方向探索', research: 'RESEARCH / 科研实践' };
 function toast(message) { const el = document.querySelector('#toast'); el.textContent = message; el.classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('visible'), 3400); }
-function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { toast('浏览器存储不可用，请导出进度备份。'); } updateProgress(); }
+function save() { let saved=true; try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { saved=false; toast('浏览器存储不可用，请导出进度备份。'); } updateProgress(); return saved; }
 function updateProgress() { const all = modules.flatMap(m => m.topics); const done = all.filter(t => state.topics[t.id]).length; const pct = percent(done, all.length); document.querySelector('#side-percent').textContent = `${pct}%`; document.querySelector('#side-progress').style.width = `${pct}%`; document.querySelector('#side-count').textContent = `${done} / ${all.length} 个知识点已完成 · 本机保存`; }
 function validDate(value) { return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(`${value}T12:00:00`).valueOf()) && localISO(new Date(`${value}T12:00:00`)) === value; }
 function localISO(date) { return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`; }
@@ -30,6 +30,7 @@ function normalizeState(data) {
 function weekDate(week) { if (!state.startDate) return ''; const start = new Date(`${state.startDate}T12:00:00`); start.setDate(start.getDate() + (week - 1) * 7); const end = new Date(start); end.setDate(end.getDate() + 6); const fmt = d => `${d.getMonth()+1}/${d.getDate()}`; return `${fmt(start)}–${fmt(end)}`; }
 function currentWeek() { return schedule.find(w => !state.weeks[w.week]) || schedule.at(-1); }
 function readingsForWeek(week) {
+  if (week.readingIds?.length) return week.readingIds.map(id=>papers.find(p=>p.id===id)).filter(Boolean);
   const selected = [], limit = week.readingLimit || 2;
   for (const id of week.readingModuleIds) { const paper = modulePapers(id).find(p => p.level === 'essential' && !selected.includes(p)); if (paper && selected.length < limit) selected.push(paper); }
   for (const id of week.readingModuleIds) for (const paper of modulePapers(id)) if (!selected.includes(paper) && selected.length < limit) selected.push(paper);
@@ -77,6 +78,7 @@ function schedulePage(targetWeek) {
 }
 function notFound() { main.innerHTML = '<div class="empty"><h1>这一页还不在学习地图里。</h1><a class="button primary" href="#overview">回到课程概览 →</a></div>'; }
 function route() {
+  if (!modules.length || !schedule.length) return;
   const [rawView, id] = location.hash.slice(1).split('/');
   const view = rawView || 'overview';
   const nav = view==='module'?'curriculum':view;
@@ -101,7 +103,7 @@ document.addEventListener('click', e=>{
 document.addEventListener('input', e=>{
   if(e.target.id==='curriculum-search'){curriculumQuery=e.target.value;curriculumResults();}
   if(e.target.id==='paper-search'){paperQuery=e.target.value;paperResults();}
-  if(e.target.dataset.notes){state.notes[e.target.dataset.notes]=e.target.value;save();document.querySelector('#notes-status').textContent='已自动保存在当前浏览器';}
+  if(e.target.dataset.notes){state.notes[e.target.dataset.notes]=e.target.value;const saved=save();document.querySelector('#notes-status').textContent=saved?'已自动保存在当前浏览器':'本机保存失败，请使用导出功能备份笔记';}
 });
 document.addEventListener('change', async e=>{
   const el=e.target;

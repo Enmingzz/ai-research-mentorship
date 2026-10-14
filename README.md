@@ -92,12 +92,13 @@ npm run build
   "moduleIds": ["01", "15"],
   "focus": "复习矩阵与链式法则，建立论文阅读和实验记录习惯。",
   "deliverable": "提交梯度推导和一份结构化阅读笔记。",
+  "readingIds": ["deep-learning-book", "how-to-read"],
   "readingModuleIds": ["01", "15"],
   "readingLimit": 2
 }
 ```
 
-`phase` 为 `foundations`、`core`、`frontiers` 或 `research`。`readingModuleIds` 引用阅读资源所属模块，`readingLimit` 控制周卡片展示的资源数量；选修周加 `"optional": true`。计划只使用相对周次，没有预设开课日期。修改后运行 `npm run check`。
+`phase` 为 `foundations`、`core`、`frontiers` 或 `research`。优先通过 `readingIds` 指定当周资源的 ID 和顺序，使阅读与每周主题对应；ID 必须存在于 `papers.json`。未指定时，`readingModuleIds` 按模块关联资源作为回退。`readingLimit` 控制周卡片展示的资源数量；选修周加 `"optional": true`。计划只使用相对周次，没有预设开课日期。修改后运行 `npm run check`。
 
 ## GitHub Pages
 

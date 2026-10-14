@@ -2,6 +2,7 @@
   {
     "week": 1,
     "title": "数学起点与研究习惯",
+    "readingIds": ["deep-learning-book","how-to-read"],
     "phase": "foundations",
     "moduleIds": ["01", "15"],
     "focus": "复习向量、矩阵、shape 与链式法则；建立论文阅读和实验记录习惯。",
@@ -12,6 +13,7 @@
   {
     "week": 2,
     "title": "概率、损失与优化",
+    "readingIds": ["adam","deep-learning-book"],
     "phase": "foundations",
     "moduleIds": ["01", "15"],
     "focus": "连接 MLE、交叉熵与 KL；理解 SGD、AdamW 和泛化，明确训练、验证、测试集的边界。",
@@ -22,6 +24,7 @@
   {
     "week": 3,
     "title": "搭建可复现的训练循环",
+    "readingIds": ["pytorch-basics","pytorch-amp"],
     "phase": "foundations",
     "moduleIds": ["02", "15"],
     "focus": "掌握 Tensor、Autograd、DataLoader、checkpoint 和基础调试；使用 Git 管理实验。",
@@ -32,6 +35,7 @@
   {
     "week": 4,
     "title": "神经网络与第一组消融",
+    "readingIds": ["resnet","layernorm"],
     "phase": "foundations",
     "moduleIds": ["03", "15"],
     "focus": "理解激活、初始化、归一化、残差和正则化；建立 CNN 与循环网络的直觉。",
@@ -42,6 +46,7 @@
   {
     "week": 5,
     "title": "读懂 Q、K、V",
+    "readingIds": ["attention"],
     "phase": "foundations",
     "moduleIds": ["04", "15"],
     "focus": "推导缩放点积注意力，理解 multi-head、self/cross attention 与 causal/padding mask。",
@@ -52,6 +57,7 @@
   {
     "week": 6,
     "title": "拼出 Transformer Block",
+    "readingIds": ["rope","flashattention"],
     "phase": "foundations",
     "moduleIds": ["04", "15"],
     "focus": "连接 attention、FFN、归一化和位置编码；理解 KV Cache、prefill/decode 与计算开销。",
@@ -62,6 +68,7 @@
   {
     "week": 7,
     "title": "语言模型的数据与目标",
+    "readingIds": ["llama","attention"],
     "phase": "core",
     "moduleIds": ["05", "15"],
     "focus": "理解 tokenization、next-token loss、perplexity 和数据清洗，比较 GPT、BERT 与 encoder-decoder。",
@@ -72,6 +79,7 @@
   {
     "week": 8,
     "title": "训练一个 Mini-GPT",
+    "readingIds": ["scaling-laws","llama"],
     "phase": "core",
     "moduleIds": ["05", "15"],
     "focus": "完成小规模自回归训练与生成，比较采样策略，并讨论 scaling laws 和计算预算。",
@@ -82,6 +90,7 @@
   {
     "week": 9,
     "title": "低秩适配与微调",
+    "readingIds": ["lora","qlora"],
     "phase": "core",
     "moduleIds": ["06", "15"],
     "focus": "理解 LoRA 的低秩更新、初始化、插入位置和 merge；比较 full fine-tuning、LoRA 与 QLoRA。",
@@ -92,6 +101,7 @@
   {
     "week": 10,
     "title": "稀疏专家与路由",
+    "readingIds": ["switch-transformer","mixtral"],
     "phase": "core",
     "moduleIds": ["07", "15"],
     "focus": "理解 router、Top-k、load balancing 与 capacity，区分总参数和激活参数。",
@@ -102,6 +112,7 @@
   {
     "week": 11,
     "title": "从图像到视觉表征",
+    "readingIds": ["resnet","vit"],
     "phase": "core",
     "moduleIds": ["08", "15"],
     "focus": "串联 CNN、ResNet 与 ViT，理解 patch embedding、数据增强和全局/局部特征。",
@@ -112,6 +123,7 @@
   {
     "week": 12,
     "title": "图文对齐与自监督",
+    "readingIds": ["clip","dino"],
     "phase": "core",
     "moduleIds": ["08", "15"],
     "focus": "理解 InfoNCE、CLIP、SigLIP 与 DINO 的目标差异，认识 SAM / SAM2 的用途。",
@@ -122,6 +134,7 @@
   {
     "week": 13,
     "title": "潜变量与 VAE",
+    "readingIds": ["vae"],
     "phase": "core",
     "moduleIds": ["09", "15"],
     "focus": "理解 ELBO、重参数化和 KL 正则化；比较 AE、VAE、β-VAE 与 VQ-VAE。",
@@ -132,6 +145,7 @@
   {
     "week": 14,
     "title": "扩散与生成过程",
+    "readingIds": ["ddpm","flow-matching"],
     "phase": "core",
     "moduleIds": ["09", "15"],
     "focus": "掌握 diffusion 的加噪、去噪、noise schedule 与 CFG；Flow Matching 的数学和实现作为选修深入。",
@@ -142,6 +156,7 @@
   {
     "week": 15,
     "title": "连接视觉与语言",
+    "readingIds": ["llava","blip2"],
     "phase": "core",
     "moduleIds": ["10", "15"],
     "focus": "理解 vision encoder、projector、Q-Former 与 LLM 的连接，以及视觉对齐与 instruction tuning。",
@@ -152,6 +167,7 @@
   {
     "week": 16,
     "title": "多模态评测与失败分析",
+    "readingIds": ["qwen25vl","reproducibility"],
     "phase": "core",
     "moduleIds": ["10", "15"],
     "focus": "理解动态分辨率、visual tokens、视频输入和视觉幻觉；设计可追溯的小型评测。",
@@ -162,6 +178,7 @@
   {
     "week": 17,
     "title": "先测量，再谈效率",
+    "readingIds": ["flashattention"],
     "phase": "core",
     "moduleIds": ["11", "15"],
     "focus": "区分 FLOPs、latency、throughput 与显存组成，理解 profiling、checkpointing 和基础并行策略。",
@@ -172,6 +189,7 @@
   {
     "week": 18,
     "title": "压缩模型与视觉 token",
+    "readingIds": ["llm-int8","distillation"],
     "phase": "core",
     "moduleIds": ["11", "15"],
     "focus": "比较量化、蒸馏、剪枝、token merging 与 KV Cache 压缩，分析精度和效率的取舍。",
@@ -182,6 +200,7 @@
   {
     "week": 19,
     "title": "SFT 与知识蒸馏",
+    "readingIds": ["distillation","instructgpt"],
     "phase": "core",
     "moduleIds": ["12", "15"],
     "focus": "理解 teacher forcing、exposure bias、forward/reverse KL，以及 offline 与 on-policy distillation 的分布差异。",
@@ -192,6 +211,7 @@
   {
     "week": 20,
     "title": "偏好优化与策略梯度",
+    "readingIds": ["ppo","dpo"],
     "phase": "core",
     "moduleIds": ["12", "15"],
     "focus": "掌握 reward、policy gradient、baseline 与 DPO 的基本思想；PPO / GRPO / RLOO 的推导作为选修深入。",
@@ -202,6 +222,7 @@
   {
     "week": 21,
     "title": "方向选修：长视频与记忆",
+    "readingIds": ["moviechat","ma-lmm"],
     "phase": "frontiers",
     "moduleIds": ["13", "15"],
     "focus": "选修：研究 frame sampling、时序表示和记忆更新；不选此方向时，可将本周用于核心模块补强或课题复现。",
@@ -213,6 +234,7 @@
   {
     "week": 22,
     "title": "方向选修：VLA 与世界模型",
+    "readingIds": ["diffusion-policy","rt2"],
     "phase": "frontiers",
     "moduleIds": ["14", "15"],
     "focus": "选修：连接 MDP / POMDP、imitation learning、action policy 与 world models；可替换为已选方向的深入阅读。",
@@ -224,6 +246,7 @@
   {
     "week": 23,
     "title": "收敛问题与复现 baseline",
+    "readingIds": ["how-to-read","reproducibility"],
     "phase": "research",
     "moduleIds": ["15"],
     "focus": "围绕已选方向形成可证伪假设，确定相关 baseline、数据许可、计算预算和评测协议。",
@@ -234,6 +257,7 @@
   {
     "week": 24,
     "title": "完成一次小型研究汇报",
+    "readingIds": ["reproducibility"],
     "phase": "research",
     "moduleIds": ["15"],
     "focus": "完成关键消融、多随机种子验证、失败分析与技术写作，区分统计意义和实际价值。",
