@@ -16,7 +16,8 @@ assert.equal(schedule.length,24,'24 suggested weeks');
 schedule.forEach((w,i)=>{assert.equal(w.week,i+1);assert(w.title&&w.focus&&w.deliverable);for(const id of [...w.moduleIds,...w.readingModuleIds])assert(ids.has(id),`Unknown schedule module ${id}`);for(const id of w.readingIds||[])assert(papers.some(p=>p.id===id),`Unknown week ${w.week} reading: ${id}`);});
 for(const id of ids)assert(schedule.some(w=>w.moduleIds.includes(id)),`Schedule covers module ${id}`);
 const html=await readFile('index.html','utf8');
-assert(html.includes('lang="en"')&&html.includes('name="viewport"'));
+assert(html.includes('lang="en"')&&html.includes('translate="no"')&&html.includes('name="viewport"'));
+for(const [name,content] of Object.entries({curriculum:JSON.stringify(modules),papers:JSON.stringify(papers),schedule:JSON.stringify(schedule),homepage:html,application:await readFile('app.js','utf8')}))assert(!/\p{Script=Han}/u.test(content),`${name}: English course content`);
 execFileSync(process.execPath,['--check','app.js']);
 execFileSync(process.execPath,['--check','lesson.js']);
 const course=await loadLessons();
@@ -40,6 +41,7 @@ for(const lesson of course.lessons){
   for(const ref of lesson.references){assert(ref.title?.trim()&&ref.note?.trim());assert(['paper','guide','book'].includes(ref.kind));assert.equal(new URL(ref.url).protocol,'https:');}
   assert(!/\p{Script=Han}/u.test(JSON.stringify(lesson)),`${label}: English article`);
   const page=lessonDocument(lesson,course);
+  assert(page.includes('lang="en" translate="no"'),`${label}: keep the English original`);
   for(const section of lesson.sections){assert(page.includes(`id="section-${section.id}"`));assert(page.includes(`href="#section-${section.id}"`));}
   assert(page.includes(`data-topic-id="${label}"`)&&page.includes('<h1>')&&page.includes('id="references"'));
   assert(page.includes('href="../../style.css"')&&page.includes('src="../../lesson.js"'));

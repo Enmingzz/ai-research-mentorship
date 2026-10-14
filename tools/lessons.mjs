@@ -37,7 +37,7 @@ export function lessonDocument(lesson,course) {
   const linkedTopic=(id)=>`<a href="../${e(id)}/">${e(index[id]?.title || id)} <span aria-hidden="true">↗</span></a>`;
   const adjacent=(entry,label)=>entry?`<a class="article-adjacent" href="../${e(entry.topicId)}/"><span class="eyebrow">${label}</span><strong>${e(entry.title)}</strong><span class="small">Module ${e(entry.moduleId)} · ${entry.minutes} min read</span></a>`:'';
   return `<!doctype html>
-<html lang="en">
+<html lang="en" translate="no">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#f6f5f0"><title>${e(lesson.title)} · Research Fieldnotes</title>

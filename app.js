@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'research-fieldnotes-v1';
+const BUILD_VERSION = 'development';
 const main = document.querySelector('#main');
 const defaults = () => ({ topics: {}, papers: {}, weeks: {}, notes: {}, startDate: '' });
 let modules = [], papers = [], schedule = [], topicGuides = {}, state = defaults();
@@ -143,7 +144,7 @@ window.addEventListener('hashchange',route);
 window.addEventListener('pageshow',event=>{if(event.persisted&&modules.length){try{const saved=localStorage.getItem(STORAGE_KEY);state=saved?normalizeState(JSON.parse(saved)):defaults();updateProgress();route();}catch{toast('Saved progress could not be refreshed. Reload or restore a backup.');}}});
 window.addEventListener('storage',e=>{if(e.key===STORAGE_KEY){try{state=e.newValue?normalizeState(JSON.parse(e.newValue)):defaults();updateProgress();if(!document.activeElement?.matches('textarea,input[type="search"]'))route();}catch{ /* Ignore malformed data from another tab. */ }}});
 try {
-  [modules,papers,schedule,topicGuides] = await Promise.all(['curriculum','papers','schedule','topic-index'].map(async name=>{const r=await fetch(`./data/${name}.json`);if(!r.ok)throw new Error(`${name}: ${r.status}`);return r.json();}));
+  [modules,papers,schedule,topicGuides] = await Promise.all(['curriculum','papers','schedule','topic-index'].map(async name=>{const r=await fetch(`./data/${name}.json?v=${BUILD_VERSION}`,{cache:'no-cache'});if(!r.ok)throw new Error(`${name}: ${r.status}`);return r.json();}));
   try {const saved=localStorage.getItem(STORAGE_KEY);if(saved)state=normalizeState(JSON.parse(saved));} catch {toast('The course loaded, but saved progress could not be read. Import a backup to restore it.');}
   updateProgress();route();
 } catch(error) { console.error('Course load failed:',error);main.innerHTML='<div class="empty"><h1>Course materials could not be loaded.</h1><p>Check your connection and refresh. For local use, run npm run dev in the project folder and open the local address.</p><button class="button primary" onclick="location.reload()">Reload</button></div>'; }

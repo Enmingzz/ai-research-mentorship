@@ -51,7 +51,7 @@ const uiStorage=new Map();
 const app=await vm.runInNewContext(`(async()=>{${appSource}\nreturn {route,fieldnotes};})()`,{
   document:{querySelector:uiElement,querySelectorAll:()=>[],addEventListener(type,fn){uiEvents.set(type,fn);},getElementById:id=>uiElement('#'+id)},
   localStorage:{getItem:key=>uiStorage.get(key)||null,setItem:(key,val)=>uiStorage.set(key,val)},
-  fetch:async url=>({ok:true,json:async()=>fixtures[url.replace('./data/','').replace('.json','')]}),
+  fetch:async (url,options)=>{assert(url.endsWith('?v=development'),'Course data requests include the build version');assert.equal(options.cache,'no-cache','Course data is revalidated');return {ok:true,json:async()=>fixtures[url.split('?')[0].replace('./data/','').replace('.json','')]};},
   window:{addEventListener(type,fn){windowEvents.set(type,fn);},scrollTo(){}},location,console,
   requestAnimationFrame:fn=>fn(),setTimeout:()=>1,clearTimeout:()=>{}
 });
