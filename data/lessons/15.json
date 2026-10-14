@@ -1,0 +1,754 @@
+[
+  {
+    "topicId": "15-01",
+    "title": "Read a paper to answer a question",
+    "summary": "Separate the problem, proposed mechanism, and supporting evidence before deciding what to reproduce.",
+    "prerequisites": [],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Start with a purpose",
+        "paragraphs": [
+          "Reading is an investigation rather than a test of whether you can decode every sentence. Before opening a paper, write one question: perhaps how it reduces visual tokens or whether its comparison isolates a new loss. Your purpose determines the necessary depth. A broad survey may require a map of ideas; an implementation requires tensor shapes, training details, and evaluation rules. Neither goal is served by highlighting every unfamiliar term without recording what it contributes to the argument."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Separate claims from evidence",
+        "paragraphs": [
+          "Begin by locating the task, the claimed contribution, and the main experiment. Then draw the method as inputs, transformations, and outputs. For each headline claim, identify the figure, equation, or comparison that supports it and note the conditions under which that evidence was obtained. Keshav’s three-pass method is a useful reading strategy: orient yourself first, inspect the main content next, and reconstruct the reasoning when deeper understanding is necessary. It is a strategy, not a requirement to spend equal time on every paper."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Produce a useful reading note",
+        "paragraphs": [
+          "Suppose a video paper reports higher accuracy after adding memory. Your note should record whether the baseline saw the same frames, whether memory increased token count, and whether results include multiple runs. A useful unresolved question is whether selection or additional capacity caused the gain. End with a small experiment that would distinguish those explanations. Copying the abstract into your notebook records the authors’ presentation; reconstructing a claim and its test records your own understanding."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A paper claims its router improves specialization, but only reports final task accuracy. What is missing?",
+      "answer": "Task accuracy may support a performance claim, but it does not directly establish specialization. Ask for a defined specialization measure, routing analyses, and controlled comparisons that rule out simpler explanations."
+    },
+    "takeaways": [
+      "Write down the question you are reading to answer.",
+      "Attach each claim to its evidence and remaining assumptions."
+    ],
+    "references": [
+      {
+        "title": "How to Read a Paper",
+        "url": "https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf",
+        "kind": "guide",
+        "note": "Use the three-pass method to choose the depth appropriate to your reading goal."
+      }
+    ]
+  },
+  {
+    "topicId": "15-02",
+    "title": "Find baselines that test the actual claim",
+    "summary": "A relevant baseline matches the question and constraints, not merely the most recognizable model name.",
+    "prerequisites": [
+      "15-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Organize methods by what they change",
+        "paragraphs": [
+          "A literature review becomes useful when it explains relationships. Group papers by the problem setting, available information, intervention, and evaluation protocol. Two methods can use similar architecture names while solving different tasks. Conversely, a simple heuristic may be the most informative baseline for a sophisticated learned component. For a memory-selection method, uniform sampling, random selection, and a recency rule reveal different aspects of the claim; none needs to be fashionable to be scientifically useful."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Build a comparison matrix",
+        "paragraphs": [
+          "For each candidate baseline, record data access, input resolution or context length, pretrained weights, training budget, inference budget, and metric definition. Mark which conditions can be matched and which must remain different. Trace citations backward to foundational methods and forward to relevant follow-up evaluations. Read the original method before describing its limitations. A table cell saying that a paper does not support a feature is a factual claim that needs checking, not an inference from an abstract that happens not to mention it."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Include a simple control",
+        "paragraphs": [
+          "Imagine proposing a learned selector that keeps 32 of 256 image tokens. Compare against keeping all tokens as an uncompressed reference, randomly keeping 32 to test selection quality, and a strong existing selector under the same budget. A comparison only with the full model confounds compression quality with selection quality. Document whether each result comes from your rerun, an official checkpoint, or a quoted table, because those evidence sources may use different conditions."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Why is comparing your 32-token selector only against a 64-token selector inconclusive?",
+      "answer": "Both the selection rule and token budget differ. Add an equal-budget comparison to isolate selection quality, and optionally show a full quality–budget curve to compare the methods across operating points."
+    },
+    "takeaways": [
+      "Choose baselines around the claim being tested.",
+      "Separate rerun results from numbers copied from other evaluation settings."
+    ],
+    "references": [
+      {
+        "title": "Troubling Trends in Machine Learning Scholarship",
+        "url": "https://arxiv.org/abs/1807.03341",
+        "kind": "paper",
+        "note": "Read the discussion of identifying the real sources of empirical gains."
+      },
+      {
+        "title": "How to Read a Paper",
+        "url": "https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf",
+        "kind": "guide",
+        "note": "Use related work and citation trails to map a research area."
+      }
+    ]
+  },
+  {
+    "topicId": "15-03",
+    "title": "Turn an idea into a falsifiable hypothesis",
+    "summary": "Specify a mechanism, measurable prediction, and possible counterexample before running the experiment.",
+    "prerequisites": [
+      "15-02"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A hypothesis can lose",
+        "paragraphs": [
+          "A claim such as “memory helps video understanding” leaves too many outcomes open to interpretation. A more useful hypothesis states that, at a fixed token budget, retaining event boundaries improves questions about event order relative to uniform sampling. This specifies an intervention, a comparison, an outcome, and a setting. It also permits a negative result. A hypothesis that is reworded after every experiment to fit whatever happened cannot distinguish an explanation from a story."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Connect mechanism and prediction",
+        "paragraphs": [
+          "Write the causal chain you believe is operating. For example, boundary-aware selection may preserve transitions, which may help temporal ordering while doing little for static appearance questions. This yields a contrast between task slices as well as an aggregate prediction. Identify alternative explanations, such as a larger effective context or an easier selected subset. Design controls that keep those factors fixed. State the metric and a practically meaningful effect size before examining the comparison so the success criterion does not drift."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Plan the failure interpretation",
+        "paragraphs": [
+          "Suppose ordering accuracy fails to improve. Check whether the selector actually retained more relevant transitions, whether the model could use them, and whether the evaluation had enough examples to detect the expected effect. Failure of one implementation is not a proof that every version of the idea is impossible. Equally, repeatedly changing the implementation until a favorable result appears creates a selection problem. Record revisions as new hypotheses and reserve fresh evaluation evidence for the revised claim."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Rewrite “our compression method is better” as a testable hypothesis.",
+      "answer": "For example: at 32 visual tokens, on a fixed held-out OCR set, the proposed selector improves exact-match accuracy by at least two percentage points over uniform selection using the same backbone and decoding settings. State the evaluation uncertainty and whether that threshold is practically useful."
+    },
+    "takeaways": [
+      "Define the comparison and success criterion in advance.",
+      "Treat a changed explanation as a new hypothesis to test."
+    ],
+    "references": [
+      {
+        "title": "Troubling Trends in Machine Learning Scholarship",
+        "url": "https://arxiv.org/abs/1807.03341",
+        "kind": "paper",
+        "note": "Distinguish an explanation supported by evidence from a speculative interpretation."
+      }
+    ]
+  },
+  {
+    "topicId": "15-04",
+    "title": "Reproduce a result before extending it",
+    "summary": "Reconstruct the experimental contract and diagnose deviations systematically instead of chasing one reported number.",
+    "prerequisites": [
+      "02-10",
+      "15-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Define what you are reproducing",
+        "paragraphs": [
+          "A published result depends on more than a model name. Identify the exact checkpoint, dataset version, preprocessing, prompt format, decoding rule, metric implementation, and aggregation method. Decide whether you are rerunning the authors’ code, independently implementing the method, or testing whether the conclusion transfers to another setting. These are all useful activities, but they answer different questions. Write down the target experiment so a later discrepancy has a clear reference point."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Match the evaluation contract",
+        "paragraphs": [
+          "Start with the smallest runnable path: load a checkpoint, run a few known examples, and inspect intermediate shapes and outputs. Compare preprocessing and metric inputs before launching expensive training. Reconstruct configuration values from code, appendices, and released artifacts, recording any unresolved ambiguity. Save environment information and immutable data identifiers. A container or requirements file helps, but hardware kernels and external resources may still change numerical behavior, so treat the complete execution context as evidence."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Localize a mismatch",
+        "paragraphs": [
+          "Suppose reported accuracy is 74% and your run reaches 69%. First verify dataset split, label mapping, evaluation mode, prompt formatting, and checkpoint identity. Then inspect whether training length, batch size, or precision differs. Compare per-example predictions when available rather than changing many settings at once. Report the attempted configurations and remaining differences honestly. A faithful reproduction with a documented gap is more informative than silently choosing the luckiest run to make the headline number agree."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Your evaluation score changes after calling model.eval(). What reproduction detail should you inspect?",
+      "answer": "Check whether dropout or normalization behavior differed between training and evaluation mode, and confirm the original evaluation procedure. Also ensure gradient disabling and evaluation mode are treated separately: no_grad does not itself switch module behavior."
+    },
+    "takeaways": [
+      "Reproduce an explicitly defined experiment.",
+      "Investigate data and evaluation before attributing a gap to the learning algorithm."
+    ],
+    "references": [
+      {
+        "title": "Improving Reproducibility in Machine Learning Research",
+        "url": "https://arxiv.org/abs/2003.12206",
+        "kind": "paper",
+        "note": "Use the reproducibility program and checklist as a framework for documenting an experiment."
+      }
+    ]
+  },
+  {
+    "topicId": "15-05",
+    "title": "Use ablations to identify what caused a gain",
+    "summary": "Remove or alter components under controlled conditions, then check whether interactions change the explanation.",
+    "prerequisites": [
+      "15-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "One change gives a local contrast",
+        "paragraphs": [
+          "An ablation asks what changes when a specific design choice changes. If a new model simultaneously adds a loss, a larger backbone, and more training data, its improvement cannot be attributed to the loss alone. Hold the other factors fixed for the first comparison. The result is conditional on that configuration: removing a component from a carefully tuned system may not reveal the best achievable performance of a separately tuned alternative."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Check interactions explicitly",
+        "paragraphs": [
+          "Suppose baseline accuracy is 70, adding A gives 72, adding B gives 73, and adding both gives 78. A and B together improve by more than the sum of their separate gains. The interaction contrast is 78−72−73+70=3 percentage points. A one-factor-at-a-time sequence can miss this interaction or assign it to whichever component was added last. A small factorial comparison reveals whether components are complementary, redundant, or harmful only in combination."
+        ],
+        "formula": "Interaction contrast = score(A+B) − score(A) − score(B) + score(baseline)"
+      },
+      {
+        "id": "practice",
+        "title": "Keep the ablation meaningful",
+        "paragraphs": [
+          "Removing a module may change parameter count, training stability, or available information. State these changes and add a capacity-matched or budget-matched control when the interpretation requires one. Repeat key contrasts under multiple random seeds and show uncertainty rather than treating a tiny difference as a mechanism. Choose ablations to distinguish plausible explanations. A large table of arbitrary toggles is less useful than a few interventions that directly test why the proposed method should work."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A+B scores 78, A scores 72, B scores 73, and baseline scores 70. Can you say A always contributes five points?",
+      "answer": "No. A adds two points without B and five points with B. Its effect depends on the presence of B, with a three-point interaction in this example."
+    },
+    "takeaways": [
+      "Ablation effects depend on the surrounding configuration.",
+      "Use interaction checks when components may depend on each other."
+    ],
+    "references": [
+      {
+        "title": "Troubling Trends in Machine Learning Scholarship",
+        "url": "https://arxiv.org/abs/1807.03341",
+        "kind": "paper",
+        "note": "Study why gains must be attributed to the component or training choice actually responsible."
+      }
+    ]
+  },
+  {
+    "topicId": "15-06",
+    "title": "Make comparisons fair to the research question",
+    "summary": "Match the factors that should be controlled and report the resources that cannot be made equivalent.",
+    "prerequisites": [
+      "15-02",
+      "11-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Fairness requires a stated question",
+        "paragraphs": [
+          "There is no single universal matching rule. Equal parameter count, equal training compute, and equal latency can produce different comparisons. If the question concerns an inference-time token selector, fix the backbone, input data, and token budget. If the question concerns architectures under a compute budget, allow architectures to differ while measuring total training resources consistently. State what is held fixed and why; otherwise a favorable result may answer a different question than the one advertised."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Count tuning and evaluation choices",
+        "paragraphs": [
+          "A method tuned over 100 configurations has more opportunity to find a strong result than a baseline tried once. Allocate comparable search effort or report the asymmetry and its implications. Use the same data splits, metrics, preprocessing, and evaluation prompts unless a difference is itself under study. For systems comparisons, specify hardware, software, precision, warmup, synchronization, batch size, and input/output lengths. Faster decoding of shorter outputs is not automatically faster decoding under an equal workload."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Report the operating point",
+        "paragraphs": [
+          "Imagine two models with identical accuracy but latencies of 20 and 30 milliseconds. That comparison is useful only after declaring whether it measures a single example, a batch, prefill, decode, or end-to-end service time. A more complete report shows quality against latency over several budgets and identifies settings where the conclusion reverses. Preserve baseline configurations and unsuccessful trials in the experiment record so a reader can see how the presented operating points were selected."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Your method gets ten tuning runs and the baseline gets one. What should you change or disclose?",
+      "answer": "Give the baseline a comparable tuning opportunity where feasible, and report both search spaces and total search cost. If equal tuning is not feasible, explicitly limit the claim rather than implying the difference isolates the method itself."
+    },
+    "takeaways": [
+      "Choose a control strategy that matches the claim.",
+      "Include tuning effort and measurement conditions in the comparison."
+    ],
+    "references": [
+      {
+        "title": "Deep Reinforcement Learning that Matters",
+        "url": "https://arxiv.org/abs/1709.06560",
+        "kind": "paper",
+        "note": "Inspect how experimental choices and variability affect comparisons in deep reinforcement learning."
+      },
+      {
+        "title": "Improving Reproducibility in Machine Learning Research",
+        "url": "https://arxiv.org/abs/2003.12206",
+        "kind": "paper",
+        "note": "Use reporting requirements to make comparison conditions inspectable."
+      }
+    ]
+  },
+  {
+    "topicId": "15-07",
+    "title": "Keep information from leaking across evaluation boundaries",
+    "summary": "Split by the unit of generalization, and fit every learned preprocessing step using only permitted training information.",
+    "prerequisites": [
+      "01-11",
+      "15-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "The test asks about unavailable information",
+        "paragraphs": [
+          "Leakage occurs when the evaluation procedure gives a model information that would not legitimately be available in the intended deployment setting. Exact duplicate examples are one route, but related observations can leak too. Randomly splitting adjacent frames from the same video may place nearly identical scenes in training and testing. Splitting records from the same person or device can create similar problems when the goal is generalization to unseen people or devices."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Audit the whole pipeline",
+        "paragraphs": [
+          "Define the independent grouping unit before splitting: a document, user, scene, source, or time period may be more appropriate than an individual row. Fit normalization statistics, vocabulary decisions, feature selection, and any learned transformations using allowed training data only, then apply them to held-out data. Keep validation for model selection and reserve the final test for the stated evaluation. Repeatedly adjusting prompts after inspecting test errors also uses test information, even without a gradient update."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Distinguish contamination from proof of memorization",
+        "paragraphs": [
+          "Foundation-model training corpora can be incompletely documented, making benchmark overlap uncertain. Check available provenance, duplicates, and temporal cutoffs; use fresh evaluation data where appropriate. Overlap is a concern that needs analysis, not automatic proof that every correct answer was memorized. Conversely, absence of exact string matches does not rule out paraphrases or shared source material. Report what your audit can establish and keep a record of which benchmark feedback influenced development."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A dataset contains 100 frames from each of 20 videos. You randomly split all frames into training and test sets. What alternative split better tests new-video generalization?",
+      "answer": "Assign whole videos to splits so related frames do not cross the boundary. If videos themselves share a scene or source, consider grouping at that higher level as well."
+    },
+    "takeaways": [
+      "Split according to the deployment generalization target.",
+      "Evaluation leakage can happen through preprocessing and human model selection."
+    ],
+    "references": [
+      {
+        "title": "Leakage and the Reproducibility Crisis in ML-based Science",
+        "url": "https://arxiv.org/abs/2207.07048",
+        "kind": "paper",
+        "note": "Read the taxonomy of leakage and its effects on reported scientific results."
+      }
+    ]
+  },
+  {
+    "topicId": "15-08",
+    "title": "Quantify uncertainty across runs and examples",
+    "summary": "Random seeds and confidence intervals describe particular sources of variability; name those sources before interpreting an error bar.",
+    "prerequisites": [
+      "01-06",
+      "15-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A score is one realization",
+        "paragraphs": [
+          "Initialization, data order, augmentation, and stochastic sampling can change a run’s result. A single successful seed does not reveal how reliably a method works. Variation across trained models is distinct from uncertainty due to the finite evaluation set. Evaluating one model on many examples does not replace retraining under several seeds when the claim concerns training reliability. Decide which population of runs, examples, tasks, or deployments the reported uncertainty is intended to describe."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Distinguish spread from uncertainty of a mean",
+        "paragraphs": [
+          "The sample standard deviation describes variation among the observed runs. Under suitable independence and distributional assumptions, the standard error of their mean scales as s/√n. A confidence interval requires a method appropriate to the sample and estimand; with a small approximately normal sample, a Student-t interval is one option. A nominal 95% frequentist interval is a property of a repeated-sampling procedure, not a guarantee about this particular interval or a description of the spread of future runs."
+        ],
+        "formula": "Standard error of the sample mean ≈ s / √n"
+      },
+      {
+        "id": "practice",
+        "title": "Compare paired outcomes when appropriate",
+        "paragraphs": [
+          "If methods use matched datasets or seeds, analyze the differences within those matched units rather than discarding the pairing. Report all run scores, the number of runs, and the aggregation rule. For multiple tasks or correlated examples, a naive interval treating every measurement as independent can be misleading. Bootstrap at a defensible independent unit when using resampling. A narrow interval obtained by counting correlated video frames as independent observations can create confidence without adding real evidence."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Five independent run scores have mean 80 and sample standard deviation 1. Under the usual t-interval assumptions, use t₄≈2.776 to calculate a 95% interval for the mean.",
+      "answer": "The standard error is 1/√5≈0.447. The margin is 2.776×0.447≈1.24, giving approximately [78.76,81.24]. This interval concerns the mean over comparable runs, not every future run or all possible datasets."
+    },
+    "takeaways": [
+      "State what varies and what your interval estimates.",
+      "Keep independent runs, paired comparisons, and correlated examples distinct."
+    ],
+    "references": [
+      {
+        "title": "Deep Reinforcement Learning at the Edge of the Statistical Precipice",
+        "url": "https://arxiv.org/abs/2108.13264",
+        "kind": "paper",
+        "note": "Study uncertainty-aware aggregation and comparison of few-run RL evaluations."
+      },
+      {
+        "title": "Statistical Comparisons of Classifiers over Multiple Data Sets",
+        "url": "https://www.jmlr.org/papers/v7/demsar06a.html",
+        "kind": "paper",
+        "note": "Review comparisons across multiple datasets and the assumptions of statistical tests."
+      }
+    ]
+  },
+  {
+    "topicId": "15-09",
+    "title": "Treat hyperparameter search as part of the experiment",
+    "summary": "The search procedure spends compute and uses validation information, so it belongs in the method description.",
+    "prerequisites": [
+      "01-11",
+      "15-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "The final configuration was selected",
+        "paragraphs": [
+          "Learning rate, regularization, rank, and training length can strongly affect a model’s performance. Reporting only the winning configuration hides how it was found. A broad search can outperform a narrow one without improving the underlying algorithm. Record the search space, sampling distribution, selection metric, budget, and stopping rule. The validation set participates in that selection process; its best observed score is not an unbiased estimate of performance on entirely new data."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Search on a meaningful scale",
+        "paragraphs": [
+          "A learning rate often spans orders of magnitude, so sampling uniformly in log space can be more useful than sampling uniformly in its numeric value. For example, log-uniform sampling between 10⁻⁵ and 10⁻² gives equal probability to each decade. Random search also explores more distinct values along influential dimensions than a small Cartesian grid. These are useful design choices, not guarantees that random search wins for every constrained problem. Early stopping and low-fidelity trials introduce additional assumptions about which candidates look promising early."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Protect the final evaluation",
+        "paragraphs": [
+          "Choose the configuration using a declared validation procedure, then evaluate the selected method on the held-out test under a fixed protocol. If you repeatedly revise the search after viewing test results, the test has become part of development. With limited data, nested evaluation can separate tuning from performance estimation, though it costs more computation. Include failed and interrupted trials in the log, labeling infrastructure failures separately from numerically unstable configurations so the search history is interpretable."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "You search 1,000 configurations and report the best validation score as your final result. What is the problem?",
+      "answer": "Selection favors configurations that benefited from validation noise as well as genuine quality. Use an untouched test or an appropriate outer evaluation, and report the tuning budget and selection procedure."
+    },
+    "takeaways": [
+      "Describe the search, not only its winner.",
+      "Keep validation selection separate from final performance estimation."
+    ],
+    "references": [
+      {
+        "title": "Random Search for Hyper-Parameter Optimization",
+        "url": "https://www.jmlr.org/papers/v13/bergstra12a.html",
+        "kind": "paper",
+        "note": "Compare random and grid search, especially when only some hyperparameters strongly affect performance."
+      }
+    ]
+  },
+  {
+    "topicId": "15-10",
+    "title": "Use failure cases to generate better experiments",
+    "summary": "Qualitative examples reveal possible mechanisms, but representative sampling is needed before making prevalence claims.",
+    "prerequisites": [
+      "15-03",
+      "15-07"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Averages hide different mistakes",
+        "paragraphs": [
+          "An aggregate accuracy score can conceal distinct failure modes: OCR errors, missed objects, temporal confusion, or answers driven by language priors. Inspecting examples helps turn a vague weakness into a specific question. The goal is not merely to collect embarrassing outputs. Record the input, expected behavior, prediction, and evidence for the assigned error category. Some failures reflect ambiguous labels or inadequate task definitions rather than a missing capability in the model."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Choose examples with a transparent rule",
+        "paragraphs": [
+          "Use random samples, predefined slices, or a documented error-sampling procedure. Separate examples chosen to illustrate a mechanism from samples used to estimate how common it is. Create a small coding rubric and check that different reviewers can apply it consistently. Where possible, hide method identity during annotation to reduce expectations influencing the labels. If an error category is discovered after inspecting the test set, treat it as a hypothesis to investigate on fresh or separately held-out examples."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Convert an observation into a test",
+        "paragraphs": [
+          "Suppose a VLM answers object-count questions correctly in clean scenes but misses small objects in crowded scenes. Build controlled pairs that vary object size or clutter while preserving the relevant count, and compare performance under fixed prompts and resolution. This distinguishes a visual-resolution explanation from a prompt artifact. Five compelling screenshots can motivate this experiment, but they do not establish a population error rate. Report both representative success cases and boundary failures so the reader can understand the operating region."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "You hand-pick ten dramatic failures and find that eight involve OCR. Can you estimate that 80% of all failures are OCR-related?",
+      "answer": "No. The selection was not designed to estimate prevalence. Use a representative sample of failures with a declared annotation rule, and report uncertainty for the resulting proportion."
+    },
+    "takeaways": [
+      "Examples explain possibilities; sampling supports frequency claims.",
+      "Turn recurring error patterns into controlled follow-up experiments."
+    ],
+    "references": [
+      {
+        "title": "Model Cards for Model Reporting",
+        "url": "https://arxiv.org/abs/1810.03993",
+        "kind": "paper",
+        "note": "Use intended-use and evaluation-slice reporting to organize model behavior beyond one aggregate score."
+      }
+    ]
+  },
+  {
+    "topicId": "15-11",
+    "title": "Separate statistical evidence from practical value",
+    "summary": "A detectable effect may be too small to matter, while an important effect may remain uncertain with limited evidence.",
+    "prerequisites": [
+      "15-08",
+      "11-16"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Two questions need two answers",
+        "paragraphs": [
+          "Statistical analysis asks how the observed data relate to an explicit model of variability and a hypothesis. Practical significance asks whether an effect changes a meaningful decision. A 0.1-percentage-point improvement may be detectable with a huge sample yet offer little value relative to a large increase in latency or cost. Conversely, a promising improvement from a few expensive runs may be practically important but too uncertain to justify a strong conclusion."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Report effect sizes and uncertainty",
+        "paragraphs": [
+          "State the effect in useful units: percentage points, milliseconds, memory usage, or task success probability. Distinguish absolute from relative changes. Moving accuracy from 90% to 91% is one percentage point higher accuracy and a 10% relative reduction in error rate, not a 10% increase in accuracy. A p-value is not the probability that the proposed method is useful or that the null hypothesis is true. Confidence intervals and an explicitly chosen practical threshold help the reader interpret both magnitude and uncertainty."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Make the trade-off visible",
+        "paragraphs": [
+          "Suppose a compression method loses 0.2 accuracy points while reducing peak memory enough to fit on an available device. Whether that is valuable depends on the application’s tolerance and operating constraint. Declare the relevant threshold before inspecting the result where possible. Account for repeated comparisons when many metrics or variants are tested, and avoid selecting only the favorable significant outcomes. A report can honestly conclude that an effect is uncertain, negligible, or beneficial only under particular resource constraints."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A method improves accuracy from 80% to 80.1% and doubles inference latency. A test gives p<0.01. Is the method necessarily better to deploy?",
+      "answer": "No. Statistical evidence for a difference does not establish deployment value. Compare the effect size, uncertainty, latency budget, and error costs against the intended application’s requirements."
+    },
+    "takeaways": [
+      "Effect size and uncertainty should accompany significance claims.",
+      "Define what improvement would be useful in the intended setting."
+    ],
+    "references": [
+      {
+        "title": "Statistical Comparisons of Classifiers over Multiple Data Sets",
+        "url": "https://www.jmlr.org/papers/v7/demsar06a.html",
+        "kind": "paper",
+        "note": "Review test choices and the distinction between observed differences and evidence across datasets."
+      },
+      {
+        "title": "Deep Reinforcement Learning at the Edge of the Statistical Precipice",
+        "url": "https://arxiv.org/abs/2108.13264",
+        "kind": "paper",
+        "note": "Examine uncertainty-aware performance summaries rather than relying on a single point estimate."
+      }
+    ]
+  },
+  {
+    "topicId": "15-12",
+    "title": "Make each experiment an inspectable record",
+    "summary": "A result should be traceable to code, data, configuration, environment, and the exact evaluation that produced it.",
+    "prerequisites": [
+      "02-03",
+      "02-10"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A filename is not an experiment record",
+        "paragraphs": [
+          "A checkpoint named best_model.pt does not explain which data, learning rate, or selection rule produced it. Give every run a unique identifier and store the inputs to the experiment as well as its outputs. Capture the code revision and any uncommitted diff, dataset identifiers, configuration, random seeds, software versions, and hardware. A useful record lets another person distinguish a scientific change from an accidental environment or preprocessing change."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Separate immutable facts from interpretations",
+        "paragraphs": [
+          "Log raw metrics with their step or epoch, aggregation rule, and evaluation dataset. Save the final configuration after defaults and overrides are resolved. Keep a human-readable note for the hypothesis, unexpected events, and decisions, but do not overwrite raw measurements with a later interpretation. Link the chosen checkpoint to the criterion that selected it. For resumed training, record the parent run and restored optimizer or scheduler state so an apparent continuous curve does not hide a reset."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Build a minimum rerun package",
+        "paragraphs": [
+          "For a small LoRA experiment, retain a launch command, dependency specification, adapter configuration, dataset version, evaluation script, and a compact results file. Include a smoke-test command that runs on a tiny sample before the full job. Avoid putting credentials or private examples into logs and public artifacts; use identifiers and controlled access where necessary. Reproducibility is a workflow property, not a guarantee supplied by one tracking product. Test the instructions in a clean environment before calling the package reproducible."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A resumed experiment loads model weights but not optimizer state. What should the log say?",
+      "answer": "Record that optimization was restarted from saved weights, identify the source checkpoint, and state which states were not restored. Do not present it as an exact continuation of the original optimizer trajectory."
+    },
+    "takeaways": [
+      "Record resolved inputs and raw outputs for every run.",
+      "A reproducible package includes instructions that another environment can actually execute."
+    ],
+    "references": [
+      {
+        "title": "Improving Reproducibility in Machine Learning Research",
+        "url": "https://arxiv.org/abs/2003.12206",
+        "kind": "paper",
+        "note": "Use the reporting checklist to audit missing artifacts and experimental details."
+      }
+    ]
+  },
+  {
+    "topicId": "15-13",
+    "title": "Design figures that expose the comparison",
+    "summary": "Choose axes, uncertainty displays, and tables so readers can check the claim without decoding decorative choices.",
+    "prerequisites": [
+      "15-08",
+      "11-16"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Choose the question before the chart",
+        "paragraphs": [
+          "A figure should answer a specific comparison: does quality improve with token budget, how variable are the runs, or where does a speed–accuracy trade-off change? Use a line plot for an ordered sweep, points or intervals for estimates, and a table when exact values across several attributes matter. A complex visualization is not automatically more informative. Start by writing the sentence the reader should be able to assess, then select a representation that makes the underlying evidence visible."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Label every transformation",
+        "paragraphs": [
+          "Specify units, dataset, sample count, and what error bars represent. Distinguish standard deviation from confidence intervals and state whether curves average runs or examples. Use consistent scales for direct comparisons, and disclose logarithmic axes or truncated ranges clearly. Bars generally need a meaningful baseline because length encodes magnitude. Choose color and marker combinations that remain distinguishable in grayscale and do not rely on color alone. Legends should identify experimental settings rather than unexplained internal run names."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Show trade-offs without hiding conditions",
+        "paragraphs": [
+          "For token compression, plot accuracy against measured latency and annotate token budgets. Keep hardware and measurement protocol fixed, or split panels when conditions differ. Connect points only when the connecting path has a meaningful interpretation; a line between unrelated methods can imply an interpolation that does not exist. In a results table, distinguish the best mean from a reliably better method, and avoid excessive bolding that obscures small, uncertain differences. Keep the data and plotting script with the experiment record."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A caption says “error bars show uncertainty” but gives no further detail. What should be added?",
+      "answer": "Specify the interval or spread measure, confidence level if applicable, independent sampling unit, number of runs or examples, and the procedure used to calculate the bars."
+    },
+    "takeaways": [
+      "A caption should make the evidence interpretable on its own.",
+      "Keep the data and transformations behind every plotted point."
+    ],
+    "references": [
+      {
+        "title": "Ten Simple Rules for Better Figures",
+        "url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003833",
+        "kind": "paper",
+        "note": "Review figure design principles including clarity, audience, and informative captions."
+      }
+    ]
+  },
+  {
+    "topicId": "15-14",
+    "title": "Write the argument, not just the chronology",
+    "summary": "Connect the problem, method, evidence, and limitations so readers can identify what the work establishes.",
+    "prerequisites": [
+      "15-01",
+      "15-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A paper makes a bounded claim",
+        "paragraphs": [
+          "A technical report is not a diary of everything that happened during development. Organize it around the question, the proposed answer, and the evidence. State the setting and why existing approaches leave a relevant gap. Describe the contribution precisely enough that a reader can tell whether it is an algorithm, an empirical finding, a dataset, or a systems improvement. A modest claim supported clearly is more useful than an expansive claim that the experiments cannot distinguish from alternative explanations."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Connect method and experiments",
+        "paragraphs": [
+          "Define symbols before using them, state tensor shapes when ambiguity matters, and explain how each component changes the computation. The method section should enable an informed reader to reconstruct the procedure without guessing hidden choices. Organize experiments around questions rather than around an arbitrary sequence of tables. Report the comparison conditions and selection rules alongside the results. Separate observed measurements from your interpretation of the mechanism, using additional experiments when the interpretation needs support."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Write useful limitations",
+        "paragraphs": [
+          "A limitation explains the boundary of the evidence and its consequence. “We evaluated one backbone and do not know whether the ranking transfers to larger models” is more informative than “more experiments are needed.” If a method depends on access to a particular training signal, say when that signal is unavailable. Use captions and section openings to guide the reader, then remove claims not supported by the displayed results. After drafting, ask someone to summarize the contribution without explanation from you; their confusion identifies missing links in the argument."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Your method improves three benchmarks but fails on small-object questions. How should this appear in the report?",
+      "answer": "Report both the aggregate improvements and the failure slice, describe its evaluation conditions, and bound claims about visual understanding accordingly. If you propose a cause, label it as an interpretation unless a controlled experiment supports it."
+    },
+    "takeaways": [
+      "Tie every major claim to an explicit result.",
+      "Describe limitations as boundaries with concrete consequences."
+    ],
+    "references": [
+      {
+        "title": "Ten simple rules for structuring papers",
+        "url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005619",
+        "kind": "paper",
+        "note": "Study how a paper’s structure carries a clear scientific argument."
+      },
+      {
+        "title": "Troubling Trends in Machine Learning Scholarship",
+        "url": "https://arxiv.org/abs/1807.03341",
+        "kind": "paper",
+        "note": "Check that explanatory claims do not exceed the evidence."
+      }
+    ]
+  },
+  {
+    "topicId": "15-15",
+    "title": "Plan research with data and resource constraints in view",
+    "summary": "Document provenance, permissions, possible harms, and compute costs as part of the experimental design.",
+    "prerequisites": [
+      "15-03",
+      "15-12"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Data availability is not the whole question",
+        "paragraphs": [
+          "Before collecting or reusing a dataset, record its origin, collection purpose, documentation, license, access conditions, and the intended use of your project. Public accessibility alone does not establish that every reuse or redistribution is appropriate. Sensitive or identifiable examples can also create privacy and consent concerns. When permissions or institutional requirements are unclear, resolve them through the relevant data owner or review process before sharing artifacts. This is part of planning a valid study, rather than an appendix added after experiments finish."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Make the resource plan explicit",
+        "paragraphs": [
+          "Estimate the number of training runs, accelerator hours, evaluation calls, and storage required by the hypothesis test. Start with a small pilot to measure throughput and identify failures before committing the full budget. Distinguish a final training run from the larger cost of search and failed attempts. A hardware name alone is not a measurement of energy use: power draw and duration matter, and converting energy to emissions requires additional location- and time-dependent assumptions. Record measured quantities separately from estimates."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Design an informative first experiment",
+        "paragraphs": [
+          "Suppose you have 40 accelerator-hours. Reserving eight hours for baseline validation and four for final evaluation leaves 28 hours for method development. If a full training run costs seven hours, that permits only four such runs, before failures or extra analysis. This arithmetic may suggest a smaller pilot, fewer variants, or a more focused claim. Document known dataset exclusions and evaluation gaps so other researchers can judge where the result might fail. Release only artifacts you are authorized to share, with enough context to interpret their intended use."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Why is a dataset URL alone insufficient documentation for a research release?",
+      "answer": "It does not identify the version, collection context, permission terms, preprocessing, exclusions, or whether the data can be redistributed with your artifacts. Record those facts and the decisions relevant to your specific use."
+    },
+    "takeaways": [
+      "Treat data provenance and permitted use as design inputs.",
+      "Budget for search, evaluation, and failures as well as the final run."
+    ],
+    "references": [
+      {
+        "title": "Datasheets for Datasets",
+        "url": "https://arxiv.org/abs/1803.09010",
+        "kind": "paper",
+        "note": "Use structured dataset documentation to record provenance, collection, and intended uses."
+      },
+      {
+        "title": "Energy and Policy Considerations for Deep Learning in NLP",
+        "url": "https://arxiv.org/abs/1906.02243",
+        "kind": "paper",
+        "note": "Read the discussion of training and search costs, noting the context of the reported measurements."
+      }
+    ]
+  }
+]

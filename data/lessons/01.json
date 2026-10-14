@@ -1,0 +1,540 @@
+[
+  {
+    "topicId": "01-01",
+    "title": "Linear algebra as a language for model behavior",
+    "summary": "Read vectors, matrix products, transposes, and norms as concrete operations on representations.",
+    "prerequisites": [],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A matrix transforms coordinates",
+        "paragraphs": [
+          "A feature vector is an ordered collection of measurements. Its entries might describe temperature, pressure, and humidity, or learned coordinates with no individual name. A matrix maps one such coordinate system into another. Each output coordinate is a weighted combination of input coordinates. This perspective makes a neural network layer easier to inspect: its weight matrix describes which input directions influence each output, while its bias shifts the result."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Follow one multiplication by hand",
+        "paragraphs": [
+          "Let a row vector x = [2, −1] and a weight matrix W = [[1, 3], [4, 2]]. Multiplication gives xW = [−2, 4]: the first output is 2·1 − 1·4, and the second is 2·3 − 1·2. The transpose swaps rows and columns; it does not invert a transformation. In reverse-mode differentiation, transposes appear because a gradient must travel from output coordinates back into input coordinates."
+        ],
+        "formula": "Y = XW;  ∂L/∂X = (∂L/∂Y)Wᵀ"
+      },
+      {
+        "id": "practice",
+        "title": "Measure size without losing meaning",
+        "paragraphs": [
+          "The Euclidean norm measures vector length. The Frobenius norm treats a matrix as one long vector, whereas its spectral norm measures the largest possible amplification of a unit input. Those quantities answer different questions: total weight magnitude and worst-direction amplification need not move together. Multiplication is also order-sensitive; changing XW into WX can change both meaning and validity. Write the input and output spaces beside every matrix before manipulating an expression."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "For W = [[3, 0], [0, 4]], compute its Frobenius and spectral norms. Which unit vector receives the largest amplification?",
+      "answer": "The Frobenius norm is √(9 + 16) = 5. The spectral norm is 4. The unit vector [0, 1] is stretched to [0, 4], achieving that maximum; its negative works as well."
+    },
+    "takeaways": [
+      "Matrix multiplication composes linear maps.",
+      "Transpose, inverse, and norm are different operations."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning — Linear Algebra",
+        "url": "https://www.deeplearningbook.org/contents/linear_algebra.html",
+        "kind": "book",
+        "note": "Read matrix multiplication, transposition, and the distinction between vector and matrix norms."
+      }
+    ]
+  },
+  {
+    "topicId": "01-02",
+    "title": "Derive tensor shapes before running the model",
+    "summary": "Use dimensions as a lightweight proof that a computation connects the intended axes.",
+    "prerequisites": [
+      "01-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Shapes carry semantic labels",
+        "paragraphs": [
+          "A tensor shape becomes useful when each axis has a name. For a batch of sentences, [B, T, D] means examples, token positions, and features. The identical numerical shape could describe entirely different data, so checking only sizes is insufficient. Shape reasoning follows which axes survive, which are contracted, and which are newly introduced. This often catches an incorrect implementation before any loss curve can reveal it."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Trace a projection and a comparison",
+        "paragraphs": [
+          "Suppose X has shape [2, 5, 12] and W has shape [12, 8]. The product XW has shape [2, 5, 8]; the feature axis contracts while batch and token axes remain. A bias [8] broadcasts over both leading axes. To compare every token with every other token, multiply Q of shape [2, 5, 8] by K transposed on its final two axes, obtaining scores [2, 5, 5]."
+        ],
+        "formula": "[B, T, D] @ [D, H] → [B, T, H]"
+      },
+      {
+        "id": "practice",
+        "title": "Broadcasting can hide an error",
+        "paragraphs": [
+          "Broadcasting aligns shapes from the right. Two axes are compatible when they are equal or one has size one; missing leading axes act like ones. That convenience can silently create a pairwise operation: subtracting predictions [B, 1] from labels [B] produces [B, B], rather than B individual residuals. Explicitly reshape labels, and assert named dimensions at module boundaries. Avoid a plain transpose on higher-dimensional tensors when only the feature and sequence axes should swap."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A classifier produces [16, 1] predictions and receives [16] scalar targets. What shape does subtraction produce, and how should you fix it?",
+      "answer": "Right-aligned broadcasting expands [16] to [1, 16], so the result is [16, 16]. Reshape targets to [16, 1], or squeeze the final prediction dimension to [16], before computing the elementwise loss."
+    },
+    "takeaways": [
+      "Name axes before deriving their sizes.",
+      "A valid broadcast can still implement the wrong objective."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning — Linear Algebra",
+        "url": "https://www.deeplearningbook.org/contents/linear_algebra.html",
+        "kind": "book",
+        "note": "Review dimensions of linear maps and matrix products."
+      },
+      {
+        "title": "Deep Learning — Numerical Computation",
+        "url": "https://www.deeplearningbook.org/contents/numerical.html",
+        "kind": "book",
+        "note": "Connect shape mistakes to reliable numerical implementations."
+      }
+    ]
+  },
+  {
+    "topicId": "01-03",
+    "title": "Rank and singular values reveal what a layer can express",
+    "summary": "Understand eigenvectors and the SVD through the directions a linear transformation preserves or removes.",
+    "prerequisites": [
+      "01-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Look for informative directions",
+        "paragraphs": [
+          "A matrix may have many entries but still produce outputs confined to a small subspace. Its rank counts independent output directions. If two rows encode the same measurement, adding both does not create a new degree of freedom. This matters when diagnosing redundant features, understanding compression, or asking why a low-rank weight update can be much smaller than a dense matrix while still changing useful model behavior."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Separate rotation from scaling",
+        "paragraphs": [
+          "An eigenvector of a square matrix retains its direction under the map, changing only by an eigenvalue. The singular value decomposition works for rectangular matrices too: A = UΣVᵀ. The right singular vectors specify input directions, singular values specify their nonnegative gains, and left singular vectors specify corresponding output directions. Keeping the largest r singular values gives the best rank-r approximation in Frobenius norm, although that matrix error does not directly guarantee task accuracy."
+        ],
+        "formula": "A = UΣVᵀ;  rank(A) = number of nonzero singular values"
+      },
+      {
+        "id": "practice",
+        "title": "Exact rank is not effective rank",
+        "paragraphs": [
+          "For A = [[2, 0], [0, 0.001]], exact rank is two, but one direction is amplified two thousand times more than the other. Finite precision and noise may make the weak direction unusable. Numerical rank therefore depends on a tolerance and scale. Eigenvalues can also mislead for nonsymmetric matrices: singular values, rather than eigenvalue magnitudes alone, describe one-step worst-case amplification. Inspect the singular spectrum instead of reporting only a single integer."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A matrix has singular values [5, 2, 0]. What is its rank, and what Frobenius error results from retaining only the largest singular value?",
+      "answer": "The rank is two. Removing singular values 2 and 0 leaves Frobenius error √(2² + 0²) = 2. The squared error is 4; confusing error with squared error changes the reported quantity."
+    },
+    "takeaways": [
+      "Rank counts independent directions.",
+      "Singular values describe amplification and approximation error."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning — Linear Algebra",
+        "url": "https://www.deeplearningbook.org/contents/linear_algebra.html",
+        "kind": "book",
+        "note": "Study eigendecomposition, singular value decomposition, and low-rank approximation."
+      }
+    ]
+  },
+  {
+    "topicId": "01-04",
+    "title": "The chain rule is the wiring diagram of learning",
+    "summary": "Connect partial derivatives, Jacobians, and backpropagation by tracking how small changes propagate.",
+    "prerequisites": [
+      "01-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A derivative answers a local question",
+        "paragraphs": [
+          "A partial derivative asks how an output changes when one input coordinate moves and the others stay fixed. A gradient collects those sensitivities for a scalar output. A Jacobian extends the idea to a vector output: each row describes one output coordinate and each column one input coordinate. These are local descriptions, so a derivative at today's parameters does not promise the same behavior after a large update."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Compose sensitivities in the right order",
+        "paragraphs": [
+          "Consider x mapped to z = Wx + b, then h = tanh(z), then a scalar loss. The derivative of the loss with respect to z multiplies the incoming gradient elementwise by 1 − tanh²(z). The derivative with respect to x is Wᵀ times that result. Backpropagation computes these vector-Jacobian products without constructing an enormous Jacobian explicitly. A shared variable receives a sum of contributions from every path that uses it."
+        ],
+        "formula": "∇ₓL = Wᵀ[(∇ₕL) ⊙ (1 − tanh²(z))]"
+      },
+      {
+        "id": "practice",
+        "title": "Check a derivative numerically",
+        "paragraphs": [
+          "For f(w) = (3w − 1)², the derivative is 6(3w − 1). At w = 1 it equals 12. Compare this with the centered difference [f(w + ε) − f(w − ε)]/(2ε). A moderate ε balances approximation error against floating-point cancellation. Use float64 for a small gradient check, avoid nondifferentiable points such as a ReLU kink, and check a few coordinates rather than assuming a successful backward call proves correctness."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Let y = ab + a². Find both partial derivatives at a = 2 and b = 3. Why does the derivative with respect to a have two terms?",
+      "answer": "∂y/∂a = b + 2a = 7 and ∂y/∂b = a = 2. The variable a affects y through both the product ab and the square a², so the chain rule adds both path contributions."
+    },
+    "takeaways": [
+      "Gradients are local sensitivities.",
+      "Backpropagation accumulates contributions along every computational path."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning — Numerical Computation",
+        "url": "https://www.deeplearningbook.org/contents/numerical.html",
+        "kind": "book",
+        "note": "Read gradient-based optimization and the use of derivatives in multivariable functions."
+      }
+    ]
+  },
+  {
+    "topicId": "01-05",
+    "title": "Why a gradient step can lower the loss",
+    "summary": "Derive the local descent argument and see why learning rate matters even for a simple quadratic.",
+    "prerequisites": [
+      "01-04"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Follow a locally useful direction",
+        "paragraphs": [
+          "The gradient points toward the steepest local increase under Euclidean distance. Moving in its negative direction therefore promises a decrease for a sufficiently small step when the gradient is nonzero. The word local is essential: the terrain can curve sharply, and a direction that looked helpful at the starting point may overshoot the useful region. Optimization repeatedly remeasures that direction instead of trusting one gradient forever."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Use the first-order approximation",
+        "paragraphs": [
+          "For parameters θ and a small displacement Δ, the loss is approximately L(θ) + ∇L(θ)ᵀΔ. Choosing Δ = −η∇L gives an expected first-order change of −η‖∇L‖². For L(w) = aw²/2 with a > 0, the update is exactly w_next = (1 − ηa)w. It converges when 0 < ηa < 2. Larger curvature therefore requires a smaller stable step."
+        ],
+        "formula": "θ_next = θ − η∇L(θ)"
+      },
+      {
+        "id": "practice",
+        "title": "Separate poor conditioning from noise",
+        "paragraphs": [
+          "A loss bowl can be steep along one coordinate and shallow along another. One global learning rate then oscillates across the steep direction while making slow progress in the shallow direction. Feature scaling, adaptive optimizers, and momentum can change this behavior. Minibatch gradients add sampling noise, so a single increase in training loss is not proof of failure. Inspect smoothed trends, gradient norms, and validation performance before increasing the model's complexity."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "For L(w) = 5w² and w = 1, compare one gradient step with learning rates 0.1 and 0.3. Which step reduces the loss?",
+      "answer": "The gradient is 10w. With η = 0.1, w becomes 0 and loss becomes 0. With η = 0.3, w becomes −2 and loss rises from 5 to 20. The stable interval is 0 < η < 0.2."
+    },
+    "takeaways": [
+      "Negative gradients offer local descent, not a global guarantee.",
+      "Curvature and learning rate jointly determine stability."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning — Numerical Computation",
+        "url": "https://www.deeplearningbook.org/contents/numerical.html",
+        "kind": "book",
+        "note": "Focus on gradient descent, curvature, and conditioning."
+      }
+    ]
+  },
+  {
+    "topicId": "01-06",
+    "title": "Probability turns incomplete information into explicit assumptions",
+    "summary": "Use conditional probability, Bayes' rule, expectation, and variance to reason about uncertain observations.",
+    "prerequisites": [],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Conditioning changes the question",
+        "paragraphs": [
+          "A probability describes uncertainty under a specified information set. P(A) asks about an event before seeing evidence; P(A | B) asks after learning B. These need not be similar. In machine learning, the training distribution supplies one information environment, while deployment may supply another. Writing the conditioning variables explicitly prevents ambiguous claims such as a model being accurate without saying on which examples or under which sampling process."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Reverse a conditional with base rates",
+        "paragraphs": [
+          "Suppose 10% of documents are technical. A keyword appears in 80% of technical documents and 20% of other documents. Among 100 imagined documents, 8 technical and 18 nontechnical documents contain it. The probability that a keyword-containing document is technical is therefore 8/26, about 0.308. It is not 0.8: that number answers the opposite conditional. Bayes' rule combines likelihood with the prior frequency of the event."
+        ],
+        "formula": "P(A | B) = P(B | A)P(A) / P(B)"
+      },
+      {
+        "id": "practice",
+        "title": "Summarize a distribution carefully",
+        "paragraphs": [
+          "Expectation is a probability-weighted average, not necessarily a possible observation. A Bernoulli outcome can only be zero or one, even when its expectation is 0.3. Variance measures expected squared deviation from the mean and has squared units. For sums, variances add only when covariance terms vanish; dependent training examples can therefore make uncertainty larger than an independent-sample calculation suggests. Always identify the random variable before taking its mean or variance."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A binary variable X equals 1 with probability 0.25. Compute E[X], E[X²], and Var(X). What changes for Y = 4X?",
+      "answer": "E[X] = E[X²] = 0.25, so Var(X) = 0.25 − 0.0625 = 0.1875. For Y, E[Y] = 1 and Var(Y) = 16·0.1875 = 3. Scaling changes variance quadratically."
+    },
+    "takeaways": [
+      "Conditional probabilities depend on the direction of the question.",
+      "Expectation and variance describe different aspects of uncertainty."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning — Probability and Information Theory",
+        "url": "https://www.deeplearningbook.org/contents/prob.html",
+        "kind": "book",
+        "note": "Read conditional probability, Bayes' rule, expectation, variance, and covariance."
+      }
+    ]
+  },
+  {
+    "topicId": "01-07",
+    "title": "Choose a distribution that matches the outcome",
+    "summary": "Distinguish Bernoulli, categorical, and Gaussian models by their support and parameters.",
+    "prerequisites": [
+      "01-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Start with what can happen",
+        "paragraphs": [
+          "A distribution's support is the set of outcomes it can describe. A Bernoulli variable represents one binary outcome, a categorical variable selects one of several mutually exclusive classes, and a Gaussian variable represents a continuous measurement. Choosing a likelihood is therefore a modeling decision about the data. A classification head and a regression head differ partly because they assign probability to different kinds of outcomes."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Connect outputs to valid parameters",
+        "paragraphs": [
+          "A Bernoulli model needs a probability p between zero and one, often obtained with a sigmoid. A categorical model needs nonnegative probabilities that sum to one, usually produced by softmax logits. A Gaussian model needs a mean and a positive variance; predicting an unconstrained log-variance is one way to enforce positivity. Multiple independent binary labels generally require several Bernoulli outputs, not one categorical distribution that forces only one label to be correct."
+        ],
+        "formula": "Bernoulli: P(X = x) = pˣ(1 − p)¹⁻ˣ;  Gaussian: X ∼ N(μ, σ²)"
+      },
+      {
+        "id": "practice",
+        "title": "Probability density is not probability mass",
+        "paragraphs": [
+          "A continuous variable assigns zero probability to any exact point. Its density can exceed one, while probabilities over intervals remain bounded by one. Consequently, comparing a Gaussian density value with a categorical class probability is meaningless. Gaussian residual assumptions also have limits: strong skew, heavy tails, or multiple modes can make a single mean-and-variance model misleading. Examine residuals and predicted uncertainty rather than assuming every continuous target is naturally Gaussian."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "An image can contain both a dog and a bicycle. Should two output scores use a two-class softmax or independent sigmoids? Explain the outcome space.",
+      "answer": "Use independent sigmoids for the two presence labels, allowing neither, either, or both objects. A two-class softmax allows only one class and forces the probabilities to sum to one, excluding valid joint outcomes."
+    },
+    "takeaways": [
+      "Match distribution support to the prediction task.",
+      "A density and a probability mass are different quantities."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning — Probability and Information Theory",
+        "url": "https://www.deeplearningbook.org/contents/prob.html",
+        "kind": "book",
+        "note": "Compare Bernoulli, multinoulli/categorical, and Gaussian distributions."
+      }
+    ]
+  },
+  {
+    "topicId": "01-08",
+    "title": "Maximum likelihood chooses parameters that explain observed data",
+    "summary": "Derive familiar losses by writing down a probabilistic model and maximizing its likelihood.",
+    "prerequisites": [
+      "01-06",
+      "01-07"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Fit a model to the observations",
+        "paragraphs": [
+          "Maximum likelihood estimates parameters by asking which setting assigns the greatest probability, or density, to the observed dataset. The data are fixed during this optimization; the parameters vary. This differs from treating the likelihood as a probability distribution over parameters. To make a likelihood meaningful, specify the outcome distribution and assumptions about dependence between examples before choosing an optimizer."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Products become sums of log probabilities",
+        "paragraphs": [
+          "For independent Bernoulli observations, the likelihood multiplies p for every success and 1 − p for every failure. Taking logs turns the product into a sum, which is easier to optimize and less vulnerable to numerical underflow. Differentiating that sum shows that the maximum-likelihood estimate is the empirical success rate. For a Gaussian with fixed variance, maximizing log likelihood is equivalent to minimizing squared residuals; changing the distribution changes the loss."
+        ],
+        "formula": "θ̂ = argmaxθ Σᵢ log pθ(xᵢ) = argminθ −Σᵢ log pθ(xᵢ)"
+      },
+      {
+        "id": "practice",
+        "title": "Likelihood does not protect against overfitting",
+        "paragraphs": [
+          "A flexible model can assign high likelihood to training examples by memorizing peculiarities that do not recur. Evaluate on held-out data and consider regularization or a prior when data are limited. With all Bernoulli observations equal to one, MLE gives p = 1, assigning zero probability to any future failure. That boundary estimate illustrates why finite data can produce overconfident conclusions even when the optimization is mathematically correct."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "You observe 7 successes and 3 failures. What is the Bernoulli MLE? If the next observation is a failure, what is its negative log likelihood under that estimate?",
+      "answer": "The estimate is p = 7/10 = 0.7. A failure has probability 0.3, so its negative log likelihood is −ln(0.3), approximately 1.204 nats. The logarithm base determines the unit."
+    },
+    "takeaways": [
+      "A loss function often encodes a likelihood assumption.",
+      "Maximum training likelihood does not guarantee generalization."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning — Machine Learning Basics",
+        "url": "https://www.deeplearningbook.org/contents/ml.html",
+        "kind": "book",
+        "note": "Read maximum likelihood estimation and its relationship to supervised losses."
+      }
+    ]
+  },
+  {
+    "topicId": "01-09",
+    "title": "Entropy, cross-entropy, and KL answer three different questions",
+    "summary": "Separate intrinsic uncertainty from the penalty for using the wrong predictive distribution.",
+    "prerequisites": [
+      "01-06",
+      "01-08"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Measure surprise under a distribution",
+        "paragraphs": [
+          "An event with low predicted probability has high surprise, measured as negative log probability. Entropy averages that surprise when the predictions equal the true distribution p. Cross-entropy averages surprise when outcomes still come from p but a different distribution q supplies the predictions. KL divergence isolates the extra expected surprise caused by that mismatch. This distinction explains why a nonzero optimal loss need not mean a model is wrong."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Decompose the prediction cost",
+        "paragraphs": [
+          "Expanding the definitions gives H(p, q) = H(p) + KL(p ∥ q). When p is fixed, minimizing cross-entropy also minimizes this forward KL because entropy does not depend on model parameters. For a fair binary source, a correct predictor still has entropy ln 2. A predictor q = [0.9, 0.1] incurs higher cross-entropy because it confidently favors one outcome without evidence. KL is directional, so reversing p and q changes the weighting of errors."
+        ],
+        "formula": "H(p) = −Σ p log p;  H(p, q) = −Σ p log q"
+      },
+      {
+        "id": "practice",
+        "title": "One-hot labels simplify, but do not redefine, the objective",
+        "paragraphs": [
+          "With a one-hot observed label, cross-entropy reduces to −log q(correct). Averaging over examples estimates an expectation over the underlying data distribution; it does not prove that the true conditional entropy is zero. Never apply softmax twice when a loss expects logits, and distinguish mean from summed loss when comparing runs. If q assigns zero probability where p is positive, the forward KL is infinite rather than merely large."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "For p = [0.5, 0.5] and q = [0.5, 0.5], calculate entropy, cross-entropy, and KL using natural logs. What does their relationship tell you?",
+      "answer": "Entropy and cross-entropy both equal ln 2 ≈ 0.693 nats, while KL is zero. Prediction is distributionally correct despite positive loss, because the source itself remains uncertain."
+    },
+    "takeaways": [
+      "Cross-entropy equals entropy plus forward KL.",
+      "Zero KL can coexist with positive predictive loss."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning — Probability and Information Theory",
+        "url": "https://www.deeplearningbook.org/contents/prob.html",
+        "kind": "book",
+        "note": "Focus on information theory: entropy, cross-entropy, and KL divergence."
+      }
+    ]
+  },
+  {
+    "topicId": "01-10",
+    "title": "Optimizers differ in how they turn gradients into steps",
+    "summary": "Understand SGD, momentum, Adam, and AdamW through the state each optimizer carries.",
+    "prerequisites": [
+      "01-05",
+      "01-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A gradient is only the starting signal",
+        "paragraphs": [
+          "SGD scales the current minibatch gradient by a learning rate. Momentum adds a running directional memory, smoothing noisy updates and allowing progress along consistently useful directions. Adam maintains both a first moment and a second moment of gradients, adapting the step scale per coordinate. These choices change the optimization trajectory, even when models, batches, and losses are identical."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Track moments and decay separately",
+        "paragraphs": [
+          "Adam's first moment averages gradients; its second moment averages squared gradients. Bias correction compensates for both moving averages starting at zero. The normalized update divides the corrected first moment by the square root of the corrected second moment plus a stabilizing epsilon. AdamW additionally shrinks weights independently of that adaptive normalization. An L2 penalty added to the gradient is equivalent to weight decay in simple SGD under matching conventions, but generally not in Adam."
+        ],
+        "formula": "mₜ = β₁mₜ₋₁ + (1 − β₁)gₜ;  vₜ = β₂vₜ₋₁ + (1 − β₂)gₜ²"
+      },
+      {
+        "id": "practice",
+        "title": "Compare complete training configurations",
+        "paragraphs": [
+          "A comparison between optimizers is incomplete without learning rate, schedule, batch size, decay, and training budget. Adam's extra moment tensors also consume memory; changing only the optimizer may alter the largest feasible batch. Watch update norms as well as gradient norms, because adaptive scaling can produce very different parameter changes from similar gradients. When resuming training, restore optimizer state or acknowledge that the next steps no longer continue the original trajectory."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Why does loading only model weights fail to resume an Adam training run exactly? Name two missing pieces of optimizer state.",
+      "answer": "Adam's running first and second moments are missing, along with its step count for bias correction. Reinitializing them changes the normalized updates even if the next batch, weights, and learning rate are identical."
+    },
+    "takeaways": [
+      "Optimizer state affects both trajectory and memory.",
+      "AdamW separates weight shrinkage from adaptive gradient scaling."
+    ],
+    "references": [
+      {
+        "title": "Adam: A Method for Stochastic Optimization",
+        "url": "https://arxiv.org/abs/1412.6980",
+        "kind": "paper",
+        "note": "Read moment estimates, bias correction, and the update algorithm."
+      },
+      {
+        "title": "Decoupled Weight Decay Regularization",
+        "url": "https://arxiv.org/abs/1711.05101",
+        "kind": "paper",
+        "note": "Read why decoupled weight decay differs from an L2 penalty under adaptive optimization."
+      }
+    ]
+  },
+  {
+    "topicId": "01-11",
+    "title": "Generalization begins with how you split the data",
+    "summary": "Use training, validation, and test sets to separate fitting, model selection, and final measurement.",
+    "prerequisites": [
+      "01-08"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Training success is an incomplete result",
+        "paragraphs": [
+          "A model is useful when it performs on examples it did not fit. Overfitting occurs when improvements on training data fail to transfer to the intended deployment distribution. The gap can arise from memorization, excessive model selection, leakage, or genuine distribution shift. More training accuracy is therefore evidence about fitting capacity, not sufficient evidence that a model is ready for a new population."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Give each split one job",
+        "paragraphs": [
+          "Training data determine parameter updates. Validation data guide choices such as hyperparameters, architecture, and stopping time. Test data estimate performance after those choices are fixed. The split unit must match the independence assumption: if several scans belong to one patient, randomizing scans can place near-related examples on both sides. For forecasting, chronological separation is often more meaningful than random splitting because future information would not be available at prediction time."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Regularization changes the effective search",
+        "paragraphs": [
+          "Weight decay, dropout, augmentation, early stopping, and architectural constraints restrict or reshape the functions training tends to produce. None repairs a leaked test set. Fit preprocessing statistics on training data only, keep duplicates and related groups together, and record every validation-driven choice. Repeatedly checking the test set and selecting the best run turns that set into another validation set. Report variation across sensible seeds when training randomness materially affects conclusions."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A dataset contains 100 people with 10 measurements each. You want performance on unseen people. Why is a random measurement-level split misleading, and what split should replace it?",
+      "answer": "Measurements from the same person can share identity-specific information, so the model may recognize people instead of generalizing. Split by person, placing all 10 measurements together, then fit preprocessing only on the training group."
+    },
+    "takeaways": [
+      "Choose a split unit that matches deployment.",
+      "Regularization cannot compensate for evaluation leakage."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning — Machine Learning Basics",
+        "url": "https://www.deeplearningbook.org/contents/ml.html",
+        "kind": "book",
+        "note": "Read generalization, capacity, overfitting, and validation-based model selection."
+      }
+    ]
+  }
+]

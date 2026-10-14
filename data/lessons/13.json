@@ -1,0 +1,686 @@
+[
+  {
+    "topicId": "13-01",
+    "title": "Sampling Video Frames and Building Tokens",
+    "summary": "Video tokenization chooses which moments and spatial details a model is able to observe.",
+    "prerequisites": [
+      "08-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A video is more than many images",
+        "paragraphs": [
+          "A video contains ordered observations of a changing scene. Processing every pixel of every frame is usually expensive, so systems sample frames and convert spatial regions into tokens. The sampling policy defines the evidence available for later reasoning. Uniform sampling provides coverage; denser sampling around an event provides detail. Neither can recover a brief event that was never observed. Treat frame selection as part of the model pipeline rather than an invisible preprocessing choice."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Calculate the sequence length",
+        "paragraphs": [
+          "If F frames each produce P patch tokens, a simple concatenated representation has approximately F×P visual tokens before special tokens or compression. Sixteen frames with 196 patches each produce 3,136 tokens. Doubling both frame count and patches per frame quadruples this sequence length. Some encoders use tubelets spanning several frames, while others encode frames separately and combine them later. Record timestamps and frame indices so tokens retain a meaningful relationship to video time."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Choose sampling for the question",
+        "paragraphs": [
+          "A question about the room layout may need few frames, while a question about the order of two rapid actions needs finer temporal coverage. Sampling at a fixed frame count across videos creates different temporal spacing as duration changes. A ten-minute clip and a ten-second clip are not equally observed under that protocol. Report source duration, source frame rate, sampled timestamps, resize policy, and patch count. Test short events and boundary events explicitly instead of evaluating only persistent objects."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "You sample 8 frames from a 40-second clip and use 144 patches per frame. How many patch tokens are produced before compression?",
+      "answer": "There are 8×144=1,152 patch tokens. This count says nothing about whether a half-second event was captured; that depends on the actual timestamps selected."
+    },
+    "takeaways": [
+      "Sampling determines accessible evidence.",
+      "Report temporal coverage as well as token count."
+    ],
+    "references": [
+      {
+        "title": "An Image is Worth 16x16 Words",
+        "url": "https://arxiv.org/abs/2010.11929",
+        "kind": "paper",
+        "note": "Trace patch extraction and the resulting sequence length."
+      },
+      {
+        "title": "Qwen2.5-VL Technical Report",
+        "url": "https://arxiv.org/abs/2502.13923",
+        "kind": "paper",
+        "note": "Explore time-aware visual representations and multimodal evaluation."
+      }
+    ]
+  },
+  {
+    "topicId": "13-02",
+    "title": "Temporal Attention and Temporal Position",
+    "summary": "A sequence model needs information about when observations occurred to reason about order and duration.",
+    "prerequisites": [
+      "04-03",
+      "04-08"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Order is not in the set of frames",
+        "paragraphs": [
+          "Attention compares content, but content alone does not necessarily distinguish a door opening from the same frames shown in reverse. Positional information gives the model a way to separate earlier from later observations. In video, spatial position and temporal position describe different relationships. A patch at the same image coordinate across frames may belong to different moving objects, while one object can move across many coordinates."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Separate attention arrangements",
+        "paragraphs": [
+          "Full spatiotemporal attention lets all F×P tokens interact and has a pairwise term proportional to (FP)². Factorized designs can first mix spatial information within frames and then temporal information across corresponding groups, changing both cost and inductive bias. Temporal encodings may use frame indices, normalized positions, or actual timestamps. Frame indices alone cannot distinguish one-second spacing from ten-second spacing unless sampling metadata or another signal supplies that difference."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Test order and time explicitly",
+        "paragraphs": [
+          "Create paired clips with the same frames in different orders and ask an order-sensitive question. Also change playback speed or sampling interval to test duration sensitivity. A model can perform well on action labels by recognizing objects without using temporal information. Ensure masks reflect the setting: a streaming model must not attend to future frames, whereas an offline model may. Keep temporal metadata consistent after dropping or merging frames; renumbering them can accidentally erase real gaps and imply continuous observation."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Two clips have identical sampled images and frame indices, but timestamps differ by a factor of ten. What information is missing if timestamps are omitted?",
+      "answer": "The model lacks the real elapsed-time scale. It may recognize the same ordering but cannot infer the different duration or speed from those indices alone."
+    },
+    "takeaways": [
+      "Ordering and elapsed time are distinct signals.",
+      "Use order-sensitive tests to verify temporal reasoning."
+    ],
+    "references": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Review attention shapes and the need for positional information."
+      },
+      {
+        "title": "Qwen2.5-VL Technical Report",
+        "url": "https://arxiv.org/abs/2502.13923",
+        "kind": "paper",
+        "note": "Explore time-aware visual representations and multimodal evaluation."
+      }
+    ]
+  },
+  {
+    "topicId": "13-03",
+    "title": "Video Understanding Versus Video Generation",
+    "summary": "Understanding infers properties of observed video, while generation models possible visual sequences.",
+    "prerequisites": [
+      "09-10",
+      "13-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Different outputs imply different objectives",
+        "paragraphs": [
+          "Video understanding may classify an action, answer a question, localize an event, or summarize a clip. Video generation produces frames or latent video representations conditioned on text, images, or prior frames. Both can require temporal structure, but success on one does not establish success on the other. A visually plausible generated sequence may invent events; a strong action classifier may retain too little information to reconstruct the original scene."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Compare the learning problems",
+        "paragraphs": [
+          "A classifier can map a video tensor to a probability vector over action labels. A temporal grounding system predicts start and end times. A generator models a distribution over future or complete visual sequences, often through iterative denoising or another generative process. Understanding losses emphasize task-relevant invariances; generation often requires preserving detailed appearance and motion. For example, ignoring background color may improve an action label predictor while making exact frame reconstruction impossible."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Evaluate each claim with its own evidence",
+        "paragraphs": [
+          "Use task accuracy, retrieval quality, or temporal overlap for understanding, depending on the output. For generation, inspect temporal consistency, conditioning fidelity, diversity, and task-appropriate quality measures. A single attractive sample is weak evidence about a distribution. Generated videos can support data augmentation or world modeling, but errors in dynamics or object persistence may mislead a downstream learner. Keep observed evidence separate from predicted possibilities when a system answers questions about what actually happened in a recorded clip."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A model generates a convincing clip of a cup falling after viewing one still image. Has it established that the cup fell in the original recording?",
+      "answer": "No. It generated a plausible continuation conditioned on limited evidence. Understanding the actual recording requires observed frames or another reliable source establishing that event."
+    },
+    "takeaways": [
+      "Plausibility is different from factual evidence about a clip.",
+      "Match evaluation to the output and objective."
+    ],
+    "references": [
+      {
+        "title": "Video Diffusion Models",
+        "url": "https://arxiv.org/abs/2204.03458",
+        "kind": "paper",
+        "note": "Compare generative video modeling with recognition objectives."
+      },
+      {
+        "title": "MovieChat",
+        "url": "https://arxiv.org/abs/2307.16449",
+        "kind": "paper",
+        "note": "Inspect the separation of short-term and long-term video memory."
+      }
+    ]
+  },
+  {
+    "topicId": "13-04",
+    "title": "Short-Term and Long-Term Temporal Reasoning",
+    "summary": "Reasoning horizon concerns dependencies between events, not merely the duration of the input file.",
+    "prerequisites": [
+      "13-02"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Local motion and distant dependencies",
+        "paragraphs": [
+          "Short-term reasoning may determine whether a hand moved left or right over a few frames. Long-term reasoning may connect an object placed in a drawer early in a video with a later search. The distinction depends on the information needed to answer, not on a universal time threshold. A long video can contain an easy static question, while a brief clip can require subtle ordering and causal interpretation."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Track a dependency across events",
+        "paragraphs": [
+          "Imagine a person puts a blue key in a bag, walks through several rooms, and later removes a red key from a shelf. Answering where the blue key is requires retaining object identity and the earlier location update while ignoring distracting events. A representation of only the latest frame may be insufficient. Event summaries, identity tracking, and memory can preserve useful links, but compressed descriptions may lose details such as which of two similar bags was used."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Design evaluations that isolate the horizon",
+        "paragraphs": [
+          "Vary the gap between relevant events while keeping the underlying task similar. Add distractors to test interference, and include questions answerable only by combining distant observations. Report whether the model saw the whole video at once or processed it sequentially. Avoid attributing a gain to long-term reasoning if one method simply receives more frames or higher resolution. Inspect failures involving entity identity, event order, and state updates separately; each points to a different missing capability."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A one-hour video asks what color the wall is. Does success demonstrate long-term temporal reasoning?",
+      "answer": "Not necessarily. A single representative frame may suffice. A stronger test requires linking information from separated moments, such as tracking a changed object state across intervening events."
+    },
+    "takeaways": [
+      "Dependency length is more informative than clip duration alone.",
+      "Separate memory retention from temporal inference."
+    ],
+    "references": [
+      {
+        "title": "MovieChat",
+        "url": "https://arxiv.org/abs/2307.16449",
+        "kind": "paper",
+        "note": "Inspect the separation of short-term and long-term video memory."
+      },
+      {
+        "title": "MA-LMM",
+        "url": "https://arxiv.org/abs/2404.05726",
+        "kind": "paper",
+        "note": "Follow the memory-bank update and bounded online processing."
+      }
+    ]
+  },
+  {
+    "topicId": "13-05",
+    "title": "Streaming and Offline Video Processing",
+    "summary": "Streaming systems must make decisions using only information available before the current time.",
+    "prerequisites": [
+      "13-01",
+      "13-02"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "The availability constraint changes the task",
+        "paragraphs": [
+          "An offline system can inspect a complete recording, revisit arbitrary moments, and choose frames after seeing the question. A streaming system receives observations over time and must operate within an arrival schedule and memory budget. It cannot use future frames to improve an earlier prediction. A method may work in both settings, but the evaluation must specify when questions arrive, when answers are due, and whether stored raw video can be revisited."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Trace a causal update",
+        "paragraphs": [
+          "At time t, a streaming encoder updates memory Mt=f(Mt−1,Ot) using the new observation Ot and prior state. An answer produced then should depend only on observations up to t. If processing a chunk requires frames through t+2, the earliest valid answer time includes that lookahead. A system that buffers all raw frames on disk may have bounded GPU memory but unbounded total storage, which is a different claim from strict bounded-memory streaming."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Measure deadlines and backlogs",
+        "paragraphs": [
+          "Report processing throughput relative to the incoming frame rate, answer latency, and maximum buffer occupancy. If a system receives 30 frames per second but can process only 20 indefinitely, its backlog grows unless it drops frames or compresses work. Offline accuracy alone does not establish real-time capability. Use causal masks and timestamped logs, and audit query-dependent frame selection for future access. A fair offline comparison may allow richer evidence, but should be labeled as an offline upper reference rather than an equivalent streaming baseline."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A system answers at second 10 using a summary created from the entire 30-second clip. Is the answer causally streaming?",
+      "answer": "No. The summary may contain information from seconds 10–30. The answer violates the available-information boundary even if the final prediction happens to be correct."
+    },
+    "takeaways": [
+      "Streaming is an information and timing constraint.",
+      "Report total storage and backlog, not only GPU memory."
+    ],
+    "references": [
+      {
+        "title": "MA-LMM",
+        "url": "https://arxiv.org/abs/2404.05726",
+        "kind": "paper",
+        "note": "Follow the memory-bank update and bounded online processing."
+      }
+    ]
+  },
+  {
+    "topicId": "13-06",
+    "title": "Memory Tokens, Recurrent State, and External Memory",
+    "summary": "Different memory interfaces preserve different kinds of past information and support different retrieval operations.",
+    "prerequisites": [
+      "13-05"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Three ways to carry the past",
+        "paragraphs": [
+          "Memory tokens are learned or updated representations placed into a model's token sequence. Recurrent memory compresses previous computation into a state passed to the next step. External memory stores separately addressable records that can be retrieved later. These categories can overlap: an external bank may contain token embeddings, and recurrent updates may write into that bank. What matters is how information is written, retained, and read."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Inspect the interface and shapes",
+        "paragraphs": [
+          "A fixed recurrent state might have shape [B,M,D] and update after every video chunk. The number M bounds its representation size, but not the amount of raw history it has summarized. An external bank may instead store K records with timestamps and keys, then retrieve a subset for a query. Addressability helps locate specific evidence, while a compressed recurrent state can support cheap continuous updates. Neither guarantees preservation of every event."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Understand the bottleneck",
+        "paragraphs": [
+          "A fixed-width memory cannot losslessly encode arbitrary unbounded video at finite precision. Training must favor information useful for expected tasks, and unexpected future questions can expose what was discarded. Evaluate write policies and read policies separately: a good retriever cannot recover a fact never stored, while a rich memory can be wasted by poor retrieval. Track provenance so a generated answer can be connected to retained observations. Do not equate learned memory tokens with a verbatim transcript or an unlimited database."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A system stores one vector per minute but a query asks about a one-frame gesture. What determines whether the answer is possible?",
+      "answer": "The minute-level encoding must have retained evidence of that gesture. Increasing retrieval quality cannot reconstruct a detail that compression discarded; denser storage or task-aware preservation may be necessary."
+    },
+    "takeaways": [
+      "Memory capacity and memory addressability are different.",
+      "Separate writing failures from reading failures."
+    ],
+    "references": [
+      {
+        "title": "MovieChat",
+        "url": "https://arxiv.org/abs/2307.16449",
+        "kind": "paper",
+        "note": "Inspect the separation of short-term and long-term video memory."
+      },
+      {
+        "title": "MA-LMM",
+        "url": "https://arxiv.org/abs/2404.05726",
+        "kind": "paper",
+        "note": "Follow the memory-bank update and bounded online processing."
+      }
+    ]
+  },
+  {
+    "topicId": "13-07",
+    "title": "Retrieval-Based and Hierarchical Video Memory",
+    "summary": "Organizing memory by relevance and temporal scale can reduce retrieval cost while introducing new failure modes.",
+    "prerequisites": [
+      "13-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Search a structured history",
+        "paragraphs": [
+          "Retrieval-based memory stores records with keys that support matching a later query. Hierarchical memory groups fine-grained observations into coarser segments, events, or summaries. A query can first identify a promising interval and then retrieve detailed records inside it. This resembles searching a chapter index before reading a page. The benefit depends on whether the hierarchy preserves routes to the evidence instead of replacing every detailed record with an irreversible summary."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Follow a two-stage lookup",
+        "paragraphs": [
+          "Suppose a one-hour recording has 120 half-minute segments, each containing 10 detailed records. A coarse search selects three segments, then a fine search considers their 30 records instead of all 1,200. This reduces candidate evaluation, but a relevant segment omitted in stage one cannot be rescued by stage two. Semantic similarity alone may retrieve visually similar but temporally wrong events, so timestamps, entity identity, and task constraints can be useful filters."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Audit retrieval and answering separately",
+        "paragraphs": [
+          "Measure whether the correct evidence enters the retrieved set before measuring the final answer. A language model may guess correctly despite retrieval failure, masking the weakness. Include questions with repeated scenes and near-duplicate actions. Report index storage, update cost, retrieval latency, and the number of retrieved tokens. In streaming settings, the index must contain only past records; building summaries from future observations introduces leakage. When a query is unknown during recording, compare question-independent storage fairly with question-aware alternatives."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "The fine retriever is perfect, but the coarse stage selects no segment containing the relevant event. Can the final evidence recall be perfect?",
+      "answer": "No. The fine stage only searches selected segments, so its candidate set lacks the needed evidence. Coarse-stage recall places an upper bound on what this retrieval pipeline can recover."
+    },
+    "takeaways": [
+      "Early retrieval errors constrain every later stage.",
+      "Keep detailed evidence accessible when summaries are insufficient."
+    ],
+    "references": [
+      {
+        "title": "MA-LMM",
+        "url": "https://arxiv.org/abs/2404.05726",
+        "kind": "paper",
+        "note": "Follow the memory-bank update and bounded online processing."
+      },
+      {
+        "title": "MovieChat",
+        "url": "https://arxiv.org/abs/2307.16449",
+        "kind": "paper",
+        "note": "Inspect the separation of short-term and long-term video memory."
+      }
+    ]
+  },
+  {
+    "topicId": "13-08",
+    "title": "Compressing Video Memory Under a Fixed Budget",
+    "summary": "A memory budget should specify physical storage and how information is consolidated as the stream grows.",
+    "prerequisites": [
+      "13-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Choose a budget that means something",
+        "paragraphs": [
+          "A claim of fixed memory might refer to token count, embedding bytes, GPU allocation, or total system storage. These are not equivalent. A bank of M vectors with width D and b bytes per value uses roughly MDb bytes before metadata and temporary buffers. Keeping M fixed while increasing D or precision changes the physical budget. Storing the discarded raw frames elsewhere also changes what the system can retrieve later."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Explore a bounded update",
+        "paragraphs": [
+          "Consider a bank of 100 event vectors. When a new event arrives, the system could evict one old vector, merge two similar vectors, or compress several records into a summary. Merging preserves some aggregate content but can erase order or rare attributes. Eviction preserves retained records exactly but loses others completely. A hierarchical scheme can retain recent detail and older summaries, allocating representational precision according to time and expected use."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Measure forgetting as well as average accuracy",
+        "paragraphs": [
+          "Test queries about rare early events after increasing amounts of distracting video. Plot accuracy against memory bytes and elapsed stream duration. Compare methods with the same observation access, not merely the same final token count. Include update-time peaks because temporary concatenation of old and new banks may exceed the nominal limit. Compression quality is task-dependent: a summary useful for scene classification may be inadequate for exact counting or temporal grounding. Report what metadata survives, especially timestamps and entity links."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A bank contains 128 vectors of width 256 stored in 2-byte values. What is its raw vector storage?",
+      "answer": "It uses 128×256×2 = 65,536 bytes, or 64 KiB. Timestamps, indexes, masks, allocator overhead, and temporary update buffers are additional storage."
+    },
+    "takeaways": [
+      "State the budget in bytes and include metadata.",
+      "Evaluate what is forgotten as the stream grows."
+    ],
+    "references": [
+      {
+        "title": "MovieChat",
+        "url": "https://arxiv.org/abs/2307.16449",
+        "kind": "paper",
+        "note": "Inspect the separation of short-term and long-term video memory."
+      },
+      {
+        "title": "MA-LMM",
+        "url": "https://arxiv.org/abs/2404.05726",
+        "kind": "paper",
+        "note": "Follow the memory-bank update and bounded online processing."
+      }
+    ]
+  },
+  {
+    "topicId": "13-09",
+    "title": "Importance, Redundancy, and Relevance",
+    "summary": "A useful memory policy balances valuable evidence, repeated observations, and the questions it expects to answer.",
+    "prerequisites": [
+      "13-08"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Three scores answer different questions",
+        "paragraphs": [
+          "Importance estimates whether an observation could matter. Redundancy estimates how much it duplicates information already stored. Relevance measures its relationship to a particular query or task. A rare event can be important without being relevant to the current question. A highly relevant frame can be redundant with ten nearby frames. Treating one attention score as all three concepts hides why a storage policy succeeds or fails."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Think in marginal value",
+        "paragraphs": [
+          "Suppose memory already contains a clear view of a red cup. Another almost identical view may add little, while a frame showing the cup being moved into a drawer changes the tracked state. A conceptual selection score might reward relevance and novelty while penalizing storage cost. Such a score is a design heuristic unless its objective and assumptions are formally justified. Similar visual embeddings can still represent different times or events, so feature similarity alone is an imperfect redundancy test."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Avoid using future knowledge unfairly",
+        "paragraphs": [
+          "If the question is known while selecting frames, query relevance is available. If the system records first and receives arbitrary questions later, it must preserve information without that oracle. Compare these settings separately. Build tests with rare details, repeated appearances, and changing object states to expose each scoring component. Inspect selected and rejected records, and ablate novelty, recency, and query terms independently. A compelling visualization of selected frames does not establish that the policy preserves the information needed across the full question distribution."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Two identical-looking frames show a door before and after a person passes through. Are they necessarily redundant for an event-order query?",
+      "answer": "No. Their appearance may match, but their timestamps and position around the event can establish ordering or state continuity. Redundancy depends on the information required by the task."
+    },
+    "takeaways": [
+      "Importance, novelty, and query relevance are distinct.",
+      "Declare whether the future question is available during selection."
+    ],
+    "references": [
+      {
+        "title": "MovieChat",
+        "url": "https://arxiv.org/abs/2307.16449",
+        "kind": "paper",
+        "note": "Inspect the separation of short-term and long-term video memory."
+      },
+      {
+        "title": "MA-LMM",
+        "url": "https://arxiv.org/abs/2404.05726",
+        "kind": "paper",
+        "note": "Follow the memory-bank update and bounded online processing."
+      }
+    ]
+  },
+  {
+    "topicId": "13-10",
+    "title": "Memory Updates, Forgetting, and Eviction",
+    "summary": "A memory system needs a policy for changing stored evidence, not just a container for accumulating it.",
+    "prerequisites": [
+      "13-06",
+      "13-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Retention is an active decision",
+        "paragraphs": [
+          "Every bounded memory eventually chooses what to overwrite, merge, or discard. Recency policies favor new information; frequency policies retain repeatedly useful records; task-aware policies prioritize estimated future value. Forgetting can improve efficiency and remove obsolete state, but it can also erase facts needed later. The right policy depends on whether the task asks about current state, historical events, or both."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Distinguish state replacement from history deletion",
+        "paragraphs": [
+          "If a cup moves from a table to a shelf, updating its current location should replace the state estimate. A historical query asking where it was earlier still needs the previous event record. A gated recurrent update may interpolate between old and new representations, while an explicit bank can append a timestamped event and update a separate current-state index. These interfaces make different information accessible. Merging contradictory observations without timestamps can produce an ambiguous representation."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Test update consistency",
+        "paragraphs": [
+          "Use controlled streams with repeated facts, changed facts, and delayed questions. Check that newer observations do not rewrite what happened earlier, and that stale state does not dominate current-state answers. Report how ties, duplicate records, and full-capacity updates are handled. In learned systems, distinguish limited gradient history during training from limited memory at inference; truncated backpropagation does not necessarily reset the forward state. Log eviction decisions so failures can be traced to the missing evidence rather than blamed vaguely on reasoning."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A tracker updates a person's location from room A to room B. What must it retain to answer both current-location and past-location questions?",
+      "answer": "It needs the current state plus timestamped history or equivalent recoverable evidence. Overwriting room A with room B alone supports the current answer but loses the earlier location."
+    },
+    "takeaways": [
+      "Current state and event history serve different queries.",
+      "Audit memory writes and evictions with controlled streams."
+    ],
+    "references": [
+      {
+        "title": "MA-LMM",
+        "url": "https://arxiv.org/abs/2404.05726",
+        "kind": "paper",
+        "note": "Follow the memory-bank update and bounded online processing."
+      }
+    ]
+  },
+  {
+    "topicId": "13-11",
+    "title": "Long-Video Questions and Temporal Grounding",
+    "summary": "Answering what happened and identifying when it happened require related but distinct evidence and metrics.",
+    "prerequisites": [
+      "13-04",
+      "13-07"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Connect language to an interval",
+        "paragraphs": [
+          "Video question answering produces an answer conditioned on the clip and question. Temporal grounding locates the interval corresponding to a description or event. A system can identify the right action but place it at the wrong time, or localize the right interval while describing it incorrectly. Long recordings add repeated events, distractors, and sparse evidence, making it important to evaluate temporal localization separately from answer fluency."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Calculate temporal overlap",
+        "paragraphs": [
+          "For predicted interval [a,b] and reference [c,d], temporal intersection-over-union is overlap duration divided by union duration. With [10,20] and [15,25], intersection is 5 seconds and union is 15, so tIoU is 1/3. Boundary conventions and zero-length intervals need explicit handling. Question-answer accuracy measures a different property and may depend on exact matching, semantic grading, or human evaluation. None of these alone proves that the model used the correct visual evidence."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Guard against language shortcuts",
+        "paragraphs": [
+          "A plausible answer may be guessed from a question's wording or common event patterns. Include visually counterintuitive cases and compare against a question-only baseline. For grounding, test repeated similar events and specify which occurrence the annotation refers to. Record time units and sampling resolution; coarse frame sampling limits achievable boundaries. Split related videos carefully to avoid near-duplicate scenes across training and evaluation. When reporting aggregate scores, also inspect failures in retrieval, event identity, ordering, and boundary precision."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A prediction covers [0,30] and the target covers [10,20]. Why is covering the entire target not sufficient for perfect tIoU?",
+      "answer": "The intersection is 10 seconds but the union is 30 seconds, giving tIoU=1/3. The metric penalizes an overly broad interval because it includes unrelated time."
+    },
+    "takeaways": [
+      "Answer correctness and temporal localization need separate checks.",
+      "Use evidence-sensitive tests and explicit time conventions."
+    ],
+    "references": [
+      {
+        "title": "Qwen2.5-VL Technical Report",
+        "url": "https://arxiv.org/abs/2502.13923",
+        "kind": "paper",
+        "note": "Explore time-aware visual representations and multimodal evaluation."
+      },
+      {
+        "title": "MovieChat",
+        "url": "https://arxiv.org/abs/2307.16449",
+        "kind": "paper",
+        "note": "Inspect the separation of short-term and long-term video memory."
+      }
+    ]
+  },
+  {
+    "topicId": "13-12",
+    "title": "Static Appearance and Motion Information",
+    "summary": "Recognizing objects in frames is different from understanding how those objects change over time.",
+    "prerequisites": [
+      "13-01",
+      "13-02"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A still image can be misleading",
+        "paragraphs": [
+          "A person beside a bicycle could be mounting it, dismounting it, or standing still. Appearance identifies objects and scene context; motion describes changes across observations. Some action datasets contain strong background shortcuts, so a model can achieve useful scores without tracking movement. To claim motion understanding, evaluation must include cases where similar appearances correspond to different temporal behaviors."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Represent change carefully",
+        "paragraphs": [
+          "A simple difference between adjacent frames highlights changing pixels, but camera movement and lighting changes also produce differences. Optical flow estimates apparent image-plane displacement, not necessarily physical three-dimensional motion. Temporal attention can combine learned features across frames without explicitly computing flow, yet it still depends on sampling and position information. If a rapidly moving object returns to the same position between sampled frames, sparse sampling can miss its movement entirely, an example of temporal aliasing."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Disentangle objects from actions",
+        "paragraphs": [
+          "Compare clips with reversed order, shuffled frames, or matched backgrounds while preserving a meaningful test protocol. These interventions probe different dependencies and can also create unnatural inputs, so interpret results carefully. Include camera motion, occlusion, and speed changes. Report whether the model receives explicit motion features or only RGB frames. A performance gain from more frames may come from seeing more object viewpoints rather than modeling velocity. Inspect examples where appearance remains stable but action direction changes."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Two sampled frames are identical, but an object completed a full circular motion between them. Can those two frames alone establish that motion?",
+      "answer": "No. Multiple intervening trajectories are consistent with the same endpoints, including no motion. Denser observations or additional motion-sensitive measurements are needed to disambiguate the event."
+    },
+    "takeaways": [
+      "Appearance cues can conceal weak temporal modeling.",
+      "Sampling and camera motion complicate motion interpretation."
+    ],
+    "references": [
+      {
+        "title": "OpenCV: Optical Flow",
+        "url": "https://docs.opencv.org/4.x/d4/dee/tutorial_optical_flow.html",
+        "kind": "guide",
+        "note": "Study image-plane motion and the assumptions behind flow estimation."
+      },
+      {
+        "title": "Qwen2.5-VL Technical Report",
+        "url": "https://arxiv.org/abs/2502.13923",
+        "kind": "paper",
+        "note": "Explore time-aware visual representations and multimodal evaluation."
+      }
+    ]
+  },
+  {
+    "topicId": "13-13",
+    "title": "Accuracy, Memory, and Latency in Video Systems",
+    "summary": "Video-memory methods should be compared as complete systems under equal observation and resource constraints.",
+    "prerequisites": [
+      "11-16",
+      "13-08"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "More than a final accuracy number",
+        "paragraphs": [
+          "A video system may improve question accuracy by retaining more frames, increasing resolution, or using a larger language model. Those changes can increase memory and latency independently of the proposed memory algorithm. A meaningful trade-off comparison states which resources are fixed and which are varied. Memory can include visual features, indexes, model state, and raw video storage; latency can include ingestion, retrieval, and answer generation."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Build a controlled comparison",
+        "paragraphs": [
+          "Hold the encoder, language model, input sampling, and output settings fixed while varying the memory budget and update policy. For each budget, measure task accuracy, peak storage, update cost per chunk, retrieval time, and answer latency. A method that compresses aggressively may reduce retrieval cost while adding expensive updates. In streaming use, average throughput must also keep up with incoming data. Report warmup and synchronization practices when GPU timing is involved."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Interpret the operating point",
+        "paragraphs": [
+          "Consider one method with higher accuracy but twice the update latency and another that meets a strict real-time deadline. Neither is universally better. Plot nondominated configurations and show uncertainty from question sampling or repeated timing runs. Include long-duration stress tests to reveal whether memory remains bounded. Avoid comparing an offline method with question-aware frame access against a causal streaming method without labeling the information advantage. Quality under a fixed byte budget is different from quality under a fixed number of compressed vectors."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Method A uses 100 tokens of width 1,024, while B uses 100 tokens of width 4,096 at the same dtype. Are their raw feature-memory budgets equal?",
+      "answer": "No. B uses four times the raw feature storage before metadata. Equal token counts only imply equal bytes when dimensions, dtype, and storage layout are also comparable."
+    },
+    "takeaways": [
+      "Match evidence access and physical resource budgets.",
+      "Report update, retrieval, and generation costs separately."
+    ],
+    "references": [
+      {
+        "title": "MA-LMM",
+        "url": "https://arxiv.org/abs/2404.05726",
+        "kind": "paper",
+        "note": "Follow the memory-bank update and bounded online processing."
+      },
+      {
+        "title": "PyTorch Profiler",
+        "url": "https://docs.pytorch.org/docs/2.14/profiler.html",
+        "kind": "guide",
+        "note": "Inspect CPU, CUDA, shapes, and memory in an execution trace."
+      }
+    ]
+  }
+]

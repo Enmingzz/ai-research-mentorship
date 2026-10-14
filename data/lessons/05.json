@@ -1,0 +1,760 @@
+[
+  {
+    "topicId": "05-01",
+    "title": "Autoregressive modeling turns a sequence into conditional predictions",
+    "summary": "Derive sequence likelihood and distinguish parallel training from sequential generation.",
+    "prerequisites": [
+      "01-06",
+      "04-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Predict the next symbol from what is available",
+        "paragraphs": [
+          "An autoregressive language model represents a sequence by predicting each token from the tokens before it. This does not assume tokens are independent; the prefix is precisely how dependencies enter the model. The same mechanism can model prose, code, or other tokenized sequences. A model's fluent output emerges from repeatedly selecting a continuation under these learned conditional distributions, not from a separate sentence-level grammar engine."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Factor a joint distribution with the chain rule",
+        "paragraphs": [
+          "For tokens x₁ through x_T, the joint probability is the product of p(x_t | x_<t). Taking a negative logarithm produces a sum of next-token losses. During training, the full observed sequence is known, so a causal Transformer can compute losses at many positions in one pass. During free generation, later inputs are unknown until earlier choices are made, so ordinary sampling proceeds sequentially."
+        ],
+        "formula": "p(x₁,…,x_T) = ∏ₜ p(x_t | x_<t)"
+      },
+      {
+        "id": "practice",
+        "title": "Training prefixes and generated prefixes differ",
+        "paragraphs": [
+          "Teacher-forced training conditions on observed prefixes. Generation conditions on the model's own earlier outputs, which can include mistakes or unusual continuations. Evaluate complete generated behavior as well as held-out likelihood. A high-probability continuation is also not automatically factually correct: the objective rewards statistical prediction under the training distribution. Define end-of-sequence behavior and maximum generation length so that decoding has a clear stopping policy."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A model assigns probabilities 0.5, 0.25, and 0.8 to three observed tokens given their respective prefixes. What is the sequence probability and total negative log likelihood?",
+      "answer": "The sequence probability is 0.5·0.25·0.8 = 0.1. Total negative log likelihood is −ln(0.1) ≈ 2.303 nats, equal to the sum of the three token-level negative log probabilities."
+    },
+    "takeaways": [
+      "Autoregression uses conditional dependence, not token independence.",
+      "Parallel teacher-forced training and sequential sampling use the same factorization."
+    ],
+    "references": [
+      {
+        "title": "Language Models are Few-Shot Learners",
+        "url": "https://arxiv.org/abs/2005.14165",
+        "kind": "paper",
+        "note": "Read the autoregressive language-model objective and generation-based task framing."
+      },
+      {
+        "title": "LLaMA: Open and Efficient Foundation Language Models",
+        "url": "https://arxiv.org/abs/2302.13971",
+        "kind": "paper",
+        "note": "Inspect the causal language-model training setup."
+      }
+    ]
+  },
+  {
+    "topicId": "05-02",
+    "title": "Tokenization chooses the units a language model predicts",
+    "summary": "Understand BPE and SentencePiece without assuming that a token is a word.",
+    "prerequisites": [
+      "03-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Text must become discrete model inputs",
+        "paragraphs": [
+          "A language model consumes token IDs, so tokenization determines how raw text becomes a sequence of prediction targets. Whole-word vocabularies struggle with rare words and spelling variation, while character-level sequences can become very long. Subword tokenization balances vocabulary size against sequence length by representing common patterns compactly and composing less common strings from smaller pieces. The choice affects compute, context usage, and evaluation."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Learn reusable pieces from a corpus",
+        "paragraphs": [
+          "BPE repeatedly merges frequent adjacent symbol pairs during tokenizer training. If a toy sequence begins as [a, b, a, b] and the learned merge combines a with b, it becomes [ab, ab]. Real tokenizers also define normalization, whitespace treatment, special tokens, and initial symbols such as bytes or characters. SentencePiece is a tokenizer framework that can train models such as BPE or unigram directly from raw sentences; it is not a synonym for one specific merge algorithm."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Keep tokenizer and model versions together",
+        "paragraphs": [
+          "Changing the tokenizer changes token IDs and segmentation, so an embedding table trained for one vocabulary cannot generally interpret another. Inspect exact tokenization for spaces, Unicode, numbers, and code before interpreting length or errors. Different tokenizers can produce different perplexities on the same text because the prediction units differ. Longer vocabularies may shorten sequences but enlarge embeddings and output projections, making tokenization an architectural and systems trade-off."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A tokenizer represents the same sentence with 10 tokens while another uses 15. Can you compare their token-level perplexities directly to conclude which language model is better?",
+      "answer": "Not reliably. The units and number of conditional predictions differ, so token-level perplexity is tokenizer-dependent. Use a compatible text-normalized measure or matched tokenization, and evaluate the intended downstream task as well."
+    },
+    "takeaways": [
+      "Tokens are learned text units, not necessarily words.",
+      "Tokenizer identity is part of a model checkpoint's contract."
+    ],
+    "references": [
+      {
+        "title": "Neural Machine Translation of Rare Words with Subword Units",
+        "url": "https://arxiv.org/abs/1508.07909",
+        "kind": "paper",
+        "note": "Read the subword BPE construction and rare-word motivation."
+      },
+      {
+        "title": "SentencePiece: A simple and language independent subword tokenizer and detokenizer for Neural Text Processing",
+        "url": "https://arxiv.org/abs/1808.06226",
+        "kind": "paper",
+        "note": "Compare tokenizer model choices and raw-text processing."
+      }
+    ]
+  },
+  {
+    "topicId": "05-03",
+    "title": "Causal language-model loss depends on a one-token alignment",
+    "summary": "Build shifted targets and valid-token reductions so the model learns continuation rather than copying.",
+    "prerequisites": [
+      "05-01",
+      "01-09",
+      "04-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "The output at one position predicts the next token",
+        "paragraphs": [
+          "A causal model's hidden state at position t has seen tokens through t. Its vocabulary logits should therefore be compared with token t+1. If labels are aligned with the current input token, a model can learn an easier copying problem that does not train useful continuation. A low loss under that misalignment can look impressive while generation remains poor."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Trace a four-token example",
+        "paragraphs": [
+          "For [BOS, A, B, EOS], one explicit training pair uses inputs [BOS, A, B] and targets [A, B, EOS]. Logits have shape [B, T−1, V], with one V-way classification problem per valid target. Some model APIs accept the full sequence as both input and labels and perform the shift internally; others expect pre-shifted tensors. Applying both conventions shifts twice. Check the interface with a tiny sequence whose expected targets you can list by hand."
+        ],
+        "formula": "L = −(1/N_valid) Σ_valid log pθ(x_(t+1) | x_≤t)"
+      },
+      {
+        "id": "practice",
+        "title": "Mask targets as well as attention",
+        "paragraphs": [
+          "Padding positions should not enter the loss denominator. Instruction tuning may also mask prompt tokens so only desired assistant responses provide supervision. This changes the objective even when the attention mask remains causal. Packed documents require an explicit policy for boundaries and whether cross-document context is allowed. Inspect a decoded input beside its target IDs and ignore mask before trusting a large dataset pipeline."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A training sample has 5 real tokens followed by 3 padding tokens. Under explicit one-token shifting, how many next-token targets within the real sequence contribute, assuming no additional start token outside those 5?",
+      "answer": "There are four real-to-real next-token targets. Targets that point to padding are excluded. If the dataset explicitly includes a start or end token, count it according to the actual five-token sequence rather than silently adding another prediction."
+    },
+    "takeaways": [
+      "Shift exactly once according to the model interface.",
+      "The loss mask and denominator define which predictions are trained."
+    ],
+    "references": [
+      {
+        "title": "LLaMA: Open and Efficient Foundation Language Models",
+        "url": "https://arxiv.org/abs/2302.13971",
+        "kind": "paper",
+        "note": "Read the autoregressive pretraining objective and data processing context."
+      },
+      {
+        "title": "Hugging Face — Perplexity of Fixed-Length Models",
+        "url": "https://huggingface.co/docs/transformers/perplexity",
+        "kind": "guide",
+        "note": "Inspect target shifting, ignored labels, and counting predicted tokens."
+      }
+    ]
+  },
+  {
+    "topicId": "05-04",
+    "title": "Perplexity is exponentiated average surprise",
+    "summary": "Compute perplexity correctly and understand why tokenization and context windows affect comparisons.",
+    "prerequisites": [
+      "01-09",
+      "05-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Translate log loss into an intuitive scale",
+        "paragraphs": [
+          "Perplexity exponentiates the average negative log probability assigned to observed tokens. A perfectly uniform predictor over V tokens has perplexity V. This motivates an interpretation as an effective number of equally likely alternatives, although a real model's probabilities vary by token and context. Lower held-out perplexity indicates better average probability assignment under a specified evaluation setup, not necessarily better factual answers or instruction following."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Aggregate losses before exponentiating",
+        "paragraphs": [
+          "Using natural logs, PPL = exp(total negative log likelihood / number of valid targets). Unequal sequence lengths must contribute proportionally to their valid token counts. Averaging per-sequence perplexities is generally wrong because exponentiation is nonlinear. Context-limited models add another choice: evaluating independent chunks deprives early chunk positions of preceding context, while overlapping windows can preserve more context if already-scored targets are masked appropriately."
+        ],
+        "formula": "PPL = exp(−Σ_valid log p(x_t | context) / N_valid)"
+      },
+      {
+        "id": "practice",
+        "title": "State the evaluation contract",
+        "paragraphs": [
+          "Report tokenizer, corpus, context length, stride or chunking policy, and treatment of document boundaries. Different tokenizers change the units, so their raw token perplexities are not directly interchangeable. A low perplexity on leaked or duplicated text does not establish generalization. For a model intended to answer questions, pair likelihood with task-specific evaluation and inspect failure cases rather than treating one scalar as a complete quality ranking."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Two equally long sequences have perplexities 4 and 16 under the same tokenizer. What is their combined perplexity if each sequence has the same number of valid targets?",
+      "answer": "Average their log losses: (ln 4 + ln 16)/2 = ln 8, so combined perplexity is 8. The arithmetic mean 10 is incorrect. If lengths differ, weight each log loss by its valid-target count."
+    },
+    "takeaways": [
+      "Average token log loss first, then exponentiate.",
+      "Perplexity comparisons require matching tokenization and context policy."
+    ],
+    "references": [
+      {
+        "title": "Hugging Face — Perplexity of Fixed-Length Models",
+        "url": "https://huggingface.co/docs/transformers/perplexity",
+        "kind": "guide",
+        "note": "Read fixed-context evaluation, sliding windows, and correct token counting."
+      }
+    ]
+  },
+  {
+    "topicId": "05-05",
+    "title": "Choose a language-model architecture by its access pattern",
+    "summary": "Compare encoder-only, decoder-only, and encoder-decoder models through visibility and output structure.",
+    "prerequisites": [
+      "04-07",
+      "05-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Different tasks expose different information",
+        "paragraphs": [
+          "An encoder-only model commonly reads an entire observed input and produces contextual representations useful for classification, retrieval, or token labeling. A decoder-only model predicts continuations under a causal mask. An encoder-decoder model reads an observed source and generates a separate target. None of these labels alone guarantees a model's suitability; pretraining objective, data, adaptation, and evaluation also shape what it can do."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Compare the attention connections",
+        "paragraphs": [
+          "An encoder can connect every valid input position to every other valid input position. A causal decoder connects each position only to its prefix. An encoder-decoder adds cross-attention from target states to source states, allowing a generated target to read the fully observed source while remaining causal within itself. A decoder-only system can represent the same source-target task by concatenating a prompt and continuation, but its computation and masking are organized differently."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Avoid leakage when changing the task",
+        "paragraphs": [
+          "A bidirectional encoder cannot score an observed token as a next-token prediction if its representation has already read that token or future context. Masked-language modeling and causal-language modeling therefore define different likelihood-related tasks. For deployment, compare quality alongside input length, output length, reusable source computation, and generation latency. Architectural familiarity should not replace a measured baseline on the actual application."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "You need a label for every word in a fully observed sentence and do not need free-form generation. Which architecture offers a natural baseline, and why is it not the only possible choice?",
+      "answer": "An encoder-only model is a natural baseline because every token can use both left and right context. Other architectures can also be adapted, but their training objective and computational cost should be evaluated rather than assuming generation capability is necessary."
+    },
+    "takeaways": [
+      "Visibility and source-target structure distinguish the architectures.",
+      "Task compatibility depends on objective and adaptation as well as architecture."
+    ],
+    "references": [
+      {
+        "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+        "url": "https://arxiv.org/abs/1810.04805",
+        "kind": "paper",
+        "note": "Read bidirectional contextual encoding and masked pretraining."
+      },
+      {
+        "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+        "url": "https://arxiv.org/abs/1910.10683",
+        "kind": "paper",
+        "note": "Read the encoder-decoder text-to-text setup."
+      },
+      {
+        "title": "Language Models are Few-Shot Learners",
+        "url": "https://arxiv.org/abs/2005.14165",
+        "kind": "paper",
+        "note": "Read causal decoding and prompt-based task formulation."
+      }
+    ]
+  },
+  {
+    "topicId": "05-06",
+    "title": "Compare GPT, BERT, and LLaMA at the level of blocks and objectives",
+    "summary": "Separate broad model families from the specific architectural choices of a published generation.",
+    "prerequisites": [
+      "05-05",
+      "04-09",
+      "04-12"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Family names are not complete specifications",
+        "paragraphs": [
+          "GPT-style models are associated with causal decoding, while BERT uses bidirectional encoding trained with a masked-token objective. LLaMA is also a causal decoder family, so its differences from GPT are often block-level and training-design choices rather than a different autoregressive factorization. Family names span multiple releases; a careful comparison names the exact paper or checkpoint instead of assuming one configuration describes every descendant."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Inspect the concrete components",
+        "paragraphs": [
+          "The original LLaMA design combines pre-normalization, RMSNorm, rotary position embeddings, and SwiGLU feed-forward layers. BERT's bidirectional mask and masked-token objective create a different information flow from causal GPT-style training. Early GPT-style designs and later members can differ in position encoding, normalization, biases, head sharing, and FFNs. Read the configuration for model width, layer count, head counts, vocabulary, and context handling before estimating memory or adapting a checkpoint."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "A weight tensor needs its original computation",
+        "paragraphs": [
+          "Two models with similarly shaped matrices may still compute different functions because of normalization placement, positional encoding, or gating. Loading weights into an approximately matching block is not sufficient. For an architecture comparison, hold task, data budget, and evaluation fixed where possible, then attribute claims narrowly. A difference in benchmark score cannot automatically be assigned to one block change when training data and compute also differ."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Why is 'BERT versus LLaMA' partly an objective comparison, while 'an early GPT-style decoder versus original LLaMA' is often more of a block-design comparison?",
+      "answer": "BERT reads bidirectionally and predicts masked tokens, whereas LLaMA uses causal next-token prediction. Both GPT-style decoders and LLaMA use causal generation, so their differences can center on normalization, position encoding, FFNs, data, and training choices."
+    },
+    "takeaways": [
+      "Specify the model generation and checkpoint configuration.",
+      "Similar tensor shapes do not establish architectural equivalence."
+    ],
+    "references": [
+      {
+        "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+        "url": "https://arxiv.org/abs/1810.04805",
+        "kind": "paper",
+        "note": "Read attention visibility and masked-language pretraining."
+      },
+      {
+        "title": "LLaMA: Open and Efficient Foundation Language Models",
+        "url": "https://arxiv.org/abs/2302.13971",
+        "kind": "paper",
+        "note": "Inspect RMSNorm, pre-normalization, SwiGLU, and rotary embeddings."
+      },
+      {
+        "title": "Language Models are Few-Shot Learners",
+        "url": "https://arxiv.org/abs/2005.14165",
+        "kind": "paper",
+        "note": "Use the GPT-3 causal model as a concrete GPT-family reference."
+      }
+    ]
+  },
+  {
+    "topicId": "05-07",
+    "title": "Pretraining, continued pretraining, and SFT change different distributions",
+    "summary": "Distinguish learning broad text statistics, adapting to a domain, and learning response behavior.",
+    "prerequisites": [
+      "05-01",
+      "05-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A training stage is defined by its data and objective",
+        "paragraphs": [
+          "Pretraining typically learns general sequence prediction from a large corpus. Continued pretraining resumes that style of learning on additional data, often emphasizing a domain or updated distribution. Supervised fine-tuning uses demonstrations of desired input-output behavior, such as questions paired with helpful responses. These stages may all use token-level cross-entropy, yet they differ in which contexts and targets receive learning signal."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Trace the supervised tokens",
+        "paragraphs": [
+          "In continued pretraining on technical documents, the model may predict nearly every valid next token. In response-focused SFT, prompt tokens can provide context while only assistant-response tokens contribute to the loss. The model therefore learns conditional behavior under a different distribution of prefixes. The optimizer, learning rate, data mixture, and training length determine how strongly the new stage changes existing representations and capabilities."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Evaluate adaptation and retention together",
+        "paragraphs": [
+          "A domain model can improve on specialist text while losing performance elsewhere. Measure the target domain and a retained-capability set rather than assuming more training is universally beneficial. High-quality demonstrations matter: a small clean dataset can teach formatting and response patterns without replacing broad pretraining. Do not infer factual reliability from instruction-following style alone. Track data provenance and prevent evaluation examples from entering any training stage."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A model needs better biomedical vocabulary and better adherence to a requested answer format. Which stage naturally addresses each need, and why might both be useful?",
+      "answer": "Continued pretraining on appropriate biomedical text can adapt domain statistics and terminology. SFT on task demonstrations can teach the requested answer behavior and format. Both may be useful because domain familiarity and response conditioning are distinct goals, and both require evaluation."
+    },
+    "takeaways": [
+      "Identical loss families can train different behaviors under different data distributions.",
+      "Measure new-domain gains and retained capabilities together."
+    ],
+    "references": [
+      {
+        "title": "LLaMA: Open and Efficient Foundation Language Models",
+        "url": "https://arxiv.org/abs/2302.13971",
+        "kind": "paper",
+        "note": "Inspect large-scale next-token pretraining and corpus composition."
+      },
+      {
+        "title": "Training language models to follow instructions with human feedback",
+        "url": "https://arxiv.org/abs/2203.02155",
+        "kind": "paper",
+        "note": "Read the supervised demonstration stage before preference-based training."
+      }
+    ]
+  },
+  {
+    "topicId": "05-08",
+    "title": "Chat templates are part of the model's input language",
+    "summary": "Serialize roles and turn boundaries exactly as the instruction-tuned model expects.",
+    "prerequisites": [
+      "05-02",
+      "05-07"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A chat message list is not the model's native input",
+        "paragraphs": [
+          "An application represents conversation as structured messages with roles such as user and assistant. A language model ultimately receives a token sequence. A chat template converts the message structure into the specific markers, separators, and control tokens used during training. Two models can understand similar natural language while expecting different conversation serialization, so formatting is part of compatibility rather than a universal convention."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Make the next role unambiguous",
+        "paragraphs": [
+          "A template may surround each turn with role markers and end-of-message tokens, then append an assistant-generation prefix. This prefix tells the model which kind of content should come next. During SFT, the same serialization determines which token positions belong to assistant responses and should contribute to the loss. Adding special tokens twice, or omitting a needed turn boundary, changes the sequence the model sees even if the rendered conversation looks identical."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Inspect token IDs as well as decoded text",
+        "paragraphs": [
+          "Use the tokenizer's provided template when available and examine a minimal two-turn example. Check the generation prompt, end-of-turn behavior, and whether the tokenizer adds additional beginning or end tokens. For packed conversations, keep boundaries and loss masks consistent. A template can guide role behavior, but it is not a security boundary by itself: the application must still define what content is trusted and how generated actions are validated."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A template already includes its required special tokens. You render it to text, then tokenize with automatic special-token insertion enabled. What can go wrong, and how do you check?",
+      "answer": "The sequence can contain duplicated beginning or end markers that differ from training. Inspect the resulting token IDs and decoded special tokens, and use the template's direct tokenization path or the documented option that avoids adding them a second time."
+    },
+    "takeaways": [
+      "Chat formatting is model-specific input serialization.",
+      "Training masks and inference prefixes must follow the same conversation structure."
+    ],
+    "references": [
+      {
+        "title": "Hugging Face — Chat Templates",
+        "url": "https://huggingface.co/docs/transformers/chat_templating",
+        "kind": "guide",
+        "note": "Read role markers, generation prompts, and avoiding duplicated special tokens."
+      },
+      {
+        "title": "Training language models to follow instructions with human feedback",
+        "url": "https://arxiv.org/abs/2203.02155",
+        "kind": "paper",
+        "note": "Connect instruction demonstrations with learned response behavior."
+      }
+    ]
+  },
+  {
+    "topicId": "05-09",
+    "title": "Decoding chooses a path through a learned distribution",
+    "summary": "Compare greedy selection, temperature, top-k, and nucleus sampling as separate generation controls.",
+    "prerequisites": [
+      "05-01",
+      "01-07"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A model distribution does not specify one answer",
+        "paragraphs": [
+          "At each step, a language model assigns scores to possible next tokens. Greedy decoding always selects the highest-probability token. Sampling instead draws from a distribution, allowing different continuations from the same prompt. These are inference procedures applied to the same model, so differences in output diversity or repetition can arise without any parameter change. The appropriate policy depends on whether the task values exactness, variety, or coverage."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Separate scaling from truncation",
+        "paragraphs": [
+          "Temperature divides logits by a positive value before softmax: lower temperature sharpens probabilities, while higher temperature flattens them. Top-k keeps a fixed number of highest-scoring candidates. Top-p keeps a smallest high-probability prefix whose cumulative probability reaches a chosen threshold, so its candidate count adapts to uncertainty. After filtering, probabilities must be renormalized. Greedy decoding is a limiting or separate selection rule; literally dividing by temperature zero is undefined."
+        ],
+        "formula": "p_i(T) = exp(z_i/T) / Σ_j exp(z_j/T),  T > 0"
+      },
+      {
+        "id": "practice",
+        "title": "A lower temperature cannot verify a claim",
+        "paragraphs": [
+          "Sharper sampling makes outputs more repeatable but does not make an incorrect high-probability answer true. Report decoding settings when evaluating generation, including stopping rules and random seeds where relevant. Truncation can remove valid rare alternatives, while unrestricted sampling can select poor tail candidates. Compare complete task metrics and representative outputs rather than optimizing diversity alone or treating one sampling recipe as universally best."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "The sorted token probabilities are [0.50, 0.30, 0.15, 0.05]. Under top-p with p = 0.75, which tokens remain and what are their renormalized probabilities?",
+      "answer": "The first two tokens reach cumulative probability 0.80, so they remain. Dividing by 0.80 yields [0.625, 0.375]. The exact boundary convention should be checked in the implementation, but this example has no threshold tie."
+    },
+    "takeaways": [
+      "Temperature rescales logits; top-k and top-p remove candidates.",
+      "Decoding changes output behavior without changing model knowledge."
+    ],
+    "references": [
+      {
+        "title": "The Curious Case of Neural Text Degeneration",
+        "url": "https://arxiv.org/abs/1904.09751",
+        "kind": "paper",
+        "note": "Read the motivation and construction of nucleus sampling."
+      }
+    ]
+  },
+  {
+    "topicId": "05-10",
+    "title": "A long context window is a capacity, not a guarantee",
+    "summary": "Evaluate whether a model can use information across length and position, not merely accept the tokens.",
+    "prerequisites": [
+      "04-09",
+      "04-14",
+      "04-17"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Availability and successful retrieval are different",
+        "paragraphs": [
+          "A model may accept a long sequence while failing to use a relevant detail buried inside it. Long-context ability involves positional handling, training exposure, attention patterns, and the task itself. A document retrieval question and a multi-step synthesis question can stress different capabilities at the same length. The advertised or configured maximum window therefore describes an input limit, not a complete quality measurement."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Length changes several resources at once",
+        "paragraphs": [
+          "Longer inputs increase token processing, cache storage, and dense pairwise attention work during prefill. Position encodings must remain meaningful at the new distances, and training must expose the model to useful long-range dependencies. Extending a positional scheme or using an efficient attention kernel addresses only part of the problem. Retrieval augmentation and summarization can reduce the amount of text presented, but may discard evidence that the final question requires."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Move the evidence around",
+        "paragraphs": [
+          "Build evaluations that vary total length, relevant-information position, distractor count, and reasoning depth independently. A simple inserted fact checks retrieval, while a task combining several distant facts checks integration. Keep the underlying answer fixed when moving evidence so that position is the controlled variable. Inspect truncation at the tokenizer and application layers; an apparently poor long-context model may never have received the crucial passage."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A model answers correctly when a fact appears first or last, but fails when the same fact is placed in the middle. What conclusion is justified, and what conclusion is too strong?",
+      "answer": "The controlled test suggests position-sensitive use of context for that task and setup. It does not prove the model cannot process the full length or cannot solve every long-context task. Repeat across examples, lengths, and distractor structures."
+    },
+    "takeaways": [
+      "Input length support and effective context use are different.",
+      "Evaluate retrieval, integration, position, and resource cost separately."
+    ],
+    "references": [
+      {
+        "title": "Lost in the Middle: How Language Models Use Long Contexts",
+        "url": "https://arxiv.org/abs/2307.03172",
+        "kind": "paper",
+        "note": "Read position-controlled retrieval and question-answering evaluations."
+      },
+      {
+        "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+        "url": "https://arxiv.org/abs/2104.09864",
+        "kind": "paper",
+        "note": "Connect positional representation to relative distances."
+      }
+    ]
+  },
+  {
+    "topicId": "05-11",
+    "title": "In-context learning changes the task description without updating weights",
+    "summary": "Use demonstrations to condition a model and evaluate how example selection affects its behavior.",
+    "prerequisites": [
+      "05-01",
+      "05-08"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Examples can define what a prompt means",
+        "paragraphs": [
+          "A prompt can include demonstrations of an input-output mapping before presenting a new input. The model uses those examples as context to infer a useful continuation pattern. During ordinary in-context learning, its parameters are not updated by an optimizer. The adaptation is expressed through the forward computation on a different context, which distinguishes it from supervised fine-tuning even when both use labeled examples."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Make the mapping and format explicit",
+        "paragraphs": [
+          "Suppose two examples map short reviews to sentiment labels. They communicate the task, the label vocabulary, and the output format. A new review then conditions on those demonstrations. Example order, class balance, wording, and similarity to the query can influence the result. This behavior may combine learned task knowledge, pattern completion, and context-based inference; a successful few-shot prompt alone does not identify one universal internal mechanism."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Separate demonstration selection from test evaluation",
+        "paragraphs": [
+          "Do not select examples by inspecting test answers or repeatedly tune prompts on the final test set. Compare zero-shot and few-shot conditions with the same evaluation protocol, and report the actual prompt or a versioned template. Include order or demonstration-set variation when it materially changes results. More examples consume context and can introduce contradictory labels, so adding demonstrations is not guaranteed to improve performance."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A model receives five labeled demonstrations and predicts a sixth example, with no backward call or optimizer step. Have the model weights learned those five labels during this interaction? What changed?",
+      "answer": "The weights have not been updated during that interaction. The input context and resulting hidden activations changed, allowing the existing model to condition its prediction on the demonstrations. Persistent adaptation would require a separate learning or memory mechanism."
+    },
+    "takeaways": [
+      "In-context adaptation ordinarily happens without gradient updates.",
+      "Demonstration selection and order are experimental variables."
+    ],
+    "references": [
+      {
+        "title": "Language Models are Few-Shot Learners",
+        "url": "https://arxiv.org/abs/2005.14165",
+        "kind": "paper",
+        "note": "Read zero-shot, one-shot, and few-shot task evaluation and prompt construction."
+      }
+    ]
+  },
+  {
+    "topicId": "05-12",
+    "title": "Scaling laws guide budget allocation under stated assumptions",
+    "summary": "Use empirical loss trends to reason about model size, data exposure, and training compute.",
+    "prerequisites": [
+      "01-05",
+      "05-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A larger model is only one use of a budget",
+        "paragraphs": [
+          "Training compute can be spent on more parameters, more tokens, or a different optimization and data strategy. Scaling-law studies fit empirical relationships between those choices and predictive loss. Their value is to inform allocation and extrapolation within a relevant regime. They are not physical laws guaranteeing that every architecture, corpus, and downstream capability improves according to the same exponent."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Connect parameters and tokens to compute",
+        "paragraphs": [
+          "A rough estimate for dense Transformer training is C ≈ 6ND, with N parameters and D training tokens, ignoring important architecture- and sequence-dependent overheads. Under fixed C, doubling N roughly halves the affordable D in this approximation. The best balance depends on how loss responds to both capacity and data. Compute-optimal training also differs from deployment-optimal design: a smaller model trained longer may be attractive when inference will be repeated many times."
+        ],
+        "formula": "Approximate dense training compute: C ≈ 6ND"
+      },
+      {
+        "id": "practice",
+        "title": "Treat extrapolation as a testable forecast",
+        "paragraphs": [
+          "Fit trends using consistent datasets, tokenization, optimization, and evaluation. Include uncertainty and check a held-out scale before committing a much larger budget. Data quality, repeated data, context length, and optimization failures can break a simple fit. A lower language-model loss may correlate with task improvements without uniquely determining every task score. State the measured quantity and avoid using a fitted loss curve as a universal capability guarantee."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Under C ≈ 6ND, you double parameter count while holding total training compute fixed. How must token count change, and why might this still fail to preserve final loss?",
+      "answer": "Token count must approximately halve. Final loss can change because larger capacity and reduced data exposure have different effects; the original allocation may already have been near its best balance, and the approximation omits other costs and training effects."
+    },
+    "takeaways": [
+      "Scaling relationships are empirical and regime-dependent.",
+      "Training compute and lifetime deployment cost can favor different designs."
+    ],
+    "references": [
+      {
+        "title": "Scaling Laws for Neural Language Models",
+        "url": "https://arxiv.org/abs/2001.08361",
+        "kind": "paper",
+        "note": "Read empirical loss trends with parameters, data, and compute."
+      },
+      {
+        "title": "Training Compute-Optimal Large Language Models",
+        "url": "https://arxiv.org/abs/2203.15556",
+        "kind": "paper",
+        "note": "Compare model-size and token-budget allocation under fixed training compute."
+      }
+    ]
+  },
+  {
+    "topicId": "05-13",
+    "title": "Data preparation determines what the language model practices",
+    "summary": "Separate cleaning, deduplication, and packing because they change different properties of training.",
+    "prerequisites": [
+      "05-02",
+      "05-03",
+      "01-11"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A corpus is an implicit curriculum",
+        "paragraphs": [
+          "The model receives more learning signal from patterns that appear more often. Duplicated pages, boilerplate, corrupted text, or an imbalanced domain mixture therefore affect what it practices. Cleaning aims to remove or transform unsuitable records; deduplication reduces repeated or near-repeated content; packing improves how tokens fill training sequences. These operations should have explicit goals and audit trails because each can change the resulting distribution."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Keep content decisions separate from layout",
+        "paragraphs": [
+          "Exact deduplication can compare normalized document hashes, while near-duplicate detection requires a similarity policy. Split train and evaluation data so related or duplicated content does not leak across them. Packing concatenates shorter examples to reduce padding waste, but it introduces boundary choices: whether attention may cross documents, which separator tokens appear, and which next-token targets are scored. A block-diagonal attention policy and ordinary concatenation are different training objectives."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Measure what the filters remove",
+        "paragraphs": [
+          "A language filter or quality score can disproportionately discard dialects, code, formulas, or specialist material. Inspect samples before and after filtering and report retention rates by relevant category. Preserve source provenance and licensing information. For packing, decode a packed sequence with its boundaries and masks visible, then verify that token counts and losses match the intended policy. Throughput gains should not silently alter the supervision you meant to provide."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Two short documents are packed into one sequence. Why might an ordinary causal mask let the second document use the first, and how can you prevent that if documents should be independent?",
+      "answer": "A standard causal mask permits every earlier token, regardless of document boundary. Use document-aware block masking, or another explicitly independent batching scheme, so second-document queries cannot read first-document keys. Also define boundary targets and separator handling consistently."
+    },
+    "takeaways": [
+      "Cleaning changes content; packing changes layout and possibly context.",
+      "Deduplicate across evaluation boundaries as well as within training."
+    ],
+    "references": [
+      {
+        "title": "Deduplicating Training Data Makes Language Models Better",
+        "url": "https://arxiv.org/abs/2107.06499",
+        "kind": "paper",
+        "note": "Read duplicate detection and the effects of repeated training content."
+      },
+      {
+        "title": "LLaMA: Open and Efficient Foundation Language Models",
+        "url": "https://arxiv.org/abs/2302.13971",
+        "kind": "paper",
+        "note": "Inspect corpus composition and preprocessing decisions in a pretraining pipeline."
+      }
+    ]
+  },
+  {
+    "topicId": "05-14",
+    "title": "Evaluate the behavior you intend to claim",
+    "summary": "Combine likelihood, task metrics, and failure analysis under a reproducible protocol.",
+    "prerequisites": [
+      "05-04",
+      "01-11"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A benchmark score answers a narrow question",
+        "paragraphs": [
+          "Perplexity measures predictive probability on a corpus. Task accuracy measures correctness under a particular question format and scoring rule. Free-form generation may require additional criteria such as exact-match extraction, factual support, or format validity. These measurements overlap imperfectly. A credible evaluation starts with the intended claim and chooses evidence that actually tests it, rather than assuming one popular benchmark summarizes the entire model."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Control the evaluation interface",
+        "paragraphs": [
+          "Record dataset version, split, prompt template, demonstrations, tokenizer, decoding settings, and answer extraction. Multiple-choice accuracy can change if answer labels or option order change. For generated answers, normalization rules may decide whether punctuation, aliases, or units count as correct. Aggregate by the right unit: examples, categories, or users can imply different weightings. Report the denominator and excluded cases so another researcher can reproduce the number."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Inspect mistakes and uncertainty",
+        "paragraphs": [
+          "Compare against a meaningful baseline and examine failures by category, length, and difficulty. A small score difference may reflect sampling variability or prompt sensitivity rather than a robust improvement. Prevent contamination from training and model-selection loops. If the model is stochastic, report appropriate repeated-run variation. Keep resource measurements beside quality when the research claim concerns efficiency, and avoid changing evaluation settings between the baseline and proposed method."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Model A scores 80% on 100 questions and model B scores 81% on the same set. Why is the one-point difference insufficient by itself to establish a reliable improvement?",
+      "answer": "It is only one additional correct answer. Inspect paired disagreements, uncertainty, prompt and sampling variation, and whether either model used the test set for selection. A broader or repeated evaluation may show that the difference is unstable."
+    },
+    "takeaways": [
+      "Match metrics and protocols to the claim.",
+      "Small score differences need uncertainty and failure analysis."
+    ],
+    "references": [
+      {
+        "title": "Measuring Massive Multitask Language Understanding",
+        "url": "https://arxiv.org/abs/2009.03300",
+        "kind": "paper",
+        "note": "Read the task coverage and evaluation design of a broad language-understanding benchmark."
+      },
+      {
+        "title": "Hugging Face — Perplexity of Fixed-Length Models",
+        "url": "https://huggingface.co/docs/transformers/perplexity",
+        "kind": "guide",
+        "note": "Contrast corpus likelihood evaluation with task-specific accuracy."
+      }
+    ]
+  }
+]

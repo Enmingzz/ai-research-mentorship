@@ -1,0 +1,949 @@
+[
+  {
+    "topicId": "04-01",
+    "title": "Attention lets a token choose which context to read",
+    "summary": "Understand why content-dependent access complements or replaces recurrent compression.",
+    "prerequisites": [
+      "03-11"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Remembering everything in one state is difficult",
+        "paragraphs": [
+          "A recurrent model carries the past through a fixed-width hidden state. Information needed much later must survive many updates, even when the model does not yet know it will matter. Attention provides a different access pattern: a representation can compare itself with stored representations and retrieve a weighted mixture. The computation can therefore focus on a relevant earlier phrase without requiring every detail to travel through one compact recurrent summary."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Replace one fixed summary with a query-dependent one",
+        "paragraphs": [
+          "Imagine translating a sentence containing two names. Different output words need different parts of the source. A query-dependent weighted sum can retrieve the relevant name at one step and a verb at another. In self-attention, every input position can construct such a summary from the same sequence. During teacher-forced training, many positions can be processed in parallel because their input tokens are already known; a causal mask still prevents access to future targets."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Account for what attention costs",
+        "paragraphs": [
+          "Dense attention compares many pairs of positions, creating quadratic pairwise work as sequence length grows. A recurrent state can be much more compact for streaming use. Attention also needs positional information or another mechanism to distinguish order; content comparisons alone do not encode a sequence's arrangement. Choose an architecture by the task's access pattern, memory budget, and latency requirements. The motivation for attention explains a useful trade-off rather than proving recurrent models are always inappropriate."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A document question asks for a name mentioned near the beginning of a long passage. What advantage does attention offer, and what resource cost grows when every position can compare with every other?",
+      "answer": "Attention can directly retrieve information associated with the earlier name instead of depending only on a repeatedly updated summary. Dense all-pairs comparisons grow quadratically with sequence length, and naive implementations also store quadratic attention matrices."
+    },
+    "takeaways": [
+      "Attention provides query-dependent access to context.",
+      "Its direct access pattern trades against pairwise computation and memory."
+    ],
+    "references": [
+      {
+        "title": "Neural Machine Translation by Jointly Learning to Align and Translate",
+        "url": "https://arxiv.org/abs/1409.0473",
+        "kind": "paper",
+        "note": "Read the motivation for accessing source representations with learned alignment."
+      },
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Compare self-attention and recurrent layers in the architecture discussion."
+      }
+    ]
+  },
+  {
+    "topicId": "04-02",
+    "title": "Queries ask, keys match, and values carry the information",
+    "summary": "Separate the roles of Q, K, and V in a learned retrieval operation.",
+    "prerequisites": [
+      "01-02",
+      "03-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Matching and content are different jobs",
+        "paragraphs": [
+          "A query describes what a position wants to retrieve. A key describes how a source position should be matched. A value contains the information contributed if that source receives weight. All three are learned numerical representations, not literal database strings. Separating the matching space from the transmitted content lets a model decide relevance using one set of features while passing along another set."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Project representations into three roles",
+        "paragraphs": [
+          "For input X of shape [B, T, D], learned matrices produce Q = XW_Q, K = XW_K, and V = XW_V. Queries and keys must share their final width so their dot products are defined. Values may have a different final width. A query compares against all keys, softmax turns scores into weights, and those weights mix values. The output length follows the number of queries, not the number of stored keys."
+        ],
+        "formula": "Q: [B, T_q, d_k];  K: [B, T_k, d_k];  V: [B, T_k, d_v]"
+      },
+      {
+        "id": "practice",
+        "title": "Do not confuse source identity with parameter sharing",
+        "paragraphs": [
+          "In self-attention, Q, K, and V originate from the same sequence, but usually use different projections. Their rows therefore need not be identical. In cross-attention, queries may come from a text decoder while keys and values come from image features. Keys and values must remain aligned by source position; permuting one without the other changes which content a match retrieves. A large attention weight also does not establish a complete causal explanation of the model's answer."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "There are 6 queries, 10 keys, query/key width 8, and value width 12. What are the attention-score and output shapes without batch or head dimensions?",
+      "answer": "The score matrix is [6, 10], containing one score per query-key pair. Multiplying normalized scores by values [10, 12] produces [6, 12], one retrieved vector for each query."
+    },
+    "takeaways": [
+      "Queries and keys determine matching; values determine transmitted content.",
+      "Keys and values must preserve the same source ordering."
+    ],
+    "references": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Read the query/key/value definition and the attention function's input and output dimensions."
+      }
+    ]
+  },
+  {
+    "topicId": "04-03",
+    "title": "Compute scaled dot-product attention by hand",
+    "summary": "Follow a complete numeric Q/K/V example from matching scores to a weighted output.",
+    "prerequisites": [
+      "04-02",
+      "01-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "One output is a weighted reading of the values",
+        "paragraphs": [
+          "Attention first decides where to look, then combines what it finds. Queries and keys produce relevance scores; values supply the vectors being mixed. The weights for each query form a distribution over source positions. Before adding output projections, dropout, or other blocks, one attention row is therefore a convex combination of the value vectors. This simple property gives you a concrete way to check an implementation instead of memorizing its formula."
+        ]
+      },
+      {
+        "id": "shapes",
+        "title": "Write the dimensions before the numbers",
+        "paragraphs": [
+          "Ignore batches and heads for this example. Let Q and K each have shape [2, 2]: there are two queries, two source positions, and query/key width d_k = 2. Let V also be [2, 2], so each source contributes a two-feature value. QKᵀ has shape [2, 2], with rows indexing queries and columns indexing keys. Softmax acts across each row, and multiplying by V returns [2, 2]."
+        ],
+        "formula": "Attention(Q, K, V) = softmax(QKᵀ/√d_k)V"
+      },
+      {
+        "id": "example",
+        "title": "Turn two scores into one retrieved vector",
+        "paragraphs": [
+          "Choose Q = K = [[1, 0], [0, 1]] and V = [[2, 0], [0, 4]]. The first query has raw scores [1, 0]. Dividing by √2 gives [0.7071, 0]. Exponentiation gives approximately [2.0281, 1], and normalization produces [0.6698, 0.3302]. Its output is 0.6698·[2, 0] + 0.3302·[0, 4] = [1.3396, 1.3208]. The second query swaps the weights, producing approximately [0.6604, 2.6792]. Notice that the output mixes values, not keys."
+        ]
+      },
+      {
+        "id": "scaling",
+        "title": "Why divide by the square root of the width?",
+        "paragraphs": [
+          "Under a simple model with independent, zero-mean, unit-variance query and key coordinates, a dot product sums d_k terms and has variance d_k. Dividing by √d_k keeps that variance near one. Without the scaling, wider heads tend to generate more extreme logits, which can make softmax sharply concentrated and its gradients less useful. Real learned features need not satisfy those assumptions exactly; the argument motivates the scale rather than proving attention weights always remain well behaved."
+        ]
+      },
+      {
+        "id": "checks",
+        "title": "Mask and normalize the intended axis",
+        "paragraphs": [
+          "Subtracting the largest logit before exponentiation improves numerical stability without changing softmax. Apply an additive mask before softmax so forbidden positions receive zero probability. In this example, a causal mask removes the first query's access to the second source: its weights become [1, 0] and its output becomes [2, 0]. Check row sums and forbidden positions explicitly. An entirely masked row needs defined handling because naive softmax of all negative infinities is invalid."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "In the unmasked example, replace both value vectors by [3, −1] while keeping Q and K unchanged. What does each output become, and why?",
+      "answer": "Both outputs become [3, −1]. Each row's attention weights sum to one, so any weighted mixture of identical value vectors equals that same vector. Scores may differ, but there is no content difference for them to select."
+    },
+    "takeaways": [
+      "Scores come from Q and K; output content comes from V.",
+      "Softmax normalizes over source positions for each query.",
+      "Scaling controls the typical logit magnitude as head width changes."
+    ],
+    "references": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Read scaled dot-product attention and the motivation for the √d_k scaling factor."
+      },
+      {
+        "title": "PyTorch — Scaled Dot-Product Attention",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+        "kind": "guide",
+        "note": "Check tensor shapes, additive masks, and the reference computation."
+      }
+    ]
+  },
+  {
+    "topicId": "04-04",
+    "title": "Self-attention and cross-attention differ in where information comes from",
+    "summary": "Trace the query stream separately from the key-value source in both attention patterns.",
+    "prerequisites": [
+      "04-02",
+      "04-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Ask which representation is being updated",
+        "paragraphs": [
+          "Self-attention updates a sequence using information from that same sequence. Cross-attention updates one sequence using a separate source. The mathematical weighted-sum operation can be identical; the distinction is the origin of its inputs. In a translation model, decoder states can ask questions of encoded source tokens. In a multimodal system, text queries can retrieve information from image patches."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Output length follows the queries",
+        "paragraphs": [
+          "Suppose a decoder has 5 token states and an image encoder produces 196 patch states. Cross-attention can project decoder states into Q [5, d_k], image states into K [196, d_k] and V [196, d_v], then produce 5 output vectors. Its score matrix is [5, 196], not square. The two streams can have different original feature widths because their learned projection matrices map them into compatible matching dimensions."
+        ],
+        "formula": "CrossAttn(X, S) = softmax((XW_Q)(SW_K)ᵀ/√d_k)(SW_V)"
+      },
+      {
+        "id": "practice",
+        "title": "Apply masks according to the information policy",
+        "paragraphs": [
+          "Decoder self-attention usually needs causality to avoid reading future target tokens. Cross-attention over a fully observed source generally does not need a triangular target-style mask, but it still needs to exclude padded source positions. A source containing future observations in a forecasting task may require additional restrictions. Shared source data can also allow precomputing cross-attention keys and values during generation; do not recompute them merely because a new query arrives."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A text decoder has 8 queries and an audio encoder has 120 source frames. What score shape should cross-attention produce, and which length determines the number of output positions?",
+      "answer": "The score matrix is [8, 120], before batch and head axes. The output has 8 positions because each query receives one mixture of the 120 source values. The source length controls the number of retrieval candidates."
+    },
+    "takeaways": [
+      "Self versus cross describes input origin, not a different softmax rule.",
+      "Source padding and target causality are distinct masking requirements."
+    ],
+    "references": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Compare encoder self-attention, decoder self-attention, and encoder-decoder attention."
+      }
+    ]
+  },
+  {
+    "topicId": "04-05",
+    "title": "Multiple attention heads offer multiple matching spaces",
+    "summary": "Understand head splitting, independent projections, and the trade-off between head count and head width.",
+    "prerequisites": [
+      "04-03",
+      "02-04"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "One mixture may combine incompatible relationships",
+        "paragraphs": [
+          "A single attention distribution must allocate one set of weights across source positions. Multiple heads let the model construct several distributions in separate learned feature spaces, then combine their outputs. One head might become useful for local context while another captures a longer relationship, but such roles are learned possibilities rather than guaranteed human-readable assignments. The benefit comes from flexible parallel subspaces, not from naming heads after linguistic concepts."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Split width, then recombine",
+        "paragraphs": [
+          "With model width D = 96 and H = 4 heads, a common design uses head width 24. Projected Q, K, and V are rearranged from [B, T, 96] to [B, 4, T, 24]. Each head computes its own [T, T] attention matrix. Concatenating the four [T, 24] outputs restores width 96, and an output projection mixes information across heads. Holding D fixed keeps many projection parameter counts unchanged when H changes."
+        ],
+        "formula": "MultiHead(X) = Concat(head₁, …, head_H)W_O"
+      },
+      {
+        "id": "practice",
+        "title": "More heads are not free expressiveness",
+        "paragraphs": [
+          "At fixed total width, adding heads makes each matching subspace narrower. It can also change kernel efficiency and attention-memory overhead. Some heads may become redundant, and good performance does not require every head to have a distinct interpretation. Check that D is divisible by H in a simple equal-width implementation, and transpose axes carefully when merging heads. Compare head counts under matched width and training budget to isolate the actual architectural change."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A model has width 128. Compare 4 heads and 8 heads under an equal-width split. What is the per-head width, and does the concatenated output width change?",
+      "answer": "The head widths are 32 and 16 respectively. In both cases concatenation returns width 128. Increasing head count changes how the representation is partitioned, rather than automatically doubling the output width or the main projection matrices."
+    },
+    "takeaways": [
+      "Heads learn separate retrieval distributions.",
+      "At fixed model width, more heads mean narrower heads."
+    ],
+    "references": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Read multi-head projection, concatenation, and the per-head dimension choice."
+      }
+    ]
+  },
+  {
+    "topicId": "04-06",
+    "title": "Masks define what a model is allowed to know",
+    "summary": "Keep causal restrictions, padding restrictions, and library boolean conventions separate.",
+    "prerequisites": [
+      "04-03",
+      "02-08"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A mask is an information boundary",
+        "paragraphs": [
+          "A causal language model predicts a later token using only the available prefix. During training, all target tokens may already be present in memory, so the model needs an explicit restriction preventing future access. Padding creates another boundary: artificial positions should not contribute content merely because batching requires a rectangle. These masks solve different problems and often need to be combined."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Mask scores before normalization",
+        "paragraphs": [
+          "For an additive mask, allowed query-key pairs receive zero and forbidden pairs receive negative infinity before softmax. A square causal mask permits key index j only when j ≤ i for query index i. A key-padding mask excludes padded source columns for every valid query. Padded query outputs may still exist, so exclude their targets from the loss separately. Cached decoding needs position-aware masks because query and key lengths may differ."
+        ],
+        "formula": "weights = softmax(scores + mask);  maskᵢⱼ = 0 if allowed, otherwise −∞"
+      },
+      {
+        "id": "practice",
+        "title": "Boolean values are API-specific",
+        "paragraphs": [
+          "PyTorch's functional scaled_dot_product_attention uses True to mean a position participates, while MultiheadAttention key_padding_mask uses True to mean ignore that position. Reusing one boolean mask unchanged can reverse the information policy. Test with a tiny sequence whose future token is deliberately altered: earlier causal outputs should remain unchanged. Also handle rows with no valid keys explicitly, because a naive softmax over entirely masked entries can produce undefined values."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "For a four-token causal sequence with zero-based indices, which key positions may query index 2 read? If index 1 is padding, which of those remain valid?",
+      "answer": "Causality permits keys 0, 1, and 2. Excluding the padded key leaves 0 and 2. Key 3 remains forbidden by causality even though it is not padding."
+    },
+    "takeaways": [
+      "Causal masks and padding masks enforce different boundaries.",
+      "Verify boolean conventions and test causality with changed future tokens."
+    ],
+    "references": [
+      {
+        "title": "PyTorch — Scaled Dot-Product Attention",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+        "kind": "guide",
+        "note": "Read boolean-mask semantics, additive masks, and non-square causal alignment."
+      },
+      {
+        "title": "PyTorch — MultiheadAttention",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html",
+        "kind": "guide",
+        "note": "Compare key_padding_mask and attn_mask conventions."
+      }
+    ]
+  },
+  {
+    "topicId": "04-07",
+    "title": "Encoder and decoder blocks are information-flow patterns",
+    "summary": "Read architecture names through their attention masks and the sources they can access.",
+    "prerequisites": [
+      "04-04",
+      "04-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "The task determines what is visible",
+        "paragraphs": [
+          "An encoder usually builds representations of an observed input with bidirectional self-attention. A decoder used for autoregressive generation restricts self-attention to the available prefix. An encoder-decoder model separates an observed source from a generated target and adds cross-attention connecting them. These labels describe common patterns, so inspect the actual block and objective rather than assuming the name alone specifies every implementation detail."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Trace a translation computation",
+        "paragraphs": [
+          "An encoder converts a source sentence of length S into S contextual vectors. The decoder processes target-prefix states of length T with causal self-attention, then uses cross-attention over the encoded source. The target stream therefore has both a [T, T] masked interaction and a [T, S] source interaction. During teacher-forced training, all target positions are computed together; during generation, the target grows one token at a time."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "A decoder-only model still conditions on input",
+        "paragraphs": [
+          "A prompt and its continuation can share one causal sequence, so decoder-only does not mean input-free. Conversely, an encoder's bidirectional representations cannot simply be used for next-token prediction without controlling target leakage. Architecture also affects reusable computation: an encoder-decoder can encode a fixed source once, while the decoder repeatedly retrieves from it. Compare systems with the same task framing, because different source-target formatting can change both cost and available information."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "For summarization, identify the source and target streams in an encoder-decoder model. Which stream can use bidirectional attention, and which must preserve causal generation?",
+      "answer": "The document is the observed source and can be encoded bidirectionally. The summary is the generated target and uses causal self-attention over its prefix, plus cross-attention to the document representation."
+    },
+    "takeaways": [
+      "Architecture names summarize access patterns.",
+      "A causal prompt can provide conditioning without a separate encoder."
+    ],
+    "references": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Read the encoder and decoder stacks and their three attention uses."
+      }
+    ]
+  },
+  {
+    "topicId": "04-08",
+    "title": "Position encodings give order to content-based attention",
+    "summary": "Compare learned position vectors with sinusoidal coordinates and their extrapolation limits.",
+    "prerequisites": [
+      "04-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Content alone does not specify order",
+        "paragraphs": [
+          "If a self-attention layer has no positional signal and no order-dependent mask, consistently permuting its input positions permutes its outputs rather than teaching it that one token came first. Many tasks need ordering: exchanging subject and object can change a sentence's meaning. Position encodings provide a coordinate system alongside token content so the model can distinguish identical tokens appearing at different locations."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Add a coordinate vector to each token",
+        "paragraphs": [
+          "A learned absolute-position table stores one vector per supported position and adds it to the token embedding. Sinusoidal encoding instead fills paired coordinates with sine and cosine functions at different frequencies. The multiple frequencies provide both fast-changing local signals and slower-changing long-range signals. Addition preserves model width, but mixes position and content in the representation consumed by later projections."
+        ],
+        "formula": "PE(pos, 2i) = sin(pos/10000^(2i/D));  PE(pos, 2i+1) = cos(pos/10000^(2i/D))"
+      },
+      {
+        "id": "practice",
+        "title": "Representing a position is not mastering it",
+        "paragraphs": [
+          "A sinusoidal formula can be evaluated beyond the training length, but that does not guarantee accurate long-context behavior. Learned tables have an explicit range unless extended or interpolated. Position indices also need to remain consistent when padding, packing, or caching sequences. Test a model with the same content placed at different positions and lengths; a failure can reflect training distribution, positional treatment, or attention access rather than an insufficient vocabulary."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A learned position table has shape [512, 64]. What fails when an unmodified model indexes position 600? Why does a sinusoidal formula avoid that specific failure without guaranteeing good predictions?",
+      "answer": "The table has no row 600, so direct lookup is out of range. A sinusoidal formula can compute that position without a stored row, but the model may still behave poorly because it never learned to use such positions or distances."
+    },
+    "takeaways": [
+      "Position encoding makes order available to the model.",
+      "A computable position is not necessarily a well-trained position."
+    ],
+    "references": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Read sinusoidal positional encodings and the learned-position comparison."
+      }
+    ]
+  },
+  {
+    "topicId": "04-09",
+    "title": "RoPE makes query-key interactions depend on relative position",
+    "summary": "Understand rotary position embeddings through paired-coordinate rotations and their effect on dot products.",
+    "prerequisites": [
+      "04-02",
+      "04-08"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Rotate the matching coordinates",
+        "paragraphs": [
+          "Rotary position embedding applies a position-dependent rotation to pairs of query and key coordinates. A rotation changes direction while preserving length. When a query and key at different positions are compared, their relative rotation influences the dot product. Position therefore enters the matching operation directly, rather than only through an absolute vector added to the residual stream."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Relative angles survive the dot product",
+        "paragraphs": [
+          "For a two-dimensional pair, rotate x by angle θ using [x₁ cosθ − x₂ sinθ, x₁ sinθ + x₂ cosθ]. If query position m uses rotation R_m and key position n uses R_n, their dot product becomes qᵀR_mᵀR_nk = qᵀR_(n−m)k when the angles are linear in position. Different coordinate pairs use different frequencies, providing multiple distance scales. Values are typically left unrotated in the common formulation."
+        ],
+        "formula": "(R_m q)ᵀ(R_n k) = qᵀR_(n−m)k"
+      },
+      {
+        "id": "practice",
+        "title": "Cached positions must remain consistent",
+        "paragraphs": [
+          "During incremental decoding, a newly computed query must use its actual position, not restart from zero. Cached keys need the corresponding rotations from their own positions. Mixing a rotated cache with an inconsistent indexing convention corrupts matching even when tensor shapes look correct. RoPE also does not eliminate long-context limits: changing the frequency schedule or extending context requires careful evaluation of retrieval and task accuracy across positions."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Let q = k = [1, 0]. Rotate q by 0 degrees and k by 90 degrees. What is their dot product? What happens if both are rotated by 90 degrees?",
+      "answer": "With different rotations, the vectors are [1, 0] and [0, 1], so the dot product is zero. If both rotate by 90 degrees, both become [0, 1] and the dot product is one. The shared rotation cancels; the relative angle matters."
+    },
+    "takeaways": [
+      "RoPE rotates query and key coordinate pairs.",
+      "Correct cache position offsets are essential during decoding."
+    ],
+    "references": [
+      {
+        "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+        "url": "https://arxiv.org/abs/2104.09864",
+        "kind": "paper",
+        "note": "Read the rotation construction and relative-position dot-product identity."
+      }
+    ]
+  },
+  {
+    "topicId": "04-10",
+    "title": "Normalization placement changes the residual path",
+    "summary": "Compare pre-norm and post-norm blocks by writing the exact order of their operations.",
+    "prerequisites": [
+      "03-06",
+      "03-07"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "The same ingredients can make a different network",
+        "paragraphs": [
+          "A Transformer block combines a residual connection, normalization, and a learned sublayer such as attention. Moving normalization changes the function and its gradient paths even if parameter counts remain similar. Pre-norm normalizes the branch input before the sublayer, while post-norm normalizes after the branch output is added to the residual. This is an architectural choice, not merely a cosmetic code rearrangement."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Follow the identity route",
+        "paragraphs": [
+          "In pre-norm, y = x + F(LN(x)), so x has a direct additive path to y. In post-norm, y = LN(x + F(x)), so the entire result passes through normalization. Their Jacobians therefore differ: the normalization derivative lies outside the addition in post-norm. Pre-norm stacks commonly use a final normalization after the blocks. The overall behavior also depends on initialization, residual scaling, depth, and optimizer schedule."
+        ],
+        "formula": "Pre-norm: y = x + F(LN(x));  Post-norm: y = LN(x + F(x))"
+      },
+      {
+        "id": "practice",
+        "title": "Do not swap the order inside a checkpoint",
+        "paragraphs": [
+          "Weights trained under one placement generally cannot be moved into the other computation while preserving predictions. When reproducing a paper or loading weights, inspect the exact equations and final normalization. For a controlled comparison, initialize both systems consistently and track gradient norms by depth during the first updates. Pre-norm often improves optimization behavior in deep setups, but it does not imply that every pre-norm model can safely discard warmup or use an arbitrary learning rate."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "If the residual branch F returns zero, what does each block output? What does this reveal about the identity path?",
+      "answer": "Pre-norm returns x exactly. Post-norm returns LN(x), which generally differs from x. The zero-branch case exposes the direct identity path present in pre-norm and the normalization applied to that path in post-norm."
+    },
+    "takeaways": [
+      "Operation order determines gradient flow.",
+      "Normalization placement must match the architecture used to train a checkpoint."
+    ],
+    "references": [
+      {
+        "title": "On Layer Normalization in the Transformer Architecture",
+        "url": "https://arxiv.org/abs/2002.04745",
+        "kind": "paper",
+        "note": "Read the definitions and gradient analysis of pre-LN and post-LN Transformers."
+      }
+    ]
+  },
+  {
+    "topicId": "04-11",
+    "title": "The Transformer FFN transforms features at each position",
+    "summary": "Understand why token mixing and positionwise nonlinear computation are complementary.",
+    "prerequisites": [
+      "03-01",
+      "04-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Retrieval is followed by local processing",
+        "paragraphs": [
+          "Attention mixes information across token positions. A feed-forward network then transforms the resulting feature vector independently at each position using shared weights. The FFN does not create a new direct path between tokens, but its input already contains context gathered by attention. Alternating these operations lets the model retrieve relevant information and then compute richer features from that contextual representation."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Expand, activate, and project back",
+        "paragraphs": [
+          "A common FFN maps model width D to hidden width F, applies a nonlinear activation, then maps back to D. With input [B, T, D], the intermediate is [B, T, F] and the output returns to [B, T, D], enabling a residual addition. Ignoring biases, the two matrices contain 2DF parameters. For D = 256 and F = 1024, that is 524,288 weights in one FFN."
+        ],
+        "formula": "FFN(x) = φ(xW_up + b_up)W_down + b_down"
+      },
+      {
+        "id": "practice",
+        "title": "Positionwise does not mean context-free",
+        "paragraphs": [
+          "The same FFN parameters are reused at every position, but different contextual inputs yield different activations. Increasing F adds representational capacity and substantial matrix-multiplication cost; attention is not automatically the dominant cost at short sequence lengths. When profiling, measure projections and FFNs separately from pairwise attention. Avoid accidentally flattening the token and feature axes into one dimension, which changes a shared positionwise network into a sequence-length-specific operation."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "An FFN maps width 64 to 256 and back to 64 with biases on both layers. How many parameters does it contain, and which dimensions change for input [2, 10, 64]?",
+      "answer": "The count is 64·256 + 256 + 256·64 + 64 = 33,088. The hidden tensor is [2, 10, 256], then the output is [2, 10, 64]. Batch size and sequence length do not change."
+    },
+    "takeaways": [
+      "Attention mixes positions; FFNs transform per-position features.",
+      "FFN width affects both parameter count and compute."
+    ],
+    "references": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Read the positionwise feed-forward sublayer and its expansion/projection structure."
+      }
+    ]
+  },
+  {
+    "topicId": "04-12",
+    "title": "SwiGLU adds an input-dependent gate to the FFN",
+    "summary": "Trace the two expansion branches and the elementwise interaction in a gated MLP.",
+    "prerequisites": [
+      "03-03",
+      "04-11"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Let one feature stream modulate another",
+        "paragraphs": [
+          "A conventional FFN applies one activation to one expansion. A gated FFN creates two learned feature streams and multiplies them elementwise before projecting back. One stream supplies content while the other controls its strength. Because both depend on the input, the interaction can express patterns that a single activated projection handles differently. The gate is a learned continuous computation, not a manually specified feature selector."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Count three matrices instead of two",
+        "paragraphs": [
+          "A common SwiGLU expression is [SiLU(xW_g) ⊙ xW_u]W_d, ignoring biases. Both expansion branches have width F, and the down projection returns to model width D. This uses roughly 3DF weights, compared with 2DF for a standard two-matrix FFN at the same F. To match parameter budgets, the gated hidden width must therefore be smaller than the ungated width. A fair comparison should state which quantity is held constant."
+        ],
+        "formula": "SwiGLU(x) = (SiLU(xW_g) ⊙ xW_u)W_d"
+      },
+      {
+        "id": "practice",
+        "title": "A gate need not lie between zero and one",
+        "paragraphs": [
+          "SiLU(x) = xσ(x) can be negative and can exceed one, so a SwiGLU gate is not simply a Bernoulli-style probability. Its multiplicative interaction changes activation and gradient scales. Check initialization, normalization, and kernel support when replacing an FFN. Also verify which projection is gated: interchanging weights in a trained checkpoint changes the function, even though the multiplication itself is commutative after both branches have been computed."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "An ordinary FFN uses hidden width 1,536. Ignoring biases, what SwiGLU hidden width gives the same parameter count at a fixed model width D?",
+      "answer": "Equate 2D·1536 with 3D·F, giving F = 1024. Both then use 3,072D weights. Real architectures may round widths for hardware efficiency, so verify the actual configuration rather than assuming an exact ratio."
+    },
+    "takeaways": [
+      "SwiGLU multiplies two input-dependent feature streams.",
+      "Match parameter or compute budgets when comparing FFN variants."
+    ],
+    "references": [
+      {
+        "title": "GLU Variants Improve Transformer",
+        "url": "https://arxiv.org/abs/2002.05202",
+        "kind": "paper",
+        "note": "Compare GLU variants and the adjusted hidden widths used for comparable parameter counts."
+      }
+    ]
+  },
+  {
+    "topicId": "04-13",
+    "title": "MHA, MQA, and GQA trade key-value diversity for cache efficiency",
+    "summary": "Keep query-head count separate from the number of key and value heads.",
+    "prerequisites": [
+      "04-05",
+      "04-14"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Queries can share the same memory representation",
+        "paragraphs": [
+          "Multi-head attention usually gives each query head its own keys and values. During decoding, storing and repeatedly reading all those key-value heads can be expensive. Multi-query attention shares one key head and one value head across all query heads. Grouped-query attention uses an intermediate number of key-value heads, with each pair shared by a group of query heads."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Separate two head counts in the shapes",
+        "paragraphs": [
+          "Let H_q = 16 and H_kv = 4. Queries have shape [B, 16, T_q, d], while keys and values use [B, 4, T_k, d]. Each group of four query heads attends to the same key-value head while retaining its own query projection. MHA corresponds to H_kv = H_q; MQA corresponds to H_kv = 1. At fixed lengths, layers, and dtype, cache size scales with H_kv."
+        ],
+        "formula": "KV cache elements = 2 · layers · B · T · H_kv · d"
+      },
+      {
+        "id": "practice",
+        "title": "Cache savings do not guarantee proportional speedups",
+        "paragraphs": [
+          "Reducing key-value heads shrinks cache storage and associated bandwidth, but query projections, output projections, FFNs, and other work remain. Quality can also change because heads share part of the representation. A naive implementation that physically repeats keys and values may lose the intended memory benefit. Check whether the attention kernel supports grouped heads, and compare end-to-end decoding at matched batch size, context length, and precision."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A model switches from 32 key-value heads to 8 while keeping all other cache dimensions fixed. What is the ideal cache-size ratio? Does total model inference time necessarily improve by the same factor?",
+      "answer": "The cache becomes 8/32 = one quarter of its previous size. Total inference time need not fall fourfold because other computation, memory transfers, and kernel overhead remain, and the original workload may not have been cache-bandwidth limited."
+    },
+    "takeaways": [
+      "Query-head count and key-value-head count are distinct.",
+      "GQA provides a continuum between MHA and MQA."
+    ],
+    "references": [
+      {
+        "title": "Fast Transformer Decoding: One Write-Head is All You Need",
+        "url": "https://arxiv.org/abs/1911.02150",
+        "kind": "paper",
+        "note": "Read shared key/value heads and the decoding bandwidth motivation."
+      },
+      {
+        "title": "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
+        "url": "https://arxiv.org/abs/2305.13245",
+        "kind": "paper",
+        "note": "Read grouped-query attention and its quality-efficiency trade-off."
+      }
+    ]
+  },
+  {
+    "topicId": "04-14",
+    "title": "A KV cache reuses the past without recomputing it",
+    "summary": "Identify the saved computation, growing memory, and conditions that make cached decoding valid.",
+    "prerequisites": [
+      "04-03",
+      "04-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Old causal states do not need future tokens",
+        "paragraphs": [
+          "In a causal decoder, a past token's hidden representation depends only on its prefix. Appending a new token does not change that old computation in deterministic evaluation. Each layer can therefore keep previously computed keys and values. The new token supplies a new query and new key-value pair, then reads the stored history. This avoids repeatedly processing the complete prefix through every layer."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Append memory at each layer",
+        "paragraphs": [
+          "For one new token, Q has query length one, while the key-value sequence length is the existing context plus that token. Attention still compares the new query with all allowed cached keys and mixes the corresponding values. The cache stores keys and values rather than past queries because future steps need the former as retrieval memory. Cache storage grows linearly with sequence length, layer count, batch size, key-value heads, and head width."
+        ],
+        "formula": "Cache bytes = 2 · L · B · T · H_kv · d_head · bytes_per_element"
+      },
+      {
+        "id": "practice",
+        "title": "Consistency matters more than the container type",
+        "paragraphs": [
+          "Position indices, masks, model weights, and preprocessing must match between full and cached evaluation. Changing an earlier token invalidates affected cached states. Training-time dropout or changing parameters also breaks straightforward reuse assumptions. Compare last-token logits from a full-prefix forward pass with incremental cached logits on a tiny example. Small numerical differences can arise from kernels, but a large mismatch usually indicates an indexing or masking error."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A 2-layer model with batch 1, sequence length 100, 4 KV heads, head width 8, and 2-byte elements stores how many cache bytes? Ignore allocator overhead.",
+      "answer": "The cache stores 2·2·1·100·4·8 = 12,800 elements, counting keys and values. At 2 bytes each, that is 25,600 bytes. Doubling context length doubles this storage."
+    },
+    "takeaways": [
+      "Caching saves repeated prefix computation.",
+      "It adds memory that grows with context and must remain position-consistent."
+    ],
+    "references": [
+      {
+        "title": "Fast Transformer Decoding: One Write-Head is All You Need",
+        "url": "https://arxiv.org/abs/1911.02150",
+        "kind": "paper",
+        "note": "Read incremental decoding and key/value memory traffic."
+      },
+      {
+        "title": "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
+        "url": "https://arxiv.org/abs/2305.13245",
+        "kind": "paper",
+        "note": "Connect the number of key-value heads to cache requirements."
+      }
+    ]
+  },
+  {
+    "topicId": "04-15",
+    "title": "Prefill and decode stress different parts of a serving system",
+    "summary": "Separate prompt processing from incremental token generation when measuring latency.",
+    "prerequisites": [
+      "04-14"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "One request contains two workloads",
+        "paragraphs": [
+          "Prefill processes the known prompt, builds contextual states, and initializes the KV cache. Decode repeatedly generates additional tokens using that cache. The prompt's tokens are available together, while each generated token depends on earlier generated choices. This difference changes parallelism and latency. A single average tokens-per-second number can hide whether a system is slow to begin responding or slow between subsequent tokens."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Compare the matrix shapes",
+        "paragraphs": [
+          "During prefill, many queries attend over the prompt, allowing relatively large matrix operations. During a single-sequence decode step, query length is often one, so the model repeatedly reads weights and an expanding cache to produce one next-token distribution. Larger decode batches can improve utilization but consume more cache memory and may affect latency. Workload regimes therefore depend on batch, prompt length, output length, architecture, and hardware rather than on a universal compute-versus-memory label."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Report user-visible timing separately",
+        "paragraphs": [
+          "Measure time to first token, time between generated tokens, complete request latency, and throughput under a stated concurrency level. Include tokenization, queuing, and transfer overhead when they matter to the user experience. Warm up kernels and synchronize timing boundaries appropriately. A short-prompt benchmark with long outputs emphasizes decode; a long-document summarization request can be dominated by prefill. Benchmark both if the application serves both."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "System A reaches the first token in 0.2 seconds and then emits 20 tokens per second. System B takes 1 second initially and emits 50 tokens per second. Which is faster for a very short answer versus a long answer?",
+      "answer": "A tends to finish a very short answer sooner because its startup cost is lower. B can finish a sufficiently long answer sooner because its per-token generation cost is lower. The crossover depends on the exact number of generated tokens and timing convention."
+    },
+    "takeaways": [
+      "Prefill and decode have different parallelism and memory behavior.",
+      "Report startup latency and incremental generation speed separately."
+    ],
+    "references": [
+      {
+        "title": "Fast Transformer Decoding: One Write-Head is All You Need",
+        "url": "https://arxiv.org/abs/1911.02150",
+        "kind": "paper",
+        "note": "Read the incremental decoding cost analysis and memory-bandwidth motivation."
+      },
+      {
+        "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+        "url": "https://arxiv.org/abs/2205.14135",
+        "kind": "paper",
+        "note": "Relate large attention workloads to GPU memory traffic and tiling."
+      }
+    ]
+  },
+  {
+    "topicId": "04-16",
+    "title": "FlashAttention saves memory traffic without approximating attention",
+    "summary": "Distinguish the mathematical operation from the way a GPU executes and stores its intermediates.",
+    "prerequisites": [
+      "04-03",
+      "02-11"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Moving numbers can cost more than multiplying them",
+        "paragraphs": [
+          "A naive attention implementation writes a large score matrix to GPU memory, applies softmax, and reads another large matrix to mix values. Those intermediates can be expensive even when the GPU has ample arithmetic capacity. FlashAttention reorganizes the same attention computation into tiles that fit faster on-chip memory, reducing transfers to and from high-bandwidth memory. Its goal is an execution improvement, not a sparse approximation to which tokens interact."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Normalize incrementally across tiles",
+        "paragraphs": [
+          "A row's softmax normally needs a maximum and a sum across all keys. Online softmax can maintain those statistics while visiting key blocks. When a new block changes the running maximum, previously accumulated sums and weighted values are rescaled consistently. This permits exact attention in real arithmetic without materializing the full attention matrix. The backward pass can recompute selected intermediates rather than storing everything from the forward pass."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Quadratic arithmetic still exists",
+        "paragraphs": [
+          "Dense FlashAttention still performs all relevant query-key interactions, so its pairwise arithmetic remains quadratic in sequence length. It reduces memory use and I/O, not the fundamental number of dense pairs. Floating-point operation order can produce small numerical differences from a reference implementation. Speed also depends on dimensions, dtype, masks, and supported hardware. Compare outputs and gradients on a small case, then measure peak memory and end-to-end runtime on the target workload."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "If sequence length doubles, does using FlashAttention make the dense pairwise computation grow only linearly? Explain which resource improvement the algorithm primarily targets.",
+      "answer": "No. The number of query-key pairs still grows by about four times. FlashAttention avoids storing full quadratic intermediates and reduces memory traffic through tiling and recomputation, while preserving dense attention semantics."
+    },
+    "takeaways": [
+      "Exact attention can have different execution schedules.",
+      "Lower memory traffic does not imply linear attention arithmetic."
+    ],
+    "references": [
+      {
+        "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+        "url": "https://arxiv.org/abs/2205.14135",
+        "kind": "paper",
+        "note": "Read the IO-aware tiling, online softmax, and recomputation approach."
+      },
+      {
+        "title": "PyTorch — Scaled Dot-Product Attention",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+        "kind": "guide",
+        "note": "Check available fused kernels and their input constraints."
+      }
+    ]
+  },
+  {
+    "topicId": "04-17",
+    "title": "Attention complexity depends on which operation you count",
+    "summary": "Separate projections, pairwise attention, activations, and incremental cache costs.",
+    "prerequisites": [
+      "04-03",
+      "04-11",
+      "04-14"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "One big-O label is not a memory budget",
+        "paragraphs": [
+          "A Transformer layer includes feature projections, pairwise token interactions, an FFN, and storage for backward or decoding. Saying attention is quadratic identifies one important growth pattern but does not describe the entire layer. At short sequences, width-dependent projections and FFNs can dominate. At long sequences, all-pairs attention and its intermediates become increasingly important. State which dimensions vary before comparing complexity claims."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Write the dominant terms",
+        "paragraphs": [
+          "For sequence length T and model width D, standard projections cost roughly O(TD²). With total head width D, score computation and value mixing cost O(T²D). Naively storing attention weights requires O(BHT²) elements, while a KV cache is linear in T. For B = 2, H = 8, T = 1024, one FP16 attention matrix alone occupies 32 MiB, excluding logits, gradients, and every other layer."
+        ],
+        "formula": "Pairwise work: O(T²D);  naive score storage: O(BHT²)"
+      },
+      {
+        "id": "practice",
+        "title": "Training and decoding need different accounting",
+        "paragraphs": [
+          "Training often retains activations for backpropagation. A cached decode step uses one new query, so its attention work grows roughly linearly with the current context length, but generating many tokens sums that cost over growing prefixes. Efficient kernels can avoid storing quadratic matrices without removing pairwise arithmetic. Report actual peak memory and latency together with theoretical counts; memory allocation, fusion, bandwidth, and batch scheduling all affect observed results."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "With width and batch fixed, sequence length rises from 512 to 2048. How do dense pairwise work, projection work, and KV-cache storage scale approximately?",
+      "answer": "Length increases fourfold. Dense pairwise work grows sixteenfold, projection work grows fourfold, and KV-cache storage grows fourfold. These ratios describe the stated components, not necessarily total wall-clock time."
+    },
+    "takeaways": [
+      "Separate width-dependent and length-dependent costs.",
+      "Training activation memory and inference cache memory are different budgets."
+    ],
+    "references": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Read the per-layer complexity comparison."
+      },
+      {
+        "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+        "url": "https://arxiv.org/abs/2205.14135",
+        "kind": "paper",
+        "note": "Compare quadratic arithmetic with reduced intermediate storage."
+      }
+    ]
+  },
+  {
+    "topicId": "04-18",
+    "title": "Build a Transformer block whose invariants you can test",
+    "summary": "Assemble attention, normalization, residuals, and an FFN while checking shapes and causality.",
+    "prerequisites": [
+      "04-06",
+      "04-10",
+      "04-11"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Build a block before building a language model",
+        "paragraphs": [
+          "A Transformer block accepts contextual vectors and returns vectors of the same width. It does not by itself provide tokenization, embeddings, positional information, or a vocabulary loss. Keeping those responsibilities separate makes the first implementation easier to inspect. Start with one head and no dropout, then verify the computation before adding multiple heads, caching, or optimized kernels."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Use a small pre-norm construction",
+        "paragraphs": [
+          "The example below normalizes before each sublayer, computes Q/K/V with one projection, applies a causal attention mask, and adds two residual updates. All tensors preserve batch and sequence axes, and the FFN expands only features. The code intentionally uses explicit attention matrices to expose the mechanism. For a complete language model, add positional information to the incoming representations and a final normalization and vocabulary head outside the block."
+        ],
+        "code": "import math\nimport torch\nfrom torch import nn\n\nclass TinyBlock(nn.Module):\n    def __init__(self, width):\n        super().__init__()\n        self.norm1 = nn.LayerNorm(width)\n        self.norm2 = nn.LayerNorm(width)\n        self.qkv = nn.Linear(width, 3 * width)\n        self.out = nn.Linear(width, width)\n        self.ffn = nn.Sequential(nn.Linear(width, 4 * width),\n                                 nn.GELU(), nn.Linear(4 * width, width))\n\n    def forward(self, x):\n        _, length, width = x.shape\n        q, k, v = self.qkv(self.norm1(x)).chunk(3, dim=-1)\n        scores = q @ k.transpose(-2, -1) / math.sqrt(width)\n        future = torch.ones(length, length, device=x.device,\n                            dtype=torch.bool).triu(diagonal=1)\n        weights = scores.masked_fill(future, float('-inf')).softmax(dim=-1)\n        x = x + self.out(weights @ v)\n        return x + self.ffn(self.norm2(x))",
+        "language": "python"
+      },
+      {
+        "id": "practice",
+        "title": "Test behavior, not just output shape",
+        "paragraphs": [
+          "First verify that output shape equals input shape and gradients reach every intended parameter. Next, change only future input positions and confirm earlier outputs are unchanged. Set both residual branches to zero and check that the block becomes an identity map. Finally, compare the explicit attention calculation with a trusted implementation on a tiny fixed input. This educational block omits padding masks and caching, so batches must contain fully valid sequences of equal length."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Why does matching input and output shapes fail to prove that a causal Transformer block is correct? Propose a stronger test.",
+      "answer": "A wrong mask or an incorrect axis permutation can preserve every shape while allowing future leakage. In evaluation mode, alter tokens after position k and verify that outputs through k stay unchanged within numerical tolerance. Also inspect that forbidden attention weights are zero."
+    },
+    "takeaways": [
+      "Preserve the residual stream's shape and meaning.",
+      "Causality is a behavioral property that needs an explicit test."
+    ],
+    "references": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "kind": "paper",
+        "note": "Use the attention, residual, and FFN equations as a construction reference."
+      },
+      {
+        "title": "PyTorch — Scaled Dot-Product Attention",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+        "kind": "guide",
+        "note": "Compare the explicit computation with the library reference implementation."
+      }
+    ]
+  }
+]

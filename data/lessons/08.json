@@ -1,0 +1,739 @@
+[
+  {
+    "topicId": "08-01",
+    "title": "From pixels to useful representations",
+    "summary": "A visual representation changes an image's coordinates so that the information needed for a task becomes easier to use.",
+    "prerequisites": [
+      "02-04",
+      "03-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Pixels are measurements, not meanings",
+        "paragraphs": [
+          "An RGB image can be represented as a grid of three-channel intensity measurements. Flattening that grid produces a vector, but nearby coordinates no longer visibly express the original spatial arrangement. A learned encoder transforms pixels into features that may respond to edges, textures, objects, or context. An embedding is simply a representation in a vector space; the word does not guarantee that distances in that space correspond to human judgments of similarity."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Keep track of shape and preprocessing",
+        "paragraphs": [
+          "A batch of images often uses shape [B, C, H, W] in convolutional code, while a Transformer may operate on [B, N, d] patch representations. For a 224-by-224 image with 16-by-16 patches, N is 196 before any special tokens. Preprocessing is part of the encoder's contract: channel order, resizing, normalization, and interpolation affect the resulting features. Passing values in [0, 255] to an encoder expecting normalized floating-point values can damage representations without triggering a shape error."
+        ],
+        "formula": "N = (H/P)(W/P), when H and W are divisible by patch size P"
+      },
+      {
+        "id": "practice",
+        "title": "Choose the representation for the question",
+        "paragraphs": [
+          "A global vector is convenient for retrieving similar images, while a spatial feature grid is better suited to locating objects. Consider two pictures containing the same objects in different arrangements. A global representation may deliberately suppress location, making it useful for recognition but weak for spatial reasoning. Test this by comparing retrieval similarity and a location-sensitive probe. Avoid using a visualization of two embedding dimensions as proof of semantic quality: projection methods can create appealing clusters even when downstream performance is poor."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "How many raw values are in a 32-by-32 RGB image, and how many 8-by-8 patches does it contain?",
+      "answer": "There are 32 × 32 × 3 = 3,072 raw values and 4 × 4 = 16 patches. Each flattened patch contains 8 × 8 × 3 = 192 values."
+    },
+    "takeaways": [
+      "Representation quality is relative to a task and preprocessing contract.",
+      "Global vectors and spatial features preserve different information."
+    ],
+    "references": [
+      {
+        "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+        "url": "https://arxiv.org/abs/2010.11929",
+        "kind": "paper",
+        "note": "Inspect the conversion from image patches to token embeddings."
+      },
+      {
+        "title": "Deep Residual Learning for Image Recognition",
+        "url": "https://arxiv.org/abs/1512.03385",
+        "kind": "paper",
+        "note": "Compare spatial feature maps with final classification features."
+      }
+    ]
+  },
+  {
+    "topicId": "08-02",
+    "title": "How convolutions and residual blocks work",
+    "summary": "Convolutions reuse local filters across an image, while residual connections give deeper networks a direct information path.",
+    "prerequisites": [
+      "03-07",
+      "03-10"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A filter is reused across locations",
+        "paragraphs": [
+          "A convolutional layer applies learned local filters at many spatial positions. Weight sharing lets the same pattern detector respond to an edge or texture wherever it appears, subject to effects from boundaries and sampling. Each output channel combines information from all input channels within the kernel footprint. Locality and sharing are useful inductive biases for images, but they do not make a network automatically invariant to every translation, scale, or rotation."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Derive one output shape",
+        "paragraphs": [
+          "For one spatial dimension, output size is floor((input + 2 padding − dilation(kernel − 1) − 1)/stride + 1). A 3-by-3 convolution with stride one and padding one preserves a 32-by-32 grid. With 3 input channels and 16 output channels, it has 16 × 3 × 3 × 3 = 432 kernel parameters. A residual block adds its transformed output to the input; when widths or spatial sizes differ, a projection or other matching operation is required."
+        ],
+        "formula": "H_out = floor((H + 2p − d(k − 1) − 1)/s + 1)"
+      },
+      {
+        "id": "practice",
+        "title": "Understand what the skip path helps",
+        "paragraphs": [
+          "Write a block as y = x + F(x). Its input gradient includes a direct path from the identity term as well as a path through F. This can make optimization of deep stacks easier, but it does not eliminate all vanishing, exploding, or poorly conditioned gradients. In a toy network, compare gradient norms across plain and residual stacks with matched widths. Check tensor shapes at every addition: broadcasting an incorrectly shaped shortcut can produce a legal tensor operation that implements the wrong architecture."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A 32-by-32 input uses kernel 3, padding 1, dilation 1, and stride 2. What is the output size?",
+      "answer": "floor((32 + 2 − 2 − 1)/2 + 1) = 16 in each spatial dimension, so the output grid is 16 by 16."
+    },
+    "takeaways": [
+      "Convolution shares local filters; residual addition creates a direct path.",
+      "Calculate output shapes before adding shortcuts."
+    ],
+    "references": [
+      {
+        "title": "Deep Residual Learning for Image Recognition",
+        "url": "https://arxiv.org/abs/1512.03385",
+        "kind": "paper",
+        "note": "Read the residual mapping formulation and projection shortcuts."
+      }
+    ]
+  },
+  {
+    "topicId": "08-03",
+    "title": "Turning an image into a ViT sequence",
+    "summary": "A Vision Transformer represents image patches as a sequence while preserving spatial information through positional embeddings.",
+    "prerequisites": [
+      "04-05",
+      "08-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Patches become the sequence elements",
+        "paragraphs": [
+          "Split an image into nonoverlapping P-by-P patches. Flatten each patch's channel values and linearly project them to a hidden width d. A learned CLS token may be prepended to the sequence and used as the classification representation. Positional embeddings tell the model where patches came from. The original ViT design uses these ingredients to apply familiar Transformer blocks to images; different vision architectures may omit CLS tokens or use alternative pooling and position schemes."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Follow a complete shape example",
+        "paragraphs": [
+          "Take B images of shape [B, 3, 224, 224], patch size 16, and width 768. There are 14 × 14 = 196 patches. Each patch contains 3 × 16 × 16 = 768 raw values and is projected to a 768-dimensional embedding. Appending CLS gives [B, 197, 768]. Attention operates across these 197 positions, not across individual pixels. The equality of raw patch width and hidden width in this example is coincidental; the projection can change dimensionality."
+        ],
+        "formula": "Patch count N = HW/P²; sequence length with CLS = N + 1"
+      },
+      {
+        "id": "practice",
+        "title": "Position and resolution are connected",
+        "paragraphs": [
+          "Without spatial position information, a standard self-attention stack cannot distinguish arbitrary permutations of otherwise identical patch embeddings in the intended image layout. At a new resolution, a learned positional grid may need interpolation, and the number of tokens changes. A smaller patch size preserves finer spatial detail but increases sequence length and attention cost. Do not assume CLS is literally an average of patches: it is a learned token whose representation evolves through attention. Inspect how the selected checkpoint pools features before attaching a downstream head."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "For a 256-by-256 image with 16-by-16 patches and one CLS token, what is the sequence length?",
+      "answer": "There are 16 × 16 = 256 patch tokens, so the sequence length is 257."
+    },
+    "takeaways": [
+      "Patch size determines both spatial granularity and token count.",
+      "CLS pooling and positional embeddings are architectural choices."
+    ],
+    "references": [
+      {
+        "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+        "url": "https://arxiv.org/abs/2010.11929",
+        "kind": "paper",
+        "note": "Read patch embedding, position embedding, and classification-token construction."
+      }
+    ]
+  },
+  {
+    "topicId": "08-04",
+    "title": "Comparing CNN and ViT inductive biases",
+    "summary": "CNNs and Vision Transformers impose different assumptions about locality, sharing, and how spatial information is combined.",
+    "prerequisites": [
+      "08-02",
+      "08-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Both are learned image processors",
+        "paragraphs": [
+          "A CNN begins with local filters whose weights are reused across locations. Stacking layers expands the receptive field, allowing distant regions to interact indirectly. A standard ViT uses patch tokens and self-attention that can connect distant patches in a single block. This does not mean every ViT attention pattern is global in practice, nor that CNNs cannot learn global context. The important distinction is how architectural constraints shape the available computations and learning problem."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Compare sequence scaling with feature-map scaling",
+        "paragraphs": [
+          "For a standard dense attention layer with N tokens and hidden width d, the attention interaction term scales roughly as N²d. A convolution's cost depends on spatial output size, kernel area, input channels, and output channels. If image height and width double with fixed patch size, ViT patch count quadruples and the N² interaction term grows sixteenfold. CNN cost often grows roughly with spatial area when the architecture and channel widths remain fixed, although details vary by layer."
+        ],
+        "formula": "Dense attention interaction cost ∝ N²d"
+      },
+      {
+        "id": "practice",
+        "title": "Avoid architecture-only explanations",
+        "paragraphs": [
+          "A comparison can change not only architecture but also pretraining data, augmentation, parameter count, optimizer, and resolution. Large differences in any of those can dominate the result. For a small experiment, train matched-size models with the same dataset and document tuning budgets, then evaluate both clean accuracy and a chosen shift such as blur or translation. A common overstatement is that one architecture always needs more data or is always more robust. Those tendencies depend on the training recipe, model scale, and evaluation distribution; report the conditions instead of turning a trend into a rule."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "If a standard ViT's patch count increases from 196 to 784, how does its pairwise attention matrix size change?",
+      "answer": "It grows from 196² to 784² entries, a factor of 16. Other components may scale differently, so total runtime need not grow by exactly that factor."
+    },
+    "takeaways": [
+      "Compare computational structures and training recipes together.",
+      "Global connectivity is available capacity, not proof of learned reasoning."
+    ],
+    "references": [
+      {
+        "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+        "url": "https://arxiv.org/abs/2010.11929",
+        "kind": "paper",
+        "note": "Read comparisons between Transformer and convolutional visual encoders."
+      },
+      {
+        "title": "Deep Residual Learning for Image Recognition",
+        "url": "https://arxiv.org/abs/1512.03385",
+        "kind": "paper",
+        "note": "Use the residual CNN design as a concrete convolutional reference."
+      }
+    ]
+  },
+  {
+    "topicId": "08-05",
+    "title": "Designing image augmentation around the label",
+    "summary": "An augmentation is useful only when its transformation is compatible with the prediction task and supervision.",
+    "prerequisites": [
+      "08-01",
+      "01-11"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Augmentation expresses an assumption",
+        "paragraphs": [
+          "Flips, crops, color changes, and blur expose a model to variations that training should tolerate. For image classification, an augmentation often assumes that the label stays unchanged. That assumption can fail: rotating a digit can change its identity, cropping can remove the labeled object, and color jitter can erase a medically or scientifically meaningful cue. Augmentation is therefore part of task design, not a list of universally beneficial tricks."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Transform labels and geometry together",
+        "paragraphs": [
+          "For detection and segmentation, geometric transforms must also update boxes or masks. A horizontal flip of an image with width W maps a box [x_min, x_max] to [W − x_max, W − x_min] under a continuous coordinate convention. The convention changes for integer pixel indices, so use one consistently. Cropping can truncate boxes and create empty targets. Color-only changes usually leave geometry intact but may still change semantic cues or invalidate assumptions about photometric measurements."
+        ],
+        "formula": "Horizontal box flip: [x_min, x_max] → [W − x_max, W − x_min]"
+      },
+      {
+        "id": "practice",
+        "title": "Two views can define a learning task",
+        "paragraphs": [
+          "In contrastive visual learning, augmentations create different views of the same image that are treated as related. If the views preserve too little shared content, the positive-pair assumption becomes noisy. If they are almost identical, the task may be too easy. Inspect augmented examples before training, including labels and masks, and compare a small set of transformations through ablations. Applying random training augmentation at evaluation time without an explicit test-time protocol is a common mistake that can make reported metrics unstable or incomparable."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A box spans x = 10 to 30 in an image of continuous width 100. What are its bounds after a horizontal flip?",
+      "answer": "The bounds become [100 − 30, 100 − 10] = [70, 90]. Both endpoints change and their order must remain valid."
+    },
+    "takeaways": [
+      "Every augmentation encodes an invariance or equivariance assumption.",
+      "Visualize transformed targets as well as transformed images."
+    ],
+    "references": [
+      {
+        "title": "A Simple Framework for Contrastive Learning of Visual Representations",
+        "url": "https://arxiv.org/abs/2002.05709",
+        "kind": "paper",
+        "note": "Read how the composition of augmentations defines positive visual pairs."
+      },
+      {
+        "title": "End-to-End Object Detection with Transformers",
+        "url": "https://arxiv.org/abs/2005.12872",
+        "kind": "paper",
+        "note": "Inspect geometric targets used in object detection."
+      }
+    ]
+  },
+  {
+    "topicId": "08-06",
+    "title": "Learning with labels and learning from the data itself",
+    "summary": "Self-supervision changes where the training signal comes from, rather than removing the need for a carefully designed objective.",
+    "prerequisites": [
+      "03-04",
+      "08-05"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "The target can be constructed",
+        "paragraphs": [
+          "Supervised learning compares predictions with externally supplied labels such as object categories. Self-supervised learning constructs a learning signal from the data, for example by predicting masked content or matching representations of two views. It still uses targets and losses. The distinction concerns how those targets are obtained. A self-supervised representation can later be evaluated with labeled data or fine-tuned for a supervised task, so the full pipeline may contain both forms of learning."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Different objectives preserve different information",
+        "paragraphs": [
+          "A reconstruction objective encourages features that retain information needed to recover missing pixels or patches. A view-consistency objective encourages agreement across augmentations, potentially suppressing features that those augmentations change. Neither objective automatically selects the information needed for every downstream task. If color is heavily perturbed, a learned representation may become less useful for color-sensitive labels. If reconstruction focuses on local textures, good reconstruction alone may not imply strong semantic classification."
+        ],
+        "formula": "Example masked objective: L = mean over masked patches ‖prediction − target‖²"
+      },
+      {
+        "id": "practice",
+        "title": "Evaluate representations through controlled probes",
+        "paragraphs": [
+          "Freeze an encoder and train a simple linear classifier on its features to test what is linearly accessible. Compare this with full fine-tuning, which also measures adaptability. Use the same labels, train/test split, preprocessing, and feature-pooling convention across encoders. A strong downstream result does not prove that the representation is unbiased or universally reusable. A common confusion is to call image–caption pretraining completely label-free: captions supply a form of supervision even when they were collected naturally rather than manually assigned as class labels."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "If a model predicts randomly masked image patches, where do its training targets come from?",
+      "answer": "They come from the original unmasked image. The task is self-supervised because the data provides the targets without separately annotated class labels."
+    },
+    "takeaways": [
+      "Self-supervision constructs targets; it does not train without an objective.",
+      "Evaluate both frozen-feature usefulness and adaptation under controlled conditions."
+    ],
+    "references": [
+      {
+        "title": "Masked Autoencoders Are Scalable Vision Learners",
+        "url": "https://arxiv.org/abs/2111.06377",
+        "kind": "paper",
+        "note": "Inspect masked patch reconstruction as a self-supervised objective."
+      },
+      {
+        "title": "Emerging Properties in Self-Supervised Vision Transformers",
+        "url": "https://arxiv.org/abs/2104.14294",
+        "kind": "paper",
+        "note": "Compare teacher–student view consistency with reconstruction."
+      }
+    ]
+  },
+  {
+    "topicId": "08-07",
+    "title": "Understanding contrastive learning and InfoNCE",
+    "summary": "A contrastive objective teaches a representation to identify a related example among alternatives.",
+    "prerequisites": [
+      "01-09",
+      "08-05"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Turn similarity into a prediction problem",
+        "paragraphs": [
+          "Choose an anchor, a positive example related to it, and several candidate negatives. An encoder maps these examples to vectors, and a similarity score ranks the candidates. InfoNCE uses a softmax classification loss that rewards assigning high probability to the positive. In visual learning, two augmented views of one image commonly form a positive pair. The meaning of relatedness is therefore defined by data construction, not discovered independently of the training setup."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Read the denominator carefully",
+        "paragraphs": [
+          "For anchor q and positive k+, the loss is minus the log of exp(sim(q,k+)/τ) divided by the sum over all candidates, including the positive. Temperature τ controls how sharply score differences affect probabilities. For a positive score of 2 and one negative score of 0 at τ = 1, the positive probability is exp(2)/(exp(2)+1), about 0.881, and the loss is about 0.127. Lower loss means better identification within that candidate set."
+        ],
+        "formula": "L = −log [exp(sim(q,k+)/τ) / Σⱼ exp(sim(q,kⱼ)/τ)]"
+      },
+      {
+        "id": "practice",
+        "title": "Negatives can contain useful or misleading pressure",
+        "paragraphs": [
+          "A larger candidate set can make discrimination harder, but some negatives may actually share the same semantic content. Treating two pictures of the same object category as unrelated can conflict with the desired downstream representation. Representation collapse, false negatives, augmentation choices, and batch construction should be inspected together. Do not interpret a low training contrastive loss as calibrated real-world similarity or guaranteed semantic understanding. Evaluate retrieval and downstream probes using examples outside the training pair construction, and inspect both successful and failed nearest neighbors."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "If every candidate has the same score and there are eight candidates, what is the InfoNCE loss?",
+      "answer": "The positive probability is 1/8, so the loss is log(8) ≈ 2.079 nats."
+    },
+    "takeaways": [
+      "The positive/negative construction defines the learning task.",
+      "Temperature changes the sharpness of relative similarity comparisons."
+    ],
+    "references": [
+      {
+        "title": "Representation Learning with Contrastive Predictive Coding",
+        "url": "https://arxiv.org/abs/1807.03748",
+        "kind": "paper",
+        "note": "Read the contrastive predictive objective and candidate denominator."
+      },
+      {
+        "title": "A Simple Framework for Contrastive Learning of Visual Representations",
+        "url": "https://arxiv.org/abs/2002.05709",
+        "kind": "paper",
+        "note": "See how augmented image pairs instantiate contrastive learning."
+      }
+    ]
+  },
+  {
+    "topicId": "08-08",
+    "title": "CLIP as a pair of aligned encoders",
+    "summary": "CLIP learns an image space and a text space whose normalized vectors can be compared directly.",
+    "prerequisites": [
+      "08-07",
+      "04-07"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Two encoders meet in one space",
+        "paragraphs": [
+          "An image encoder converts an image into a vector, while a text encoder converts a caption or prompt into another vector. Learned projections bring them to the same embedding dimension. Training encourages matched image–text pairs to score higher than mismatched pairs in a batch. The encoders can have different internal architectures and widths; only their final comparison space must agree. This design supports retrieval in either direction without requiring the model to generate a sentence."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Trace a batch similarity matrix",
+        "paragraphs": [
+          "Let image embeddings I and text embeddings T each have shape [B, d] after normalization. Their matrix product ITᵀ has shape [B, B], where entry i,j compares image i with text j. Matched pairs lie on the diagonal under the usual batch ordering. A learned logit scale sharpens the similarity scores before the contrastive loss. Normalization matters because it turns the dot product into cosine similarity and prevents vector norm alone from dominating the comparison."
+        ],
+        "formula": "S = scale × normalize(I) normalize(T)ᵀ"
+      },
+      {
+        "id": "practice",
+        "title": "Use it as retrieval, then inspect failures",
+        "paragraphs": [
+          "For a query image, encode candidate text descriptions and rank them by similarity. For a text query, rank stored image embeddings instead. Text vectors can often be cached when the candidate labels are fixed. Consider an image of a red car behind a blue truck: broad object descriptions may rank well even if descriptions requiring exact spatial relations do not. This illustrates why alignment is not equivalent to a complete scene representation. A common mistake is expecting a CLIP encoder alone to answer open-ended questions with generated text; generation requires an additional decoder or other mechanism."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "With 32 images and 32 captions, each embedded in 512 dimensions, what is the similarity matrix shape?",
+      "answer": "It is [32, 32]. Each image is compared with every caption, producing 1,024 pair scores."
+    },
+    "takeaways": [
+      "CLIP compares image and text vectors in a shared embedding space.",
+      "Retrieval scores do not themselves produce free-form answers."
+    ],
+    "references": [
+      {
+        "title": "Learning Transferable Visual Models From Natural Language Supervision",
+        "url": "https://arxiv.org/abs/2103.00020",
+        "kind": "paper",
+        "note": "Read the dual-encoder architecture and image–text similarity construction."
+      }
+    ]
+  },
+  {
+    "topicId": "08-09",
+    "title": "CLIP loss, temperature, and zero-shot classification",
+    "summary": "Zero-shot classification turns candidate class names into text embeddings and compares them with an image embedding.",
+    "prerequisites": [
+      "08-08",
+      "01-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Training classifies paired examples twice",
+        "paragraphs": [
+          "For a batch of matched images and captions, CLIP can classify each image's matching caption and each caption's matching image. The two cross-entropy losses use the rows and columns of the same similarity matrix. The diagonal entries identify positives when batch pairs are aligned. This symmetry encourages compatibility in both retrieval directions. It does not make every caption in the batch a perfect negative for every other image; semantically overlapping examples can complicate the objective."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Temperature changes confidence more directly than rank",
+        "paragraphs": [
+          "For normalized vectors, logits are their cosine similarities divided by temperature, or multiplied by an equivalent positive scale. Decreasing temperature makes softmax probabilities sharper. With two similarities 0.3 and 0.2, temperature 0.1 produces logits 3 and 2, while temperature 0.01 produces 30 and 20. The ranking is unchanged, but the probabilities differ greatly. Thus a high softmax score among candidate labels is not automatically a calibrated probability that the label is correct."
+        ],
+        "formula": "p(class c|image) = softmax_c(sim(image, text_c)/τ)"
+      },
+      {
+        "id": "practice",
+        "title": "Build and test the text classifier",
+        "paragraphs": [
+          "Encode prompts such as 'a photo of a bicycle' for each candidate class, normalize them, and compare with the image vector. Prompt wording and the candidate set can change the result. If the true class is absent, softmax still chooses among available labels. Evaluate several reasonable prompts using validation data rather than selecting on the test set. For a controlled experiment, compare bare class names with descriptive prompts and inspect confusion pairs, especially classes that differ by small attributes or spatial relations."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Does multiplying every cosine score by the same positive scale change the top-ranked class?",
+      "answer": "No, assuming exact arithmetic and no ties. It changes softmax sharpness, not the ordering. Calibration and accuracy are therefore different concerns."
+    },
+    "takeaways": [
+      "Zero-shot classification uses text prompts as classifier prototypes.",
+      "Temperature-dependent confidence is not a substitute for calibration."
+    ],
+    "references": [
+      {
+        "title": "Learning Transferable Visual Models From Natural Language Supervision",
+        "url": "https://arxiv.org/abs/2103.00020",
+        "kind": "paper",
+        "note": "Focus on symmetric contrastive training and zero-shot prompt construction."
+      }
+    ]
+  },
+  {
+    "topicId": "08-10",
+    "title": "Why SigLIP uses a sigmoid objective",
+    "summary": "Sigmoid image–text training treats pair compatibility as a binary prediction instead of a softmax choice across all pairs.",
+    "prerequisites": [
+      "08-08",
+      "01-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Change the comparison structure",
+        "paragraphs": [
+          "A softmax contrastive loss compares one positive against a jointly normalized set of alternatives. A sigmoid loss instead assigns each image–text pair a binary match label and trains its compatibility score accordingly. Positive and negative pairs still share encoders and parameters, so their learning is coupled through the model. The difference is in loss normalization, not in abandoning negative pairs or using only matched examples."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Write a binary pair loss",
+        "paragraphs": [
+          "Let y be +1 for a matched pair and −1 for a mismatched pair. With logit z, a logistic loss is log(1 + exp(−yz)). The logit may include a learned similarity scale and bias. For z = 2, a positive pair has loss about 0.127; a negative pair with the same logit has loss about 2.127. The bias can account for the imbalance between few positives and many negatives. Stable implementations use softplus rather than directly exponentiating large numbers."
+        ],
+        "formula": "L_pair = softplus(−y z), y ∈ {−1, +1}"
+      },
+      {
+        "id": "practice",
+        "title": "Batch design still matters",
+        "paragraphs": [
+          "A batch of B matched examples yields B diagonal positives and potentially B(B − 1) mismatches. Pair subsampling, weighting, and distributed computation determine how those terms enter training. Removing a global softmax denominator does not make batch composition irrelevant. It also does not make the raw sigmoid output a universally calibrated match probability on arbitrary deployment data. Evaluate retrieval or zero-shot classification with a consistent preprocessing and prompt protocol. When comparing with CLIP, hold encoder size, data, and training budget fixed if the goal is to isolate the loss change."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "For B = 4 matched image–text pairs and all pair combinations, how many positives and negatives are available?",
+      "answer": "There are 16 pairs: four matched diagonal positives and twelve off-diagonal negatives, before accounting for any semantically valid cross-pairs."
+    },
+    "takeaways": [
+      "Sigmoid loss changes pairwise supervision and normalization.",
+      "Negative sampling, class balance, and calibration remain important."
+    ],
+    "references": [
+      {
+        "title": "Sigmoid Loss for Language Image Pre-Training",
+        "url": "https://arxiv.org/abs/2303.15343",
+        "kind": "paper",
+        "note": "Read the pairwise sigmoid objective and contrast with softmax normalization."
+      }
+    ]
+  },
+  {
+    "topicId": "08-11",
+    "title": "DINO and DINOv2 as visual feature learners",
+    "summary": "Teacher–student self-distillation can learn visual representations without requiring image–caption pairs.",
+    "prerequisites": [
+      "08-06",
+      "03-04"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Views of one image supply agreement targets",
+        "paragraphs": [
+          "DINO trains a student to match a teacher's output on different augmented views of the same image. The teacher is updated through a moving average of student parameters rather than ordinary backpropagation through the teacher target. This creates a slowly changing reference. Unlike CLIP, this setup does not align images with natural-language captions, so a DINO feature vector is not automatically compatible with arbitrary text embeddings."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Avoid the trivial agreement solution",
+        "paragraphs": [
+          "If every image produced the same output, teacher and student could agree while learning nothing useful. The objective and training recipe need mechanisms that prevent such collapse, including careful treatment of output distributions and views. A moving-average teacher alone is not a universal guarantee. DINOv2 extends the broader visual feature-learning recipe, including attention to training data and patch-level learning. Distinguish the general teacher–student idea from the exact ingredients of a particular released checkpoint."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Probe global and local information",
+        "paragraphs": [
+          "Take a frozen encoder and extract both its global image representation and its patch tokens. A linear classifier on global vectors tests accessible category information, while patch correspondences or segmentation probes test spatial features. Use consistent layer selection and normalization: early and late representations may support different tasks. For a practical exercise, compare two crops of the same object and inspect nearest patch neighbors. A visually appealing attention map is not a segmentation ground truth, and a strong frozen probe does not establish that every downstream task will benefit without adaptation."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Can you directly replace CLIP image embeddings with DINO embeddings while keeping the same CLIP text vectors?",
+      "answer": "Not in general. Their spaces were learned under different objectives and may differ in dimension and geometry. An alignment or task-specific mapping would be required."
+    },
+    "takeaways": [
+      "Self-distillation needs a nontrivial target-building and stabilization recipe.",
+      "Evaluate global and patch features using the downstream task's needs."
+    ],
+    "references": [
+      {
+        "title": "Emerging Properties in Self-Supervised Vision Transformers",
+        "url": "https://arxiv.org/abs/2104.14294",
+        "kind": "paper",
+        "note": "Read teacher–student training and the role of view consistency."
+      },
+      {
+        "title": "DINOv2: Learning Robust Visual Features without Supervision",
+        "url": "https://arxiv.org/abs/2304.07193",
+        "kind": "paper",
+        "note": "Inspect the expanded visual feature-learning recipe and dense-feature evaluation."
+      }
+    ]
+  },
+  {
+    "topicId": "08-12",
+    "title": "Global vectors and dense feature maps",
+    "summary": "Pooling helps summarize an image but can discard the spatial distinctions required for localization.",
+    "prerequisites": [
+      "08-01",
+      "08-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A summary answers a different question",
+        "paragraphs": [
+          "A global feature represents an entire image with one vector. It is convenient for classification and retrieval because every image has the same output size. Dense features retain a grid or sequence of local representations. They support questions such as where an object appears or which region matches another image. These features may already contain global context, especially after attention; 'local' describes their spatial indexing, not a guarantee that each vector depends only on nearby pixels."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Track the effect of pooling",
+        "paragraphs": [
+          "Suppose a feature map has shape [B, 14, 14, 768]. Global average pooling produces [B, 768] by averaging over 196 positions. The result cannot preserve all distinctions in the original map. Two maps with spatially permuted vectors have the same average. A CLS representation is another aggregation mechanism, but its learned pooling behavior differs from arithmetic averaging. Dense prediction usually keeps spatial indices and uses a task head or decoder to map features to boxes, masks, or coordinates."
+        ],
+        "formula": "g = (1/N) Σᵢ hᵢ"
+      },
+      {
+        "id": "practice",
+        "title": "Choose probes that expose information loss",
+        "paragraphs": [
+          "Construct two synthetic images with the same colored objects in swapped positions. Compare their global embedding similarity and the ability of a dense head to identify left versus right. If global vectors remain similar, that may be desirable for object recognition but problematic for spatial instructions. A common mistake is resizing a low-resolution feature map and interpreting it as recovered high-resolution evidence. Upsampling changes the output grid; it cannot guarantee restoration of details absent from the original representation. Evaluate localization at the resolution and coordinate convention used by the task."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "If two patch sequences contain exactly the same vectors in different orders, what happens to their mean-pooled representation?",
+      "answer": "It is identical, because summation is order-independent. The spatial arrangement is lost unless encoded in the vectors in a way that changes their values."
+    },
+    "takeaways": [
+      "Preserving spatial indices supports localization and correspondence.",
+      "Upsampling features does not automatically recover discarded detail."
+    ],
+    "references": [
+      {
+        "title": "DINOv2: Learning Robust Visual Features without Supervision",
+        "url": "https://arxiv.org/abs/2304.07193",
+        "kind": "paper",
+        "note": "Compare image-level and patch-level feature evaluation."
+      },
+      {
+        "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+        "url": "https://arxiv.org/abs/2010.11929",
+        "kind": "paper",
+        "note": "Inspect global token pooling versus the patch-token sequence."
+      }
+    ]
+  },
+  {
+    "topicId": "08-13",
+    "title": "Detection and segmentation predict different structures",
+    "summary": "Detection locates objects with boxes, while segmentation assigns labels or instance identities to image regions.",
+    "prerequisites": [
+      "08-12"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Start with the output you need",
+        "paragraphs": [
+          "Image classification returns labels for an image. Object detection returns object categories and locations, often rectangular boxes. Semantic segmentation assigns a category to each pixel but does not necessarily distinguish two objects of the same category. Instance segmentation provides separate masks for individual objects. Panoptic segmentation combines instance identities for countable objects with semantic regions for background-like categories. These tasks share visual encoders but require different output representations and evaluation procedures."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Boxes and masks use different geometry",
+        "paragraphs": [
+          "For two regions A and B, intersection-over-union is the area of their intersection divided by the area of their union. A predicted box can overlap a ground-truth box well while including substantial background. A mask can follow a nonrectangular boundary more precisely. Detection also requires matching predictions to ground truth and dealing with duplicates or missing objects. In set-based detectors, matching is part of the training design rather than simply assigning every prediction to its nearest target."
+        ],
+        "formula": "IoU(A,B) = area(A ∩ B) / area(A ∪ B)"
+      },
+      {
+        "id": "practice",
+        "title": "Evaluate more than a thresholded picture",
+        "paragraphs": [
+          "A neat visualization can hide duplicate detections, missed small objects, or systematically shifted boundaries. Report the task-appropriate metric and inspect size, class, and occlusion subgroups. Confidence thresholds trade false positives against misses, so compare methods across an agreed evaluation protocol rather than cherry-picking a display threshold. Keep coordinate normalization and resizing consistent when moving boxes between model and image space. A common error is computing overlap after applying different crop or resize transforms to predictions and targets, which produces a geometry mismatch even when the underlying prediction is reasonable."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Two masks each cover 100 pixels and overlap on 60. What is their IoU?",
+      "answer": "The union has 100 + 100 − 60 = 140 pixels, so IoU is 60/140 ≈ 0.429."
+    },
+    "takeaways": [
+      "Choose boxes, semantic labels, or instance masks according to the task.",
+      "Correct geometric alignment is essential for meaningful evaluation."
+    ],
+    "references": [
+      {
+        "title": "End-to-End Object Detection with Transformers",
+        "url": "https://arxiv.org/abs/2005.12872",
+        "kind": "paper",
+        "note": "Read object detection as set prediction and matching."
+      },
+      {
+        "title": "Segment Anything",
+        "url": "https://arxiv.org/abs/2304.02643",
+        "kind": "paper",
+        "note": "Inspect promptable mask prediction as a segmentation interface."
+      }
+    ]
+  },
+  {
+    "topicId": "08-14",
+    "title": "SAM and SAM 2 as promptable segmentation systems",
+    "summary": "Promptable segmentation uses user-specified spatial cues to identify a region, and video segmentation additionally requires memory across frames.",
+    "prerequisites": [
+      "08-13",
+      "08-12"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A prompt specifies which region matters",
+        "paragraphs": [
+          "A segmentation model may receive an image plus points, a box, or a prior mask indicating the desired object. SAM separates image encoding, prompt encoding, and mask decoding. This interface lets one image representation support several different segmentation queries. A positive point can indicate inclusion and a negative point exclusion, but ambiguous scenes can still admit several plausible masks. Promptable segmentation does not inherently provide a semantic class label for the selected region."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Video adds identity through time",
+        "paragraphs": [
+          "In a video, independently segmenting every frame can lose object identity when objects move, overlap, or disappear. SAM 2 introduces a memory-based approach for images and videos, allowing previous information to inform current predictions. The essential distinction is temporal conditioning, not merely processing more images in a batch. A wrong earlier mask can influence later frames, so corrections and the memory update policy matter. The exact memory representation and scheduling belong to the specific implementation."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Measure prompt quality and temporal failure",
+        "paragraphs": [
+          "For an image experiment, compare one positive point, a box, and additional corrective points on the same objects. For video, inspect occlusion, reappearance, camera motion, and similar-looking instances. Report whether prompts are supplied once or repeatedly: frequent human correction changes the difficulty of the task. A common mistake is treating a confident mask as guaranteed object recognition or assuming a tracked mask proves understanding of the object's action. Evaluate spatial overlap and temporal identity separately, and include failures where the prompt itself is underspecified."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A model follows the wrong person after two similar people cross. Which failure is this, even if each predicted mask is well shaped?",
+      "answer": "It is a temporal identity or association failure. Good per-frame boundaries do not guarantee that the mask continues to refer to the originally selected person."
+    },
+    "takeaways": [
+      "Spatial prompts specify a target region rather than a class ontology.",
+      "Video segmentation must preserve identity as well as mask quality."
+    ],
+    "references": [
+      {
+        "title": "Segment Anything",
+        "url": "https://arxiv.org/abs/2304.02643",
+        "kind": "paper",
+        "note": "Read image encoder, prompt encoder, and mask decoder roles."
+      },
+      {
+        "title": "SAM 2: Segment Anything in Images and Videos",
+        "url": "https://arxiv.org/abs/2408.00714",
+        "kind": "paper",
+        "note": "Inspect memory-based conditioning for video segmentation."
+      }
+    ]
+  }
+]

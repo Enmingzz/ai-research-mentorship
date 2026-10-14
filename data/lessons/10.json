@@ -1,0 +1,771 @@
+[
+  {
+    "topicId": "10-01",
+    "title": "How generative VLMs differ from CLIP",
+    "summary": "Generative vision-language models condition a text-generation process on visual evidence, while CLIP primarily scores image–text compatibility.",
+    "prerequisites": [
+      "08-08",
+      "05-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Use the term VLM carefully",
+        "paragraphs": [
+          "CLIP is itself a vision-language model in the broad sense because it learns from images and text. In this lesson, a generative VLM means a model that can produce a sequence of language tokens conditioned on visual input. CLIP's dual encoders instead produce vectors that support similarity scoring, retrieval, and zero-shot classification. The distinction is an interface and objective difference, not a statement that one system uses language while the other does not."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Compare what the model predicts",
+        "paragraphs": [
+          "A CLIP-style system computes a compatibility score between an image and a candidate text. A generative VLM models the probability of the next answer token given the image, prompt, and previous answer tokens. It can express a new sentence without enumerating every possible answer beforehand. However, fluent generation can also introduce unsupported details. Neither a high similarity score nor a confident generated answer proves that the system has correctly grounded every statement in the image."
+        ],
+        "formula": "Generative factorization: p(y|image,prompt) = ∏ₜ p(yₜ|image,prompt,y_<t)"
+      },
+      {
+        "id": "practice",
+        "title": "Choose a diagnostic example",
+        "paragraphs": [
+          "For an image containing two differently colored cups, compare ranking candidate captions with generating an answer to 'Which cup is on the left?' Retrieval can succeed if the correct caption is supplied, while generation requires selecting and expressing the relevant relation. Conversely, a generative model can produce a plausible answer from language priors even when the image is ambiguous. A common mistake is assuming that adding an LLM automatically improves visual representation. Evaluate perception, relation reasoning, answer formatting, and hallucination separately to understand which component actually changes."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Why can CLIP classify among a supplied list of labels without being able to generate a free-form explanation?",
+      "answer": "It can compare the image embedding with text embeddings of those labels. Producing a new token sequence requires a generative decoder or another mechanism beyond similarity scoring."
+    },
+    "takeaways": [
+      "CLIP belongs to the broad VLM family but has a different output interface.",
+      "Generative fluency and visual grounding must be evaluated separately."
+    ],
+    "references": [
+      {
+        "title": "Learning Transferable Visual Models From Natural Language Supervision",
+        "url": "https://arxiv.org/abs/2103.00020",
+        "kind": "paper",
+        "note": "Review dual-encoder compatibility scoring."
+      },
+      {
+        "title": "Visual Instruction Tuning",
+        "url": "https://arxiv.org/abs/2304.08485",
+        "kind": "paper",
+        "note": "Compare visual conditioning with autoregressive answer generation."
+      }
+    ]
+  },
+  {
+    "topicId": "10-02",
+    "title": "Tracing a vision encoder–projector–LLM pipeline",
+    "summary": "A common multimodal architecture converts image features into vectors compatible with a language model's hidden space.",
+    "prerequisites": [
+      "08-03",
+      "04-18",
+      "05-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Three components solve different problems",
+        "paragraphs": [
+          "The vision encoder extracts a sequence or grid of image features. A projector maps those features into the language model's embedding width. The language model combines visual and text representations and predicts answer tokens. This decomposition is common but not universal: some architectures use cross-attention or learned query modules instead of inserting every projected patch into the text sequence. Start by identifying the actual interface rather than assuming all multimodal systems share one diagram."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Annotate a complete shape path",
+        "paragraphs": [
+          "Consider a hypothetical batch with vision features [B, 196, 768] and an LLM width of 2048. A token-wise linear projector maps the final dimension to produce [B, 196, 2048]. If the prompt has 32 text tokens and all visual tokens are inserted, the combined input has 228 positions before special tokens. The language model outputs hidden states of width 2048, then a vocabulary head produces logits over text tokens. A width-changing projector does not necessarily change the visual token count."
+        ],
+        "formula": "[B,N,d_vision] → projector → [B,N,d_language]"
+      },
+      {
+        "id": "practice",
+        "title": "Locate an error by component",
+        "paragraphs": [
+          "If a small sign is unreadable in encoder features, a better text template cannot restore its exact pixels. If projected features have the wrong scale or semantics, the language model may fail to use otherwise useful visual information. If perception is correct but the response format is wrong, instruction tuning or decoding may be responsible. Debug with intermediate shapes, image-only probes, and simple prompts before attempting a complicated benchmark. A common mistake is loading a projector trained with a different vision checkpoint or feature layer merely because the dimensions happen to match."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A projector maps [2, 256, 1024] features to an LLM width of 4096 without token pooling. What is the output shape?",
+      "answer": "[2, 256, 4096]. It changes feature width, not batch size or token count."
+    },
+    "takeaways": [
+      "Track visual token count and hidden width separately.",
+      "Compatible tensor shapes do not guarantee compatible learned feature spaces."
+    ],
+    "references": [
+      {
+        "title": "Visual Instruction Tuning",
+        "url": "https://arxiv.org/abs/2304.08485",
+        "kind": "paper",
+        "note": "Inspect the vision encoder, projection, and language-model connection."
+      },
+      {
+        "title": "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models",
+        "url": "https://arxiv.org/abs/2301.12597",
+        "kind": "paper",
+        "note": "Compare a query-based interface with direct feature projection."
+      }
+    ]
+  },
+  {
+    "topicId": "10-03",
+    "title": "How visual tokens enter a language model",
+    "summary": "Visual tokens are usually continuous feature vectors placed into a multimodal computation, not ordinary vocabulary words.",
+    "prerequisites": [
+      "10-02",
+      "04-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A token position need not contain a word",
+        "paragraphs": [
+          "A language model normally begins with embeddings looked up from integer text-token IDs. In a multimodal model, some input positions can instead receive projected visual vectors. An image placeholder in a chat template tells the input processor where those vectors belong, but the placeholder is not itself the complete image representation. Some models use separate cross-attention memories rather than inserting visual vectors directly into the self-attention sequence. These interfaces require different masks and cache handling."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Separate input embeddings from output labels",
+        "paragraphs": [
+          "Suppose a prompt contains 64 visual positions followed by 20 text positions. The model may process all 84 positions while computing training loss only on selected text response tokens. Visual input positions generally do not need vocabulary labels in this setup. Ignored loss positions still influence later hidden states through attention. Therefore, a label mask is not the same thing as an attention mask. Blocking image positions from attention would remove the visual evidence the answer is supposed to use."
+        ],
+        "formula": "Input positions = visual positions + text positions + any special-token positions"
+      },
+      {
+        "id": "practice",
+        "title": "Test visibility and ordering",
+        "paragraphs": [
+          "Construct a tiny example with one image and a short question, then inspect the processor output: embeddings, position IDs, attention mask, and labels. Verify that the answer positions can attend to the intended image features. For multiple images, confirm that their feature blocks match their placeholders and descriptions. A common error is truncating the combined sequence after tokenization without accounting for expanded image tokens, which can remove instructions or response labels. Generation caches must also preserve the multimodal prefix consistently when subsequent text tokens are decoded."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "If visual positions have ignored labels, can they still affect the answer loss?",
+      "answer": "Yes. Their representations can influence later answer states through attention, so gradients can flow through them even though no direct vocabulary loss is assigned at those positions."
+    },
+    "takeaways": [
+      "Visual vectors and text token IDs are different input representations.",
+      "Loss masking and attention visibility serve different purposes."
+    ],
+    "references": [
+      {
+        "title": "Visual Instruction Tuning",
+        "url": "https://arxiv.org/abs/2304.08485",
+        "kind": "paper",
+        "note": "Read how projected visual features condition language-model generation."
+      },
+      {
+        "title": "Flamingo: a Visual Language Model for Few-Shot Learning",
+        "url": "https://arxiv.org/abs/2204.14198",
+        "kind": "paper",
+        "note": "Compare cross-attention conditioning with inserted visual embeddings."
+      }
+    ]
+  },
+  {
+    "topicId": "10-04",
+    "title": "Projectors and Q-Formers bridge modalities differently",
+    "summary": "A projector changes feature coordinates, while learned queries can also select and compress information across visual positions.",
+    "prerequisites": [
+      "10-02",
+      "04-04"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Width alignment is only the first requirement",
+        "paragraphs": [
+          "A vision encoder and a language model often use different hidden widths and learned feature geometries. A linear projector applies one learned affine transformation to each visual token. An MLP adds nonlinear transformations. Both can preserve the original number of tokens if applied independently at each position. Matching the language model's width makes the interface mechanically possible, but training must still teach the mapped features to support the language objective."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Queries can gather across positions",
+        "paragraphs": [
+          "A Q-Former uses learned query representations that interact with image features through attention. If there are M learned queries and N visual positions, the interface can output M query features rather than N directly projected patch features. The query count is therefore a possible information bottleneck. Cross-attention scores have a query-by-visual-position structure, while a purely token-wise projector has no mechanism to mix information across positions by itself. The encoder may already have mixed context before projection."
+        ],
+        "formula": "Token-wise projector: [B,N,d_v] → [B,N,d_l]; query interface: [B,N,d_v] → [B,M,d_q]"
+      },
+      {
+        "id": "practice",
+        "title": "Compare compression and expressiveness separately",
+        "paragraphs": [
+          "Imagine 576 visual tokens and 32 learned queries. The query interface can reduce the sequence passed onward, but important fine detail may be lost if those queries do not capture it. An MLP over each of the 576 tokens can be nonlinear without reducing sequence length. Evaluate both task accuracy and token cost, especially for OCR or localization. A common mistake is assuming that a two-layer projector automatically performs spatial pooling, or that a fixed query bottleneck preserves every detail required by an arbitrary future question."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A token-wise MLP maps 400 visual tokens from width 768 to width 2048. Does it reduce the token count?",
+      "answer": "No. Its output remains 400 tokens unless a separate pooling, merging, or query mechanism is included."
+    },
+    "takeaways": [
+      "Changing feature width is different from compressing token count.",
+      "Query-based interfaces gather information across visual positions."
+    ],
+    "references": [
+      {
+        "title": "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models",
+        "url": "https://arxiv.org/abs/2301.12597",
+        "kind": "paper",
+        "note": "Read the learned-query interface and Q-Former architecture."
+      },
+      {
+        "title": "Visual Instruction Tuning",
+        "url": "https://arxiv.org/abs/2304.08485",
+        "kind": "paper",
+        "note": "Compare a direct projection interface."
+      }
+    ]
+  },
+  {
+    "topicId": "10-05",
+    "title": "Alignment and visual instruction tuning",
+    "summary": "Multimodal training must make visual features usable and teach the model how to respond to instructions about them.",
+    "prerequisites": [
+      "10-02",
+      "05-07"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Two learning problems are often separated",
+        "paragraphs": [
+          "An alignment stage teaches the bridge between visual features and a language model, often using image–text pairs. An instruction stage teaches behavior on tasks such as answering questions, describing an image, or following a requested output format. The exact training stages and which modules are frozen vary by model. Treat alignment and instruction tuning as roles in a learning recipe rather than universally fixed objectives or a mandatory two-step procedure."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Inspect the supervision path",
+        "paragraphs": [
+          "For an image and target caption, the language loss rewards predicting caption tokens while conditioned on visual features. For instruction examples, the input also contains a question or command and the target is the desired response. Some training pipelines compute loss only on response tokens; others use a different masking policy. Both data format and loss mask affect what the model learns. A chat template mismatch can turn role markers or instructions into unintended prediction targets."
+        ],
+        "formula": "Typical response loss: L = −Σ over answer positions log p(yₜ|image,prompt,y_<t)"
+      },
+      {
+        "id": "practice",
+        "title": "Separate visual learning from answer style",
+        "paragraphs": [
+          "Suppose the model improves at producing polite, structured answers after instruction tuning. That does not establish that it became better at reading tiny text or counting objects. Evaluate simple perception tasks and instruction adherence separately. Use examples where the image changes while the question remains fixed, so language-only shortcuts are exposed. A common mistake is training on generated captions that contain unsupported details and then treating their fluent wording as ground truth. Audit data quality, image–text pairing, duplication, and ambiguity before scaling the number of examples."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Why can instruction tuning improve response formatting without improving OCR accuracy?",
+      "answer": "Formatting can be learned from text behavior and supervision. OCR also requires sufficiently informative visual features and appropriate examples linking those features to exact characters."
+    },
+    "takeaways": [
+      "Alignment and instruction following address different training roles.",
+      "Audit visual evidence and loss masking, not only answer fluency."
+    ],
+    "references": [
+      {
+        "title": "Visual Instruction Tuning",
+        "url": "https://arxiv.org/abs/2304.08485",
+        "kind": "paper",
+        "note": "Read the alignment and visual instruction-tuning stages."
+      },
+      {
+        "title": "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models",
+        "url": "https://arxiv.org/abs/2301.12597",
+        "kind": "paper",
+        "note": "Compare staged training across frozen visual and language components."
+      }
+    ]
+  },
+  {
+    "topicId": "10-06",
+    "title": "When to freeze the vision encoder",
+    "summary": "Freezing limits optimization and memory requirements, while end-to-end training can adapt visual features to the downstream objective.",
+    "prerequisites": [
+      "10-02",
+      "06-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A frozen encoder preserves a representation",
+        "paragraphs": [
+          "When vision weights are frozen, training changes the projector, language model, or other selected components while the visual feature extractor remains fixed. This can reduce optimizer state and protect useful pretrained features. It also restricts adaptation: if the encoder discards information needed for the task, downstream components cannot reliably recover it. End-to-end training can change those features, but it needs appropriate data, optimization settings, and safeguards against overfitting or forgetting."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Freezing and disabling gradients are related but different",
+        "paragraphs": [
+          "Setting a parameter's requires_grad to false prevents its parameter gradient from being accumulated. Whether the entire encoder forward can run without recording a graph depends on whether gradients are needed through it to any trainable upstream component or input. If image pixels are ordinary fixed inputs and no earlier trainable component exists, frozen encoder features can often be computed without a gradient graph. If trainable visual prompts or adapters are inside that path, disabling gradients indiscriminately can break their learning."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Compare staged and joint adaptation",
+        "paragraphs": [
+          "Start with a frozen-encoder baseline, then selectively unfreeze later blocks or the full encoder. Use separate learning-rate groups because pretrained vision weights and a newly initialized projector may need different update scales. Track visual-only probes as well as multimodal task metrics to detect loss of general features. A common mistake is assuming a frozen encoder is in evaluation mode automatically; dropout and normalization behavior are controlled separately. Record training mode, augmentation, feature layer, and optimizer groups so that the comparison measures freezing rather than several accidental changes at once."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "If encoder parameters are frozen, does calling model.train() necessarily keep encoder dropout disabled?",
+      "answer": "No. Parameter trainability and training/evaluation mode are separate. You must explicitly manage the encoder's mode if deterministic frozen features are required."
+    },
+    "takeaways": [
+      "Freezing constrains adaptation but does not automatically set evaluation mode.",
+      "Check which gradient paths are still required before using no-grad execution."
+    ],
+    "references": [
+      {
+        "title": "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models",
+        "url": "https://arxiv.org/abs/2301.12597",
+        "kind": "paper",
+        "note": "Inspect the use of frozen image and language encoders."
+      },
+      {
+        "title": "Visual Instruction Tuning",
+        "url": "https://arxiv.org/abs/2304.08485",
+        "kind": "paper",
+        "note": "Compare which components are updated across training stages."
+      }
+    ]
+  },
+  {
+    "topicId": "10-07",
+    "title": "Comparing LLaVA, BLIP-2, and Qwen2.5-VL",
+    "summary": "These model families illustrate different interfaces between vision features and language generation, so version-specific details matter.",
+    "prerequisites": [
+      "10-04",
+      "10-05"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Compare interfaces before benchmark scores",
+        "paragraphs": [
+          "The original LLaVA connects a vision encoder to a language model through a learned projection and emphasizes visual instruction tuning. BLIP-2 uses a Q-Former to connect frozen visual and language components through learned queries. Qwen2.5-VL includes dynamic visual input processing, a vision–language merger, and multimodal positional handling. These descriptions identify architectural decisions, not a ranking. Later releases within a family can change projectors, training recipes, encoders, or token budgets."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Ask the same questions of each architecture",
+        "paragraphs": [
+          "How many visual positions are produced? Which module changes their width or count? Are image features inserted into the language sequence or accessed through a separate mechanism? Which weights are trained at each stage? How are spatial and temporal positions represented? A fixed query interface and a variable patch sequence impose different bottlenecks. An encoder trained jointly with the rest of the model may also expose different features than a frozen off-the-shelf encoder, even if their output dimensions match."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Build a versioned comparison sheet",
+        "paragraphs": [
+          "Choose exact checkpoints and record image resolution policy, visual token count, context limit, processor revision, and training or evaluation assumptions. Run the same small set of tasks: broad description, exact text reading, spatial relations, and an ambiguous image that should prompt uncertainty. Do not infer that a higher aggregate benchmark score comes from one architectural component alone; data quality and post-training may dominate. A common error is using a newer LLaVA variant's MLP projector to describe the original paper, or transferring one family's chat template to another merely because both expose a conversational API."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Why is 'both models use a vision encoder and an LLM' insufficient to predict their memory use?",
+      "answer": "Their visual token counts, compression interfaces, hidden widths, attention layouts, resolution policies, and cache behavior can differ substantially."
+    },
+    "takeaways": [
+      "Name the exact model version when describing architecture.",
+      "Compare token interfaces, training choices, and evaluation conditions separately."
+    ],
+    "references": [
+      {
+        "title": "Visual Instruction Tuning",
+        "url": "https://arxiv.org/abs/2304.08485",
+        "kind": "paper",
+        "note": "Inspect the original LLaVA interface and training stages."
+      },
+      {
+        "title": "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models",
+        "url": "https://arxiv.org/abs/2301.12597",
+        "kind": "paper",
+        "note": "Read the Q-Former bridge and frozen components."
+      },
+      {
+        "title": "Qwen2.5-VL Technical Report",
+        "url": "https://arxiv.org/abs/2502.13923",
+        "kind": "paper",
+        "note": "Read model architecture, dynamic resolution, and the vision–language merger."
+      }
+    ]
+  },
+  {
+    "topicId": "10-08",
+    "title": "How image resolution changes visual token cost",
+    "summary": "Higher resolution can preserve fine detail while increasing visual encoder work and the language model's multimodal context.",
+    "prerequisites": [
+      "08-03",
+      "04-17",
+      "10-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "More pixels can reveal more evidence",
+        "paragraphs": [
+          "Small text, thin lines, and distant objects may disappear when an image is resized too aggressively. Increasing resolution can make those details available to the encoder. It also creates more patches at a fixed patch size. The benefit depends on the task and encoder: a coarse scene description may need less detail than reading a dense table. Resolution is therefore an information-versus-compute choice, not a universally beneficial quality slider."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Count patches and downstream tokens separately",
+        "paragraphs": [
+          "For an image H by W and nonoverlapping patches of size P, the patch count is approximately HW/P² after accounting for padding or resizing. A 224-by-224 image with P = 16 produces 196 patches; a 448-by-448 image produces 784. If a merger compresses four patches into one language-model token, these counts change again. In a direct dense-attention sequence, the interaction cost depends on the square of visual plus text positions, not on image pixels alone."
+        ],
+        "formula": "N_patch ≈ HW/P²; attention interactions ∝ (N_visual + N_text)²"
+      },
+      {
+        "id": "practice",
+        "title": "Profile a task-specific resolution curve",
+        "paragraphs": [
+          "Evaluate several resolutions with fixed prompts and a held-out set containing both large objects and small details. Record task accuracy, visual token count, prefill time, and peak memory. Keep cropping and aspect ratio policies visible: increasing the nominal resolution while cropping away the relevant corner can make performance worse. A common mistake is reporting only the input image dimensions while hiding the processor's resizing or tiling. Inspect the actual processed shapes and generated visual sequence lengths rather than assuming the uploaded image reaches the model unchanged."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "At fixed patch size, what happens to patch count when both image height and width double?",
+      "answer": "Patch count increases by four. If all those tokens participate in dense self-attention, the purely visual pairwise interaction count increases by sixteen."
+    },
+    "takeaways": [
+      "Count actual processed visual tokens, not only uploaded pixels.",
+      "Choose resolution using a task-specific accuracy and resource curve."
+    ],
+    "references": [
+      {
+        "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+        "url": "https://arxiv.org/abs/2010.11929",
+        "kind": "paper",
+        "note": "Review patch count as a function of image size."
+      },
+      {
+        "title": "Qwen2.5-VL Technical Report",
+        "url": "https://arxiv.org/abs/2502.13923",
+        "kind": "paper",
+        "note": "Inspect dynamic visual processing and token-sequence compression."
+      }
+    ]
+  },
+  {
+    "topicId": "10-09",
+    "title": "Dynamic resolution and patch merging",
+    "summary": "Dynamic visual processing adapts token count to image geometry, while merging compresses local features before language processing.",
+    "prerequisites": [
+      "10-08",
+      "10-04"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A fixed square is not always appropriate",
+        "paragraphs": [
+          "Images vary in aspect ratio and information density. A document page, a panoramic scene, and a small icon do not necessarily benefit from the same resize policy. Dynamic resolution allows the processed shape or token budget to vary with the input, subject to implementation limits. It can preserve useful detail or aspect ratio, but variable sequence lengths complicate batching and memory planning. Dynamic does not mean unlimited resolution."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Merging changes both count and representation",
+        "paragraphs": [
+          "A spatial merger groups nearby visual features and maps them to a smaller number of output tokens. In a simple 2-by-2 grouping, four features become one, reducing count by four when the grid dimensions are compatible. Qwen2.5-VL's report describes grouping four neighboring patch features before its MLP-based merger. Concatenation followed by projection can retain information differently from averaging. The resulting token is a learned local summary, not merely one selected original patch."
+        ],
+        "formula": "A 2-by-2 merge maps an H_p × W_p grid to (H_p/2) × (W_p/2) positions"
+      },
+      {
+        "id": "practice",
+        "title": "Check geometry at the boundaries",
+        "paragraphs": [
+          "For a 24-by-16 patch grid, 2-by-2 merging produces 12-by-8 = 96 tokens from 384 patches. Odd grid dimensions require a defined resize, pad, or grouping policy. Preserve the mapping between merged tokens and image coordinates when evaluating localization. A common mistake is comparing models at equal post-merge token count while ignoring different encoder workloads: one may process many more raw patches before compression. Measure both stages, and test whether merging harms tasks that depend on a small isolated feature or precise character boundaries."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A 20-by-30 patch grid is merged in nonoverlapping 2-by-2 groups. How many output positions remain?",
+      "answer": "The output grid is 10 by 15, so 150 positions remain from 600 original patches."
+    },
+    "takeaways": [
+      "Dynamic resolution needs explicit pixel and token limits.",
+      "Post-merge token count does not describe the full vision-encoder cost."
+    ],
+    "references": [
+      {
+        "title": "Qwen2.5-VL Technical Report",
+        "url": "https://arxiv.org/abs/2502.13923",
+        "kind": "paper",
+        "note": "Read native dynamic resolution and the grouping-based vision–language merger."
+      }
+    ]
+  },
+  {
+    "topicId": "10-10",
+    "title": "Interleaving images and text with meaningful positions",
+    "summary": "A multimodal sequence needs to preserve which text refers to which image and where visual content lies in space or time.",
+    "prerequisites": [
+      "10-03",
+      "04-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Order carries meaning across modalities",
+        "paragraphs": [
+          "A conversation might present image A, a description, image B, and a comparison question. The model must distinguish the two image blocks and associate surrounding text with the correct visual input. Simply concatenating all image features at the beginning can change those relationships unless the architecture and training explicitly support that format. Interleaved training data can teach a model to use alternating visual and textual context, but the input processor must preserve that structure at inference."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "One flattened index is not every position",
+        "paragraphs": [
+          "Text has a natural sequence order. An image has two spatial axes, and video adds time. A flattened patch index can identify a position but does not automatically express all these geometric relations. Multimodal position schemes can encode temporal, height, and width coordinates separately. Qwen2.5-VL's report describes temporal position handling aligned with absolute time. The exact coordinate allocation and interaction with text positions are model-specific, so importing a different checkpoint's position-ID recipe can break otherwise valid tensor shapes."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Use a correspondence test",
+        "paragraphs": [
+          "Create two images with different colored objects and ask 'What is present only in the second image?' Swap the image order while keeping text references consistent and check whether the answer changes appropriately. For video, compare clips sampled at different rates but with the same timestamps. A common mistake is assigning every frame an identical spatial sequence without a temporal distinction, or using frame index as elapsed time when sampling rates vary. Inspect image boundaries, timestamps, position IDs, and attention masks as a single input contract rather than independent implementation details."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Why can frame indices 0, 1, 2 be ambiguous when two videos are sampled at different frame rates?",
+      "answer": "The same index gaps can represent different elapsed times. Timestamps or a rate-aware temporal encoding are needed to distinguish those durations."
+    },
+    "takeaways": [
+      "Preserve image–text correspondence and image boundaries.",
+      "Position IDs must match the model's spatial and temporal conventions."
+    ],
+    "references": [
+      {
+        "title": "Flamingo: a Visual Language Model for Few-Shot Learning",
+        "url": "https://arxiv.org/abs/2204.14198",
+        "kind": "paper",
+        "note": "Read the use of interleaved visual and textual sequences."
+      },
+      {
+        "title": "Qwen2.5-VL Technical Report",
+        "url": "https://arxiv.org/abs/2502.13923",
+        "kind": "paper",
+        "note": "Inspect multimodal rotary positions and absolute-time alignment."
+      }
+    ]
+  },
+  {
+    "topicId": "10-11",
+    "title": "Four tasks that test different visual abilities",
+    "summary": "VQA, captioning, OCR, and grounding require different evidence, outputs, and evaluation rules.",
+    "prerequisites": [
+      "10-01",
+      "08-13"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Define the requested output",
+        "paragraphs": [
+          "Visual question answering responds to a question about an image. Captioning produces a description without necessarily answering a specific question. OCR transcribes visible characters, often requiring exact spelling and layout. Grounding identifies the image region referred to by language, typically through coordinates, boxes, points, or masks. A single conversational interface can support all four, but success on one does not establish success on the others."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Match the metric to the task",
+        "paragraphs": [
+          "For OCR, character error rate counts substitutions, deletions, and insertions relative to reference characters. Grounding may use overlap or point-in-region criteria. VQA can require accounting for multiple acceptable human answers, while caption evaluation must tolerate paraphrases without rewarding unsupported objects. A generic string match across all tasks is inadequate. For a sign reading 'EXIT 12', replacing 12 with 21 is a meaningful OCR error even if the sentence remains fluent and semantically plausible."
+        ],
+        "formula": "Character error rate = (substitutions + deletions + insertions) / reference characters"
+      },
+      {
+        "id": "practice",
+        "title": "Design a small diagnostic suite",
+        "paragraphs": [
+          "Use one scene image for object and relation questions, one document for exact transcription, one referring expression for localization, and one ambiguous image for calibrated uncertainty. Inspect whether failure begins in perception, spatial reasoning, language generation, or output formatting. A common mistake is counting a correct object name as successful grounding when its predicted box points elsewhere. Another is accepting a detailed caption without verifying its details. Preserve original image coordinates and text normalization rules in the evaluation script, and document whether punctuation or case differences count as errors."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A five-character reference has one substitution and one deletion, with no insertions. What is the character error rate?",
+      "answer": "(1 + 1 + 0)/5 = 0.4, or 40%, under that alignment. A fluent surrounding sentence does not remove those transcription errors."
+    },
+    "takeaways": [
+      "Task-specific outputs need task-specific evaluation.",
+      "Separate correct language from correct visual evidence and localization."
+    ],
+    "references": [
+      {
+        "title": "VQA: Visual Question Answering",
+        "url": "https://arxiv.org/abs/1505.00468",
+        "kind": "paper",
+        "note": "Read the visual-question-answering task and answer evaluation setup."
+      },
+      {
+        "title": "Qwen2.5-VL Technical Report",
+        "url": "https://arxiv.org/abs/2502.13923",
+        "kind": "paper",
+        "note": "Inspect document, OCR, and grounding evaluations as distinct capabilities."
+      }
+    ]
+  },
+  {
+    "topicId": "10-12",
+    "title": "What a video-language model must know about time",
+    "summary": "Video understanding requires evidence about temporal order and change, not merely a collection of recognizable frames.",
+    "prerequisites": [
+      "10-08",
+      "10-10"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Sampling decides what evidence exists",
+        "paragraphs": [
+          "A video model often begins by selecting frames. Uniform sampling provides broad coverage, while denser sampling can capture brief actions at a higher token cost. If a critical event occurs between sampled frames, no language reasoning can recover its exact visual evidence reliably. The sampling policy is therefore part of the task definition. Report frame count, timestamps, frame rate, and any adaptive selection rather than describing the input only by video duration."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Spatial tokens multiply across frames",
+        "paragraphs": [
+          "If each of F frames produces N visual tokens, a simple sequence contains roughly FN tokens before temporal compression or merging. Eight frames with 196 tokens each yield 1,568 visual positions. Temporal position information distinguishes ordering and duration; otherwise a set of frames can confuse opening with closing or before with after. Some architectures compress frames or use memory, so actual token counts and interaction patterns should be inspected rather than inferred from this simple product."
+        ],
+        "formula": "Uncompressed visual positions ≈ frames × tokens per frame"
+      },
+      {
+        "id": "practice",
+        "title": "Test motion and order explicitly",
+        "paragraphs": [
+          "Create paired clips with the same frames in reverse order and ask a question that depends on direction, such as whether an object was picked up or put down. Also test events of different durations and gaps. A model that answers both reversed clips identically may be relying on static appearance, though ambiguous prompts can also cause that outcome. A common mistake is claiming temporal reasoning from a benchmark dominated by questions answerable from one frame. Include temporal grounding and counterfactual order tests, and separate generation latency from the time spent decoding and preprocessing video."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A ten-second clip is sampled only at seconds 0, 5, and 10. Can the model reliably observe a brief event occurring from second 2 to 3?",
+      "answer": "Not from those sampled frames alone. It may guess from context, but the sampling policy omitted direct evidence of the event."
+    },
+    "takeaways": [
+      "Frame sampling determines the available temporal evidence.",
+      "Use order-sensitive tests to distinguish motion reasoning from static recognition."
+    ],
+    "references": [
+      {
+        "title": "Qwen2.5-VL Technical Report",
+        "url": "https://arxiv.org/abs/2502.13923",
+        "kind": "paper",
+        "note": "Read dynamic frame-rate processing and temporal position handling."
+      },
+      {
+        "title": "Flamingo: a Visual Language Model for Few-Shot Learning",
+        "url": "https://arxiv.org/abs/2204.14198",
+        "kind": "paper",
+        "note": "Inspect visual conditioning that supports image and video inputs."
+      }
+    ]
+  },
+  {
+    "topicId": "10-13",
+    "title": "Why a fluent visual answer can be wrong",
+    "summary": "A multimodal model can rely on language priors when image evidence is weak, ambiguous, or poorly used.",
+    "prerequisites": [
+      "10-01",
+      "01-11"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Generation balances evidence and expectation",
+        "paragraphs": [
+          "A language model has strong expectations about common objects, scenes, and sentence continuations. Visual conditioning can correct those expectations, but it may be incomplete or underweighted. The result can be an unsupported object, attribute, relation, or action described confidently. This is often called visual hallucination. Not every wrong answer has the same cause: poor image resolution, incorrect preprocessing, ambiguous questions, and ordinary reasoning errors can produce superficially similar failures."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Use counterfactual evidence tests",
+        "paragraphs": [
+          "Hold a question fixed and change the image, remove relevant regions, or swap image–question pairings. A grounded answer should respond to changes that matter for the question. Compare against a text-only baseline to identify questions answerable through dataset priors. These interventions need careful interpretation: an unchanged answer can be correct if the manipulated region was irrelevant. Measure object presence with balanced positive and negative queries so that always saying yes or always saying no is not rewarded."
+        ],
+        "formula": "Useful comparison: performance with matched images versus shuffled or removed visual evidence"
+      },
+      {
+        "id": "practice",
+        "title": "Inspect precision and recall together",
+        "paragraphs": [
+          "Suppose a model answers yes to every question asking whether an object is present. It may achieve high recall for present objects while producing many false positives. Conversely, a model that denies everything avoids some hallucinations but misses real evidence. Evaluate both errors, vary object popularity and wording, and inspect free-form descriptions as well as binary answers. A common mistake is treating a model's verbal confidence as a calibrated uncertainty measure. Encourage explicit uncertainty where appropriate, but verify that abstention improves reliability rather than merely hiding errors on difficult examples."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Why is a model that always answers 'no' not a satisfactory solution to object hallucination?",
+      "answer": "It reduces false claims of presence but produces false negatives for real objects. Reliability requires balancing unsupported claims with correct recognition of visible evidence."
+    },
+    "takeaways": [
+      "Counterfactual image tests help expose reliance on language priors.",
+      "Measure false positives, false negatives, and uncertainty behavior together."
+    ],
+    "references": [
+      {
+        "title": "Evaluating Object Hallucination in Large Vision-Language Models",
+        "url": "https://arxiv.org/abs/2305.10355",
+        "kind": "paper",
+        "note": "Read object-presence probing and the evaluation of hallucinated objects."
+      },
+      {
+        "title": "Visual Instruction Tuning",
+        "url": "https://arxiv.org/abs/2304.08485",
+        "kind": "paper",
+        "note": "Compare visual instruction-following behavior with the need for grounded evaluation."
+      }
+    ]
+  },
+  {
+    "topicId": "10-14",
+    "title": "Building a meaningful multimodal evaluation",
+    "summary": "A benchmark score is useful only when its tasks, input protocol, and failure patterns match the capability being claimed.",
+    "prerequisites": [
+      "10-11",
+      "10-13",
+      "01-11"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Break broad understanding into testable skills",
+        "paragraphs": [
+          "Multimodal evaluation can involve object recognition, OCR, charts, spatial relations, domain knowledge, temporal order, or instruction following. A single aggregate score combines these skills according to a dataset's composition. A model can improve overall while regressing on a small but important category. Start with a capability map and identify which subsets require actual visual evidence. Include a text-only or image-shuffled baseline when it helps reveal language shortcuts."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Make the input and scoring protocol reproducible",
+        "paragraphs": [
+          "Record image preprocessing, resolution limits, frame sampling, prompt templates, answer extraction, decoding settings, and model revision. Multiple-choice accuracy can be affected by answer parsing or option order; open-ended evaluation may depend on a judge whose consistency must be checked. Keep the test set separate from prompt and hyperparameter selection. Duplicate or near-duplicate training examples can inflate results, so examine data provenance and contamination risks rather than assuming a public benchmark is automatically unseen."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Turn errors into an experiment plan",
+        "paragraphs": [
+          "Sample failures and label likely causes: missing visual detail, incorrect reading, wrong relation, reasoning error, hallucination, or formatting. Verify those labels with intermediate probes rather than treating them as certain. For example, crop and enlarge a failed text region; if transcription improves, resolution was a plausible bottleneck. Report subgroup counts and uncertainty, since a category with five examples cannot support the same confidence as one with five thousand. A common mistake is presenting a few compelling successes as representative performance or comparing scores produced by incompatible resolution and prompting protocols."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A model gains two points overall but loses ten points on OCR. What additional information is needed before choosing it for document extraction?",
+      "answer": "Inspect the OCR subset size, uncertainty, document-domain match, exact extraction errors, and evaluation protocol. The aggregate gain may be irrelevant to the intended application."
+    },
+    "takeaways": [
+      "Connect each benchmark subset to a concrete capability claim.",
+      "Use failure analysis to design the next controlled intervention."
+    ],
+    "references": [
+      {
+        "title": "MMMU: A Massive Multi-discipline Multimodal Understanding and Reasoning Benchmark for Expert AGI",
+        "url": "https://arxiv.org/abs/2311.16502",
+        "kind": "paper",
+        "note": "Inspect task diversity and category-level multimodal evaluation."
+      },
+      {
+        "title": "Evaluating Object Hallucination in Large Vision-Language Models",
+        "url": "https://arxiv.org/abs/2305.10355",
+        "kind": "paper",
+        "note": "Compare targeted hallucination probes with broad benchmark scores."
+      }
+    ]
+  }
+]

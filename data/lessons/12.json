@@ -1,0 +1,903 @@
+[
+  {
+    "topicId": "12-01",
+    "title": "Supervised Fine-Tuning",
+    "summary": "SFT teaches a pretrained model to produce desired responses under a clearly defined conditioning format.",
+    "prerequisites": [
+      "05-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "From text prediction to task behavior",
+        "paragraphs": [
+          "Pretraining learns patterns across broad text distributions. Supervised fine-tuning continues likelihood training on examples organized around desired tasks, instructions, or conversations. The underlying next-token objective need not change, but the data distribution and loss mask usually do. An instruction dataset tells the model which response patterns should follow particular prompts. It does not automatically provide feedback about alternative responses that were never included."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Define exactly which tokens are targets",
+        "paragraphs": [
+          "For a prompt x and response y, the usual response objective is −Σt log pθ(yt | x,y<t). Prompt tokens supply context; assistant-response tokens receive loss. In multi-turn data, the chosen chat template and mask determine which turns are supervised. Padding must be excluded, and truncation must not silently remove most answers. If examples have different lengths, token-weighted and example-weighted averages optimize different objectives, so document the reduction used."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Build a small trustworthy pipeline",
+        "paragraphs": [
+          "Inspect decoded input sequences and highlighted target positions before launching a large run. A misplaced delimiter can teach the model to emit role markers or train on user text unintentionally. Compare held-out instruction behavior, not only training loss, and check for overlap between source conversations and evaluation prompts. Preserve useful pretrained behavior by monitoring broader tasks. Better formatting compliance can coexist with weaker factual performance, so avoid treating one benchmark improvement as evidence that every capability improved."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A training sample contains 100 prompt tokens and 20 assistant tokens. Which positions usually contribute to response-only SFT loss?",
+      "answer": "The 20 assistant target positions contribute, including any intended end-of-response target according to the template. Prompt tokens remain visible as context but are masked from this response-only loss; padding is also masked."
+    },
+    "takeaways": [
+      "SFT behavior depends strongly on data and formatting.",
+      "Inspect token masks and loss reductions explicitly."
+    ],
+    "references": [
+      {
+        "title": "Training language models to follow instructions with human feedback",
+        "url": "https://arxiv.org/abs/2203.02155",
+        "kind": "paper",
+        "note": "Separate demonstration learning, preference modeling, and policy optimization."
+      }
+    ]
+  },
+  {
+    "topicId": "12-02",
+    "title": "Teacher Forcing and Exposure Bias",
+    "summary": "Training on reference prefixes and generating from model prefixes create different conditioning distributions.",
+    "prerequisites": [
+      "12-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "The prefix changes the problem",
+        "paragraphs": [
+          "With teacher forcing, a model predicts the next reference token given earlier reference tokens. During generation, earlier tokens come from the model itself. A small mistake can create a prefix that was rare in the training set, and later predictions must cope with that unfamiliar context. This difference is often called exposure bias. It is a distribution mismatch, not proof that maximum-likelihood training is inherently useless or mathematically invalid."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Follow a branching sequence",
+        "paragraphs": [
+          "Suppose the reference begins 'The answer is five.' Training the token after 'answer' conditions on that correct prefix. At inference the model may instead produce 'The estimate seems', after which the appropriate continuation changes. Per-token accuracy measured only under reference prefixes does not fully capture recovery from this branch. Teacher forcing remains computationally convenient: a causal mask allows many reference-conditioned token predictions to be evaluated in parallel while preventing access to future targets."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Evaluate the behavior you need",
+        "paragraphs": [
+          "Measure free-running generations as well as teacher-forced validation loss. Include tasks where an early error changes later constraints, and inspect whether the model can recover. Training on generated prefixes or collecting corrective feedback can address parts of the mismatch, but each method introduces its own objective and data-collection assumptions. Simply replacing reference tokens with arbitrary samples can make targets inconsistent. Keep teacher forcing distinct from knowledge distillation: the former describes conditioning during sequence training, while the latter describes transferring a teacher's information."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Can excellent teacher-forced next-token accuracy guarantee that a long generated sequence is correct?",
+      "answer": "No. Generation may enter prefixes absent from the validation conditioning distribution, and even small local error probabilities can accumulate across many decisions. Evaluate complete outputs and recovery behavior rather than relying on a local metric alone."
+    },
+    "takeaways": [
+      "Reference prefixes and generated prefixes are different data.",
+      "Check complete trajectories in addition to local predictions."
+    ],
+    "references": [
+      {
+        "title": "On-Policy Distillation of Language Models: Learning from Self-Generated Mistakes",
+        "url": "https://arxiv.org/abs/2306.13649",
+        "kind": "paper",
+        "note": "Compare student-generated contexts with fixed teacher demonstrations."
+      }
+    ]
+  },
+  {
+    "topicId": "12-03",
+    "title": "The Teacher and Student in Distillation",
+    "summary": "Distillation transfers selected behavior while the student's architecture and training distribution determine what can be retained.",
+    "prerequisites": [
+      "11-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Specify the transfer contract",
+        "paragraphs": [
+          "A teacher is a source of supervision, not necessarily a single larger network. It can be an ensemble, a specialized model, or a system with additional computation. A student learns a cheaper or differently structured approximation. The contract must identify inputs, available teacher signals, and target deployment conditions. Without that contract, statements such as 'the student learned the teacher' hide which behaviors were actually measured."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Match on an explicit distribution",
+        "paragraphs": [
+          "For inputs x sampled from a chosen distribution D, a logit objective may minimize E_D KL(pT(.|x) || pS(.|x)). The input distribution matters as much as the divergence: a student trained only on short arithmetic prompts has little direct supervision for long documents. Sequence-response distillation instead trains on teacher-produced outputs, often losing access to uncertainty over other answers. A smaller student can approximate easy regions well while lacking capacity to reproduce every teacher distinction."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Audit teacher errors and student gains",
+        "paragraphs": [
+          "Hold out evaluation examples before collecting teacher labels. Record teacher settings, sampling choices, filtering rules, and the cost of producing the dataset. Compare the distilled student with an equally sized student trained on ordinary labels using a comparable budget. A student can outperform a teacher on a narrow metric through regularization or data selection, but this is an empirical outcome rather than a general guarantee. Inspect inherited mistakes and unsupported confidence instead of assuming teacher-generated text is ground truth."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Two students use the same teacher and loss, but one sees only easy prompts. Are their distillation problems equivalent?",
+      "answer": "No. Their training input distributions differ, so the expected objectives emphasize different regions. The easy-prompt student may match the teacher there while remaining unconstrained on harder or longer inputs."
+    },
+    "takeaways": [
+      "Define the teacher signal and input distribution.",
+      "Compare against a budget-matched student baseline."
+    ],
+    "references": [
+      {
+        "title": "Distilling the Knowledge in a Neural Network",
+        "url": "https://arxiv.org/abs/1503.02531",
+        "kind": "paper",
+        "note": "Read the soft-target objective and temperature discussion."
+      }
+    ]
+  },
+  {
+    "topicId": "12-04",
+    "title": "Offline and On-Policy Distillation",
+    "summary": "The source of prefixes determines whether a student learns on fixed demonstrations or on states its own policy visits.",
+    "prerequisites": [
+      "12-02",
+      "12-03"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Ask who generated the context",
+        "paragraphs": [
+          "Offline distillation uses a fixed collection of teacher outputs or other prepared examples. On-policy distillation obtains contexts or trajectories from the current student and asks the teacher to supervise those visited states. The latter can expose the teacher to the student's own mistakes and unusual prefixes. This distinction concerns data collection. It does not, by itself, determine whether the matching loss is forward KL, reverse KL, or token likelihood."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Trace one training iteration",
+        "paragraphs": [
+          "An offline loop samples a stored prompt-response pair and updates the student. An on-policy loop samples a prompt, lets the student generate a continuation, obtains teacher information at selected student prefixes, and updates using that feedback. The teacher might provide a distribution over next tokens or a corrected continuation. If a prefix is already inconsistent, a teacher completion should be interpreted as a response to that actual prefix, not as a label for an unrelated reference context."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Account for freshness and cost",
+        "paragraphs": [
+          "After enough student updates, previously collected trajectories are no longer sampled from the current policy. Reusing them creates off-policy or stale-data considerations, even if they originally came from the student. Record rollout-policy versions, sampling settings, teacher-query cost, and the ratio of collected to reused data. Compare methods at matched total budgets, since on-policy collection can consume significant generation compute. Evaluate both ordinary task performance and behavior after plausible mistakes; a lower teacher-matching loss alone does not show better free-running behavior."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A student generates a dataset once, then trains on it for many changing policy versions. Is every later update strictly on-policy?",
+      "answer": "No. The dataset reflects the policy that collected it. Later policies induce different trajectory distributions, so the fixed collection becomes stale relative to them unless the method explicitly accounts for that mismatch."
+    },
+    "takeaways": [
+      "Data collection and divergence direction are separate choices.",
+      "Track the policy version behind each rollout."
+    ],
+    "references": [
+      {
+        "title": "On-Policy Distillation of Language Models: Learning from Self-Generated Mistakes",
+        "url": "https://arxiv.org/abs/2306.13649",
+        "kind": "paper",
+        "note": "Compare student-generated contexts with fixed teacher demonstrations."
+      }
+    ]
+  },
+  {
+    "topicId": "12-05",
+    "title": "Forward KL and Reverse KL",
+    "summary": "The order of the distributions changes which mismatches receive strong penalties.",
+    "prerequisites": [
+      "01-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Name both distributions first",
+        "paragraphs": [
+          "Let p be a teacher or target distribution and q the student approximation. Forward KL commonly means KL(p || q), while reverse KL means KL(q || p); always declare this convention. The terms are not symmetric distances. Forward KL averages log(p/q) under p, so it strongly penalizes assigning tiny q probability where p has mass. Reverse KL averages log(q/p) under q, emphasizing locations the student itself chooses to occupy."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Work through a two-outcome example",
+        "paragraphs": [
+          "Take p=(0.5,0.5) and q=(0.9,0.1). Forward KL is 0.5 log(0.5/0.9)+0.5 log(0.5/0.1), approximately 0.511 nats. Reverse KL is 0.9 log(0.9/0.5)+0.1 log(0.1/0.5), approximately 0.368 nats. Both are zero only when the distributions agree. If q is exactly zero on positive p mass, forward KL is infinite; the analogous support issue reverses when p is zero on positive q mass."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Use mode intuitions carefully",
+        "paragraphs": [
+          "Forward KL is often called coverage-seeking and reverse KL mode-seeking when a restricted approximation cannot represent a multimodal target. These are useful tendencies, not unconditional laws about every neural model. If q can equal p and optimization succeeds, both objectives share that optimum. Sampling distributions also matter: an estimator for one expectation cannot be reused for the other without appropriate weighting or a different derivation. In language models, distinguish token-level conditional KL from KL over entire sequence distributions."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "If p=(1,0) and q=(0.5,0.5), which KL is infinite?",
+      "answer": "KL(q || p) is infinite because q assigns positive mass to an outcome where p is zero. KL(p || q)=log 2 is finite, using the convention that zero-weighted terms contribute zero."
+    },
+    "takeaways": [
+      "Write the ordered KL expression explicitly.",
+      "Mode-seeking language depends on approximation constraints."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning: Probability and Information Theory",
+        "url": "https://www.deeplearningbook.org/contents/prob.html",
+        "kind": "book",
+        "note": "Review entropy, cross-entropy, and the ordered definition of KL divergence."
+      },
+      {
+        "title": "On-Policy Distillation of Language Models: Learning from Self-Generated Mistakes",
+        "url": "https://arxiv.org/abs/2306.13649",
+        "kind": "paper",
+        "note": "Compare divergence choices for matching a teacher on student-generated contexts."
+      }
+    ]
+  },
+  {
+    "topicId": "12-06",
+    "title": "Jensen–Shannon Divergence and Distribution Matching",
+    "summary": "A symmetric comparison can balance two distributions, but estimating it still requires access to their probabilities.",
+    "prerequisites": [
+      "12-05"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Compare through a shared mixture",
+        "paragraphs": [
+          "For distributions p and q, define m=(p+q)/2. Jensen–Shannon divergence is half KL(p || m) plus half KL(q || m). Each distribution is compared with a mixture that contains its own support, avoiding the infinite-support penalty possible in one-way KL. With natural logarithms, JS lies between zero and log 2. The square root of JS is a metric; JS itself should not casually be called a distance satisfying every metric property."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Inspect an extreme example",
+        "paragraphs": [
+          "If p puts all mass on one outcome and q puts all mass on another, their mixture assigns half to each. Both component KL values equal log 2, so JS reaches log 2. If p=q, the mixture is identical and JS is zero. This symmetry can be useful when neither distribution is naturally privileged. However, a bounded divergence can have very different optimization behavior from a directional KL, particularly when parameterized distributions barely overlap."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Connect the objective to accessible signals",
+        "paragraphs": [
+          "Matching sampled outputs, matching token probabilities, and matching feature distributions are different operations. A finite batch of text samples does not reveal every sequence probability. Density-ratio estimation or other surrogate objectives may be needed when probabilities are unavailable, and those introduce assumptions. Choose a divergence based on what errors matter and what can be estimated reliably. Monitor task outcomes as well as the matching statistic; two systems can agree on common outputs while missing rare but important cases."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "For p=(1,0) and q=(0,1), compute JS using base-2 logarithms.",
+      "answer": "The mixture is (0.5,0.5), each component KL is 1 bit, and JS is 1 bit. The numerical upper bound changes with logarithm base; the underlying comparison does not."
+    },
+    "takeaways": [
+      "JS compares both distributions with their mixture.",
+      "A computable surrogate is not automatically the exact divergence."
+    ],
+    "references": [
+      {
+        "title": "Generative Adversarial Nets",
+        "url": "https://arxiv.org/abs/1406.2661",
+        "kind": "paper",
+        "note": "Read the distribution-matching analysis and its Jensen?Shannon connection."
+      }
+    ]
+  },
+  {
+    "topicId": "12-07",
+    "title": "Reward Models and Preference Models",
+    "summary": "A learned score summarizes observed comparisons and can fail outside the conditions that produced those comparisons.",
+    "prerequisites": [
+      "12-01"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Learn from relative judgments",
+        "paragraphs": [
+          "A preference dataset may contain a prompt and two candidate responses with a preferred choice. A reward model maps a prompt-response pair to a scalar used to predict such choices. Under a common Bradley–Terry formulation, P(yA preferred to yB)=σ(r(x,yA)−r(x,yB)). The model learns score differences from comparison labels. Adding the same constant to both scores leaves that preference probability unchanged, so the absolute score has no intrinsic universal meaning."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Trace a concrete pair",
+        "paragraphs": [
+          "Suppose a model gives response A score 2 and response B score 0. Their predicted preference probability is sigmoid(2), about 0.881. Training increases this probability when A is labeled preferred. Annotators may favor correctness, clarity, brevity, or style in different proportions, and disagreement can be genuine. Pair construction matters: comparing obviously bad answers teaches a different boundary from comparing two strong but subtly different answers."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Evaluate beyond pair accuracy",
+        "paragraphs": [
+          "Split data to avoid repeated prompts or near-duplicate responses crossing train and test boundaries. Inspect performance by task type, length, and annotator group when available. A policy optimized against the learned score can discover shortcuts such as verbosity or formatting that correlate with preferences in training but do not reflect actual usefulness. Maintain an independent evaluation process, document label instructions, and check whether score improvements correspond to human judgments on newly generated outputs. Reward-model confidence is not a certificate of factual truth."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "If every reward score increases by 100, do Bradley–Terry pair probabilities change?",
+      "answer": "No. The difference rA−rB remains unchanged, so the sigmoid probability is identical. This illustrates why pairwise data identifies relative scores more directly than an absolute reward scale."
+    },
+    "takeaways": [
+      "Preference labels define a measurement process.",
+      "Validate rewards on fresh policy-generated responses."
+    ],
+    "references": [
+      {
+        "title": "Training language models to follow instructions with human feedback",
+        "url": "https://arxiv.org/abs/2203.02155",
+        "kind": "paper",
+        "note": "Separate demonstration learning, preference modeling, and policy optimization."
+      }
+    ]
+  },
+  {
+    "topicId": "12-08",
+    "title": "States, Actions, Rewards, and Policies",
+    "summary": "An RL problem specifies how decisions change future situations and which cumulative outcomes are valued.",
+    "prerequisites": [
+      "01-06"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Describe the interaction",
+        "paragraphs": [
+          "An agent receives information, chooses an action, and observes a transition and reward. The state is a representation sufficient for predicting relevant future dynamics under actions; the observation may reveal only part of that state. A policy maps available information to an action distribution or deterministic action. Reward is an immediate signal, while return combines rewards across time. Confusing reward with return hides the delayed consequences that make sequential decisions challenging."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Build a tiny example",
+        "paragraphs": [
+          "In a two-room task, the state includes room location and whether a key has been collected. Actions move, wait, or pick up the key. A reward of one occurs only after opening the locked exit. The discounted return is Gt=Σk γ^k rt+k, with γ between zero and one in the usual discounted setting. A policy that repeatedly takes an immediately convenient action may never reach the exit, even though a longer key-collecting sequence succeeds."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Make the language-model analogy precise",
+        "paragraphs": [
+          "For autoregressive text, the prefix can serve as the decision context and the next token as an action. A final answer score can be a terminal reward. The environment and termination rules must still be specified, especially when tools or external feedback are involved. A preference score is one possible reward source, not a required component of RL. Before choosing an algorithm, write down observations, actions, transition timing, reward rules, episode endings, and the actual evaluation metric."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A trajectory receives rewards 0, 0, and 1 with γ=0.9. What is the return from the first decision under the stated indexing?",
+      "answer": "It is 0 + 0.9×0 + 0.9²×1 = 0.81. Discounting reduces the contribution of delayed reward; using γ=1 would make this return equal to 1."
+    },
+    "takeaways": [
+      "Specify the interaction before selecting an algorithm.",
+      "Immediate reward and cumulative return are different quantities."
+    ],
+    "references": [
+      {
+        "title": "Spinning Up: Key Concepts in RL",
+        "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro.html",
+        "kind": "guide",
+        "note": "Review trajectories, policies, returns, and value functions."
+      }
+    ]
+  },
+  {
+    "topicId": "12-09",
+    "title": "Policy Gradients and REINFORCE",
+    "summary": "The log-probability trick lets sampled rewards guide a stochastic policy without differentiating through the environment.",
+    "prerequisites": [
+      "12-08"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Differentiate the sampling distribution",
+        "paragraphs": [
+          "An action sample is discrete or produced through dynamics that may not be differentiable. REINFORCE instead differentiates the probability assigned to the sampled trajectory. For J(θ)=Eτ∼πθ[R(τ)], a basic estimator is R(τ)∇θ log pθ(τ). When environment transitions do not depend on θ, the parameter-dependent terms are policy action probabilities. Successful sampled choices are made more likely, while below-baseline outcomes can push their probabilities down."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Follow a Bernoulli bandit",
+        "paragraphs": [
+          "Let a policy choose action 1 with probability p=σ(z). Suppose action 1 returns reward 1 and action 0 returns 0. The expected reward is p, whose derivative with respect to z is p(1−p). A sampled score-function update uses R(a)(a−p). Its expectation matches the derivative, although individual samples vary. In a sequential task, replace the single log probability with a sum of action log probabilities and use appropriate returns or advantages."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Implement the estimator faithfully",
+        "paragraphs": [
+          "A common minimization loss is −stop_gradient(return−baseline) × log_probability. Do not backpropagate through a reward estimate accidentally unless the algorithm explicitly requires that pathway. Log probabilities must correspond to the distribution that sampled actions; changing temperature or truncating support can alter that distribution. REINFORCE can be unbiased under its assumptions while still having high variance and poor sample efficiency. Use repeated runs, reward diagnostics, and simple bandits to verify signs before applying it to long sequences."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "In the Bernoulli example, p=0.5 and action 1 receives reward 1. What is the sampled gradient with respect to z?",
+      "answer": "It is 1×(1−0.5)=0.5 for gradient ascent. Increasing z raises the probability of action 1. The sampled value need not equal the expected gradient, which is 0.25 at p=0.5."
+    },
+    "takeaways": [
+      "Differentiate action log probabilities, not the sample itself.",
+      "Estimator correctness and estimator variance are separate issues."
+    ],
+    "references": [
+      {
+        "title": "Spinning Up: Intro to Policy Optimization",
+        "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html",
+        "kind": "guide",
+        "note": "Derive the log-probability gradient and action-independent baseline."
+      }
+    ]
+  },
+  {
+    "topicId": "12-10",
+    "title": "Advantages, Baselines, and Variance Reduction",
+    "summary": "Compare an outcome with an appropriate expectation to reduce noise in policy updates.",
+    "prerequisites": [
+      "12-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Relative success is more informative",
+        "paragraphs": [
+          "A reward of ten may be excellent in one state and disappointing in another. A baseline estimates the outcome expected from the current situation, and the advantage measures how much better or worse an action performed. In value notation, Aπ(s,a)=Qπ(s,a)−Vπ(s). This does not redefine what the task ultimately rewards. It changes how the policy gradient attributes a sampled outcome relative to the state it began from."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Why a state baseline can cancel",
+        "paragraphs": [
+          "For an action-independent b(s), the expected score-function term b(s)E_a[∇ log π(a|s)] is zero under standard regularity assumptions. Subtracting such a baseline therefore need not change the expected policy gradient. It can reduce variance if it predicts returns well. A learned critic estimates V(s), while Monte Carlo returns or temporal-difference combinations provide targets. Approximate advantage estimators introduce their own bias-variance trade-offs and should not all be described as exactly unbiased."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Avoid subtle implementation leaks",
+        "paragraphs": [
+          "Detach advantage values in the actor loss when treating them as fixed weights. Train the critic through its own objective. A baseline that depends on the sampled action can bias a naive estimator, and using a batch mean that includes the same sample requires care. Normalizing advantages changes scale and may affect finite-sample behavior; record the convention. Examine critic error and advantage distributions, especially when rewards are sparse or prompts vary greatly in difficulty."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A state has estimated value 3, and a sampled action has estimated return 5. What advantage is used in the simple difference estimate?",
+      "answer": "The advantage is 5−3=2, suggesting the sampled action did better than expected from that state. The positive sign raises its probability in an ascent-style policy update, assuming the estimate is treated as fixed."
+    },
+    "takeaways": [
+      "A baseline should match the conditioning of the decision.",
+      "Action dependence and gradient flow require explicit care."
+    ],
+    "references": [
+      {
+        "title": "Spinning Up: Intro to Policy Optimization",
+        "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html",
+        "kind": "guide",
+        "note": "Derive the log-probability gradient and action-independent baseline."
+      },
+      {
+        "title": "Proximal Policy Optimization Algorithms",
+        "url": "https://arxiv.org/abs/1707.06347",
+        "kind": "paper",
+        "note": "Analyze the clipped surrogate and its dependence on advantage sign."
+      }
+    ]
+  },
+  {
+    "topicId": "12-11",
+    "title": "PPO Ratios, Clipping, and KL Penalties",
+    "summary": "PPO moderates policy updates using data from a rollout policy, but clipping is not a hard global trust-region guarantee.",
+    "prerequisites": [
+      "12-10"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Compare new and rollout probabilities",
+        "paragraphs": [
+          "Let πold be the policy that collected the rollout and πθ the policy being updated. The ratio r=πθ(a|s)/πold(a|s) indicates how much the probability of a sampled action has changed. PPO's clipped surrogate maximizes the expectation of min(rA, clip(r,1−ε,1+ε)A). Old log probabilities and advantages are normally fixed during these updates. The ratio is about data collection, not necessarily about a separate pretrained reference model."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Check both advantage signs",
+        "paragraphs": [
+          "For A=2, r=1.4, and ε=0.2, the unclipped value is 2.8 while the clipped value is 2.4, so the objective uses 2.4. Further increasing that favorable action's ratio receives no extra benefit from this sample's clipped term. For negative advantage, the relevant limiting side reverses. The minimum matters: replacing the objective with a casually clipped gradient does not implement the same function. Multiple minibatch updates reuse the rollout while trying to limit destructive drift."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Monitor what clipping cannot promise",
+        "paragraphs": [
+          "Clipping does not enforce that every action probability or the full policy KL remains within a bound. Other samples and shared parameters can move a ratio outside the interval. KL penalties or early stopping may provide additional control, but they are separate choices. In language-model alignment, KL to a fixed reference policy often discourages drift from pretrained behavior; distinguish that reference from the old rollout policy. Log ratio distributions, clip fractions, reward, and KL together instead of trusting one scalar loss."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "With A=−2, r=0.5, and ε=0.2, what is the clipped surrogate value?",
+      "answer": "The two terms are −1 and −1.6, so the minimum is −1.6. This removes the incentive from this term to keep decreasing the probability of the negatively advantaged action beyond the lower clipping boundary."
+    },
+    "takeaways": [
+      "Keep old rollout and fixed reference policies distinct.",
+      "Clipping limits an incentive, not every possible policy change."
+    ],
+    "references": [
+      {
+        "title": "Proximal Policy Optimization Algorithms",
+        "url": "https://arxiv.org/abs/1707.06347",
+        "kind": "paper",
+        "note": "Analyze the clipped surrogate and its dependence on advantage sign."
+      }
+    ]
+  },
+  {
+    "topicId": "12-12",
+    "title": "GRPO and RLOO",
+    "summary": "Group-based reward comparisons can replace a learned value baseline, but the resulting estimators are not identical.",
+    "prerequisites": [
+      "12-10",
+      "12-11"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Compare several responses to one prompt",
+        "paragraphs": [
+          "Sampling multiple completions for the same prompt provides a local comparison set. In a common GRPO formulation, each response reward is centered by the group's mean and scaled by its standard deviation, producing a group-relative advantage. RLOO uses the mean reward of the other responses as a leave-one-out baseline. Both can avoid training a separate value network, but they differ in normalization, estimator construction, and the policy objective used around that signal."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Calculate the relative scores",
+        "paragraphs": [
+          "For rewards [1,3,5], the ordinary group mean is 3, so centered values are [−2,0,2]. GRPO-style normalization additionally divides by a declared standard-deviation estimate, usually with numerical stabilization. For the response with reward 1, the RLOO baseline is (3+5)/2=4, producing advantage −3. For independent completions conditional on the prompt, excluding the current response prevents its reward from entering its own baseline, supporting the standard score-function baseline argument."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "State the exact variant",
+        "paragraphs": [
+          "GRPO implementations vary in token versus sequence aggregation, clipping, KL terms, length normalization, and reward scaling. RLOO can also be embedded in different optimization pipelines. Report those choices instead of treating the acronym as a complete algorithm. Groups with identical rewards have no within-group ranking signal; near-zero standard deviation needs careful handling. A large group costs generation compute, and relative comparison does not make an unreliable reward correct. Test on a simple reward function before trusting long reasoning rollouts."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "For rewards [0,0,1,1], what is the RLOO advantage of a response receiving 1?",
+      "answer": "The other rewards average (0+0+1)/3=1/3, so the advantage is 2/3. This differs from subtracting the full-group mean, which would give 1/2, and from standard-deviation normalization."
+    },
+    "takeaways": [
+      "Group centering and leave-one-out baselines are different.",
+      "Record reward normalization and token aggregation explicitly."
+    ],
+    "references": [
+      {
+        "title": "DeepSeekMath",
+        "url": "https://arxiv.org/abs/2402.03300",
+        "kind": "paper",
+        "note": "Read the group-relative policy optimization formulation."
+      },
+      {
+        "title": "Back to Basics: Revisiting REINFORCE Style Optimization",
+        "url": "https://arxiv.org/abs/2402.14740",
+        "kind": "paper",
+        "note": "Read the leave-one-out baseline and sequence-level reward estimator."
+      }
+    ]
+  },
+  {
+    "topicId": "12-13",
+    "title": "Direct Preference Optimization",
+    "summary": "DPO adjusts relative response likelihoods from preference pairs while using a reference policy to anchor the comparison.",
+    "prerequisites": [
+      "12-07",
+      "12-05"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Start with a preferred pair",
+        "paragraphs": [
+          "For prompt x, let yw be a preferred response and yl a rejected response. DPO trains a policy directly from such pairs without requiring a separately trained reward model in its standard workflow. The reference policy supplies a baseline likelihood for each response. The learning signal concerns how the new policy changes the preferred-versus-rejected odds relative to that reference, rather than merely maximizing the preferred response's probability in isolation."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Read the loss term by term",
+        "paragraphs": [
+          "A standard loss is −log σ(β[(log πθ(yw|x)−log πref(yw|x))−(log πθ(yl|x)−log πref(yl|x))]). Sequence log probabilities usually sum token log probabilities with appropriate masks. The reference is fixed, while the policy is optimized. If policy and reference initially agree, the bracket is zero and the loss is log 2. Raising the preferred response's relative log probability lowers the loss, as does lowering the rejected response's relative log probability."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Respect the data and derivation",
+        "paragraphs": [
+          "Preference labels may reflect presentation style, incomplete judgments, or conflicts between annotators. DPO does not turn them into objective truth. The usual method is offline on a preference dataset; generating new pairs during training changes the collection protocol. β controls the reference-relative formulation and should be interpreted within that objective, not as an interchangeable generic learning rate. Audit length effects, masking, and reference consistency. Evaluate generated responses independently because improved pairwise training loss does not guarantee improvement on unseen prompts."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "At initialization πθ=πref for both responses. What is the predicted preference sigmoid argument and loss?",
+      "answer": "The argument is zero because both reference-relative log ratios vanish. The sigmoid is 0.5 and the negative log loss is log 2, approximately 0.693 with natural logarithms."
+    },
+    "takeaways": [
+      "DPO learns reference-relative preference odds.",
+      "Offline preference fitting still requires independent generation evaluation."
+    ],
+    "references": [
+      {
+        "title": "Direct Preference Optimization",
+        "url": "https://arxiv.org/abs/2305.18290",
+        "kind": "paper",
+        "note": "Trace the reference-relative preference objective."
+      }
+    ]
+  },
+  {
+    "topicId": "12-14",
+    "title": "RLHF and RL with Verifiable Rewards",
+    "summary": "The source and reliability of the reward determine what policy optimization can actually encourage.",
+    "prerequisites": [
+      "12-07",
+      "12-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Two ways to obtain feedback",
+        "paragraphs": [
+          "RLHF commonly uses human judgments, often distilled into a learned reward or preference model, to guide a policy. RL with verifiable rewards uses a procedure that can check some outcome, such as unit tests, exact arithmetic answers, or a constrained game objective. These describe reward sources rather than one mandatory optimizer. Both may use similar policy-gradient machinery, and a system can combine human and automatically checked feedback."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Examine what the verifier proves",
+        "paragraphs": [
+          "A code solution that passes five tests has satisfied those tests, not every possible specification. An exact final-answer checker verifies the final value under its parsing rules, not necessarily the reasoning path. Verifiers can be deterministic yet incomplete, vulnerable to formatting exploits, or misaligned with user intent. Human judgments can evaluate nuance that is difficult to automate, but may be noisy, inconsistent, or sensitive to style. The correct comparison depends on the task's measurable properties."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Separate training reward from evaluation",
+        "paragraphs": [
+          "Create held-out prompts and, where possible, independent tests or judgments. Inspect high-reward failures and compare them with ordinary outputs. Report reward definitions, parser rules, test coverage, and how invalid responses are handled. A rising training reward can reflect better task performance, better exploitation of a shortcut, or both. Do not label a method reasoning-capable solely because it maximizes a narrow verifier. Document which aspects of correctness remain outside the reward and evaluate those aspects separately."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A policy learns to print a hidden test result string without solving the requested problem. Is a deterministic checker sufficient protection?",
+      "answer": "No. Determinism only makes the check repeatable. If the check rewards the string rather than the intended behavior, optimization can exploit that mismatch. The verifier and independent evaluation need to test the actual task."
+    },
+    "takeaways": [
+      "Reward source and optimization algorithm are separate axes.",
+      "Verification coverage limits the claim of correctness."
+    ],
+    "references": [
+      {
+        "title": "Training language models to follow instructions with human feedback",
+        "url": "https://arxiv.org/abs/2203.02155",
+        "kind": "paper",
+        "note": "Separate demonstration learning, preference modeling, and policy optimization."
+      },
+      {
+        "title": "DeepSeekMath",
+        "url": "https://arxiv.org/abs/2402.03300",
+        "kind": "paper",
+        "note": "Read the group-relative policy optimization formulation."
+      }
+    ]
+  },
+  {
+    "topicId": "12-15",
+    "title": "Sampling Temperature, Entropy, and Exploration",
+    "summary": "Broader sampling can reveal useful alternatives, but randomness alone does not guarantee productive exploration.",
+    "prerequisites": [
+      "05-09",
+      "12-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Explore the policy's alternatives",
+        "paragraphs": [
+          "A policy must sometimes sample choices whose value is uncertain to discover better behavior. In a language model, temperature changes the distribution from which tokens are drawn. For positive T, pT(a) is proportional to exp(za/T). Higher temperature generally spreads probability more broadly, while lower temperature concentrates it. Entropy H(π)=−Σa π(a)log π(a) measures uncertainty in a distribution; it is a property of the probabilities, not a direct measure of task competence."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Connect sampling to the estimator",
+        "paragraphs": [
+          "With probabilities [0.9,0.1], the rarer action is seldom observed but may lead to a higher reward. More exploration can reveal that possibility. However, top-k or top-p truncation may remove actions from support, preventing their discovery entirely. If rollouts use a modified sampling distribution, policy-gradient log probabilities and correction terms must match the intended estimator. Computing log probabilities under an unmodified distribution while sampling under another can silently change the training objective."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Balance diversity and useful feedback",
+        "paragraphs": [
+          "High-temperature samples may become invalid and receive identical low rewards, producing little informative ranking. An entropy bonus encourages distributional spread during optimization, whereas sampling temperature modifies collection or generation; these are different interventions. Track invalid rates, reward variance, duplicate responses, and task success alongside entropy. Exploration budgets also include the number of prompts and completions. Evaluate at a fixed decoding protocol so an apparent training gain is not merely a change in inference-time sampling or number of attempts."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "A top-k sampler excludes an action with high true reward. Can temperature alone rediscover it while the action remains excluded?",
+      "answer": "No. An action with zero sampling support cannot be drawn, regardless of temperature applied within the retained set. Exploration requires changing the support or using another collection mechanism."
+    },
+    "takeaways": [
+      "Match log probabilities to the sampling mechanism.",
+      "Diversity is useful only when it exposes informative alternatives."
+    ],
+    "references": [
+      {
+        "title": "Deep Learning: Probability and Information Theory",
+        "url": "https://www.deeplearningbook.org/contents/prob.html",
+        "kind": "book",
+        "note": "Review entropy, cross-entropy, and the ordered definition of KL divergence."
+      },
+      {
+        "title": "Spinning Up: Intro to Policy Optimization",
+        "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html",
+        "kind": "guide",
+        "note": "Derive the log-probability gradient and action-independent baseline."
+      }
+    ]
+  },
+  {
+    "topicId": "12-16",
+    "title": "Reward Hacking and Distribution Shift",
+    "summary": "Optimization can exploit weaknesses in a reward proxy as the policy moves beyond the data that shaped it.",
+    "prerequisites": [
+      "12-07",
+      "12-14"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "A proxy becomes a target",
+        "paragraphs": [
+          "A reward is usually an operational measurement of a broader goal. If a writing reward correlates with answer length, a policy may become verbose without becoming more helpful. This is reward hacking: behavior improves the measured signal while missing the intended objective. It need not involve deliberate intent by the model. Repeated optimization naturally searches for actions that score well, including regions where the reward model is poorly supported."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Follow the shifting data",
+        "paragraphs": [
+          "A reward model may be trained on ordinary assistant responses, then evaluate increasingly unusual policy-generated outputs. The resulting input distribution differs from its training distribution. An initially harmless correlation can become a shortcut under optimization. For example, a model that predicts correctness partly from confident language may assign high scores to confident false statements after the policy learns that pattern. More reward optimization can therefore reduce genuine quality even while the reported reward rises."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Build independent diagnostics",
+        "paragraphs": [
+          "Keep evaluation labels or tests independent of the optimized reward when possible. Examine the highest-scoring outputs, stratify by length and format, and create adversarial cases that isolate suspected shortcuts. Monitor reward and task success on the same held-out trajectories. Updating the reward model with new examples may help, but also changes the training system and should be documented. Constraints and reference regularization can limit drift, yet they do not prove that the reward captures the goal. Treat a widening reward-quality gap as a measurement problem requiring investigation."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "Training reward increases while independent human preference falls. What should you conclude first?",
+      "answer": "The reward is no longer a reliable proxy on the current policy distribution, or the evaluation protocols differ in a consequential way. Inspect both measurement processes and concrete outputs before claiming the policy improved."
+    },
+    "takeaways": [
+      "Optimization exposes weaknesses in imperfect proxies.",
+      "Evaluate the policy with evidence beyond its training reward."
+    ],
+    "references": [
+      {
+        "title": "Training language models to follow instructions with human feedback",
+        "url": "https://arxiv.org/abs/2203.02155",
+        "kind": "paper",
+        "note": "Separate demonstration learning, preference modeling, and policy optimization."
+      },
+      {
+        "title": "DeepSeekMath",
+        "url": "https://arxiv.org/abs/2402.03300",
+        "kind": "paper",
+        "note": "Read the group-relative policy optimization formulation."
+      }
+    ]
+  },
+  {
+    "topicId": "12-17",
+    "title": "On-Policy and Off-Policy Learning",
+    "summary": "The relationship between the data-generating policy and the optimized policy determines what corrections or assumptions are needed.",
+    "prerequisites": [
+      "12-09"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Identify behavior and target policies",
+        "paragraphs": [
+          "The behavior policy generates the data. The target policy is the policy whose performance or gradient is being estimated. On-policy methods primarily use trajectories from the current target policy or a closely controlled recent version. Off-policy methods learn from data generated by another policy, including older policies or demonstrations. These categories concern distributions, not whether data came from the internet, a simulator, or a live robot."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "See why naive reuse changes an expectation",
+        "paragraphs": [
+          "For a single action, an expectation under π can sometimes be estimated from actions sampled under μ using importance weight π(a|s)/μ(a|s), provided μ covers π's support. Full trajectories can require products of ratios and additional treatment of state-distribution differences, making variance severe. Some off-policy algorithms instead use value-learning objectives with their own assumptions. A one-step ratio does not magically turn every stale trajectory into an unbiased estimate of every desired quantity."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Place common training loops carefully",
+        "paragraphs": [
+          "PPO collects rollouts with an old policy and performs limited updates using probability ratios; it is commonly grouped with on-policy methods despite this controlled reuse. A large replay buffer mixes older behavior distributions and is characteristic of many off-policy methods. Offline RL uses a fixed dataset and faces support limitations; ordinary SFT on demonstrations is supervised imitation, not automatically an off-policy RL algorithm. Record behavior-policy versions, sampling settings, reuse counts, and support restrictions to make these distinctions concrete."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "The target policy assigns positive probability to an action that the behavior policy never sampled and assigns probability zero. Can ordinary importance weighting recover it?",
+      "answer": "No. The ratio is undefined on missing support, and the data contain no observations of that action. Additional exploration, modeling assumptions, or a constrained target policy is needed."
+    },
+    "takeaways": [
+      "Name the behavior and target distributions.",
+      "Support mismatch cannot be fixed by a ratio alone."
+    ],
+    "references": [
+      {
+        "title": "Spinning Up: Intro to Policy Optimization",
+        "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html",
+        "kind": "guide",
+        "note": "Derive the log-probability gradient and action-independent baseline."
+      },
+      {
+        "title": "Proximal Policy Optimization Algorithms",
+        "url": "https://arxiv.org/abs/1707.06347",
+        "kind": "paper",
+        "note": "Analyze the clipped surrogate and its dependence on advantage sign."
+      }
+    ]
+  },
+  {
+    "topicId": "12-18",
+    "title": "Credit Assignment Across a Trajectory",
+    "summary": "A final outcome must be connected to the earlier decisions that helped or harmed it.",
+    "prerequisites": [
+      "12-09",
+      "12-10"
+    ],
+    "sections": [
+      {
+        "id": "intuition",
+        "title": "Delayed feedback hides causality",
+        "paragraphs": [
+          "A robot may fail only after a long sequence of movements, or a generated answer may be marked wrong after hundreds of tokens. The final reward does not directly identify the decisive earlier choice. Credit assignment asks which actions should change and by how much. Assigning the same terminal return to every action is a valid starting estimator in suitable episodic settings, but its variance and interpretability can be poor."
+        ]
+      },
+      {
+        "id": "mechanism",
+        "title": "Use temporal structure",
+        "paragraphs": [
+          "Reward-to-go excludes rewards that occurred before an action because that action cannot affect the past. A value baseline removes predictable state-level outcomes. Temporal-difference methods compare an observed reward plus estimated next value with the current value estimate. These tools exploit structure to improve learning signals, but estimated values introduce approximation and sometimes bias. In language generation, a local token may matter through later consequences, so token-level correctness labels and sequence-level reward are not interchangeable."
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Avoid causal stories from one success",
+        "paragraphs": [
+          "A successful trajectory contains useful decisions, irrelevant details, and sometimes recoverable mistakes. Reinforcing every visible pattern can reward accidental correlations. Compare alternative actions or carefully designed ablations where possible, and inspect failure timing. Dense intermediate rewards can help learning but may redirect behavior if they are poorly aligned with the final goal. Document shaping rules and evaluate the unshaped task objective. For long-horizon problems, better state representations and memory may be as important as changing the gradient estimator."
+        ]
+      }
+    ],
+    "exercise": {
+      "prompt": "An action at time 5 receives a gradient weight containing a reward from time 2. Why can that term be removed in the usual policy-gradient derivation?",
+      "answer": "The later action cannot cause the earlier reward. Under the standard conditional expectation argument, its score-function contribution for past rewards has zero expectation, so removing it can reduce unnecessary variance."
+    },
+    "takeaways": [
+      "Terminal success does not identify each action's contribution.",
+      "Temporal structure can reduce noise without changing the intended goal."
+    ],
+    "references": [
+      {
+        "title": "Spinning Up: Intro to Policy Optimization",
+        "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html",
+        "kind": "guide",
+        "note": "Derive the log-probability gradient and action-independent baseline."
+      },
+      {
+        "title": "Spinning Up: Key Concepts in RL",
+        "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro.html",
+        "kind": "guide",
+        "note": "Review trajectories, policies, returns, and value functions."
+      }
+    ]
+  }
+]

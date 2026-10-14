@@ -7,6 +7,9 @@ Built with static HTML, CSS, and JavaScript, with no runtime dependencies. Ready
 ## Use the Course
 
 - Expand modules in the curriculum to check off topics, open readings, and keep learning notes.
+- Every topic has direct links to relevant original papers, textbooks, or official guides. Select **Read guide** or the topic title to open its own article.
+- Browse **Curriculum → Browse topic guides** for the searchable collection of 216 explainers. Each article includes intuition, a concrete example or formula, a practice question with a worked answer, key takeaways, and a focused reading list.
+- Article URLs such as [`learn/04-03/`](https://enmingzz.github.io/ai-research-mentorship/learn/04-03/) can be shared directly. The complete article is static HTML and remains readable without JavaScript. The article's understanding checkbox shares the same local progress as the curriculum.
 - Use the schedule to review each week's focus, assigned readings, and concrete deliverables. Weeks 21–22 are direction electives that can also be used for revision or project reproduction.
 - Practice research methods throughout the course. Advanced P2 topics in Flow Matching and reinforcement learning are optional extensions for relevant research directions.
 - Progress and notes are saved in the current browser's `localStorage`. They do not automatically sync to GitHub, other devices, or your mentor. Use JSON export and import to back up or transfer your records.
@@ -61,8 +64,24 @@ Content lives in `data/`. Edit the JSON files directly on GitHub and commit your
 | `data/curriculum.json` | Modules, topics, groups, priorities, core formulas, and assessments |
 | `data/papers.json` | Papers, guides, and textbooks, linked to modules through `moduleIds` |
 | `data/schedule.json` | Suggested weeks, learning focus, deliverables, and assigned readings |
+| `data/lessons/01.json`–`15.json` | One original English explainer and topic-specific reference list per knowledge point |
 
 Module IDs use `"01"`–`"15"`. Topic `id` values identify saved checkbox records. Keep existing IDs when editing text, and assign a unique ID to each new topic.
+
+## Edit a Topic Article
+
+Articles are grouped by module in `data/lessons/`. Keep `topicId` equal to the matching checklist item ID. Each record contains:
+
+- `title` and `summary`: the article heading and introductory sentence.
+- `prerequisites`: zero or more existing topic IDs, linked as suggested preparation.
+- `sections`: at least three sections with a unique `id`, a `title`, and a `paragraphs` array. Optional `formula`, `code`, `language`, and `bullets` fields add worked material. Use plain text and Unicode mathematics; HTML is escaped when rendered.
+- `exercise`: a `prompt` and an `answer` revealed with **Show a worked answer**.
+- `takeaways`: a short list of the central ideas.
+- `references`: topic-specific sources with `title`, `url`, `kind` (`paper`, `book`, or `guide`), and `note` describing what to read. These references appear both beside the checklist item and at the end of the article.
+
+The build generates `dist/learn/<topicId>/index.html`, `dist/data/topic-index.json`, and `dist/sitemap.xml`. Edit the source JSON rather than generated files. The local server renders articles from the current JSON on request. Publication checks require complete coverage of all topics, valid prerequisite IDs, usable source links, and substantive article content. Source URLs are checked for valid structure; external availability can change over time.
+
+## Edit Reading Resources and Weekly Assignments
 
 Example reading resource:
 
@@ -113,6 +132,8 @@ Site URL: <https://enmingzz.github.io/ai-research-mentorship/>. Commit future co
 ## Files
 
 - `index.html` / `style.css` / `app.js`: interface, interactions, and local learning records.
+- `lesson.css` / `lesson.js`: article layout, source navigation, and shared topic progress.
+- `tools/lessons.mjs`: shared static article renderer and topic-index generator.
 - `tools/`: local server, data validation, and static build scripts.
 - `.github/workflows/pages.yml`: GitHub Pages deployment workflow.
 - `dist/`: generated output, excluded from version control.
