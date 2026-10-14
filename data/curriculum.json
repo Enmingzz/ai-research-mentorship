@@ -1,0 +1,1102 @@
+[
+  {
+    "id": "01",
+    "title": "Mathematics & Machine Learning Foundations",
+    "shortTitle": "Math & ML Foundations",
+    "subtitle": "P0 · 数学、概率与优化",
+    "priorities": [
+      "P0"
+    ],
+    "group": "foundations",
+    "summary": "建立理解模型、损失函数与训练过程所需的数学基础。",
+    "topics": [
+      {
+        "id": "01-01",
+        "text": "Linear Algebra：向量、矩阵乘法、转置、矩阵范数"
+      },
+      {
+        "id": "01-02",
+        "text": "Matrix Dimensions：矩阵运算中的 shape 推导与 broadcasting"
+      },
+      {
+        "id": "01-03",
+        "text": "Eigenvalues / Eigenvectors、SVD、Matrix Rank"
+      },
+      {
+        "id": "01-04",
+        "text": "Calculus：偏导数、链式法则、Jacobian"
+      },
+      {
+        "id": "01-05",
+        "text": "Gradient Descent：梯度下降为什么有效"
+      },
+      {
+        "id": "01-06",
+        "text": "Probability：条件概率、Bayes' Rule、期望、方差"
+      },
+      {
+        "id": "01-07",
+        "text": "Common Distributions：Gaussian、Bernoulli、Categorical"
+      },
+      {
+        "id": "01-08",
+        "text": "Maximum Likelihood Estimation (MLE)"
+      },
+      {
+        "id": "01-09",
+        "text": "Cross-Entropy、Entropy、KL Divergence"
+      },
+      {
+        "id": "01-10",
+        "text": "Optimization：SGD、Momentum、Adam、AdamW"
+      },
+      {
+        "id": "01-11",
+        "text": "Generalization：Overfitting、Regularization、Train/Validation/Test"
+      }
+    ],
+    "assessment": "能解释 Cross-Entropy 和 KL 的区别，并手动推导一个简单神经网络的梯度。"
+  },
+  {
+    "id": "02",
+    "title": "PyTorch & Engineering Basics",
+    "shortTitle": "PyTorch & Engineering",
+    "subtitle": "P0 · 所有实验的基础",
+    "priorities": [
+      "P0"
+    ],
+    "group": "foundations",
+    "summary": "掌握从数据准备到可复现实验的完整工程流程。",
+    "topics": [
+      {
+        "id": "02-01",
+        "text": "Python：类、装饰器、生成器、模块组织"
+      },
+      {
+        "id": "02-02",
+        "text": "Linux / Shell：文件、进程、环境变量"
+      },
+      {
+        "id": "02-03",
+        "text": "Git：commit、branch、merge、pull request"
+      },
+      {
+        "id": "02-04",
+        "text": "Tensor：shape、reshape、permute、einsum"
+      },
+      {
+        "id": "02-05",
+        "text": "Broadcasting & Matrix Multiplication"
+      },
+      {
+        "id": "02-06",
+        "text": "Autograd：计算图与反向传播"
+      },
+      {
+        "id": "02-07",
+        "text": "nn.Module、Parameter、forward"
+      },
+      {
+        "id": "02-08",
+        "text": "Dataset、DataLoader、Batching、Padding"
+      },
+      {
+        "id": "02-09",
+        "text": "Training Loop：forward → loss → backward → step"
+      },
+      {
+        "id": "02-10",
+        "text": "Checkpoint：保存与恢复模型、优化器状态"
+      },
+      {
+        "id": "02-11",
+        "text": "GPU / CUDA：显存分配、CPU/GPU 数据转移"
+      },
+      {
+        "id": "02-12",
+        "text": "FP32、FP16、BF16、Mixed Precision"
+      },
+      {
+        "id": "02-13",
+        "text": "Debugging：NaN、gradient explosion、OOM"
+      },
+      {
+        "id": "02-14",
+        "text": "Experiment Tracking：TensorBoard / W&B"
+      }
+    ],
+    "assessment": "不依赖 Trainer，使用原生 PyTorch 完成一个可复现的训练循环。"
+  },
+  {
+    "id": "03",
+    "title": "Fundamental Neural Networks",
+    "shortTitle": "Neural Networks",
+    "subtitle": "P0 · 神经网络基础",
+    "priorities": [
+      "P0"
+    ],
+    "group": "foundations",
+    "summary": "理解神经网络的基本组件与稳定训练的方法。",
+    "topics": [
+      {
+        "id": "03-01",
+        "text": "Perceptron / MLP"
+      },
+      {
+        "id": "03-02",
+        "text": "Backpropagation"
+      },
+      {
+        "id": "03-03",
+        "text": "Activation Functions：ReLU、GELU、SiLU"
+      },
+      {
+        "id": "03-04",
+        "text": "Loss Functions：MSE、Cross-Entropy"
+      },
+      {
+        "id": "03-05",
+        "text": "Initialization：Xavier、Kaiming"
+      },
+      {
+        "id": "03-06",
+        "text": "Normalization：BatchNorm、LayerNorm、RMSNorm"
+      },
+      {
+        "id": "03-07",
+        "text": "Residual Connections / Skip Connections"
+      },
+      {
+        "id": "03-08",
+        "text": "Dropout、Weight Decay"
+      },
+      {
+        "id": "03-09",
+        "text": "Embedding Layers"
+      },
+      {
+        "id": "03-10",
+        "text": "CNN：Convolution、Pooling、Stride"
+      },
+      {
+        "id": "03-11",
+        "text": "RNN / LSTM / GRU：理解序列模型的发展"
+      },
+      {
+        "id": "03-12",
+        "text": "Learning Rate Schedules、Warmup、Gradient Clipping"
+      }
+    ],
+    "assessment": ""
+  },
+  {
+    "id": "04",
+    "title": "Attention & Transformer",
+    "shortTitle": "Attention & Transformer",
+    "subtitle": "P0 · 最重要的必修模块",
+    "priorities": [
+      "P0"
+    ],
+    "group": "foundations",
+    "summary": "从 Q/K/V 到完整 Transformer Block，打通现代模型的核心机制。",
+    "topics": [
+      {
+        "id": "04-01",
+        "text": "Attention 的动机：为什么不直接使用 RNN"
+      },
+      {
+        "id": "04-02",
+        "text": "Query、Key、Value 分别是什么"
+      },
+      {
+        "id": "04-03",
+        "text": "Scaled Dot-Product Attention"
+      },
+      {
+        "id": "04-04",
+        "text": "Self-Attention vs Cross-Attention"
+      },
+      {
+        "id": "04-05",
+        "text": "Single-Head vs Multi-Head Attention"
+      },
+      {
+        "id": "04-06",
+        "text": "Causal Mask / Padding Mask"
+      },
+      {
+        "id": "04-07",
+        "text": "Encoder、Decoder、Encoder-Decoder"
+      },
+      {
+        "id": "04-08",
+        "text": "Position Encoding：Sinusoidal、Learned Embedding"
+      },
+      {
+        "id": "04-09",
+        "text": "RoPE：Rotary Positional Embedding"
+      },
+      {
+        "id": "04-10",
+        "text": "Pre-Norm vs Post-Norm"
+      },
+      {
+        "id": "04-11",
+        "text": "Feed-Forward Network (FFN)"
+      },
+      {
+        "id": "04-12",
+        "text": "SwiGLU / Gated MLP"
+      },
+      {
+        "id": "04-13",
+        "text": "MHA、MQA、GQA"
+      },
+      {
+        "id": "04-14",
+        "text": "KV Cache：为什么加速自回归生成"
+      },
+      {
+        "id": "04-15",
+        "text": "Prefill vs Decode"
+      },
+      {
+        "id": "04-16",
+        "text": "FlashAttention：为什么能降低显存 I/O 开销"
+      },
+      {
+        "id": "04-17",
+        "text": "Attention 的计算复杂度与内存复杂度"
+      },
+      {
+        "id": "04-18",
+        "text": "从零实现一个 Transformer Block"
+      }
+    ],
+    "assessment": "为什么需要除以 √dₖ？Multi-Head 为什么可能比 Single-Head 更有表达能力？KV Cache 节省了什么计算、增加了什么显存开销？",
+    "note": "重点是理解 Q/K/V、Attention 和 FFN 在 Transformer Block 中如何协作，而不是只记住架构图。",
+    "formula": "Attention(Q, K, V) = softmax(QKᵀ / √dₖ)V"
+  },
+  {
+    "id": "05",
+    "title": "Large Language Models",
+    "shortTitle": "Large Language Models",
+    "subtitle": "P1 · LLM 基础架构与训练",
+    "priorities": [
+      "P1"
+    ],
+    "group": "core",
+    "summary": "理解语言模型如何训练、生成与评测。",
+    "topics": [
+      {
+        "id": "05-01",
+        "text": "Autoregressive Language Modeling"
+      },
+      {
+        "id": "05-02",
+        "text": "Tokenization：BPE、SentencePiece"
+      },
+      {
+        "id": "05-03",
+        "text": "Next-Token Prediction / Causal LM Loss"
+      },
+      {
+        "id": "05-04",
+        "text": "Perplexity"
+      },
+      {
+        "id": "05-05",
+        "text": "Decoder-only、Encoder-only、Encoder-Decoder"
+      },
+      {
+        "id": "05-06",
+        "text": "GPT、BERT、LLaMA 系列的架构区别"
+      },
+      {
+        "id": "05-07",
+        "text": "Pretraining vs Continued Pretraining vs SFT"
+      },
+      {
+        "id": "05-08",
+        "text": "Instruction Tuning / Chat Template"
+      },
+      {
+        "id": "05-09",
+        "text": "Decoding：Greedy、Temperature、Top-k、Top-p"
+      },
+      {
+        "id": "05-10",
+        "text": "Context Length / Long-Context Modeling"
+      },
+      {
+        "id": "05-11",
+        "text": "In-Context Learning / Few-shot Prompting"
+      },
+      {
+        "id": "05-12",
+        "text": "Scaling Laws：参数、数据、计算预算"
+      },
+      {
+        "id": "05-13",
+        "text": "Data Cleaning、Deduplication、Packing"
+      },
+      {
+        "id": "05-14",
+        "text": "Evaluation：Benchmark、Perplexity、Task Accuracy"
+      }
+    ],
+    "assessment": "能实现一个 Mini-GPT，训练在小型文本数据上，完成自回归文本生成。"
+  },
+  {
+    "id": "06",
+    "title": "Fine-Tuning & LoRA",
+    "shortTitle": "Fine-Tuning & LoRA",
+    "subtitle": "P1 · 必修",
+    "priorities": [
+      "P1"
+    ],
+    "group": "core",
+    "summary": "掌握参数高效微调，并用实验理解 LoRA 的取舍。",
+    "topics": [
+      {
+        "id": "06-01",
+        "text": "Full Fine-Tuning vs Parameter-Efficient Fine-Tuning"
+      },
+      {
+        "id": "06-02",
+        "text": "LoRA 为什么假设权重更新可由低秩矩阵表示"
+      },
+      {
+        "id": "06-03",
+        "text": "LoRA：W′ = W + (α/r)BA"
+      },
+      {
+        "id": "06-04",
+        "text": "Rank r、Scaling α、Dropout"
+      },
+      {
+        "id": "06-05",
+        "text": "LoRA 插入位置：Q、K、V、O、MLP"
+      },
+      {
+        "id": "06-06",
+        "text": "LoRA Initialization / Merge / Unmerge"
+      },
+      {
+        "id": "06-07",
+        "text": "Adapter Tuning / Prefix Tuning / Prompt Tuning"
+      },
+      {
+        "id": "06-08",
+        "text": "QLoRA：4-bit Frozen Weights + LoRA"
+      },
+      {
+        "id": "06-09",
+        "text": "NF4、Double Quantization"
+      },
+      {
+        "id": "06-10",
+        "text": "rsLoRA / DoRA 的基本思想"
+      },
+      {
+        "id": "06-11",
+        "text": "LoRA 与 Full Fine-Tuning 的性能、显存和容量比较"
+      },
+      {
+        "id": "06-12",
+        "text": "Hugging Face PEFT 的基本使用"
+      }
+    ],
+    "assessment": "从零写一个 LoRA Linear Layer，检查训练参数量，并比较不同 rank 的效果。",
+    "formula": "W′ = W + (α/r)BA"
+  },
+  {
+    "id": "07",
+    "title": "Mixture of Experts (MoE)",
+    "shortTitle": "Mixture of Experts",
+    "subtitle": "P1 · 必修架构知识",
+    "priorities": [
+      "P1"
+    ],
+    "group": "core",
+    "summary": "理解稀疏专家模型的路由、容量与计算成本。",
+    "topics": [
+      {
+        "id": "07-01",
+        "text": "Dense Model vs Sparse Model"
+      },
+      {
+        "id": "07-02",
+        "text": "什么是 Expert，通常替换 Transformer 的哪个部分"
+      },
+      {
+        "id": "07-03",
+        "text": "Router / Gating Network"
+      },
+      {
+        "id": "07-04",
+        "text": "Top-1、Top-2、Top-k Routing"
+      },
+      {
+        "id": "07-05",
+        "text": "Expert Outputs 的加权组合"
+      },
+      {
+        "id": "07-06",
+        "text": "Load Balancing Loss"
+      },
+      {
+        "id": "07-07",
+        "text": "Capacity Factor / Token Dropping"
+      },
+      {
+        "id": "07-08",
+        "text": "Expert Specialization"
+      },
+      {
+        "id": "07-09",
+        "text": "Total Parameters vs Active Parameters"
+      },
+      {
+        "id": "07-10",
+        "text": "Expert Parallelism / Communication Overhead"
+      },
+      {
+        "id": "07-11",
+        "text": "Switch Transformer / Mixtral / DeepSeekMoE 的设计思路"
+      }
+    ],
+    "assessment": "实现一个带 4 个 Experts 的简化 MoE Layer，观察 Token Routing 的分布以及是否发生 Expert Collapse。"
+  },
+  {
+    "id": "08",
+    "title": "Computer Vision & Visual Representation",
+    "shortTitle": "Computer Vision",
+    "subtitle": "P1 · VLM 必修",
+    "priorities": [
+      "P1"
+    ],
+    "group": "core",
+    "summary": "建立视觉表征基础，理解图像与文本如何对齐。",
+    "topics": [
+      {
+        "id": "08-01",
+        "text": "Image Representation：Pixels、Features、Embeddings"
+      },
+      {
+        "id": "08-02",
+        "text": "CNN / ResNet 的基本原理"
+      },
+      {
+        "id": "08-03",
+        "text": "ViT：Patch Embedding、Position Embedding、CLS Token"
+      },
+      {
+        "id": "08-04",
+        "text": "CNN vs ViT"
+      },
+      {
+        "id": "08-05",
+        "text": "Image Augmentation"
+      },
+      {
+        "id": "08-06",
+        "text": "Supervised vs Self-Supervised Learning"
+      },
+      {
+        "id": "08-07",
+        "text": "Contrastive Learning / InfoNCE"
+      },
+      {
+        "id": "08-08",
+        "text": "CLIP：Image Encoder + Text Encoder"
+      },
+      {
+        "id": "08-09",
+        "text": "CLIP 的 Contrastive Loss、Temperature、Zero-shot Classification"
+      },
+      {
+        "id": "08-10",
+        "text": "SigLIP：Sigmoid-based Image-Text Alignment"
+      },
+      {
+        "id": "08-11",
+        "text": "DINO / DINOv2：视觉自监督特征"
+      },
+      {
+        "id": "08-12",
+        "text": "Global Features vs Patch-Level / Dense Features"
+      },
+      {
+        "id": "08-13",
+        "text": "Detection / Segmentation 的基本概念"
+      },
+      {
+        "id": "08-14",
+        "text": "SAM / SAM2 的基本架构与用途"
+      }
+    ],
+    "assessment": "用预训练 CLIP 完成 Zero-shot Image Classification，并能解释 CLIP 和 DINO 的训练目标为什么不同。"
+  },
+  {
+    "id": "09",
+    "title": "Generative Models",
+    "shortTitle": "Generative Models",
+    "subtitle": "P1：VAE / Diffusion · P2：Flow Matching 深入",
+    "priorities": [
+      "P1",
+      "P2"
+    ],
+    "group": "core",
+    "summary": "从潜变量模型走向 Diffusion 与 Flow Matching。",
+    "topics": [
+      {
+        "id": "09-01",
+        "text": "Autoencoder：Encoder / Decoder / Latent Space",
+        "section": "Autoencoder / VAE"
+      },
+      {
+        "id": "09-02",
+        "text": "AE vs VAE：确定性表示与概率潜变量模型",
+        "section": "Autoencoder / VAE"
+      },
+      {
+        "id": "09-03",
+        "text": "Variational Inference / ELBO",
+        "section": "Autoencoder / VAE"
+      },
+      {
+        "id": "09-04",
+        "text": "Reconstruction Loss / KL Regularization",
+        "section": "Autoencoder / VAE"
+      },
+      {
+        "id": "09-05",
+        "text": "Reparameterization Trick",
+        "section": "Autoencoder / VAE"
+      },
+      {
+        "id": "09-06",
+        "text": "Posterior Collapse",
+        "section": "Autoencoder / VAE"
+      },
+      {
+        "id": "09-07",
+        "text": "β-VAE / VQ-VAE",
+        "section": "Autoencoder / VAE"
+      },
+      {
+        "id": "09-08",
+        "text": "Latent Representation 与 Compression 的关系",
+        "section": "Autoencoder / VAE"
+      },
+      {
+        "id": "09-09",
+        "text": "GAN 的基本思想及其与 VAE 的区别",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-10",
+        "text": "Diffusion：Forward / Reverse Process",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-11",
+        "text": "DDPM / DDIM",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-12",
+        "text": "Noise Schedule",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-13",
+        "text": "ε-Prediction、x₀-Prediction、v-Prediction",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-14",
+        "text": "Classifier-Free Guidance (CFG)",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-15",
+        "text": "Latent Diffusion Models (LDM)",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-16",
+        "text": "Score Matching 的基本概念",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-17",
+        "text": "ODE / SDE 的直觉",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-18",
+        "text": "Flow Matching / Rectified Flow",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-19",
+        "text": "Velocity Field / Numerical Solvers",
+        "section": "Diffusion / Flow"
+      },
+      {
+        "id": "09-20",
+        "text": "Diffusion vs Flow Matching：训练目标和采样过程",
+        "section": "Diffusion / Flow"
+      }
+    ],
+    "assessment": "在 MNIST 上训练一个 VAE，实现图像重建与随机生成；进阶再实现 2D Toy Distribution 的 Diffusion 或 Flow Matching。"
+  },
+  {
+    "id": "10",
+    "title": "Vision-Language Models (VLM)",
+    "shortTitle": "Vision-Language Models",
+    "subtitle": "P1 · 多模态研究核心",
+    "priorities": [
+      "P1"
+    ],
+    "group": "core",
+    "summary": "理解视觉信息如何进入语言模型并支持多模态推理。",
+    "topics": [
+      {
+        "id": "10-01",
+        "text": "VLM 与 CLIP 的区别"
+      },
+      {
+        "id": "10-02",
+        "text": "Vision Encoder + Projector + LLM 架构"
+      },
+      {
+        "id": "10-03",
+        "text": "Visual Tokens 如何进入 LLM"
+      },
+      {
+        "id": "10-04",
+        "text": "Linear Projector / MLP Projector / Q-Former"
+      },
+      {
+        "id": "10-05",
+        "text": "Multimodal Alignment / Visual Instruction Tuning"
+      },
+      {
+        "id": "10-06",
+        "text": "Frozen Encoder vs End-to-End Training"
+      },
+      {
+        "id": "10-07",
+        "text": "LLaVA、BLIP-2、Qwen2.5-VL 的基本区别"
+      },
+      {
+        "id": "10-08",
+        "text": "Image Resolution 与 Visual Token Count"
+      },
+      {
+        "id": "10-09",
+        "text": "Dynamic Resolution / Patch Merging"
+      },
+      {
+        "id": "10-10",
+        "text": "Image-Text Interleaving / Multimodal Position Encoding"
+      },
+      {
+        "id": "10-11",
+        "text": "VQA、Image Captioning、OCR、Visual Grounding"
+      },
+      {
+        "id": "10-12",
+        "text": "Video-Language Models：Frames、Temporal Encoding"
+      },
+      {
+        "id": "10-13",
+        "text": "Visual Hallucination / Language Prior Bias"
+      },
+      {
+        "id": "10-14",
+        "text": "Multimodal Benchmark 与 Failure Analysis"
+      }
+    ],
+    "assessment": "能从输入图像开始，完整解释 LLaVA 或 Qwen2.5-VL 如何生成答案，并标出各层 Tensor Shapes。"
+  },
+  {
+    "id": "11",
+    "title": "Efficient Deep Learning",
+    "shortTitle": "Efficient Deep Learning",
+    "subtitle": "P1 · 高效模型研究核心",
+    "priorities": [
+      "P1"
+    ],
+    "group": "core",
+    "summary": "用统一评测衡量模型质量、计算、显存与延迟之间的取舍。",
+    "topics": [
+      {
+        "id": "11-01",
+        "text": "FLOPs、MACs、Latency、Throughput 的区别"
+      },
+      {
+        "id": "11-02",
+        "text": "Parameter Count / Active Parameters"
+      },
+      {
+        "id": "11-03",
+        "text": "GPU Memory：Parameters、Gradients、Optimizer States、Activations"
+      },
+      {
+        "id": "11-04",
+        "text": "Training Memory vs Inference Memory"
+      },
+      {
+        "id": "11-05",
+        "text": "Quantization：PTQ / QAT、INT8 / INT4"
+      },
+      {
+        "id": "11-06",
+        "text": "Knowledge Distillation：Logit / Feature / Response Distillation"
+      },
+      {
+        "id": "11-07",
+        "text": "Temperature Scaling / Soft Targets"
+      },
+      {
+        "id": "11-08",
+        "text": "Pruning：Structured / Unstructured"
+      },
+      {
+        "id": "11-09",
+        "text": "Token Pruning / Token Merging / Token Selection"
+      },
+      {
+        "id": "11-10",
+        "text": "Vision Token Compression"
+      },
+      {
+        "id": "11-11",
+        "text": "KV Cache Compression / Eviction"
+      },
+      {
+        "id": "11-12",
+        "text": "FlashAttention / Memory-Efficient Attention"
+      },
+      {
+        "id": "11-13",
+        "text": "Gradient Checkpointing / Gradient Accumulation"
+      },
+      {
+        "id": "11-14",
+        "text": "DDP / FSDP / Tensor Parallelism 的基础"
+      },
+      {
+        "id": "11-15",
+        "text": "Profiling：定位计算、显存和数据加载瓶颈"
+      },
+      {
+        "id": "11-16",
+        "text": "Accuracy–Efficiency Trade-off / Pareto Frontier"
+      }
+    ],
+    "assessment": "在相同任务与相同评测设置下比较 Baseline 和压缩模型，同时报告 Accuracy、Token Count、Latency、Peak GPU Memory。"
+  },
+  {
+    "id": "12",
+    "title": "Post-Training, Distillation & Reinforcement Learning",
+    "shortTitle": "Post-Training & RL",
+    "subtitle": "P1：SFT / Distillation · P2：RL 深入",
+    "priorities": [
+      "P1",
+      "P2"
+    ],
+    "group": "core",
+    "summary": "理解监督微调、蒸馏、偏好优化与强化学习的训练机制。",
+    "topics": [
+      {
+        "id": "12-01",
+        "text": "Supervised Fine-Tuning (SFT)"
+      },
+      {
+        "id": "12-02",
+        "text": "Teacher Forcing / Exposure Bias"
+      },
+      {
+        "id": "12-03",
+        "text": "Knowledge Distillation：Teacher / Student"
+      },
+      {
+        "id": "12-04",
+        "text": "Offline Distillation vs On-Policy Distillation"
+      },
+      {
+        "id": "12-05",
+        "text": "Forward KL vs Reverse KL"
+      },
+      {
+        "id": "12-06",
+        "text": "JS Divergence / Distribution Matching"
+      },
+      {
+        "id": "12-07",
+        "text": "Reward Model / Preference Model"
+      },
+      {
+        "id": "12-08",
+        "text": "RL Basics：State、Action、Reward、Policy"
+      },
+      {
+        "id": "12-09",
+        "text": "Policy Gradient / REINFORCE"
+      },
+      {
+        "id": "12-10",
+        "text": "Advantage / Baseline / Variance Reduction"
+      },
+      {
+        "id": "12-11",
+        "text": "PPO：Ratio、Clipping、KL Penalty"
+      },
+      {
+        "id": "12-12",
+        "text": "GRPO / RLOO"
+      },
+      {
+        "id": "12-13",
+        "text": "DPO：Preference Optimization"
+      },
+      {
+        "id": "12-14",
+        "text": "RLHF vs RLVR"
+      },
+      {
+        "id": "12-15",
+        "text": "Sampling Temperature / Entropy / Exploration"
+      },
+      {
+        "id": "12-16",
+        "text": "Reward Hacking / Distribution Shift"
+      },
+      {
+        "id": "12-17",
+        "text": "On-Policy vs Off-Policy Training"
+      },
+      {
+        "id": "12-18",
+        "text": "Credit Assignment"
+      }
+    ],
+    "assessment": "能解释为什么 SFT 和 On-Policy Distillation 的训练分布不同，并在一个 Toy Task 上实现基本的 Policy Gradient。"
+  },
+  {
+    "id": "13",
+    "title": "Video Understanding & Memory",
+    "shortTitle": "Video & Memory",
+    "subtitle": "P2 · 长视频与记忆研究方向",
+    "priorities": [
+      "P2"
+    ],
+    "group": "frontiers",
+    "summary": "探索有限记忆预算下的长视频理解与时序推理。",
+    "topics": [
+      {
+        "id": "13-01",
+        "text": "Video Encoding：Frame Sampling / Spatial-Temporal Tokens"
+      },
+      {
+        "id": "13-02",
+        "text": "Temporal Attention / Temporal Position Encoding"
+      },
+      {
+        "id": "13-03",
+        "text": "Video Understanding vs Video Generation"
+      },
+      {
+        "id": "13-04",
+        "text": "Short-Term vs Long-Term Temporal Reasoning"
+      },
+      {
+        "id": "13-05",
+        "text": "Streaming Video vs Offline Video Processing"
+      },
+      {
+        "id": "13-06",
+        "text": "Memory Tokens / Recurrent Memory / External Memory"
+      },
+      {
+        "id": "13-07",
+        "text": "Retrieval-Based Memory / Hierarchical Memory"
+      },
+      {
+        "id": "13-08",
+        "text": "Memory Compression / Fixed Memory Budget"
+      },
+      {
+        "id": "13-09",
+        "text": "What-to-Remember：Importance / Redundancy / Relevance"
+      },
+      {
+        "id": "13-10",
+        "text": "Memory Update / Forgetting / Eviction"
+      },
+      {
+        "id": "13-11",
+        "text": "Long-Video QA / Temporal Grounding"
+      },
+      {
+        "id": "13-12",
+        "text": "Static Appearance vs Motion Information"
+      },
+      {
+        "id": "13-13",
+        "text": "Accuracy–Memory–Latency Trade-off"
+      }
+    ],
+    "assessment": ""
+  },
+  {
+    "id": "14",
+    "title": "Vision-Language-Action / World Models",
+    "shortTitle": "VLA & World Models",
+    "subtitle": "P2 · Robotics / VLA 方向",
+    "priorities": [
+      "P2"
+    ],
+    "group": "frontiers",
+    "summary": "连接视觉、语言与动作，理解策略、世界模型和闭环控制。",
+    "topics": [
+      {
+        "id": "14-01",
+        "text": "MDP / POMDP 基本概念"
+      },
+      {
+        "id": "14-02",
+        "text": "Observation、State、Action、Trajectory"
+      },
+      {
+        "id": "14-03",
+        "text": "Behavior Cloning / Imitation Learning"
+      },
+      {
+        "id": "14-04",
+        "text": "Action Chunking / ACT"
+      },
+      {
+        "id": "14-05",
+        "text": "Diffusion Policy / Flow-Based Action Policy"
+      },
+      {
+        "id": "14-06",
+        "text": "VLA Architecture：Vision + Language + Action"
+      },
+      {
+        "id": "14-07",
+        "text": "Autoregressive vs Continuous Action Generation"
+      },
+      {
+        "id": "14-08",
+        "text": "Closed-Loop Control / Replanning"
+      },
+      {
+        "id": "14-09",
+        "text": "Synchronous vs Asynchronous Execution"
+      },
+      {
+        "id": "14-10",
+        "text": "Compounding Errors / Distribution Shift"
+      },
+      {
+        "id": "14-11",
+        "text": "World Models / Latent Dynamics"
+      },
+      {
+        "id": "14-12",
+        "text": "Planning / Model Predictive Control"
+      },
+      {
+        "id": "14-13",
+        "text": "Robotics Simulation / LIBERO 等 Benchmark"
+      },
+      {
+        "id": "14-14",
+        "text": "Success Rate / Rollout Evaluation / Failure Diagnosis"
+      }
+    ],
+    "assessment": ""
+  },
+  {
+    "id": "15",
+    "title": "Research Skills & Scientific Method",
+    "shortTitle": "Research Skills",
+    "subtitle": "P0–P1 · 全过程必修",
+    "priorities": [
+      "P0",
+      "P1"
+    ],
+    "group": "research",
+    "summary": "把阅读、假设、实验与写作贯穿整个学习和研究过程。",
+    "topics": [
+      {
+        "id": "15-01",
+        "text": "How to Read a Paper：Problem、Motivation、Method、Experiments"
+      },
+      {
+        "id": "15-02",
+        "text": "Related Work：找到真正相关的 Baseline"
+      },
+      {
+        "id": "15-03",
+        "text": "Hypothesis：提出可验证、可证伪的假设"
+      },
+      {
+        "id": "15-04",
+        "text": "Reproduction：复现公开结果"
+      },
+      {
+        "id": "15-05",
+        "text": "Ablation Study：一次改变一个关键因素"
+      },
+      {
+        "id": "15-06",
+        "text": "Fair Comparison：相同数据、预算、模型和评测条件"
+      },
+      {
+        "id": "15-07",
+        "text": "Train/Test Leakage / Contamination"
+      },
+      {
+        "id": "15-08",
+        "text": "Multiple Seeds / Variance / Confidence Intervals"
+      },
+      {
+        "id": "15-09",
+        "text": "Hyperparameter Search / Validation Selection"
+      },
+      {
+        "id": "15-10",
+        "text": "Qualitative Analysis / Failure Cases"
+      },
+      {
+        "id": "15-11",
+        "text": "Statistical vs Practical Significance"
+      },
+      {
+        "id": "15-12",
+        "text": "Experiment Logging / Reproducibility"
+      },
+      {
+        "id": "15-13",
+        "text": "Figure / Table Design"
+      },
+      {
+        "id": "15-14",
+        "text": "Technical Writing：Method、Results、Limitations"
+      },
+      {
+        "id": "15-15",
+        "text": "Research Ethics / Data Licensing / Compute Budget"
+      }
+    ],
+    "assessment": ""
+  }
+]

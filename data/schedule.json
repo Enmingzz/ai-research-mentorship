@@ -1,0 +1,244 @@
+[
+  {
+    "week": 1,
+    "title": "数学起点与研究习惯",
+    "phase": "foundations",
+    "moduleIds": ["01", "15"],
+    "focus": "复习向量、矩阵、shape 与链式法则；建立论文阅读和实验记录习惯。",
+    "deliverable": "提交一页数学自测，手动推导两层 MLP 的梯度，并用 Problem / Method / Evidence / Limitations 模板写一份阅读笔记。",
+    "readingModuleIds": ["01", "15"],
+    "readingLimit": 2
+  },
+  {
+    "week": 2,
+    "title": "概率、损失与优化",
+    "phase": "foundations",
+    "moduleIds": ["01", "15"],
+    "focus": "连接 MLE、交叉熵与 KL；理解 SGD、AdamW 和泛化，明确训练、验证、测试集的边界。",
+    "deliverable": "用数值例子解释 Cross-Entropy 与 KL 的区别；绘制两种优化器的损失曲线，记录随机种子和数据划分。",
+    "readingModuleIds": ["01"],
+    "readingLimit": 2
+  },
+  {
+    "week": 3,
+    "title": "搭建可复现的训练循环",
+    "phase": "foundations",
+    "moduleIds": ["02", "15"],
+    "focus": "掌握 Tensor、Autograd、DataLoader、checkpoint 和基础调试；使用 Git 管理实验。",
+    "deliverable": "用原生 PyTorch 完成训练与验证循环，演示从 checkpoint 恢复，并提供运行命令、配置和日志。",
+    "readingModuleIds": ["02"],
+    "readingLimit": 2
+  },
+  {
+    "week": 4,
+    "title": "神经网络与第一组消融",
+    "phase": "foundations",
+    "moduleIds": ["03", "15"],
+    "focus": "理解激活、初始化、归一化、残差和正则化；建立 CNN 与循环网络的直觉。",
+    "deliverable": "在同一小数据集上一次只改变一个因素，对比归一化或残差连接的作用，提交曲线和失败案例。",
+    "readingModuleIds": ["03"],
+    "readingLimit": 2
+  },
+  {
+    "week": 5,
+    "title": "读懂 Q、K、V",
+    "phase": "foundations",
+    "moduleIds": ["04", "15"],
+    "focus": "推导缩放点积注意力，理解 multi-head、self/cross attention 与 causal/padding mask。",
+    "deliverable": "从零实现 masked multi-head attention，逐步标注 Tensor shapes，并解释除以 √dₖ 的原因。",
+    "readingModuleIds": ["04"],
+    "readingLimit": 2
+  },
+  {
+    "week": 6,
+    "title": "拼出 Transformer Block",
+    "phase": "foundations",
+    "moduleIds": ["04", "15"],
+    "focus": "连接 attention、FFN、归一化和位置编码；理解 KV Cache、prefill/decode 与计算开销。",
+    "deliverable": "实现 Transformer Block，验证 mask 行为；用图说明 KV Cache 节省的计算与增加的显存，解释 MHA / MQA / GQA。",
+    "readingModuleIds": ["04"],
+    "readingLimit": 2
+  },
+  {
+    "week": 7,
+    "title": "语言模型的数据与目标",
+    "phase": "core",
+    "moduleIds": ["05", "15"],
+    "focus": "理解 tokenization、next-token loss、perplexity 和数据清洗，比较 GPT、BERT 与 encoder-decoder。",
+    "deliverable": "准备有来源记录的小型语料，检查 train/test 重复，展示 tokenizer、packing 和 causal loss 的最小示例。",
+    "readingModuleIds": ["05"],
+    "readingLimit": 2
+  },
+  {
+    "week": 8,
+    "title": "训练一个 Mini-GPT",
+    "phase": "core",
+    "moduleIds": ["05", "15"],
+    "focus": "完成小规模自回归训练与生成，比较采样策略，并讨论 scaling laws 和计算预算。",
+    "deliverable": "提交可运行的 Mini-GPT、验证集 perplexity 和 greedy / temperature / top-p 生成对比，记录训练成本与局限。",
+    "readingModuleIds": ["05"],
+    "readingLimit": 2
+  },
+  {
+    "week": 9,
+    "title": "低秩适配与微调",
+    "phase": "core",
+    "moduleIds": ["06", "15"],
+    "focus": "理解 LoRA 的低秩更新、初始化、插入位置和 merge；比较 full fine-tuning、LoRA 与 QLoRA。",
+    "deliverable": "从零实现 LoRA Linear Layer，检查可训练参数量与 merge 一致性，在固定设置下比较至少两个 rank。",
+    "readingModuleIds": ["06"],
+    "readingLimit": 2
+  },
+  {
+    "week": 10,
+    "title": "稀疏专家与路由",
+    "phase": "core",
+    "moduleIds": ["07", "15"],
+    "focus": "理解 router、Top-k、load balancing 与 capacity，区分总参数和激活参数。",
+    "deliverable": "实现含 4 个 experts 的简化 MoE Layer，绘制 token routing 分布，对比加入负载均衡前后的 expert collapse。",
+    "readingModuleIds": ["07"],
+    "readingLimit": 2
+  },
+  {
+    "week": 11,
+    "title": "从图像到视觉表征",
+    "phase": "core",
+    "moduleIds": ["08", "15"],
+    "focus": "串联 CNN、ResNet 与 ViT，理解 patch embedding、数据增强和全局/局部特征。",
+    "deliverable": "标注 CNN 与 ViT 的特征形状，比较同一图像的全局与 patch 表征，写清检测、分割和分类的输出差异。",
+    "readingModuleIds": ["08"],
+    "readingLimit": 2
+  },
+  {
+    "week": 12,
+    "title": "图文对齐与自监督",
+    "phase": "core",
+    "moduleIds": ["08", "15"],
+    "focus": "理解 InfoNCE、CLIP、SigLIP 与 DINO 的目标差异，认识 SAM / SAM2 的用途。",
+    "deliverable": "用预训练 CLIP 完成 zero-shot 分类，对比两组 prompt，报告准确率与失败案例，并解释 CLIP 与 DINO 的训练目标。",
+    "readingModuleIds": ["08"],
+    "readingLimit": 2
+  },
+  {
+    "week": 13,
+    "title": "潜变量与 VAE",
+    "phase": "core",
+    "moduleIds": ["09", "15"],
+    "focus": "理解 ELBO、重参数化和 KL 正则化；比较 AE、VAE、β-VAE 与 VQ-VAE。",
+    "deliverable": "在 MNIST 上训练 VAE，展示重建、随机生成与 latent interpolation，并分别记录重建损失和 KL 项。",
+    "readingModuleIds": ["09"],
+    "readingLimit": 2
+  },
+  {
+    "week": 14,
+    "title": "扩散与生成过程",
+    "phase": "core",
+    "moduleIds": ["09", "15"],
+    "focus": "掌握 diffusion 的加噪、去噪、noise schedule 与 CFG；Flow Matching 的数学和实现作为选修深入。",
+    "deliverable": "画出 DDPM 训练与采样流程，解释 ε / x₀ / v prediction；按计算预算选做 2D toy diffusion 或 Flow Matching。",
+    "readingModuleIds": ["09"],
+    "readingLimit": 2
+  },
+  {
+    "week": 15,
+    "title": "连接视觉与语言",
+    "phase": "core",
+    "moduleIds": ["10", "15"],
+    "focus": "理解 vision encoder、projector、Q-Former 与 LLM 的连接，以及视觉对齐与 instruction tuning。",
+    "deliverable": "绘制 LLaVA 或 Qwen2.5-VL 从输入图像到答案的完整数据流，逐层标注 shapes，比较其与 CLIP 的差异。",
+    "readingModuleIds": ["10"],
+    "readingLimit": 2
+  },
+  {
+    "week": 16,
+    "title": "多模态评测与失败分析",
+    "phase": "core",
+    "moduleIds": ["10", "15"],
+    "focus": "理解动态分辨率、visual tokens、视频输入和视觉幻觉；设计可追溯的小型评测。",
+    "deliverable": "整理覆盖 VQA、OCR 和 grounding 的小型样例集，记录输入设置与输出，归类至少三类失败并提出可验证假设。",
+    "readingModuleIds": ["10", "15"],
+    "readingLimit": 2
+  },
+  {
+    "week": 17,
+    "title": "先测量，再谈效率",
+    "phase": "core",
+    "moduleIds": ["11", "15"],
+    "focus": "区分 FLOPs、latency、throughput 与显存组成，理解 profiling、checkpointing 和基础并行策略。",
+    "deliverable": "建立固定输入和批量大小的 benchmark，报告 warmup、测量方法、Accuracy、Token Count、Latency 与 Peak GPU Memory。",
+    "readingModuleIds": ["11"],
+    "readingLimit": 2
+  },
+  {
+    "week": 18,
+    "title": "压缩模型与视觉 token",
+    "phase": "core",
+    "moduleIds": ["11", "15"],
+    "focus": "比较量化、蒸馏、剪枝、token merging 与 KV Cache 压缩，分析精度和效率的取舍。",
+    "deliverable": "选择一种压缩方法，在相同任务、数据和评测设置下对比 baseline，绘制 Accuracy–Latency 或 Accuracy–Memory 图。",
+    "readingModuleIds": ["11"],
+    "readingLimit": 2
+  },
+  {
+    "week": 19,
+    "title": "SFT 与知识蒸馏",
+    "phase": "core",
+    "moduleIds": ["12", "15"],
+    "focus": "理解 teacher forcing、exposure bias、forward/reverse KL，以及 offline 与 on-policy distillation 的分布差异。",
+    "deliverable": "用 toy distribution 计算两种 KL，画出 SFT 与 on-policy distillation 的数据产生流程，提出一组公平比较设置。",
+    "readingModuleIds": ["12"],
+    "readingLimit": 2
+  },
+  {
+    "week": 20,
+    "title": "偏好优化与策略梯度",
+    "phase": "core",
+    "moduleIds": ["12", "15"],
+    "focus": "掌握 reward、policy gradient、baseline 与 DPO 的基本思想；PPO / GRPO / RLOO 的推导作为选修深入。",
+    "deliverable": "在 toy task 上实现 REINFORCE，对比有无 baseline 的训练曲线，解释 RLHF / RLVR 与 reward hacking 的典型问题。",
+    "readingModuleIds": ["12"],
+    "readingLimit": 2
+  },
+  {
+    "week": 21,
+    "title": "方向选修：长视频与记忆",
+    "phase": "frontiers",
+    "moduleIds": ["13", "15"],
+    "focus": "选修：研究 frame sampling、时序表示和记忆更新；不选此方向时，可将本周用于核心模块补强或课题复现。",
+    "deliverable": "比较两种固定 memory budget 的抽帧或记忆策略，列出准确率、内存与延迟的评测方案；或提交核心课题复现记录。",
+    "readingModuleIds": ["13"],
+    "readingLimit": 2,
+    "optional": true
+  },
+  {
+    "week": 22,
+    "title": "方向选修：VLA 与世界模型",
+    "phase": "frontiers",
+    "moduleIds": ["14", "15"],
+    "focus": "选修：连接 MDP / POMDP、imitation learning、action policy 与 world models；可替换为已选方向的深入阅读。",
+    "deliverable": "绘制 observation → policy → action → environment 的闭环，比较 ACT、Diffusion Policy 或 VLA；设计 rollout 成功率与失败分类表。",
+    "readingModuleIds": ["14"],
+    "readingLimit": 2,
+    "optional": true
+  },
+  {
+    "week": 23,
+    "title": "收敛问题与复现 baseline",
+    "phase": "research",
+    "moduleIds": ["15"],
+    "focus": "围绕已选方向形成可证伪假设，确定相关 baseline、数据许可、计算预算和评测协议。",
+    "deliverable": "提交一页研究计划、baseline 复现结果、实验矩阵和资源预算；注明原论文结果与本次复现条件的差异。",
+    "readingModuleIds": ["15"],
+    "readingLimit": 2
+  },
+  {
+    "week": 24,
+    "title": "完成一次小型研究汇报",
+    "phase": "research",
+    "moduleIds": ["15"],
+    "focus": "完成关键消融、多随机种子验证、失败分析与技术写作，区分统计意义和实际价值。",
+    "deliverable": "交付可复现代码、配置与日志，一张主结果表、一组消融、失败案例及含 Method / Results / Limitations 的短报告。",
+    "readingModuleIds": ["15"],
+    "readingLimit": 2
+  }
+]

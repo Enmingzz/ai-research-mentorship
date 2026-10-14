@@ -1,0 +1,12 @@
+{
+  "name": "ai-research-mentorship",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Research Fieldnotes — AI research mentorship curriculum",
+  "scripts": {
+    "dev": "node tools/serve.mjs",
+    "build": "node tools/build.mjs",
+    "check": "node tools/check.mjs"
+  }
+}
