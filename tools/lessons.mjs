@@ -40,26 +40,26 @@ export function lessonDocument(lesson,course) {
 <html lang="en" translate="no">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#f6f5f0"><title>${e(lesson.title)} · Research Fieldnotes</title>
+<meta name="theme-color" content="#f6f5f0"><title>${e(lesson.title)} · enming group</title>
 <meta name="description" content="${e(lesson.summary)}"><link rel="canonical" href="${url}">
 <meta property="og:type" content="article"><meta property="og:title" content="${e(lesson.title)}"><meta property="og:description" content="${e(lesson.summary)}"><meta property="og:url" content="${url}">
 <link rel="stylesheet" href="../../style.css"><link rel="stylesheet" href="../../lesson.css"><script type="module" src="../../lesson.js"></script>
-<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'LearningResource',name:lesson.title,description:lesson.summary,inLanguage:'en',learningResourceType:'Concept explanation',url,isPartOf:{'@type':'Course',name:'AI Research Mentorship',url:SITE_URL+'/'}}).replace(/</g,'\\u003c')}</script>
+<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'LearningResource',name:lesson.title,description:lesson.summary,inLanguage:'en',learningResourceType:'Concept explanation',url,isPartOf:{'@type':'Course',name:'enming group · Learning course',url:SITE_URL+'/course.html'}}).replace(/</g,'\\u003c')}</script>
 </head>
 <body class="lesson-page" data-topic-id="${e(lesson.topicId)}">
 <a class="skip-link" href="#article-content">Skip to the article</a>
 <aside class="sidebar" aria-label="Course navigation">
-<a class="brand" href="../../#overview"><span class="brand-mark">r<span>f</span></span><span>RESEARCH<br><b>FIELDNOTES</b></span></a>
-<div class="space-label">ENMINGZZ / MENTORSHIP</div>
-<nav><a href="../../#overview"><span aria-hidden="true">◈</span>Overview</a><a class="active" href="../../#curriculum"><span aria-hidden="true">▤</span>Curriculum</a><a href="../../#schedule"><span aria-hidden="true">▦</span>Schedule</a><a href="../../#papers"><span aria-hidden="true">↗</span>Reading room</a></nav>
-<div class="side-path"><div class="eyebrow">EXPLORE THE FIELDNOTES</div><a href="../../#fieldnotes">All ${lessons.length} topic guides <span>↗</span></a><a href="../../#module/${module.id}">Back to module ${module.id} <span>↗</span></a></div>
+<a class="brand" href="../../"><span class="brand-mark">e<span>g</span></span><span>enming<br><b>group</b></span></a>
+<div class="space-label">ENMING GROUP / LEARNING</div>
+<nav><a href="../../"><span aria-hidden="true">◈</span>Research projects</a><a href="../../course.html#overview"><span aria-hidden="true">◈</span>Overview</a><a class="active" href="../../course.html#curriculum"><span aria-hidden="true">▤</span>Curriculum</a><a href="../../course.html#schedule"><span aria-hidden="true">▦</span>Schedule</a><a href="../../course.html#papers"><span aria-hidden="true">↗</span>Reading room</a></nav>
+<div class="side-path"><div class="eyebrow">EXPLORE THE COURSE</div><a href="../../course.html#fieldnotes">All ${lessons.length} topic guides <span>↗</span></a><a href="../../course.html#module/${module.id}">Back to module ${module.id} <span>↗</span></a></div>
 <div class="sidebar-bottom"><div class="eyebrow">A LITTLE PROGRESS, EVERY DAY.</div><p>Read with a question.<br>Test with an experiment.</p><a class="github-link" href="https://github.com/Enmingzz/ai-research-mentorship" target="_blank" rel="noopener noreferrer">Course on GitHub <span>↗</span></a></div>
 </aside>
 <div class="workspace">
-<header class="topbar"><div class="breadcrumb"><a href="../../#curriculum">Curriculum</a><span>/</span><a href="../../#module/${module.id}">Module ${module.id}</a><span>/</span><b>Fieldnote ${lesson.topicId}</b></div><div class="top-actions"><button class="button secondary" id="copy-article">Copy link ↗</button></div></header>
+<header class="topbar"><div class="breadcrumb"><a href="../../course.html#curriculum">Curriculum</a><span>/</span><a href="../../course.html#module/${module.id}">Module ${module.id}</a><span>/</span><b>Guide ${lesson.topicId}</b></div><div class="top-actions"><button class="button secondary" id="copy-article">Copy link ↗</button></div></header>
 <main id="article-content" tabindex="-1">
-<div class="article-topline"><a class="back-link" href="../../#module/${module.id}">← ${e(module.shortTitle)}</a><span class="outline-tag">CONCEPT GUIDE</span></div>
-<header class="article-header"><div class="eyebrow">FIELDNOTE ${lesson.topicId.replace('-','.')} / ${e(module.group.toUpperCase())}</div><h1>${e(lesson.title)}</h1><p class="article-dek">${e(lesson.summary)}</p><div class="article-meta"><span>Research Fieldnotes</span><span>${readingMinutes(lesson)} min read</span><span>${lesson.references.length} primary ${lesson.references.length===1?'source':'sources'}</span><span>${module.priorities.join(' / ')}</span></div></header>
+<div class="article-topline"><a class="back-link" href="../../course.html#module/${module.id}">← ${e(module.shortTitle)}</a><span class="outline-tag">CONCEPT GUIDE</span></div>
+<header class="article-header"><div class="eyebrow">GUIDE ${lesson.topicId.replace('-','.')} / ${e(module.group.toUpperCase())}</div><h1>${e(lesson.title)}</h1><p class="article-dek">${e(lesson.summary)}</p><div class="article-meta"><span>enming group</span><span>${readingMinutes(lesson)} min read</span><span>${lesson.references.length} primary ${lesson.references.length===1?'source':'sources'}</span><span>${module.priorities.join(' / ')}</span></div></header>
 <div class="article-layout"><article class="article-body">
 ${lesson.prerequisites.length?`<aside class="prerequisite-box"><span class="eyebrow">BEFORE YOU BEGIN</span><p>It helps to be comfortable with:</p><div>${lesson.prerequisites.map(linkedTopic).join('')}</div></aside>`:''}
 <details class="mobile-toc"><summary>On this page</summary><nav aria-label="Article sections on mobile">${toc}</nav></details>
@@ -68,10 +68,10 @@ ${lesson.sections.map((section,i)=>`<section class="article-section" id="section
 <section class="article-section" id="takeaways"><div class="section-kicker">KEEP THESE IN MIND</div><h2>Key takeaways</h2><ul class="takeaway-list">${lesson.takeaways.map(t=>`<li>${e(t)}</li>`).join('')}</ul></section>
 <section class="article-section article-references" id="references"><div class="section-kicker">GO TO THE SOURCE</div><h2>Papers & further reading</h2><p class="reference-intro">Read the original source with the focus below. Books and official guides are labeled separately from research papers.</p><ol>${lesson.references.map(r=>`<li><span class="priority">${e(r.kind.toUpperCase())}</span><h3>${external(r)}</h3><p>${e(r.note)}</p></li>`).join('')}</ol></section>
 <div class="article-completion"><div><strong>Ready to move on?</strong><p>Mark this topic when you can explain it in your own words.</p></div><label><input type="checkbox" id="topic-understood"> I understand this topic</label><span class="completion-status" role="status" id="completion-status">Saved in this browser, alongside your course progress.</span></div>
-<nav class="article-pagination" aria-label="Previous and next topics">${adjacent(previous,'← PREVIOUS FIELDNOTE')}${adjacent(next,'NEXT FIELDNOTE →')}</nav>
-</article><aside class="article-rail"><div class="article-rail-sticky"><div class="eyebrow">ON THIS PAGE</div><nav class="article-toc" aria-label="Article sections">${toc}</nav><div class="article-rail-note"><span class="eyebrow">LEARN WITH INTENT</span><p>A useful question to take to your mentor: which assumption in this explanation would you test first?</p><a href="../../#module/${module.id}">Open module notes ↗</a></div></div></aside></div>
+<nav class="article-pagination" aria-label="Previous and next topics">${adjacent(previous,'← PREVIOUS GUIDE')}${adjacent(next,'NEXT GUIDE →')}</nav>
+</article><aside class="article-rail"><div class="article-rail-sticky"><div class="eyebrow">ON THIS PAGE</div><nav class="article-toc" aria-label="Article sections">${toc}</nav><div class="article-rail-note"><span class="eyebrow">LEARN WITH INTENT</span><p>A useful question to take to your mentor: which assumption in this explanation would you test first?</p><a href="../../course.html#module/${module.id}">Open module notes ↗</a></div></div></aside></div>
 </main>
-<footer><span>RESEARCH FIELDNOTES · Understand. Implement. Question.</span><span><a href="../../#fieldnotes">All topic guides ↗</a></span></footer>
+<footer><span>ENMING GROUP · Understand. Implement. Question.</span><span><a href="../../course.html#fieldnotes">All topic guides ↗</a></span></footer>
 </div><div id="toast" role="status" aria-live="polite"></div><noscript>The full article and source links work without JavaScript. Enable JavaScript to save your progress.</noscript>
 </body></html>`;
 }

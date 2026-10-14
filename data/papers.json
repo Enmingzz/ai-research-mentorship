@@ -4,7 +4,10 @@
     "title": "Deep Learning",
     "authors": "Ian Goodfellow, Yoshua Bengio & Aaron Courville",
     "year": 2016,
-    "moduleIds": ["01", "03"],
+    "moduleIds": [
+      "01",
+      "03"
+    ],
     "kind": "book",
     "url": "https://www.deeplearningbook.org/",
     "level": "essential",
@@ -15,7 +18,9 @@
     "title": "Adam: A Method for Stochastic Optimization",
     "authors": "Diederik P. Kingma & Jimmy Ba",
     "year": 2014,
-    "moduleIds": ["01"],
+    "moduleIds": [
+      "01"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/1412.6980",
     "level": "essential",
@@ -26,7 +31,9 @@
     "title": "PyTorch: Learn the Basics",
     "authors": "Suraj Subramanian et al. · PyTorch",
     "year": 2021,
-    "moduleIds": ["02"],
+    "moduleIds": [
+      "02"
+    ],
     "kind": "guide",
     "url": "https://docs.pytorch.org/tutorials/beginner/basics/intro.html",
     "level": "essential",
@@ -37,7 +44,9 @@
     "title": "PyTorch: Automatic Mixed Precision",
     "authors": "Michael Carilli · PyTorch",
     "year": 2020,
-    "moduleIds": ["02"],
+    "moduleIds": [
+      "02"
+    ],
     "kind": "guide",
     "url": "https://docs.pytorch.org/tutorials/recipes/recipes/amp_recipe.html",
     "level": "further",
@@ -48,7 +57,10 @@
     "title": "Deep Residual Learning for Image Recognition",
     "authors": "Kaiming He et al.",
     "year": 2015,
-    "moduleIds": ["03", "08"],
+    "moduleIds": [
+      "03",
+      "08"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/1512.03385",
     "level": "essential",
@@ -59,7 +71,9 @@
     "title": "Layer Normalization",
     "authors": "Jimmy Lei Ba, Jamie Ryan Kiros & Geoffrey E. Hinton",
     "year": 2016,
-    "moduleIds": ["03"],
+    "moduleIds": [
+      "03"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/1607.06450",
     "level": "further",
@@ -70,7 +84,9 @@
     "title": "Attention Is All You Need",
     "authors": "Ashish Vaswani et al.",
     "year": 2017,
-    "moduleIds": ["04"],
+    "moduleIds": [
+      "04"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/1706.03762",
     "level": "essential",
@@ -81,7 +97,9 @@
     "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
     "authors": "Jianlin Su et al.",
     "year": 2021,
-    "moduleIds": ["04"],
+    "moduleIds": [
+      "04"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2104.09864",
     "level": "essential",
@@ -92,7 +110,10 @@
     "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
     "authors": "Tri Dao et al.",
     "year": 2022,
-    "moduleIds": ["04", "11"],
+    "moduleIds": [
+      "04",
+      "11"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2205.14135",
     "level": "further",
@@ -103,7 +124,9 @@
     "title": "LLaMA: Open and Efficient Foundation Language Models",
     "authors": "Hugo Touvron et al.",
     "year": 2023,
-    "moduleIds": ["05"],
+    "moduleIds": [
+      "05"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2302.13971",
     "level": "essential",
@@ -114,7 +137,9 @@
     "title": "Scaling Laws for Neural Language Models",
     "authors": "Jared Kaplan et al.",
     "year": 2020,
-    "moduleIds": ["05"],
+    "moduleIds": [
+      "05"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2001.08361",
     "level": "further",
@@ -125,7 +150,9 @@
     "title": "LoRA: Low-Rank Adaptation of Large Language Models",
     "authors": "Edward J. Hu et al.",
     "year": 2021,
-    "moduleIds": ["06"],
+    "moduleIds": [
+      "06"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2106.09685",
     "level": "essential",
@@ -136,7 +163,9 @@
     "title": "QLoRA: Efficient Finetuning of Quantized LLMs",
     "authors": "Tim Dettmers et al.",
     "year": 2023,
-    "moduleIds": ["06"],
+    "moduleIds": [
+      "06"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2305.14314",
     "level": "essential",
@@ -147,7 +176,9 @@
     "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity",
     "authors": "William Fedus, Barret Zoph & Noam Shazeer",
     "year": 2021,
-    "moduleIds": ["07"],
+    "moduleIds": [
+      "07"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2101.03961",
     "level": "essential",
@@ -158,7 +189,9 @@
     "title": "Mixtral of Experts",
     "authors": "Albert Q. Jiang et al.",
     "year": 2024,
-    "moduleIds": ["07"],
+    "moduleIds": [
+      "07"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2401.04088",
     "level": "essential",
@@ -169,7 +202,9 @@
     "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
     "authors": "Alexey Dosovitskiy et al.",
     "year": 2020,
-    "moduleIds": ["08"],
+    "moduleIds": [
+      "08"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2010.11929",
     "level": "essential",
@@ -180,7 +215,9 @@
     "title": "Learning Transferable Visual Models From Natural Language Supervision",
     "authors": "Alec Radford et al.",
     "year": 2021,
-    "moduleIds": ["08"],
+    "moduleIds": [
+      "08"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2103.00020",
     "level": "essential",
@@ -191,7 +228,9 @@
     "title": "Emerging Properties in Self-Supervised Vision Transformers",
     "authors": "Mathilde Caron et al.",
     "year": 2021,
-    "moduleIds": ["08"],
+    "moduleIds": [
+      "08"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2104.14294",
     "level": "further",
@@ -202,7 +241,9 @@
     "title": "Auto-Encoding Variational Bayes",
     "authors": "Diederik P. Kingma & Max Welling",
     "year": 2013,
-    "moduleIds": ["09"],
+    "moduleIds": [
+      "09"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/1312.6114",
     "level": "essential",
@@ -213,7 +254,9 @@
     "title": "Denoising Diffusion Probabilistic Models",
     "authors": "Jonathan Ho, Ajay Jain & Pieter Abbeel",
     "year": 2020,
-    "moduleIds": ["09"],
+    "moduleIds": [
+      "09"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2006.11239",
     "level": "essential",
@@ -224,7 +267,9 @@
     "title": "Flow Matching for Generative Modeling",
     "authors": "Yaron Lipman et al.",
     "year": 2022,
-    "moduleIds": ["09"],
+    "moduleIds": [
+      "09"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2210.02747",
     "level": "further",
@@ -235,7 +280,9 @@
     "title": "Visual Instruction Tuning",
     "authors": "Haotian Liu et al.",
     "year": 2023,
-    "moduleIds": ["10"],
+    "moduleIds": [
+      "10"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2304.08485",
     "level": "essential",
@@ -246,7 +293,9 @@
     "title": "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models",
     "authors": "Junnan Li et al.",
     "year": 2023,
-    "moduleIds": ["10"],
+    "moduleIds": [
+      "10"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2301.12597",
     "level": "essential",
@@ -257,7 +306,9 @@
     "title": "Qwen2.5-VL Technical Report",
     "authors": "Shuai Bai et al.",
     "year": 2025,
-    "moduleIds": ["10"],
+    "moduleIds": [
+      "10"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2502.13923",
     "level": "further",
@@ -268,7 +319,10 @@
     "title": "Distilling the Knowledge in a Neural Network",
     "authors": "Geoffrey Hinton, Oriol Vinyals & Jeff Dean",
     "year": 2015,
-    "moduleIds": ["11", "12"],
+    "moduleIds": [
+      "11",
+      "12"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/1503.02531",
     "level": "essential",
@@ -279,7 +333,9 @@
     "title": "LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale",
     "authors": "Tim Dettmers et al.",
     "year": 2022,
-    "moduleIds": ["11"],
+    "moduleIds": [
+      "11"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2208.07339",
     "level": "further",
@@ -290,7 +346,9 @@
     "title": "Proximal Policy Optimization Algorithms",
     "authors": "John Schulman et al.",
     "year": 2017,
-    "moduleIds": ["12"],
+    "moduleIds": [
+      "12"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/1707.06347",
     "level": "further",
@@ -301,7 +359,9 @@
     "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
     "authors": "Rafael Rafailov et al.",
     "year": 2023,
-    "moduleIds": ["12"],
+    "moduleIds": [
+      "12"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2305.18290",
     "level": "essential",
@@ -312,87 +372,12 @@
     "title": "Training language models to follow instructions with human feedback",
     "authors": "Long Ouyang et al.",
     "year": 2022,
-    "moduleIds": ["12"],
+    "moduleIds": [
+      "12"
+    ],
     "kind": "paper",
     "url": "https://arxiv.org/abs/2203.02155",
     "level": "essential",
     "note": "Trace the training signals through InstructGPT's SFT, preference data, reward modeling, and PPO stages."
-  },
-  {
-    "id": "moviechat",
-    "title": "MovieChat: From Dense Token to Sparse Memory for Long Video Understanding",
-    "authors": "Enxin Song et al.",
-    "year": 2023,
-    "moduleIds": ["13"],
-    "kind": "paper",
-    "url": "https://arxiv.org/abs/2307.16449",
-    "level": "essential",
-    "note": "Compare short-term and long-term memory designs, and discuss what information video token compression may lose."
-  },
-  {
-    "id": "ma-lmm",
-    "title": "MA-LMM: Memory-Augmented Large Multimodal Model for Long-Term Video Understanding",
-    "authors": "Bo He et al.",
-    "year": 2024,
-    "moduleIds": ["13"],
-    "kind": "paper",
-    "url": "https://arxiv.org/abs/2404.05726",
-    "level": "further",
-    "note": "Trace memory bank updates during online processing, and compare accuracy and cost under a fixed memory budget."
-  },
-  {
-    "id": "diffusion-policy",
-    "title": "Diffusion Policy: Visuomotor Policy Learning via Action Diffusion",
-    "authors": "Cheng Chi et al.",
-    "year": 2023,
-    "moduleIds": ["14"],
-    "kind": "paper",
-    "url": "https://arxiv.org/abs/2303.04137",
-    "level": "essential",
-    "note": "Understand conditional diffusion over action sequences, receding horizon control, and closed-loop replanning."
-  },
-  {
-    "id": "rt2",
-    "title": "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control",
-    "authors": "Anthony Brohan et al.",
-    "year": 2023,
-    "moduleIds": ["14"],
-    "kind": "paper",
-    "url": "https://arxiv.org/abs/2307.15818",
-    "level": "essential",
-    "note": "Explain how robot actions become tokens and how training combines image–text tasks with robot trajectories."
-  },
-  {
-    "id": "dreamerv3",
-    "title": "Mastering Diverse Domains through World Models",
-    "authors": "Danijar Hafner et al.",
-    "year": 2023,
-    "moduleIds": ["14"],
-    "kind": "paper",
-    "url": "https://arxiv.org/abs/2301.04104",
-    "level": "further",
-    "note": "Understand DreamerV3's latent dynamics and imagined rollouts, then discuss how model errors propagate."
-  },
-  {
-    "id": "how-to-read",
-    "title": "How to Read a Paper",
-    "authors": "S. Keshav",
-    "year": 2007,
-    "moduleIds": ["15"],
-    "kind": "guide",
-    "url": "https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf",
-    "level": "essential",
-    "note": "Use the three-pass method; record each paper's problem, method, evidence, assumptions, and open questions."
-  },
-  {
-    "id": "reproducibility",
-    "title": "Improving Reproducibility in Machine Learning Research (A Report from the NeurIPS 2019 Reproducibility Program)",
-    "authors": "Joelle Pineau et al.",
-    "year": 2020,
-    "moduleIds": ["15"],
-    "kind": "paper",
-    "url": "https://arxiv.org/abs/2003.12206",
-    "level": "essential",
-    "note": "Create a reproducibility checklist covering data splits, random seeds, hyperparameters, and compute budget."
   }
 ]

@@ -4,33 +4,76 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f6f5f0">
-  <meta name="description" content="From mathematical foundations to multimodal research: 15 modules, 216 topics with dedicated explainers and source links, plus a suggested 24-week learning path. AI Research Mentorship by Enmingzz.">
-  <title>Research Fieldnotes · AI Mentorship</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23272c25'/%3E%3Cpath d='M18 46V18h17a9 9 0 010 18H18m14 0 14 10' fill='none' stroke='%23dcf2a4' stroke-width='5'/%3E%3C/svg%3E">
+  <meta name="description" content="enming group — a shared space for research projects, tasks, and learning. Explore the work ahead and a 12-module AI research course.">
+  <title>enming group · Research, together</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232d3b2c'/%3E%3Cpath d='M19 33h26c0-9-4-15-12-15s-14 7-14 16 5 14 14 14c5 0 9-2 12-5' fill='none' stroke='%23dfecc4' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <script>
+    if (/^#(?:overview|curriculum|module|schedule|papers|fieldnotes)(?:\/|$)/.test(location.hash)) {
+      location.replace('./course.html' + location.search + location.hash);
+    }
+  </script>
   <link rel="stylesheet" href="./style.css">
-  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./projects.css">
+  <script type="module" src="./projects.js"></script>
 </head>
-<body>
+<body class="group-site">
   <a class="skip-link" href="#main">Skip to main content</a>
-  <aside class="sidebar" aria-label="Course navigation">
-    <a class="brand" href="#overview"><span class="brand-mark">r<span>f</span></span><span>RESEARCH<br><b>FIELDNOTES</b></span></a>
-    <div class="space-label">ENMINGZZ / MENTORSHIP</div>
-    <nav id="navigation">
-      <a href="#overview" data-nav="overview"><span aria-hidden="true">◈</span>Overview</a>
-      <a href="#curriculum" data-nav="curriculum"><span aria-hidden="true">▤</span>Curriculum</a>
-      <a href="#schedule" data-nav="schedule"><span aria-hidden="true">▦</span>Schedule</a>
-      <a href="#papers" data-nav="papers"><span aria-hidden="true">↗</span>Reading room</a>
+  <header class="group-header">
+    <a class="group-brand" href="./" aria-label="enming group home"><span class="group-mark" aria-hidden="true">e<span>g</span></span><span>enming group<span class="brand-caption">a research workspace</span></span></a>
+    <nav class="group-nav" aria-label="Main navigation">
+      <a href="#projects" data-section-nav="projects">Projects</a>
+      <a href="#tasks" data-section-nav="tasks">Tasks</a>
+      <a href="./course.html">Learning course <span aria-hidden="true">↗</span></a>
     </nav>
-    <div class="side-path"><div class="eyebrow">YOUR LEARNING PATH</div><a href="#curriculum" data-stage-link="P0"><i class="dot sage"></i>Build foundations <span>P0</span></a><a href="#curriculum" data-stage-link="P1"><i class="dot lavender"></i>Develop core skills <span>P1</span></a><a href="#curriculum" data-stage-link="P2"><i class="dot peach"></i>Explore research <span>P2</span></a></div>
-    <div class="sidebar-bottom"><div class="side-progress-head"><span>My progress</span><strong id="side-percent">0%</strong></div><div class="progress-track"><span id="side-progress"></span></div><p id="side-count">Loading the course…</p><a class="github-link" href="https://github.com/Enmingzz/ai-research-mentorship" target="_blank" rel="noopener noreferrer">Course on GitHub <span>↗</span></a></div>
-  </aside>
-  <div class="workspace">
-    <header class="topbar"><div class="breadcrumb">Learning workspace <span>/</span> <b id="page-label">Overview</b></div><div class="top-actions"><span class="live-label"><i></i> Learn. Build. Research.</span><button class="icon-button" id="backup-open" aria-label="Manage learning progress" title="Export / import progress">⇅</button><span class="avatar" title="Enmingzz">E</span></div></header>
-    <main id="main" tabindex="-1"><div class="loading">Loading your research roadmap…</div></main>
-    <footer><span>RESEARCH FIELDNOTES <span class="footer-dot">·</span> A little progress, every week.</span><span>Designed for curious minds. <a href="https://github.com/Enmingzz/ai-research-mentorship" target="_blank" rel="noopener noreferrer">View source ↗</a></span></footer>
-  </div>
-  <dialog id="backup-dialog"><div class="dialog-head"><h2>Take your progress with you</h2><button class="icon-button" data-close-dialog aria-label="Close">×</button></div><p>Checklists, notes, and your start date are saved in this browser. They do not sync with your mentor automatically. Export a backup to continue on another device.</p><div class="dialog-actions"><button class="button primary" id="export-progress">Export progress JSON ↓</button><button class="button secondary" id="import-open">Import progress ↑</button><input id="import-progress" type="file" accept="application/json,.json" hidden></div><p class="muted small">Importing replaces the progress in this browser. Export a backup first.</p></dialog>
-  <div id="toast" role="status" aria-live="polite"></div>
-  <noscript>This course uses JavaScript to display checklists and schedules. Enable JavaScript, or read the data files in the GitHub repository.</noscript>
+    <a class="group-github" href="https://github.com/Enmingzz/ai-research-mentorship/edit/main/data/projects.json" target="_blank" rel="noopener noreferrer">Manage on GitHub <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="main" class="group-main" tabindex="-1">
+    <section class="group-hero" aria-labelledby="hero-title">
+      <div class="group-hero-copy">
+        <p class="group-eyebrow"><span class="small-star" aria-hidden="true">✳</span> RESEARCH, TOGETHER</p>
+        <h1 id="hero-title">Good questions.<br><span>Shared progress.</span></h1>
+        <p class="group-intro">A home for our research projects, the work ahead,<br class="desktop-break"> and the ideas we’re learning along the way.</p>
+        <div class="group-hero-actions"><a class="group-button dark" href="#projects">Explore projects <span aria-hidden="true">↓</span></a><a class="group-text-link" href="./course.html">Start learning <span aria-hidden="true">↗</span></a></div>
+      </div>
+      <div class="research-sketch" aria-hidden="true">
+        <span class="sketch-caption">THE WORK IS IN THE PROCESS</span>
+        <svg class="sketch-lines" viewBox="0 0 420 300" fill="none"><path d="M87 88C159 5 292 35 334 130C377 230 241 291 138 248C49 211 67 135 87 88Z" stroke="currentColor" stroke-width="1"/><path d="M91 86C165 106 282 75 330 130C372 183 247 271 138 248C94 238 49 143 91 86Z" stroke="currentColor" stroke-width="1" stroke-dasharray="3 5"/><path d="M88 89L211 161L334 130M211 161L139 248" stroke="currentColor" stroke-width="1"/><circle cx="211" cy="161" r="58" fill="#edf1e5" stroke="currentColor"/><circle cx="211" cy="161" r="48" stroke="currentColor" opacity=".35"/><circle cx="88" cy="89" r="6" fill="#536b48"/><circle cx="334" cy="130" r="6" fill="#536b48"/><circle cx="139" cy="248" r="6" fill="#536b48"/><path d="M211 135V187M185 161H237M193 143L229 179M229 143L193 179" stroke="#687f53" stroke-width="2"/></svg>
+        <span class="sketch-label label-question">01 / question</span><span class="sketch-label label-experiment">02 / experiment</span><span class="sketch-label label-evidence">03 / evidence</span>
+        <span class="sketch-note">a little more understanding,<br>one iteration at a time.</span>
+      </div>
+    </section>
+    <div class="workspace-summary" aria-label="Workspace at a glance">
+      <span class="summary-label"><span class="summary-dot" aria-hidden="true"></span> OUR WORKSPACE</span>
+      <a href="#projects"><strong id="project-total">—</strong> <span>projects</span></a>
+      <a href="#tasks"><strong id="task-open-count">—</strong> <span>tasks ahead</span></a>
+      <a href="./course.html" class="summary-course"><span>Learning stays part of the work</span> <span aria-hidden="true">↗</span></a>
+    </div>
+    <section id="projects" class="board-section" aria-labelledby="projects-title">
+      <div class="board-heading"><div><p class="group-eyebrow">01 / THE QUESTIONS WE’RE EXPLORING</p><h2 id="projects-title">Projects<span id="project-count" class="section-count" aria-label="Project count">—</span></h2><p>From an initial idea to a result worth sharing.</p></div><span class="board-heading-note">Make room for the next question.</span></div>
+      <div class="board-toolbar">
+        <div class="board-filters" role="group" aria-label="Filter projects by status"><button type="button" data-project-status="all" aria-pressed="true">All projects</button><button type="button" data-project-status="planned" aria-pressed="false">Planned</button><button type="button" data-project-status="active" aria-pressed="false">Active</button><button type="button" data-project-status="completed" aria-pressed="false">Completed</button></div>
+        <label class="board-search"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="project-search" type="search" placeholder="Find a project…" aria-label="Search projects"></label>
+      </div>
+      <p id="project-results-label" class="board-results-label" role="status" aria-live="polite"></p>
+      <div id="project-results" class="project-grid" aria-busy="true"><div class="board-loading">Gathering the projects…</div></div>
+    </section>
+    <section id="tasks" class="board-section task-section" aria-labelledby="tasks-title">
+      <div class="board-heading"><div><p class="group-eyebrow">02 / THE NEXT SMALL STEPS</p><h2 id="tasks-title">Tasks<span id="task-count" class="section-count" aria-label="Task count">—</span></h2><p>The work that moves a question forward.</p></div><span class="board-heading-note">Small steps. Visible progress.</span></div>
+      <div class="board-toolbar">
+        <div class="board-filters" role="group" aria-label="Filter tasks by status"><button type="button" data-task-status="all" aria-pressed="true">All tasks</button><button type="button" data-task-status="open" aria-pressed="false">Open</button><button type="button" data-task-status="in-progress" aria-pressed="false">In progress</button><button type="button" data-task-status="done" aria-pressed="false">Done</button></div>
+        <div class="task-search-tools"><select id="task-project-filter" class="board-select" aria-label="Filter tasks by project"><option value="all">All projects</option><option value="independent">Independent tasks</option></select><label class="board-search"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="task-search" type="search" placeholder="Find a task…" aria-label="Search tasks"></label></div>
+      </div>
+      <p id="task-results-label" class="board-results-label" role="status" aria-live="polite"></p>
+      <div id="task-results" class="task-list" aria-busy="true"><div class="board-loading">Gathering the tasks…</div></div>
+    </section>
+    <section class="group-course" aria-labelledby="course-title">
+      <div class="course-symbol" aria-hidden="true"><span>↗</span><span class="course-symbol-ring"></span></div>
+      <div class="group-course-copy"><p class="group-eyebrow">03 / KEEP LEARNING</p><h2 id="course-title">Build the foundations.<br>Find your next idea.</h2><p>An AI research course with clear explanations, original papers,<br class="desktop-break"> and practical exercises to turn reading into understanding.</p><a class="group-button dark" href="./course.html">Explore the learning course <span aria-hidden="true">↗</span></a></div>
+      <dl class="course-numbers"><div><dt>Modules</dt><dd>12</dd></div><div><dt>Topics to explore</dt><dd>174</dd></div><div><dt>Suggested weeks</dt><dd>20</dd></div></dl>
+    </section>
+  </main>
+  <footer class="group-footer"><a class="footer-brand" href="./">enming group<span>A shared space for thoughtful work.</span></a><div><a href="#projects">Projects</a><a href="#tasks">Tasks</a><a href="./course.html">Learning course ↗</a><a href="https://github.com/Enmingzz/ai-research-mentorship/edit/main/data/projects.json" target="_blank" rel="noopener noreferrer">Manage on GitHub ↗</a></div></footer>
+  <dialog id="board-detail" class="board-dialog" aria-labelledby="detail-title"><div class="board-dialog-top"><span id="detail-kind" class="group-eyebrow">PROJECT</span><button type="button" id="detail-close" class="detail-close" aria-label="Close details">×</button></div><div id="detail-content"></div></dialog>
+  <noscript><div class="group-noscript">Enable JavaScript to browse projects and tasks. You can still <a href="./course.html">open the learning course</a> or <a href="https://github.com/Enmingzz/ai-research-mentorship">visit the group on GitHub</a>.</div></noscript>
 </body>
 </html>

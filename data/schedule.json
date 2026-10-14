@@ -2,267 +2,358 @@
   {
     "week": 1,
     "title": "Math Foundations & Research Habits",
-    "readingIds": ["deep-learning-book","how-to-read"],
+    "readingIds": [
+      "deep-learning-book",
+      "adam"
+    ],
     "phase": "foundations",
-    "moduleIds": ["01", "15"],
+    "moduleIds": [
+      "01"
+    ],
     "focus": "Review vectors, matrices, tensor shapes, and the chain rule; establish habits for reading papers and logging experiments.",
     "deliverable": "Submit a one-page math self-assessment, derive the gradients of a two-layer MLP by hand, and write a reading note using the Problem / Method / Evidence / Limitations template.",
-    "readingModuleIds": ["01", "15"],
+    "readingModuleIds": [
+      "01"
+    ],
     "readingLimit": 2
   },
   {
     "week": 2,
     "title": "Probability, Losses & Optimization",
-    "readingIds": ["adam","deep-learning-book"],
+    "readingIds": [
+      "adam",
+      "deep-learning-book"
+    ],
     "phase": "foundations",
-    "moduleIds": ["01", "15"],
+    "moduleIds": [
+      "01"
+    ],
     "focus": "Connect MLE, cross-entropy, and KL divergence; understand SGD, AdamW, and generalization, and distinguish the roles of training, validation, and test sets.",
     "deliverable": "Explain the difference between cross-entropy and KL divergence with a numerical example. Plot loss curves for two optimizers and record random seeds and data splits.",
-    "readingModuleIds": ["01"],
+    "readingModuleIds": [
+      "01"
+    ],
     "readingLimit": 2
   },
   {
     "week": 3,
     "title": "Build a Reproducible Training Loop",
-    "readingIds": ["pytorch-basics","pytorch-amp"],
+    "readingIds": [
+      "pytorch-basics",
+      "pytorch-amp"
+    ],
     "phase": "foundations",
-    "moduleIds": ["02", "15"],
+    "moduleIds": [
+      "02"
+    ],
     "focus": "Learn tensors, Autograd, DataLoader, checkpoints, and basic debugging; use Git to manage experiments.",
     "deliverable": "Build training and validation loops in native PyTorch, demonstrate checkpoint recovery, and provide run commands, configurations, and logs.",
-    "readingModuleIds": ["02"],
+    "readingModuleIds": [
+      "02"
+    ],
     "readingLimit": 2
   },
   {
     "week": 4,
     "title": "Neural Networks & Your First Ablation",
-    "readingIds": ["resnet","layernorm"],
+    "readingIds": [
+      "resnet",
+      "layernorm"
+    ],
     "phase": "foundations",
-    "moduleIds": ["03", "15"],
+    "moduleIds": [
+      "03"
+    ],
     "focus": "Understand activations, initialization, normalization, residual connections, and regularization; build intuition for CNNs and recurrent networks.",
     "deliverable": "Change one factor at a time on the same small dataset to compare the effects of normalization or residual connections. Submit learning curves and failure cases.",
-    "readingModuleIds": ["03"],
+    "readingModuleIds": [
+      "03"
+    ],
     "readingLimit": 2
   },
   {
     "week": 5,
     "title": "Understand Q, K & V",
-    "readingIds": ["attention"],
+    "readingIds": [
+      "attention"
+    ],
     "phase": "foundations",
-    "moduleIds": ["04", "15"],
+    "moduleIds": [
+      "04"
+    ],
     "focus": "Derive scaled dot-product attention and understand multi-head attention, self-attention, cross-attention, and causal/padding masks.",
     "deliverable": "Implement masked multi-head attention from scratch, annotate tensor shapes at each step, and explain why attention scores are divided by √dₖ.",
-    "readingModuleIds": ["04"],
+    "readingModuleIds": [
+      "04"
+    ],
     "readingLimit": 2
   },
   {
     "week": 6,
     "title": "Assemble a Transformer Block",
-    "readingIds": ["rope","flashattention"],
+    "readingIds": [
+      "rope",
+      "flashattention"
+    ],
     "phase": "foundations",
-    "moduleIds": ["04", "15"],
+    "moduleIds": [
+      "04"
+    ],
     "focus": "Connect attention, FFNs, normalization, and positional encoding; understand the KV cache, prefill/decode, and computational costs.",
     "deliverable": "Implement a Transformer block and verify mask behavior. Use a diagram to explain the computation saved and GPU memory added by the KV cache, and explain MHA / MQA / GQA.",
-    "readingModuleIds": ["04"],
+    "readingModuleIds": [
+      "04"
+    ],
     "readingLimit": 2
   },
   {
     "week": 7,
     "title": "Language Model Data & Objectives",
-    "readingIds": ["llama","attention"],
+    "readingIds": [
+      "llama",
+      "attention"
+    ],
     "phase": "core",
-    "moduleIds": ["05", "15"],
+    "moduleIds": [
+      "05"
+    ],
     "focus": "Understand tokenization, next-token loss, perplexity, and data cleaning; compare GPT, BERT, and encoder-decoder models.",
     "deliverable": "Prepare a small corpus with documented sources, check for train/test duplicates, and demonstrate minimal examples of tokenization, packing, and causal language modeling loss.",
-    "readingModuleIds": ["05"],
+    "readingModuleIds": [
+      "05"
+    ],
     "readingLimit": 2
   },
   {
     "week": 8,
     "title": "Train a Mini-GPT",
-    "readingIds": ["scaling-laws","llama"],
+    "readingIds": [
+      "scaling-laws",
+      "llama"
+    ],
     "phase": "core",
-    "moduleIds": ["05", "15"],
+    "moduleIds": [
+      "05"
+    ],
     "focus": "Complete small-scale autoregressive training and generation, compare sampling strategies, and discuss scaling laws and compute budgets.",
     "deliverable": "Submit a runnable Mini-GPT, validation perplexity, and a comparison of greedy, temperature, and top-p generation. Document training costs and limitations.",
-    "readingModuleIds": ["05"],
+    "readingModuleIds": [
+      "05"
+    ],
     "readingLimit": 2
   },
   {
     "week": 9,
     "title": "Low-Rank Adaptation & Fine-Tuning",
-    "readingIds": ["lora","qlora"],
+    "readingIds": [
+      "lora",
+      "qlora"
+    ],
     "phase": "core",
-    "moduleIds": ["06", "15"],
+    "moduleIds": [
+      "06"
+    ],
     "focus": "Understand LoRA's low-rank updates, initialization, insertion points, and merging; compare full fine-tuning, LoRA, and QLoRA.",
     "deliverable": "Implement a LoRA linear layer from scratch, check the trainable parameter count and equivalence after merging, and compare at least two ranks under fixed settings.",
-    "readingModuleIds": ["06"],
+    "readingModuleIds": [
+      "06"
+    ],
     "readingLimit": 2
   },
   {
     "week": 10,
     "title": "Sparse Experts & Routing",
-    "readingIds": ["switch-transformer","mixtral"],
+    "readingIds": [
+      "switch-transformer",
+      "mixtral"
+    ],
     "phase": "core",
-    "moduleIds": ["07", "15"],
+    "moduleIds": [
+      "07"
+    ],
     "focus": "Understand routers, top-k routing, load balancing, and capacity; distinguish total parameters from active parameters.",
     "deliverable": "Implement a simplified MoE layer with 4 experts, plot the token routing distribution, and compare expert collapse with and without load balancing.",
-    "readingModuleIds": ["07"],
+    "readingModuleIds": [
+      "07"
+    ],
     "readingLimit": 2
   },
   {
     "week": 11,
     "title": "From Images to Visual Representations",
-    "readingIds": ["resnet","vit"],
+    "readingIds": [
+      "resnet",
+      "vit"
+    ],
     "phase": "core",
-    "moduleIds": ["08", "15"],
+    "moduleIds": [
+      "08"
+    ],
     "focus": "Connect CNNs, ResNets, and ViTs; understand patch embeddings, data augmentation, and global versus local features.",
     "deliverable": "Annotate CNN and ViT feature shapes, compare global and patch representations of the same image, and describe how detection, segmentation, and classification outputs differ.",
-    "readingModuleIds": ["08"],
+    "readingModuleIds": [
+      "08"
+    ],
     "readingLimit": 2
   },
   {
     "week": 12,
     "title": "Image-Text Alignment & Self-Supervision",
-    "readingIds": ["clip","dino"],
+    "readingIds": [
+      "clip",
+      "dino"
+    ],
     "phase": "core",
-    "moduleIds": ["08", "15"],
+    "moduleIds": [
+      "08"
+    ],
     "focus": "Understand how the objectives of InfoNCE, CLIP, SigLIP, and DINO differ, and learn the uses of SAM / SAM2.",
     "deliverable": "Perform zero-shot classification with pretrained CLIP, compare two prompt sets, report accuracy and failure cases, and explain the training objectives of CLIP and DINO.",
-    "readingModuleIds": ["08"],
+    "readingModuleIds": [
+      "08"
+    ],
     "readingLimit": 2
   },
   {
     "week": 13,
     "title": "Latent Variables & VAEs",
-    "readingIds": ["vae"],
+    "readingIds": [
+      "vae"
+    ],
     "phase": "core",
-    "moduleIds": ["09", "15"],
+    "moduleIds": [
+      "09"
+    ],
     "focus": "Understand the ELBO, reparameterization, and KL regularization; compare AEs, VAEs, β-VAEs, and VQ-VAEs.",
     "deliverable": "Train a VAE on MNIST, show reconstructions, random samples, and latent interpolations, and log the reconstruction loss and KL term separately.",
-    "readingModuleIds": ["09"],
+    "readingModuleIds": [
+      "09"
+    ],
     "readingLimit": 2
   },
   {
     "week": 14,
     "title": "Diffusion & Generative Processes",
-    "readingIds": ["ddpm","flow-matching"],
+    "readingIds": [
+      "ddpm",
+      "flow-matching"
+    ],
     "phase": "core",
-    "moduleIds": ["09", "15"],
+    "moduleIds": [
+      "09"
+    ],
     "focus": "Learn diffusion's forward noising, denoising, noise schedules, and CFG; explore Flow Matching mathematics and implementation as an optional extension.",
     "deliverable": "Diagram DDPM training and sampling, and explain ε / x₀ / v prediction. Optionally implement diffusion or Flow Matching on a 2D toy distribution, depending on your compute budget.",
-    "readingModuleIds": ["09"],
+    "readingModuleIds": [
+      "09"
+    ],
     "readingLimit": 2
   },
   {
     "week": 15,
     "title": "Connect Vision & Language",
-    "readingIds": ["llava","blip2"],
+    "readingIds": [
+      "llava",
+      "blip2"
+    ],
     "phase": "core",
-    "moduleIds": ["10", "15"],
+    "moduleIds": [
+      "10"
+    ],
     "focus": "Understand how vision encoders, projectors, Q-Formers, and LLMs connect, along with visual alignment and instruction tuning.",
     "deliverable": "Diagram the complete data flow from an input image to an answer in LLaVA or Qwen2.5-VL, annotate shapes at each layer, and compare the model with CLIP.",
-    "readingModuleIds": ["10"],
+    "readingModuleIds": [
+      "10"
+    ],
     "readingLimit": 2
   },
   {
     "week": 16,
     "title": "Multimodal Evaluation & Failure Analysis",
-    "readingIds": ["qwen25vl","reproducibility"],
+    "readingIds": [
+      "qwen25vl",
+      "llava"
+    ],
     "phase": "core",
-    "moduleIds": ["10", "15"],
+    "moduleIds": [
+      "10"
+    ],
     "focus": "Understand dynamic resolution, visual tokens, video inputs, and visual hallucinations; design a small evaluation with traceable records.",
     "deliverable": "Curate a small example set covering VQA, OCR, and grounding. Record input settings and outputs, identify at least three failure categories, and propose testable hypotheses.",
-    "readingModuleIds": ["10", "15"],
+    "readingModuleIds": [
+      "10"
+    ],
     "readingLimit": 2
   },
   {
     "week": 17,
     "title": "Measure Efficiency First",
-    "readingIds": ["flashattention"],
+    "readingIds": [
+      "flashattention"
+    ],
     "phase": "core",
-    "moduleIds": ["11", "15"],
+    "moduleIds": [
+      "11"
+    ],
     "focus": "Distinguish FLOPs, latency, throughput, and GPU memory components; understand profiling, checkpointing, and basic parallelism strategies.",
     "deliverable": "Build a benchmark with fixed inputs and batch size. Report warmup, measurement methods, accuracy, token count, latency, and peak GPU memory.",
-    "readingModuleIds": ["11"],
+    "readingModuleIds": [
+      "11"
+    ],
     "readingLimit": 2
   },
   {
     "week": 18,
     "title": "Compress Models & Visual Tokens",
-    "readingIds": ["llm-int8","distillation"],
+    "readingIds": [
+      "llm-int8",
+      "distillation"
+    ],
     "phase": "core",
-    "moduleIds": ["11", "15"],
+    "moduleIds": [
+      "11"
+    ],
     "focus": "Compare quantization, distillation, pruning, token merging, and KV cache compression; analyze accuracy-efficiency trade-offs.",
     "deliverable": "Choose one compression method and compare it with the baseline using the same task, data, and evaluation settings. Plot accuracy versus latency or memory.",
-    "readingModuleIds": ["11"],
+    "readingModuleIds": [
+      "11"
+    ],
     "readingLimit": 2
   },
   {
     "week": 19,
     "title": "SFT & Knowledge Distillation",
-    "readingIds": ["distillation","instructgpt"],
+    "readingIds": [
+      "distillation",
+      "instructgpt"
+    ],
     "phase": "core",
-    "moduleIds": ["12", "15"],
+    "moduleIds": [
+      "12"
+    ],
     "focus": "Understand teacher forcing, exposure bias, forward/reverse KL, and the distribution differences between offline and on-policy distillation.",
     "deliverable": "Calculate both KL directions on a toy distribution, diagram how SFT and on-policy distillation produce training data, and propose settings for a fair comparison.",
-    "readingModuleIds": ["12"],
+    "readingModuleIds": [
+      "12"
+    ],
     "readingLimit": 2
   },
   {
     "week": 20,
     "title": "Preference Optimization & Policy Gradients",
-    "readingIds": ["ppo","dpo"],
+    "readingIds": [
+      "ppo",
+      "dpo"
+    ],
     "phase": "core",
-    "moduleIds": ["12", "15"],
+    "moduleIds": [
+      "12"
+    ],
     "focus": "Learn the basic ideas behind rewards, policy gradients, baselines, and DPO; explore PPO / GRPO / RLOO derivations as optional extensions.",
     "deliverable": "Implement REINFORCE on a toy task, compare training curves with and without a baseline, and explain RLHF / RLVR and common reward hacking problems.",
-    "readingModuleIds": ["12"],
-    "readingLimit": 2
-  },
-  {
-    "week": 21,
-    "title": "Elective: Long Video & Memory",
-    "readingIds": ["moviechat","ma-lmm"],
-    "phase": "frontiers",
-    "moduleIds": ["13", "15"],
-    "focus": "Elective: study frame sampling, temporal representations, and memory updates. Use this week to reinforce core modules or reproduce a project if this direction is outside your focus.",
-    "deliverable": "Compare two frame-sampling or memory strategies under a fixed memory budget and outline an evaluation of accuracy, memory, and latency; alternatively, submit reproduction records for a core project.",
-    "readingModuleIds": ["13"],
-    "readingLimit": 2,
-    "optional": true
-  },
-  {
-    "week": 22,
-    "title": "Elective: VLA & World Models",
-    "readingIds": ["diffusion-policy","rt2"],
-    "phase": "frontiers",
-    "moduleIds": ["14", "15"],
-    "focus": "Elective: connect MDPs / POMDPs, imitation learning, action policies, and world models. You may replace this week with deeper reading in your chosen direction.",
-    "deliverable": "Diagram the observation → policy → action → environment control loop, compare approaches such as ACT, Diffusion Policy, or VLA, and design a table for rollout success rates and failure categories.",
-    "readingModuleIds": ["14"],
-    "readingLimit": 2,
-    "optional": true
-  },
-  {
-    "week": 23,
-    "title": "Define a Question & Reproduce a Baseline",
-    "readingIds": ["how-to-read","reproducibility"],
-    "phase": "research",
-    "moduleIds": ["15"],
-    "focus": "Form a falsifiable hypothesis in your chosen direction and define relevant baselines, data licenses, compute budgets, and evaluation protocols.",
-    "deliverable": "Submit a one-page research plan, baseline reproduction results, an experiment matrix, and a resource budget. Document differences between the original paper's results and your reproduction conditions.",
-    "readingModuleIds": ["15"],
-    "readingLimit": 2
-  },
-  {
-    "week": 24,
-    "title": "Deliver a Small Research Study",
-    "readingIds": ["reproducibility"],
-    "phase": "research",
-    "moduleIds": ["15"],
-    "focus": "Complete key ablations, validation across multiple random seeds, failure analysis, and technical writing; distinguish statistical significance from practical value.",
-    "deliverable": "Deliver reproducible code, configurations, and logs; a main results table; a set of ablations; failure cases; and a short report with Method / Results / Limitations sections.",
-    "readingModuleIds": ["15"],
+    "readingModuleIds": [
+      "12"
+    ],
     "readingLimit": 2
   }
 ]

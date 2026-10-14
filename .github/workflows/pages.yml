@@ -1,4 +1,4 @@
-name: Deploy course to GitHub Pages
+name: Deploy enming group to GitHub Pages
 
 on:
   push:

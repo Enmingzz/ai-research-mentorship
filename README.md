@@ -1,39 +1,73 @@
-# AI Research Mentorship
+# enming group
 
-An AI research course home for mentors and mentees: 15 learning modules, 216 knowledge checkpoints, links to papers and textbooks, and an adjustable 24-week suggested schedule. The course preserves the original syllabus topics, priorities, and assessment requirements. Adapt the schedule to the mentee's background, research direction, and compute budget.
+A research workspace for projects and tasks, with an AI learning course alongside it. The homepage starts with no projects or tasks; add real work by editing the repository on GitHub.
 
-Built with static HTML, CSS, and JavaScript, with no runtime dependencies. Ready for GitHub Pages.
+- [Research homepage](https://enmingzz.github.io/ai-research-mentorship/): shared projects, links, and tasks.
+- [Learning course](https://enmingzz.github.io/ai-research-mentorship/course.html): 12 modules, 174 knowledge checkpoints and topic guides, reading resources, and a suggested 20-week schedule.
+- [Example topic guide](https://enmingzz.github.io/ai-research-mentorship/learn/04-03/): a standalone explanation with an example, exercise, answer, and source links.
 
-## Use the Course
+Built with static HTML, CSS, and JavaScript, with no runtime dependencies. The existing repository name and site URL remain in place; topic-guide URLs for the retained modules are unchanged.
 
-- Expand modules in the curriculum to check off topics, open readings, and keep learning notes.
-- Every topic has direct links to relevant original papers, textbooks, or official guides. Select **Read guide** or the topic title to open its own article.
-- Browse **Curriculum → Browse topic guides** for the searchable collection of 216 explainers. Each article includes intuition, a concrete example or formula, a practice question with a worked answer, key takeaways, and a focused reading list.
-- Article URLs such as [`learn/04-03/`](https://enmingzz.github.io/ai-research-mentorship/learn/04-03/) can be shared directly. The complete article is static HTML and remains readable without JavaScript. The article's understanding checkbox shares the same local progress as the curriculum.
-- Use the schedule to review each week's focus, assigned readings, and concrete deliverables. Weeks 21–22 are direction electives that can also be used for revision or project reproduction.
-- Practice research methods throughout the course. Advanced P2 topics in Flow Matching and reinforcement learning are optional extensions for relevant research directions.
-- Progress and notes are saved in the current browser's `localStorage`. They do not automatically sync to GitHub, other devices, or your mentor. Use JSON export and import to back up or transfer your records.
+## Add Projects and Tasks on GitHub
 
-This site combines a shared curriculum with personal learning records. It has no account system or mentor administration dashboard. Clearing the browser's site data removes local records, so export a backup first.
+The shared research homepage reads [`data/projects.json`](https://github.com/Enmingzz/ai-research-mentorship/blob/main/data/projects.json). Its initial content is intentionally empty:
 
-## Local Preview
-
-Use Node.js 22. No `npm install` is needed.
-
-If Windows PowerShell blocks `npm.ps1`, replace `npm` with `npm.cmd` in the commands below.
-
-```sh
-npm run dev
+```json
+{
+  "projects": [],
+  "tasks": []
+}
 ```
 
-Open the local address printed in the terminal. Use the local server because the data files need to load over HTTP.
+To publish an update:
 
-```sh
-npm run check
-npm run build
-```
+1. Open `data/projects.json` in the GitHub repository and select the pencil icon to edit it.
+2. Add or update entries inside `projects` and `tasks`. Use the field reference below. The separate [`examples/projects.example.json`](examples/projects.example.json) shows valid example records; replace its illustrative titles, dates, assignee, and placeholder links with your own information before using them.
+3. Keep IDs stable when changing a title or status. Use a new unique ID for each new project or task, and keep task `projectId` values linked to existing projects.
+4. Select **Commit changes** and commit to `main`, or use a branch and merge its pull request into `main` after review.
+5. Open **Actions → Deploy enming group to GitHub Pages** and wait for the checks and deployment to succeed. The homepage updates after publication. If checks fail, open the failed job, correct the reported JSON or data issue, and commit the fix.
 
-`check` validates the application and course data. `build` copies static files to `dist/` and generates `.nojekyll`.
+Use double quotes for JSON strings, commas between entries, and no trailing comma or comments. Editing this file updates the shared website. It does not require the local development tools.
+
+The example file is documentation only. It is not loaded as production project or task data. The project and task lists on the homepage are maintained through GitHub rather than through a separate account or administration system.
+
+### Project Fields
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `id` | Yes | Unique, stable identifier, such as `visual-token-study` |
+| `title` | Yes | Project name |
+| `summary` | Yes | Short description of the question or objective |
+| `status` | Yes | `planned`, `active`, or `completed` |
+| `tags` | Yes | Array of topic labels; use `[]` if none |
+| `links` | Yes | Array of `{ "label": "...", "url": "https://..." }`; use `[]` if none |
+| `updated` | No | Last update date in `YYYY-MM-DD` format |
+
+### Task Fields
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `id` | Yes | Unique, stable task identifier |
+| `title` | Yes | Short action-oriented title |
+| `description` | Yes | Scope, context, or expected deliverable |
+| `projectId` | No | Existing project ID, or `null` for a standalone task |
+| `status` | Yes | `open`, `in-progress`, or `done` |
+| `priority` | Yes | `normal` or `high` |
+| `assignee` | No | Display name of the person responsible |
+| `dueDate` | No | Due date in `YYYY-MM-DD` format |
+| `links` | Yes | Array of labeled HTTPS links; use `[]` if none |
+
+When removing a project, first move its tasks to another project or set their `projectId` to `null`. Change status to `completed` or `done` when you want to retain finished work. Dates are entered explicitly; they are not inferred from commits.
+
+## Use the Learning Course
+
+- Open `course.html` to browse the curriculum, schedule, and reading room.
+- Every topic links to an original English guide and relevant papers, textbooks, or official documentation. Select the topic title or **Read guide** to open the article.
+- Articles at `learn/<topicId>/` are static pages that can be shared directly and read without JavaScript. Their understanding checkboxes share progress with the course checklist.
+- The 20-week plan is a recommendation with relative week numbers. Adjust it to the learner's background, research direction, and compute budget. Advanced Flow Matching and RL topics remain optional extensions within the relevant modules.
+- Learning progress, notes, and the chosen start date are saved in the current browser. They do not automatically sync to GitHub, other devices, or another group member. Use JSON export and import to back up or transfer these records before clearing browser site data.
+
+Shared research information is published from GitHub. Personal learning records remain local to the browser. Existing course progress and backup identifiers are retained for compatibility. Personal records for removed modules remain in local storage and exported backups, but are excluded from active course totals.
 
 ## Course Structure
 
@@ -51,89 +85,47 @@ npm run build
 | 10 | Vision-Language Models (VLM) | P1 |
 | 11 | Efficient Deep Learning | P1 |
 | 12 | Post-Training, Distillation & Reinforcement Learning | P1: SFT / Distillation; P2: advanced RL |
-| 13 | Video Understanding & Memory | P2, direction elective |
-| 14 | Vision-Language-Action / World Models | P2, direction elective |
-| 15 | Research Skills & Scientific Method | P0–P1, required throughout |
 
-## Edit the Curriculum and Readings
+## Edit Learning Content
 
-Content lives in `data/`. Edit the JSON files directly on GitHub and commit your changes:
-
-| File | Content |
+| Source file | Content |
 | --- | --- |
-| `data/curriculum.json` | Modules, topics, groups, priorities, core formulas, and assessments |
-| `data/papers.json` | Papers, guides, and textbooks, linked to modules through `moduleIds` |
-| `data/schedule.json` | Suggested weeks, learning focus, deliverables, and assigned readings |
-| `data/lessons/01.json`–`15.json` | One original English explainer and topic-specific reference list per knowledge point |
+| `data/curriculum.json` | Modules, knowledge checkpoints, priorities, formulas, and assessments |
+| `data/papers.json` | Shared reading resources, linked to modules through `moduleIds` |
+| `data/schedule.json` | Weekly focus, deliverables, and assigned readings |
+| `data/lessons/01.json`–`12.json` | One explanation and topic-specific reading list per knowledge checkpoint |
 
-Module IDs use `"01"`–`"15"`. Topic `id` values identify saved checkbox records. Keep existing IDs when editing text, and assign a unique ID to each new topic.
+Module IDs use `"01"`–`"12"`. Keep topic IDs stable when editing text because they identify saved learning records. Use only existing topic IDs in article prerequisites.
 
-## Edit a Topic Article
+Each article has a `topicId`, `title`, `summary`, `prerequisites`, at least three `sections`, an `exercise` with a `prompt` and `answer`, `takeaways`, and `references`. Sections use a unique `id`, a `title`, and a `paragraphs` array. Optional `formula`, `code`, `language`, and `bullets` fields add worked material. Write plain text and Unicode mathematics; HTML is escaped when rendered.
 
-Articles are grouped by module in `data/lessons/`. Keep `topicId` equal to the matching checklist item ID. Each record contains:
+Article references contain `title`, `url`, `kind` (`paper`, `book`, or `guide`), and `note` describing what to read. They appear beside the curriculum topic and at the end of its guide. Shared reading resources in `papers.json` additionally include `id`, `authors`, `year`, `moduleIds`, and `level` (`essential` or `further`).
 
-- `title` and `summary`: the article heading and introductory sentence.
-- `prerequisites`: zero or more existing topic IDs, linked as suggested preparation.
-- `sections`: at least three sections with a unique `id`, a `title`, and a `paragraphs` array. Optional `formula`, `code`, `language`, and `bullets` fields add worked material. Use plain text and Unicode mathematics; HTML is escaped when rendered.
-- `exercise`: a `prompt` and an `answer` revealed with **Show a worked answer**.
-- `takeaways`: a short list of the central ideas.
-- `references`: topic-specific sources with `title`, `url`, `kind` (`paper`, `book`, or `guide`), and `note` describing what to read. These references appear both beside the checklist item and at the end of the article.
+For a schedule entry, `week` is the relative week number, `moduleIds` links the relevant modules, and `focus` and `deliverable` explain the assignment. Prefer `readingIds` to specify exact resource IDs from `papers.json` in the desired order. If that list is absent, `readingModuleIds` selects readings by module and `readingLimit` limits this fallback selection. The complete explicit `readingIds` list is displayed as supplied.
 
-The build generates `dist/learn/<topicId>/index.html`, `dist/data/topic-index.json`, and `dist/sitemap.xml`. Edit the source JSON rather than generated files. The local server renders articles from the current JSON on request. Publication checks require complete coverage of all topics, valid prerequisite IDs, usable source links, and substantive article content. Source URLs are checked for valid structure; external availability can change over time.
+The build creates `dist/learn/<topicId>/index.html`, `dist/data/topic-index.json`, and `dist/sitemap.xml`. Edit source JSON rather than generated files. Checks validate topic coverage, references, prerequisites, and substantive article content. External source availability can change even when a URL is structurally valid.
 
-## Edit Reading Resources and Weekly Assignments
+## Local Preview and Validation
 
-Example reading resource:
+Use Node.js 22. No `npm install` is needed. If Windows PowerShell blocks `npm.ps1`, replace `npm` with `npm.cmd`.
 
-```json
-{
-  "id": "attention",
-  "title": "Attention Is All You Need",
-  "authors": "Ashish Vaswani et al.",
-  "year": 2017,
-  "moduleIds": ["04"],
-  "kind": "paper",
-  "url": "https://arxiv.org/abs/1706.03762",
-  "level": "essential",
-  "note": "Work through Q/K/V, scaled dot-product attention, and the Transformer block."
-}
+```sh
+npm run dev
 ```
 
-`kind` is `paper`, `guide`, or `book`; `level` is `essential` or `further`. The year records the resource's initial release; online guides may receive ongoing updates. Recommended readings provide an entry point to each topic. Mentees are not expected to finish every resource in a module within one week.
+Open the address printed in the terminal for the research homepage. Add `/course.html` for the course. Use the local server because data files load over HTTP.
 
-Example schedule entry:
-
-```json
-{
-  "week": 1,
-  "title": "Math Foundations & Research Habits",
-  "phase": "foundations",
-  "moduleIds": ["01", "15"],
-  "focus": "Review matrices and the chain rule; establish paper-reading and experiment-logging habits.",
-  "deliverable": "Submit a gradient derivation and a structured reading note.",
-  "readingIds": ["deep-learning-book", "how-to-read"],
-  "readingModuleIds": ["01", "15"],
-  "readingLimit": 2
-}
+```sh
+npm run check
+npm run build
 ```
 
-`phase` is `foundations`, `core`, `frontiers`, or `research`. Prefer `readingIds` to specify the exact resources and their order for a week; every ID must exist in `papers.json`, and the complete explicit list is shown. If no explicit resources are specified, `readingModuleIds` provides a fallback by linking readings from those modules, with `readingLimit` controlling only this fallback selection. Add `"optional": true` for an elective week. The schedule uses relative week numbers with no preset start date. Run `npm run check` after editing.
+`check` validates content and application behavior. `build` prepares the research homepage, course, and standalone guides in `dist/`, including `.nojekyll` for GitHub Pages.
 
 ## GitHub Pages
 
 Repository: [`Enmingzz/ai-research-mentorship`](https://github.com/Enmingzz/ai-research-mentorship)
 
-1. In the repository, set **Settings → Pages → Build and deployment → Source** to **GitHub Actions**.
-2. Push changes to `main`, or manually run the **Deploy course to GitHub Pages** workflow.
-3. The workflow validates and builds the site, then publishes `dist/`. The deployment URL appears in the Actions deployment result.
+In **Settings → Pages → Build and deployment → Source**, select **GitHub Actions**. Changes pushed to `main` trigger the **Deploy enming group to GitHub Pages** workflow. It validates, builds, and publishes the site; its deployment result links to the live URL.
 
-Site URL: <https://enmingzz.github.io/ai-research-mentorship/>. Commit future course or style changes to `main` to trigger an update.
-
-## Files
-
-- `index.html` / `style.css` / `app.js`: interface, interactions, and local learning records.
-- `lesson.css` / `lesson.js`: article layout, source navigation, and shared topic progress.
-- `tools/lessons.mjs`: shared static article renderer and topic-index generator.
-- `tools/`: local server, data validation, and static build scripts.
-- `.github/workflows/pages.yml`: GitHub Pages deployment workflow.
-- `dist/`: generated output, excluded from version control.
+The repository path remains unchanged for continuity. `dist/` is generated output and is not committed. `examples/projects.example.json` is an illustrative editing aid; `data/projects.json` is the source of published research records.

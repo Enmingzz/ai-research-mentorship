@@ -1,0 +1,45 @@
+{
+  "projects": [
+    {
+      "id": "example-visual-token-study",
+      "title": "Example project: visual token compression",
+      "summary": "Illustrative record only. Replace this with your own research question, scope, and project details before adding it to data/projects.json.",
+      "status": "planned",
+      "tags": ["Example", "Multimodal", "Efficiency"],
+      "links": [
+        {
+          "label": "Example project notes — replace this URL",
+          "url": "https://example.com/project-notes"
+        }
+      ],
+      "updated": "2026-10-14"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "example-compare-baselines",
+      "title": "Example task: compare baseline settings",
+      "description": "Illustrative assignment only. Record input resolution, token budget, accuracy, latency, and memory under a shared evaluation protocol.",
+      "projectId": "example-visual-token-study",
+      "status": "open",
+      "priority": "high",
+      "assignee": "Example researcher",
+      "dueDate": "2026-10-21",
+      "links": [
+        {
+          "label": "Example comparison notes — replace this URL",
+          "url": "https://example.com/comparison-notes"
+        }
+      ]
+    },
+    {
+      "id": "example-prepare-meeting",
+      "title": "Example standalone task: prepare meeting notes",
+      "description": "Illustrative standalone task. Replace with a real deliverable; optional assignee and dueDate fields may be omitted.",
+      "projectId": null,
+      "status": "in-progress",
+      "priority": "normal",
+      "links": []
+    }
+  ]
+}

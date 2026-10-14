@@ -735,7 +735,7 @@
     "summary": "A useful model choice depends on nondominated trade-offs under a shared measurement protocol.",
     "prerequisites": [
       "11-01",
-      "15-06"
+      "05-14"
     ],
     "sections": [
       {

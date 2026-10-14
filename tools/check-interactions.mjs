@@ -56,6 +56,11 @@ const app=await vm.runInNewContext(`(async()=>{${appSource}\nreturn {route,field
   requestAnimationFrame:fn=>fn(),setTimeout:()=>1,clearTimeout:()=>{}
 });
 assert(uiElement('#main').innerHTML.includes('TOPIC EXPLAINERS'),'Homepage links to the article collection');
+assert(uiElement('#main').innerHTML.includes('<strong>12</strong>')&&uiElement('#main').innerHTML.includes('<strong>174</strong>'),'Course overview reflects the retained syllabus');
+location.hash='#schedule';app.route();
+assert.equal((uiElement('#main').innerHTML.match(/class="week-card/g)||[]).length,20,'Schedule contains twenty weeks');
+location.hash='#module/13';app.route();
+assert(uiElement('#main').innerHTML.includes('This page is not on the map.'),'Removed modules cannot be opened');
 const readyModule=course.modules.find(m=>m.topics.every(t=>topicIndex[t.id]));
 assert(readyModule,'At least one module is complete for interaction checks');
 location.hash=`#module/${readyModule.id}`;app.route();
@@ -66,6 +71,12 @@ uiStorage.set(key,JSON.stringify({...original,topics:{[readyModule.topics[0].id]
 windowEvents.get('pageshow')({persisted:true});
 assert(uiElement('#main').innerHTML.includes(`id="topic-label-${readyModule.topics[0].id}"`));
 assert(uiElement('#main').innerHTML.includes('1 / '+readyModule.topics.length+' understood'),'Returning to a cached course page reflects article progress');
+uiStorage.set(key,JSON.stringify({...original,topics:{'01-01':true,'13-01':true},papers:{attention:true,moviechat:true},weeks:{1:true,21:true},notes:{'04':'Retained note','13':'Archived personal note'}}));
+windowEvents.get('pageshow')({persisted:true});
+uiEvents.get('input')({target:{dataset:{notes:'01'},value:'A new learning note'}});
+const preserved=JSON.parse(uiStorage.get(key));
+assert.equal(preserved.topics['13-01'],true);assert.equal(preserved.notes['13'],'Archived personal note');assert.equal(preserved.weeks['21'],true);assert.equal(preserved.papers.moviechat,true);
+assert(uiElement('#side-count').textContent.startsWith('1 / 174'),'Dormant progress is preserved without contributing to course totals');
 location.hash='#fieldnotes';app.route();
 assert.equal((uiElement('#guide-results').innerHTML.match(/class="guide-card"/g)||[]).length,Math.min(24,course.lessons.length),'Guide collection is paginated');
 uiEvents.get('input')({target:{id:'guide-search',value:'zzzz-unmatched-lesson-query',dataset:{}}});

@@ -1,9 +1,9 @@
 {
-  "name": "ai-research-mentorship",
+  "name": "enming-group",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Research Fieldnotes — AI research mentorship curriculum",
+  "description": "enming group — research projects, tasks, and an AI learning course",
   "scripts": {
     "dev": "node tools/serve.mjs",
     "build": "node tools/build.mjs",
