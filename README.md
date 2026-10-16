@@ -1,6 +1,6 @@
 # enming group
 
-A research workspace for projects and tasks, with an AI reference library alongside it. The homepage starts with no projects or tasks; add real work by editing the repository on GitHub.
+A mentee-facing workspace for research projects and tasks, with an AI reference library alongside it. Maintain assignments locally in `data/projects.json` and push updates to publish them. The public website contains no repository-management or source-code backlinks.
 
 - [Research homepage](https://enmingzz.github.io/vlm-project/): shared projects, links, and tasks.
 - [Reference library](https://enmingzz.github.io/vlm-project/library.html): 12 subjects, 174 articles, and 29 reading resources, with search and subject filters.
@@ -8,9 +8,9 @@ A research workspace for projects and tasks, with an AI reference library alongs
 
 Built with static HTML, CSS, and JavaScript, with no runtime dependencies. The repository is `Enmingzz/vlm-project`. Article paths remain `learn/<topicId>/` under the new site URL. On this site, `course.html` redirects to `library.html` and older topic hashes still resolve. Use the new site URL for sharing; the previous GitHub Pages base path is no longer the published address.
 
-## Add Projects and Tasks on GitHub
+## Update Projects and Tasks Locally
 
-The shared research homepage reads [`data/projects.json`](https://github.com/Enmingzz/vlm-project/blob/main/data/projects.json). Its initial content is intentionally empty:
+The shared research homepage reads [`data/projects.json`](data/projects.json). Its initial content is intentionally empty:
 
 ```json
 {
@@ -21,15 +21,15 @@ The shared research homepage reads [`data/projects.json`](https://github.com/Enm
 
 To publish an update:
 
-1. Open `data/projects.json` in the GitHub repository and select the pencil icon to edit it.
+1. Open `data/projects.json` in your local editor.
 2. Add or update entries inside `projects` and `tasks`. Use the field reference below. The separate [`examples/projects.example.json`](examples/projects.example.json) shows valid example records; replace its illustrative titles, dates, assignee, and placeholder links with your own information before using them.
 3. Keep IDs stable when changing a title or status. Use a new unique ID for each new project or task, and keep task `projectId` values linked to existing projects.
-4. Select **Commit changes** and commit to `main`, or use a branch and merge its pull request into `main` after review.
+4. Run `npm run check` and `npm run build` locally, then commit your changes and push to `main` (or merge a reviewed branch into `main`). On Windows PowerShell, use `npm.cmd` if needed.
 5. Open **Actions → Deploy enming group to GitHub Pages** and wait for the checks and deployment to succeed. The homepage updates after publication. If checks fail, open the failed job, correct the reported JSON or data issue, and commit the fix.
 
-Use double quotes for JSON strings, commas between entries, and no trailing comma or comments. Editing this file updates the shared website. It does not require the local development tools.
+Use double quotes for JSON strings, commas between entries, and no trailing comma or comments. Local edits appear on the shared website after they are pushed and the deployment succeeds.
 
-The example file is documentation only. It is not loaded as production project or task data. The project and task lists on the homepage are maintained through GitHub rather than through a separate account or administration system.
+The example file is documentation only. It is not loaded as production project or task data. Mentees browse the published projects, instructions, resources, and library; maintenance stays in the local repository.
 
 ### Project Fields
 

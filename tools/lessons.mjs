@@ -53,7 +53,7 @@ export function lessonDocument(lesson,library) {
 <div class="space-label">ENMING GROUP / REFERENCE LIBRARY</div>
 <nav><a href="../../"><span aria-hidden="true">◈</span>Research projects</a><a href="../../library.html#overview"><span aria-hidden="true">◈</span>Library overview</a><a href="../../library.html#subjects"><span aria-hidden="true">▤</span>Subjects</a><a class="active" href="../../library.html#articles"><span aria-hidden="true">▦</span>Articles</a><a href="../../library.html#papers"><span aria-hidden="true">↗</span>Papers & resources</a></nav>
 <div class="side-path"><div class="eyebrow">BROWSE THE LIBRARY</div><a href="../../library.html#articles">All ${lessons.length} articles <span>↗</span></a><a href="../../library.html#subject/${subject.id}">Subject ${subject.id} <span>↗</span></a></div>
-<div class="sidebar-bottom"><div class="eyebrow">IDEAS, METHODS & SOURCES</div><p>Technical explanations and original references.</p><a class="github-link" href="https://github.com/Enmingzz/vlm-project" target="_blank" rel="noopener noreferrer">Library on GitHub <span>↗</span></a></div>
+<div class="sidebar-bottom"><div class="eyebrow">IDEAS, METHODS & SOURCES</div><p>Technical explanations and original references.</p></div>
 </aside>
 <div class="workspace">
 <header class="topbar"><div class="breadcrumb"><a href="../../library.html#subjects">Subjects</a><span>/</span><a href="../../library.html#subject/${subject.id}">Subject ${subject.id}</a><span>/</span><b>Article ${lesson.topicId}</b></div><div class="top-actions"><button class="button secondary" id="copy-article">Copy link ↗</button></div></header>

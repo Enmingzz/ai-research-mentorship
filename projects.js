@@ -1,5 +1,4 @@
 const BUILD_VERSION = 'development';
-const MANAGE_URL = 'https://github.com/Enmingzz/vlm-project/edit/main/data/projects.json';
 const PROJECT_STATUSES = { planned: 'Planned', active: 'Active', completed: 'Completed' };
 const TASK_STATUSES = { open: 'Open', 'in-progress': 'In progress', done: 'Done' };
 const state = { data: null, loading: false, projectQuery: '', projectStatus: 'all', taskQuery: '', taskStatus: 'all', taskProject: 'all' };
@@ -122,14 +121,13 @@ function emptyState(kind, filtered = false) {
   const panel = node('div', 'board-empty');
   panel.dataset.emptyState = filtered ? 'filtered' : kind;
   panel.append(emptySymbol(kind));
-  panel.append(node('h3', '', filtered ? 'No matches this time.' : kind === 'projects' ? 'The next question starts here.' : 'A clear board. Room for what’s next.'));
-  panel.append(node('p', '', filtered ? 'Try a different search or clear the filters to see everything.' : kind === 'projects' ? 'No projects have been added yet. This space is ready for our research questions, experiments, and results.' : 'No tasks have been added yet. Project actions and independent to-dos will find a home here.'));
+  panel.append(node('h3', '', filtered ? 'No matches this time.' : kind === 'projects' ? 'No projects posted yet.' : 'No tasks posted yet.'));
+  panel.append(node('p', '', filtered ? 'Try a different search or clear the filters to see everything.' : kind === 'projects' ? 'Research projects and their resources will appear here when published.' : 'Tasks, instructions, and relevant resources will appear here when published.'));
   if (filtered) {
     const clear = button('Clear search and filters', 'board-clear', () => resetBoard(kind));
     clear.dataset.clearBoard = kind;
     panel.append(clear);
   } else {
-    panel.append(externalLink('Manage on GitHub', MANAGE_URL, 'group-text-link'));
     const corner = node('span', 'empty-corner', kind === 'projects' ? '↗' : '✳');
     corner.setAttribute('aria-hidden', 'true');
     panel.append(corner);
@@ -338,7 +336,7 @@ function renderLoadError() {
     const panel = node('div', 'board-empty');
     panel.dataset.emptyState = 'error';
     if (kind === 'project') panel.setAttribute('role', 'alert');
-    panel.append(node('h3', '', 'The board couldn’t be loaded.'), node('p', '', 'Please try again in a moment. The learning course is still available.'));
+    panel.append(node('h3', '', 'The board couldn’t be loaded.'), node('p', '', 'Please try again in a moment. You can also explore the library.'));
     const retry = button('Try again', 'group-button', loadBoard);
     retry.dataset.retryBoard = '';
     panel.append(retry);
