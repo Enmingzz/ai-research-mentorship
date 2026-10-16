@@ -3,7 +3,7 @@
     "id": "01",
     "title": "Mathematics & Machine Learning Foundations",
     "shortTitle": "Math & ML Foundations",
-    "subtitle": "P0 · Mathematics, probability & optimization",
+    "subtitle": "Mathematics, probability & optimization",
     "priorities": [
       "P0"
     ],
@@ -61,7 +61,7 @@
     "id": "02",
     "title": "PyTorch & Engineering Basics",
     "shortTitle": "PyTorch & Engineering",
-    "subtitle": "P0 · The foundation of every experiment",
+    "subtitle": "Tensors, training loops & experiment engineering",
     "priorities": [
       "P0"
     ],
@@ -131,7 +131,7 @@
     "id": "03",
     "title": "Fundamental Neural Networks",
     "shortTitle": "Neural Networks",
-    "subtitle": "P0 · Neural network fundamentals",
+    "subtitle": "Neural network architectures & training",
     "priorities": [
       "P0"
     ],
@@ -193,7 +193,7 @@
     "id": "04",
     "title": "Attention & Transformer",
     "shortTitle": "Attention & Transformer",
-    "subtitle": "P0 · The most important required module",
+    "subtitle": "Attention mechanisms & Transformer architecture",
     "priorities": [
       "P0"
     ],
@@ -281,7 +281,7 @@
     "id": "05",
     "title": "Large Language Models",
     "shortTitle": "Large Language Models",
-    "subtitle": "P1 · LLM architecture & training",
+    "subtitle": "Language model architecture & training",
     "priorities": [
       "P1"
     ],
@@ -351,7 +351,7 @@
     "id": "06",
     "title": "Fine-Tuning & LoRA",
     "shortTitle": "Fine-Tuning & LoRA",
-    "subtitle": "P1 · Required",
+    "subtitle": "Fine-tuning & parameter-efficient adaptation",
     "priorities": [
       "P1"
     ],
@@ -414,7 +414,7 @@
     "id": "07",
     "title": "Mixture of Experts (MoE)",
     "shortTitle": "Mixture of Experts",
-    "subtitle": "P1 · Essential architecture knowledge",
+    "subtitle": "Expert routing & sparse architectures",
     "priorities": [
       "P1"
     ],
@@ -472,7 +472,7 @@
     "id": "08",
     "title": "Computer Vision & Visual Representation",
     "shortTitle": "Computer Vision",
-    "subtitle": "P1 · Required for VLMs",
+    "subtitle": "Visual representations & image encoders",
     "priorities": [
       "P1"
     ],
@@ -542,7 +542,7 @@
     "id": "09",
     "title": "Generative Models",
     "shortTitle": "Generative Models",
-    "subtitle": "P1: VAE / Diffusion · P2: Advanced Flow Matching",
+    "subtitle": "VAEs, diffusion & flow matching",
     "priorities": [
       "P1",
       "P2"
@@ -657,7 +657,7 @@
     "id": "10",
     "title": "Vision-Language Models (VLM)",
     "shortTitle": "Vision-Language Models",
-    "subtitle": "P1 · Core multimodal research",
+    "subtitle": "Vision-language architectures & multimodal research",
     "priorities": [
       "P1"
     ],
@@ -727,7 +727,7 @@
     "id": "11",
     "title": "Efficient Deep Learning",
     "shortTitle": "Efficient Deep Learning",
-    "subtitle": "P1 · Core efficient-model research",
+    "subtitle": "Efficient training, inference & model compression",
     "priorities": [
       "P1"
     ],
@@ -805,7 +805,7 @@
     "id": "12",
     "title": "Post-Training, Distillation & Reinforcement Learning",
     "shortTitle": "Post-Training & RL",
-    "subtitle": "P1: SFT / Distillation · P2: Advanced RL",
+    "subtitle": "Supervised fine-tuning, distillation & reinforcement learning",
     "priorities": [
       "P1",
       "P2"

@@ -27,18 +27,18 @@
 .article-toc{display:grid;gap:0;margin:20px 0 32px;border-left:1px solid #dce3d1}
 .article-toc a{font:400 18px/1.55 var(--font);color:#637258;padding:10px 0 10px 17px;margin-left:-1px;border-left:2px solid transparent;border-radius:0;display:block;overflow-wrap:break-word}
 .article-toc a:hover,.article-toc a.current{border-left-color:#819667;color:#526c3f;background:transparent}
-.article-rail-note{border-top:1px solid var(--line);padding-top:24px}
-.article-rail-note p{font-size:17px;line-height:1.75;margin:16px 0;color:#637258}
-.article-rail-note>a{font-size:18px;line-height:1.5;color:#637258}
-.prerequisite-box{padding:24px 26px;border:1px solid #e1e4d9;background:#f0f1e9;border-radius:8px;margin-bottom:38px}
-.prerequisite-box .eyebrow{font-size:16px;letter-spacing:.8px;color:#637258}
-.prerequisite-box p{font-size:18px;line-height:1.7;margin:12px 0}
-.prerequisite-box>div{display:flex;gap:10px 20px;flex-wrap:wrap}
-.prerequisite-box a{font-size:18px;line-height:1.6;color:#657b50;border-bottom:1px solid #bac9a9;overflow-wrap:break-word}
-.article-practice{padding:30px 32px;border:1px solid #e0d8e9;background:#eeebf3;border-radius:10px}
-.article-practice>.eyebrow{color:#6d5c7d;font-size:16px;letter-spacing:.8px;margin-bottom:16px}
-.article-practice h2{color:#62536f;font-size:32px}
-.article-practice p{color:#6d5c7d;font-size:21px;line-height:1.78}
+.article-related-nav{border-top:1px solid var(--line);padding-top:24px}
+.article-related-nav>a{display:block;margin-top:14px;font-size:18px;line-height:1.5;color:#637258;overflow-wrap:break-word}
+.article-related-nav>a:hover{text-decoration:underline;text-underline-offset:4px}
+.related-concepts{padding:24px 26px;border:1px solid #e1e4d9;background:#f0f1e9;border-radius:8px;margin-bottom:38px}
+.related-concepts .eyebrow{font-size:16px;letter-spacing:.8px;color:#637258}
+.related-concepts p{font-size:18px;line-height:1.7;margin:12px 0}
+.related-concepts>div{display:flex;gap:10px 20px;flex-wrap:wrap}
+.related-concepts a{font-size:18px;line-height:1.6;color:#657b50;border-bottom:1px solid #bac9a9;overflow-wrap:break-word}
+.article-example{padding:30px 32px;border:1px solid #e0d8e9;background:#eeebf3;border-radius:10px}
+.article-example>.eyebrow{color:#6d5c7d;font-size:16px;letter-spacing:.8px;margin-bottom:16px}
+.article-example h2{color:#62536f;font-size:32px}
+.article-example p{color:#6d5c7d;font-size:21px;line-height:1.78}
 .worked-answer{border-top:1px solid #d7cee1;padding-top:18px}
 .worked-answer summary{display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer;font-size:19px;line-height:1.5;color:#6d5c7d;list-style:none}
 .worked-answer summary::-webkit-details-marker{display:none}
@@ -57,13 +57,7 @@
 .article-references h3 a{color:#5b7247;overflow-wrap:anywhere}
 .article-references h3 a:hover{text-decoration:underline;text-underline-offset:4px}
 .article-references li p{font-size:18px;margin:0;color:#637258;line-height:1.75}
-.lesson-page .article-meta .priority,.article-references .priority{font-size:16px;color:#596e49;letter-spacing:.5px}
-.article-completion{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;padding:26px;background:#e8efdd;border:1px solid #d6e1c9;border-radius:8px}
-.article-completion strong{font:600 22px/1.4 var(--display);color:#4c6539}
-.article-completion p{font-size:17px;line-height:1.7;margin:7px 0 0;color:#596e49}
-.article-completion label{display:flex;align-items:center;gap:11px;font-size:18px;line-height:1.5;color:#617b4b;cursor:pointer}
-.article-completion input{accent-color:#7c975c;width:21px;height:21px;flex:none}
-.completion-status{width:100%;font-size:16px;line-height:1.6;color:#596e49}
+.reference-kind{display:inline-block;padding:3px 7px;border-radius:4px;background:#f0f2e9;font:500 16px var(--display);color:#596e49;letter-spacing:.5px}
 .article-pagination{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin:34px 0 12px}
 .article-adjacent{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:24px!important;background:#fffef9;border:1px solid var(--line);border-radius:8px;color:#718561;min-width:0}
 .article-adjacent .eyebrow{font-size:16px;letter-spacing:.8px;color:#637258}
@@ -83,6 +77,7 @@
   .mobile-toc summary{font-size:19px;line-height:1.5;color:#637258;cursor:pointer}
   .mobile-toc nav{margin-top:16px;gap:0}
   .mobile-toc nav a{display:block;font-size:18px;line-height:1.55;font-weight:400;padding:9px 0;color:#6f835b;overflow-wrap:break-word}
+  .mobile-toc nav a.current{text-decoration:underline;text-underline-offset:4px;color:#526c3f}
 }
 @media(max-width:700px){
   .lesson-page main{padding-top:28px}
@@ -104,25 +99,23 @@
   .article-formula{padding:19px;font-size:20px}
   .article-code pre{padding:18px;font-size:15px}
   .article-code>div{padding:11px 18px}
-  .article-practice{padding:25px 21px}
-  .article-practice h2{font-size:30px}
+  .article-example{padding:25px 21px}
+  .article-example h2{font-size:30px}
   .worked-answer>div{font-size:20px}
-  .prerequisite-box{padding:21px}
-  .prerequisite-box p{font-size:18px}
+  .related-concepts{padding:21px}
+  .related-concepts p{font-size:18px}
   .mobile-toc{padding:18px 21px}
   .article-pagination{grid-template-columns:1fr;gap:15px}
   .article-adjacent{padding:21px!important}
   .article-references h3{font-size:22px}
   .article-references .reference-intro,.article-references li p{font-size:18px}
-  .article-completion{padding:22px}
-  .article-completion p{font-size:17px}
   .lesson-page .breadcrumb{font-size:16px;flex:1 1 230px;min-width:0}
   .lesson-page .breadcrumb span{padding:0 5px}
   .lesson-page .topbar .button{font-size:16px;padding:8px 12px}
   .lesson-page .topbar{height:auto;min-height:76px;align-items:center;flex-wrap:wrap;gap:10px 16px;padding-top:12px;padding-bottom:12px}
 }
 @media print{
-  .sidebar,.topbar,.article-rail,.mobile-toc,.article-pagination,.article-completion,footer,#toast{display:none!important}
+  .sidebar,.topbar,.article-rail,.mobile-toc,.article-pagination,footer,#toast{display:none!important}
   .workspace{margin:0}
   .lesson-page main{padding:0;max-width:none}
   .article-layout{display:block}

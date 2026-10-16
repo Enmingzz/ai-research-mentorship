@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate course data and application
+      - name: Validate library data and application
         run: npm run check
       - name: Build static site
         run: npm run build

@@ -1,13 +1,13 @@
 const BUILD_VERSION = 'development';
-const MANAGE_URL = 'https://github.com/Enmingzz/ai-research-mentorship/edit/main/data/projects.json';
+const MANAGE_URL = 'https://github.com/Enmingzz/vlm-project/edit/main/data/projects.json';
 const PROJECT_STATUSES = { planned: 'Planned', active: 'Active', completed: 'Completed' };
 const TASK_STATUSES = { open: 'Open', 'in-progress': 'In progress', done: 'Done' };
 const state = { data: null, loading: false, projectQuery: '', projectStatus: 'all', taskQuery: '', taskStatus: 'all', taskProject: 'all' };
 const $ = (selector) => document.querySelector(selector);
 
-function redirectLegacyCourse() {
-  if (/^#(?:overview|curriculum|module|schedule|papers|fieldnotes)(?:\/|$)/.test(location.hash)) {
-    location.replace('./course.html' + location.search + location.hash);
+function redirectLibraryLinks() {
+  if (/^#(?:overview|subjects|articles|subject|curriculum|module|schedule|papers|fieldnotes)(?:\/|$)/.test(location.hash)) {
+    location.replace('./library.html' + location.search + location.hash);
     return true;
   }
   return false;
@@ -408,5 +408,5 @@ function initializeBoard() {
   loadBoard();
 }
 
-window.addEventListener('hashchange', () => { if (!redirectLegacyCourse()) syncNavigation(); });
-if (!redirectLegacyCourse()) initializeBoard();
+window.addEventListener('hashchange', () => { if (!redirectLibraryLinks()) syncNavigation(); });
+if (!redirectLibraryLinks()) initializeBoard();

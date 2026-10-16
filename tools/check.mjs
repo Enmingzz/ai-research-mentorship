@@ -1,29 +1,36 @@
 import { readFile, readdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import {loadLessons,makeTopicIndex,lessonDocument,wordCount,escapeHTML} from './lessons.mjs';
+import {loadLessons,makeTopicIndex,lessonDocument,wordCount,escapeHTML,SITE_URL} from './lessons.mjs';
 const load=async name=>JSON.parse(await readFile(`data/${name}.json`,'utf8'));
-const [modules,papers,schedule,projects]=await Promise.all(['curriculum','papers','schedule','projects'].map(load));
-assert.equal(modules.length,12,'The course contains modules 01–12');
+const [modules,papers,projects]=await Promise.all(['curriculum','papers','projects'].map(load));
+assert.equal(SITE_URL,'https://enmingzz.github.io/vlm-project','Canonical site follows the renamed repository');
+assert.equal(modules.length,12,'The reference library contains subjects 01–12');
 const ids=new Set(modules.map(m=>m.id));
 assert.deepEqual([...ids],Array.from({length:12},(_,i)=>String(i+1).padStart(2,'0')),'Removed modules are not published');
 assert.deepEqual((await readdir('data/lessons')).sort(),[...ids].map(id=>`${id}.json`),'Removed lesson source files are absent');
 const topics=modules.flatMap(m=>m.topics);
 assert.equal(topics.length,174,'174 knowledge points in the retained modules');
 assert.equal(new Set(topics.map(t=>t.id)).size,topics.length,'Unique topic IDs');
+assert.equal(papers.length,29,'All 29 curated readings remain available');
 assert.equal(new Set(papers.map(p=>p.id)).size,papers.length,'Unique reading IDs');
-for(const m of modules){assert(m.title&&m.topics.length&&m.priorities.length);assert(papers.filter(p=>p.moduleIds.includes(m.id)).length>=2,`Readings for ${m.id}`);}
+for(const m of modules){assert(m.title&&m.summary&&m.topics.length);assert(papers.filter(p=>p.moduleIds.includes(m.id)).length>=2,`Readings for ${m.id}`);for(const t of m.topics)assert(t.text?.trim()&&t.id.startsWith(`${m.id}-`),`${m.id}: complete topic metadata`);}
 for(const p of papers){assert(p.title&&p.note&&p.year&&p.authors);assert.equal(new URL(p.url).protocol,'https:');for(const id of p.moduleIds)assert(ids.has(id),`Unknown paper module ${id}`);}
-assert.equal(schedule.length,20,'20 suggested weeks for modules 01–12');
-schedule.forEach((w,i)=>{assert.equal(w.week,i+1);assert(w.title&&w.focus&&w.deliverable);for(const id of [...w.moduleIds,...w.readingModuleIds])assert(ids.has(id),`Unknown schedule module ${id}`);for(const id of w.readingIds||[])assert(papers.some(p=>p.id===id),`Unknown week ${w.week} reading: ${id}`);});
-for(const id of ids)assert(schedule.some(w=>w.moduleIds.includes(id)),`Schedule covers module ${id}`);
 const html=await readFile('index.html','utf8');
-const courseHTML=await readFile('course.html','utf8');
+const libraryHTML=await readFile('library.html','utf8');
+const legacyHTML=await readFile('course.html','utf8');
+const appSource=await readFile('app.js','utf8');
+const lessonSource=await readFile('lesson.js','utf8');
 assert(html.includes('lang="en"')&&html.includes('translate="no"')&&html.includes('name="viewport"'));
-assert(courseHTML.includes('lang="en"')&&courseHTML.includes('translate="no"'));
-assert(html.includes('course.html'),'The research homepage links to the learning course');
-assert(courseHTML.includes('href="./"'),'The course links back to the group homepage');
-for(const [name,content] of Object.entries({curriculum:JSON.stringify(modules),papers:JSON.stringify(papers),schedule:JSON.stringify(schedule),homepage:html,course:courseHTML,application:await readFile('app.js','utf8')}))assert(!/\p{Script=Han}/u.test(content),`${name}: English course content`);
+assert(libraryHTML.includes('lang="en"')&&libraryHTML.includes('translate="no"')&&libraryHTML.includes('name="viewport"'));
+assert(html.includes('library.html'),'The research homepage links to the reference library');
+assert(libraryHTML.includes('href="./"'),'The library links back to the group homepage');
+assert(legacyHTML.includes('library.html')&&!legacyHTML.includes('src="./app.js"'),'The old course page is a lightweight library redirect');
+for(const [name,content] of Object.entries({curriculum:JSON.stringify(modules),papers:JSON.stringify(papers),homepage:html,library:libraryHTML,legacy:legacyHTML,application:appSource,articleScript:lessonSource}))assert(!/\p{Script=Han}/u.test(content),`${name}: English content`);
+const personalControls=/type=["']checkbox["']|id=["'](?:backup-dialog|import-progress|export-progress|start-date|module-notes|topic-understood|completion-status|side-progress|side-count)["']|data-(?:topic|paper|week|notes)=/i;
+assert(!personalControls.test(libraryHTML),'The reference library has no personal tracking controls');
+assert(!/href=["']#(?:schedule|curriculum|fieldnotes|module)(?:[\/"'])/.test(libraryHTML),'Library navigation uses canonical reference routes');
+for(const [name,content] of Object.entries({application:appSource,articleScript:lessonSource}))assert(!/\b(?:localStorage|sessionStorage|indexedDB)\b/.test(content),`${name}: no browser storage access`);
 execFileSync(process.execPath,['--check','app.js']);
 execFileSync(process.execPath,['--check','lesson.js']);
 execFileSync(process.execPath,['--check','projects.js']);
@@ -60,10 +67,23 @@ for(const lesson of course.lessons){
   for(const section of lesson.sections){assert(page.includes(`id="section-${section.id}"`));assert(page.includes(`href="#section-${section.id}"`));}
   assert(page.includes(`data-topic-id="${label}"`)&&page.includes('<h1>')&&page.includes('id="references"'));
   assert(page.includes('href="../../style.css"')&&page.includes('src="../../lesson.js"'));
-  assert(page.includes(`href="../../course.html#module/${label.slice(0,2)}"`),'Articles return to their module in the learning course');
+  assert(page.includes(`href="../../library.html#subject/${label.slice(0,2)}"`),'Articles return to their subject in the reference library');
+  assert(page.includes(`rel="canonical" href="${SITE_URL}/learn/${label}/"`),`${label}: canonical article URL`);
+  assert(!personalControls.test(page),`${label}: reference articles have no personal tracking controls`);
+  assert(!page.includes('course.html')&&!page.includes('#schedule')&&!page.includes('ai-research-mentorship'),`${label}: current library navigation and repository`);
+  assert(!/\bP[012]\b/.test(page),`${label}: no curriculum priority badges`);
+  const structured=JSON.parse(page.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1]||'null');
+  assert(structured&&['Article','TechArticle'].includes(structured['@type']),`${label}: article structured data`);
+  assert.equal(structured.url,`${SITE_URL}/learn/${label}/`);
+  assert.equal(structured.isPartOf?.url,`${SITE_URL}/library.html`);
+  for(const section of lesson.sections){for(const paragraph of section.paragraphs)assert(page.includes(escapeHTML(paragraph)),`${label}: full explanatory prose`);if(section.code)assert(page.includes(escapeHTML(section.code)),`${label}: code example`);if(section.formula)assert(page.includes(escapeHTML(section.formula)),`${label}: formula`);for(const bullet of section.bullets||[])assert(page.includes(escapeHTML(bullet)),`${label}: explanatory list`);}
+  assert(page.includes(escapeHTML(lesson.exercise.prompt))&&page.includes(escapeHTML(lesson.exercise.answer)),`${label}: example and answer preserved`);
+  for(const takeaway of lesson.takeaways)assert(page.includes(escapeHTML(takeaway)),`${label}: takeaway preserved`);
+  for(const ref of lesson.references){assert(page.includes(`href="${escapeHTML(ref.url)}" target="_blank" rel="noopener noreferrer"`),`${label}: safe source link`);assert(page.includes(escapeHTML(ref.note)),`${label}: source reading focus`);}
+  for(const id of lesson.prerequisites)assert(page.includes(`href="../${id}/"`),`${label}: related concept navigation`);
   assert(!/href="\.\.\/undefined\//.test(page),`${label}: valid article navigation`);
 }
 assert.equal(escapeHTML('<script>"&'), '&lt;script&gt;&quot;&amp;','Article content is escaped');
 execFileSync(process.execPath,['tools/check-interactions.mjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['tools/check-projects.mjs'],{stdio:'inherit'});
-console.log(`PASS · ${modules.length} modules · ${topics.length} topics and articles · ${papers.length} core readings · ${schedule.length} weeks · references, navigation, content and JavaScript`);
+console.log(`PASS · ${modules.length} subjects · ${topics.length} complete articles · ${papers.length} curated readings · references, navigation, content and JavaScript`);

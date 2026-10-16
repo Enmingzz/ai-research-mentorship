@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f6f5f0">
-  <meta name="description" content="enming group — a shared space for research projects, tasks, and learning. Explore the work ahead and a 12-module AI research course.">
+  <meta name="description" content="enming group — research projects, shared tasks, and an AI reference library with topic explanations and original papers.">
   <title>enming group · Research, together</title>
+  <link rel="canonical" href="https://enmingzz.github.io/vlm-project/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232d3b2c'/%3E%3Cpath d='M19 33h26c0-9-4-15-12-15s-14 7-14 16 5 14 14 14c5 0 9-2 12-5' fill='none' stroke='%23dfecc4' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
   <script>
-    if (/^#(?:overview|curriculum|module|schedule|papers|fieldnotes)(?:\/|$)/.test(location.hash)) {
-      location.replace('./course.html' + location.search + location.hash);
+    if (/^#(?:overview|subjects|articles|subject|curriculum|module|schedule|papers|fieldnotes)(?:\/|$)/.test(location.hash)) {
+      location.replace('./library.html' + location.search + location.hash);
     }
   </script>
   <link rel="stylesheet" href="./style.css">
@@ -23,17 +24,17 @@
     <nav class="group-nav" aria-label="Main navigation">
       <a href="#projects" data-section-nav="projects">Projects</a>
       <a href="#tasks" data-section-nav="tasks">Tasks</a>
-      <a href="./course.html">Learning course <span aria-hidden="true">↗</span></a>
+      <a href="./library.html">Library <span aria-hidden="true">↗</span></a>
     </nav>
-    <a class="group-github" href="https://github.com/Enmingzz/ai-research-mentorship/edit/main/data/projects.json" target="_blank" rel="noopener noreferrer">Manage on GitHub <span aria-hidden="true">↗</span></a>
+    <a class="group-github" href="https://github.com/Enmingzz/vlm-project/edit/main/data/projects.json" target="_blank" rel="noopener noreferrer">Manage on GitHub <span aria-hidden="true">↗</span></a>
   </header>
   <main id="main" class="group-main" tabindex="-1">
     <section class="group-hero" aria-labelledby="hero-title">
       <div class="group-hero-copy">
         <p class="group-eyebrow"><span class="small-star" aria-hidden="true">✳</span> RESEARCH, TOGETHER</p>
-        <h1 id="hero-title">Good questions.<br><span>Shared progress.</span></h1>
-        <p class="group-intro">A home for our research projects, the work ahead,<br class="desktop-break"> and the ideas we’re learning along the way.</p>
-        <div class="group-hero-actions"><a class="group-button dark" href="#projects">Explore projects <span aria-hidden="true">↓</span></a><a class="group-text-link" href="./course.html">Start learning <span aria-hidden="true">↗</span></a></div>
+        <h1 id="hero-title">Good questions.<br><span>Shared ideas.</span></h1>
+        <p class="group-intro">A home for our research projects, shared tasks,<br class="desktop-break"> and the ideas and papers behind the work.</p>
+        <div class="group-hero-actions"><a class="group-button dark" href="#projects">Explore projects <span aria-hidden="true">↓</span></a><a class="group-text-link" href="./library.html">Browse the library <span aria-hidden="true">↗</span></a></div>
       </div>
       <div class="research-sketch" aria-hidden="true">
         <span class="sketch-caption">THE WORK IS IN THE PROCESS</span>
@@ -46,7 +47,7 @@
       <span class="summary-label"><span class="summary-dot" aria-hidden="true"></span> OUR WORKSPACE</span>
       <a href="#projects"><strong id="project-total">—</strong> <span>projects</span></a>
       <a href="#tasks"><strong id="task-open-count">—</strong> <span>tasks ahead</span></a>
-      <a href="./course.html" class="summary-course"><span>Learning stays part of the work</span> <span aria-hidden="true">↗</span></a>
+      <a href="./library.html" class="summary-library"><span>Concepts, explanations, and papers</span> <span aria-hidden="true">↗</span></a>
     </div>
     <section id="projects" class="board-section" aria-labelledby="projects-title">
       <div class="board-heading"><div><p class="group-eyebrow">01 / THE QUESTIONS WE’RE EXPLORING</p><h2 id="projects-title">Projects<span id="project-count" class="section-count" aria-label="Project count">—</span></h2><p>From an initial idea to a result worth sharing.</p></div><span class="board-heading-note">Make room for the next question.</span></div>
@@ -66,14 +67,14 @@
       <p id="task-results-label" class="board-results-label" role="status" aria-live="polite"></p>
       <div id="task-results" class="task-list" aria-busy="true"><div class="board-loading">Gathering the tasks…</div></div>
     </section>
-    <section class="group-course" aria-labelledby="course-title">
-      <div class="course-symbol" aria-hidden="true"><span>↗</span><span class="course-symbol-ring"></span></div>
-      <div class="group-course-copy"><p class="group-eyebrow">03 / KEEP LEARNING</p><h2 id="course-title">Build the foundations.<br>Find your next idea.</h2><p>An AI research course with clear explanations, original papers,<br class="desktop-break"> and practical exercises to turn reading into understanding.</p><a class="group-button dark" href="./course.html">Explore the learning course <span aria-hidden="true">↗</span></a></div>
-      <dl class="course-numbers"><div><dt>Modules</dt><dd>12</dd></div><div><dt>Topics to explore</dt><dd>174</dd></div><div><dt>Suggested weeks</dt><dd>20</dd></div></dl>
+    <section class="group-library" aria-labelledby="library-title">
+      <div class="library-symbol" aria-hidden="true"><span>↗</span><span class="library-symbol-ring"></span></div>
+      <div class="group-library-copy"><p class="group-eyebrow">03 / THE LIBRARY</p><h2 id="library-title">Ideas, explained.<br>Sources, connected.</h2><p>A reference collection of AI concepts, worked examples,<br class="desktop-break"> and original papers. Browse by subject or look up a specific idea.</p><a class="group-button dark" href="./library.html">Browse the library <span aria-hidden="true">↗</span></a></div>
+      <dl class="library-numbers"><div><dt>Subjects</dt><dd>12</dd></div><div><dt>Articles</dt><dd>174</dd></div><div><dt>Reading resources</dt><dd>29</dd></div></dl>
     </section>
   </main>
-  <footer class="group-footer"><a class="footer-brand" href="./">enming group<span>A shared space for thoughtful work.</span></a><div><a href="#projects">Projects</a><a href="#tasks">Tasks</a><a href="./course.html">Learning course ↗</a><a href="https://github.com/Enmingzz/ai-research-mentorship/edit/main/data/projects.json" target="_blank" rel="noopener noreferrer">Manage on GitHub ↗</a></div></footer>
+  <footer class="group-footer"><a class="footer-brand" href="./">enming group<span>A shared space for thoughtful work.</span></a><div><a href="#projects">Projects</a><a href="#tasks">Tasks</a><a href="./library.html">Library ↗</a><a href="https://github.com/Enmingzz/vlm-project/edit/main/data/projects.json" target="_blank" rel="noopener noreferrer">Manage on GitHub ↗</a></div></footer>
   <dialog id="board-detail" class="board-dialog" aria-labelledby="detail-title"><div class="board-dialog-top"><span id="detail-kind" class="group-eyebrow">PROJECT</span><button type="button" id="detail-close" class="detail-close" aria-label="Close details">×</button></div><div id="detail-content"></div></dialog>
-  <noscript><div class="group-noscript">Enable JavaScript to browse projects and tasks. You can still <a href="./course.html">open the learning course</a> or <a href="https://github.com/Enmingzz/ai-research-mentorship">visit the group on GitHub</a>.</div></noscript>
+  <noscript><div class="group-noscript">Enable JavaScript to browse projects and tasks. You can still <a href="./library.html">browse the library</a> or <a href="https://github.com/Enmingzz/vlm-project">visit the group on GitHub</a>.</div></noscript>
 </body>
 </html>

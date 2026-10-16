@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "enming group — research projects, tasks, and an AI learning course",
+  "description": "enming group - research projects, shared tasks, and an AI reference library",
   "scripts": {
     "dev": "node tools/serve.mjs",
     "build": "node tools/build.mjs",

@@ -253,17 +253,17 @@ await recovery.flush();
 assert.equal(recovery.requests.length, 2);
 assert.equal(recovery.get('#project-total').textContent, String(example.projects.length), 'Retry recovers without reloading the page');
 
-for (const hash of ['#overview', '#curriculum', '#module/04', '#schedule/week-5', '#papers', '#fieldnotes']) {
+for (const hash of ['#overview', '#subjects', '#articles', '#subject/04', '#papers', '#curriculum', '#module/04', '#schedule/week-5', '#fieldnotes']) {
   const legacy = await harness(example, { hash });
-  assert.deepEqual(legacy.redirects, ['./course.html?from=bookmark' + hash], 'Legacy course bookmarks preserve search and hash');
+  assert.deepEqual(legacy.redirects, ['./library.html?from=bookmark' + hash], 'Library and legacy bookmarks preserve search and hash');
   assert.equal(legacy.requests.length, 0, 'A redirected page does not load the project board');
 }
 const inlineScripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(script => script.trim());
 assert(inlineScripts.length, 'The early legacy redirect remains available before module loading');
-for (const hash of ['#module/04', '#projects']) {
+for (const hash of ['#module/04', '#subject/04', '#articles', '#projects', '#tasks']) {
   const redirects = [];
   for (const script of inlineScripts) vm.runInNewContext(script, { location: { hash, search: '?from=saved', replace: url => redirects.push(url) } });
-  assert.deepEqual(redirects, hash === '#module/04' ? ['./course.html?from=saved#module/04'] : []);
+  assert.deepEqual(redirects, ['#module/04','#subject/04','#articles'].includes(hash) ? ['./library.html?from=saved'+hash] : []);
 }
 board.location.hash = '#tasks';
 board.windowEvents.get('hashchange')();

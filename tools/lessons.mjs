@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-export const SITE_URL = 'https://enmingzz.github.io/ai-research-mentorship';
+export const SITE_URL = 'https://enmingzz.github.io/vlm-project';
 export const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const e = escapeHTML;
 export function wordCount(lesson) {
@@ -25,17 +25,17 @@ export function makeTopicIndex({modules,lessons}) {
 }
 const external = r => `<a href="${e(r.url)}" target="_blank" rel="noopener noreferrer">${e(r.title)} <span aria-hidden="true">↗</span></a>`;
 
-export function lessonDocument(lesson,course) {
-  const {modules,lessons}=course;
-  const module=modules.find(m=>m.topics.some(t=>t.id===lesson.topicId));
-  if(!module)throw new Error(`Unknown topic ${lesson.topicId}`);
-  const index=makeTopicIndex(course),allIds=Object.keys(index),position=allIds.indexOf(lesson.topicId);
+export function lessonDocument(lesson,library) {
+  const {modules,lessons}=library;
+  const subject=modules.find(m=>m.topics.some(t=>t.id===lesson.topicId));
+  if(!subject)throw new Error(`Unknown topic ${lesson.topicId}`);
+  const index=makeTopicIndex(library),allIds=Object.keys(index),position=allIds.indexOf(lesson.topicId);
   const previous=index[allIds[position-1]],next=index[allIds[position+1]];
   const url=`${SITE_URL}/learn/${lesson.topicId}/`;
-  const sectionLinks=[...lesson.sections.map(s=>({id:`section-${s.id}`,title:s.title})),{id:'practice',title:'Check your understanding'},{id:'takeaways',title:'Key takeaways'},{id:'references',title:'Papers & further reading'}];
+  const sectionLinks=[...lesson.sections.map(s=>({id:`section-${s.id}`,title:s.title})),{id:'worked-example',title:'Worked example'},{id:'takeaways',title:'Key points'},{id:'references',title:'References & further reading'}];
   const toc=sectionLinks.map(s=>`<a href="#${e(s.id)}">${e(s.title)}</a>`).join('');
   const linkedTopic=(id)=>`<a href="../${e(id)}/">${e(index[id]?.title || id)} <span aria-hidden="true">↗</span></a>`;
-  const adjacent=(entry,label)=>entry?`<a class="article-adjacent" href="../${e(entry.topicId)}/"><span class="eyebrow">${label}</span><strong>${e(entry.title)}</strong><span class="small">Module ${e(entry.moduleId)} · ${entry.minutes} min read</span></a>`:'';
+  const adjacent=(entry,label)=>entry?`<a class="article-adjacent" href="../${e(entry.topicId)}/"><span class="eyebrow">${label}</span><strong>${e(entry.title)}</strong><span class="small">Subject ${e(entry.moduleId)} · ${entry.minutes} min read</span></a>`:'';
   return `<!doctype html>
 <html lang="en" translate="no">
 <head>
@@ -44,34 +44,33 @@ export function lessonDocument(lesson,course) {
 <meta name="description" content="${e(lesson.summary)}"><link rel="canonical" href="${url}">
 <meta property="og:type" content="article"><meta property="og:title" content="${e(lesson.title)}"><meta property="og:description" content="${e(lesson.summary)}"><meta property="og:url" content="${url}">
 <link rel="stylesheet" href="../../style.css"><link rel="stylesheet" href="../../lesson.css"><script type="module" src="../../lesson.js"></script>
-<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'LearningResource',name:lesson.title,description:lesson.summary,inLanguage:'en',learningResourceType:'Concept explanation',url,isPartOf:{'@type':'Course',name:'enming group · Learning course',url:SITE_URL+'/course.html'}}).replace(/</g,'\\u003c')}</script>
+<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'TechArticle',headline:lesson.title,description:lesson.summary,inLanguage:'en',url,isPartOf:{'@type':'CollectionPage',name:'enming group · AI reference library',url:SITE_URL+'/library.html'}}).replace(/</g,'\\u003c')}</script>
 </head>
 <body class="lesson-page" data-topic-id="${e(lesson.topicId)}">
 <a class="skip-link" href="#article-content">Skip to the article</a>
-<aside class="sidebar" aria-label="Course navigation">
+<aside class="sidebar" aria-label="Library navigation">
 <a class="brand" href="../../"><span class="brand-mark">e<span>g</span></span><span>enming<br><b>group</b></span></a>
-<div class="space-label">ENMING GROUP / LEARNING</div>
-<nav><a href="../../"><span aria-hidden="true">◈</span>Research projects</a><a href="../../course.html#overview"><span aria-hidden="true">◈</span>Overview</a><a class="active" href="../../course.html#curriculum"><span aria-hidden="true">▤</span>Curriculum</a><a href="../../course.html#schedule"><span aria-hidden="true">▦</span>Schedule</a><a href="../../course.html#papers"><span aria-hidden="true">↗</span>Reading room</a></nav>
-<div class="side-path"><div class="eyebrow">EXPLORE THE COURSE</div><a href="../../course.html#fieldnotes">All ${lessons.length} topic guides <span>↗</span></a><a href="../../course.html#module/${module.id}">Back to module ${module.id} <span>↗</span></a></div>
-<div class="sidebar-bottom"><div class="eyebrow">A LITTLE PROGRESS, EVERY DAY.</div><p>Read with a question.<br>Test with an experiment.</p><a class="github-link" href="https://github.com/Enmingzz/ai-research-mentorship" target="_blank" rel="noopener noreferrer">Course on GitHub <span>↗</span></a></div>
+<div class="space-label">ENMING GROUP / REFERENCE LIBRARY</div>
+<nav><a href="../../"><span aria-hidden="true">◈</span>Research projects</a><a href="../../library.html#overview"><span aria-hidden="true">◈</span>Library overview</a><a href="../../library.html#subjects"><span aria-hidden="true">▤</span>Subjects</a><a class="active" href="../../library.html#articles"><span aria-hidden="true">▦</span>Articles</a><a href="../../library.html#papers"><span aria-hidden="true">↗</span>Papers & resources</a></nav>
+<div class="side-path"><div class="eyebrow">BROWSE THE LIBRARY</div><a href="../../library.html#articles">All ${lessons.length} articles <span>↗</span></a><a href="../../library.html#subject/${subject.id}">Subject ${subject.id} <span>↗</span></a></div>
+<div class="sidebar-bottom"><div class="eyebrow">IDEAS, METHODS & SOURCES</div><p>Technical explanations and original references.</p><a class="github-link" href="https://github.com/Enmingzz/vlm-project" target="_blank" rel="noopener noreferrer">Library on GitHub <span>↗</span></a></div>
 </aside>
 <div class="workspace">
-<header class="topbar"><div class="breadcrumb"><a href="../../course.html#curriculum">Curriculum</a><span>/</span><a href="../../course.html#module/${module.id}">Module ${module.id}</a><span>/</span><b>Guide ${lesson.topicId}</b></div><div class="top-actions"><button class="button secondary" id="copy-article">Copy link ↗</button></div></header>
+<header class="topbar"><div class="breadcrumb"><a href="../../library.html#subjects">Subjects</a><span>/</span><a href="../../library.html#subject/${subject.id}">Subject ${subject.id}</a><span>/</span><b>Article ${lesson.topicId}</b></div><div class="top-actions"><button class="button secondary" id="copy-article">Copy link ↗</button></div></header>
 <main id="article-content" tabindex="-1">
-<div class="article-topline"><a class="back-link" href="../../course.html#module/${module.id}">← ${e(module.shortTitle)}</a><span class="outline-tag">CONCEPT GUIDE</span></div>
-<header class="article-header"><div class="eyebrow">GUIDE ${lesson.topicId.replace('-','.')} / ${e(module.group.toUpperCase())}</div><h1>${e(lesson.title)}</h1><p class="article-dek">${e(lesson.summary)}</p><div class="article-meta"><span>enming group</span><span>${readingMinutes(lesson)} min read</span><span>${lesson.references.length} primary ${lesson.references.length===1?'source':'sources'}</span><span>${module.priorities.join(' / ')}</span></div></header>
+<div class="article-topline"><a class="back-link" href="../../library.html#subject/${subject.id}">← ${e(subject.shortTitle)}</a><span class="outline-tag">REFERENCE ARTICLE</span></div>
+<header class="article-header"><div class="eyebrow">ARTICLE ${lesson.topicId.replace('-','.')} / ${e(subject.shortTitle.toUpperCase())}</div><h1>${e(lesson.title)}</h1><p class="article-dek">${e(lesson.summary)}</p><div class="article-meta"><span>enming group</span><span>${readingMinutes(lesson)} min read</span><span>${lesson.references.length} primary ${lesson.references.length===1?'source':'sources'}</span></div></header>
 <div class="article-layout"><article class="article-body">
-${lesson.prerequisites.length?`<aside class="prerequisite-box"><span class="eyebrow">BEFORE YOU BEGIN</span><p>It helps to be comfortable with:</p><div>${lesson.prerequisites.map(linkedTopic).join('')}</div></aside>`:''}
+${lesson.prerequisites.length?`<aside class="related-concepts"><span class="eyebrow">RELATED CONCEPTS</span><p>Background on the ideas used in this article.</p><div>${lesson.prerequisites.map(linkedTopic).join('')}</div></aside>`:''}
 <details class="mobile-toc"><summary>On this page</summary><nav aria-label="Article sections on mobile">${toc}</nav></details>
-${lesson.sections.map((section,i)=>`<section class="article-section" id="section-${e(section.id)}"><div class="section-kicker">${String(i+1).padStart(2,'0')} / UNDERSTAND</div><h2>${e(section.title)}</h2>${(section.paragraphs||[]).map(p=>`<p>${e(p)}</p>`).join('')}${section.formula?`<pre class="article-formula" aria-label="Formula">${e(section.formula)}</pre>`:''}${section.code?`<div class="article-code"><div>${e(section.language||'Example')}</div><pre><code>${e(section.code)}</code></pre></div>`:''}${section.bullets?.length?`<ul>${section.bullets.map(b=>`<li>${e(b)}</li>`).join('')}</ul>`:''}</section>`).join('')}
-<section class="article-section article-practice" id="practice"><div class="eyebrow">PAUSE & TRY IT</div><h2>Check your understanding.</h2><p>${e(lesson.exercise.prompt)}</p><details class="worked-answer"><summary>Show a worked answer <span aria-hidden="true">+</span></summary><div>${e(lesson.exercise.answer)}</div></details></section>
-<section class="article-section" id="takeaways"><div class="section-kicker">KEEP THESE IN MIND</div><h2>Key takeaways</h2><ul class="takeaway-list">${lesson.takeaways.map(t=>`<li>${e(t)}</li>`).join('')}</ul></section>
-<section class="article-section article-references" id="references"><div class="section-kicker">GO TO THE SOURCE</div><h2>Papers & further reading</h2><p class="reference-intro">Read the original source with the focus below. Books and official guides are labeled separately from research papers.</p><ol>${lesson.references.map(r=>`<li><span class="priority">${e(r.kind.toUpperCase())}</span><h3>${external(r)}</h3><p>${e(r.note)}</p></li>`).join('')}</ol></section>
-<div class="article-completion"><div><strong>Ready to move on?</strong><p>Mark this topic when you can explain it in your own words.</p></div><label><input type="checkbox" id="topic-understood"> I understand this topic</label><span class="completion-status" role="status" id="completion-status">Saved in this browser, alongside your course progress.</span></div>
-<nav class="article-pagination" aria-label="Previous and next topics">${adjacent(previous,'← PREVIOUS GUIDE')}${adjacent(next,'NEXT GUIDE →')}</nav>
-</article><aside class="article-rail"><div class="article-rail-sticky"><div class="eyebrow">ON THIS PAGE</div><nav class="article-toc" aria-label="Article sections">${toc}</nav><div class="article-rail-note"><span class="eyebrow">LEARN WITH INTENT</span><p>A useful question to take to your mentor: which assumption in this explanation would you test first?</p><a href="../../course.html#module/${module.id}">Open module notes ↗</a></div></div></aside></div>
+${lesson.sections.map((section,i)=>`<section class="article-section" id="section-${e(section.id)}"><div class="section-kicker">${String(i+1).padStart(2,'0')} / EXPLANATION</div><h2>${e(section.title)}</h2>${(section.paragraphs||[]).map(p=>`<p>${e(p)}</p>`).join('')}${section.formula?`<pre class="article-formula" aria-label="Formula">${e(section.formula)}</pre>`:''}${section.code?`<div class="article-code"><div>${e(section.language||'Example')}</div><pre><code>${e(section.code)}</code></pre></div>`:''}${section.bullets?.length?`<ul>${section.bullets.map(b=>`<li>${e(b)}</li>`).join('')}</ul>`:''}</section>`).join('')}
+<section class="article-section article-example" id="worked-example"><div class="eyebrow">EXAMPLE</div><h2>Worked example</h2><p>${e(lesson.exercise.prompt)}</p><details class="worked-answer" open><summary>Explanation <span aria-hidden="true">+</span></summary><div>${e(lesson.exercise.answer)}</div></details></section>
+<section class="article-section" id="takeaways"><div class="section-kicker">AT A GLANCE</div><h2>Key points</h2><ul class="takeaway-list">${lesson.takeaways.map(t=>`<li>${e(t)}</li>`).join('')}</ul></section>
+<section class="article-section article-references" id="references"><div class="section-kicker">ORIGINAL SOURCES</div><h2>References & further reading</h2><p class="reference-intro">Original papers, books, and official documentation, with a suggested focus for each.</p><ol>${lesson.references.map(r=>`<li><span class="reference-kind">${e(r.kind.toUpperCase())}</span><h3>${external(r)}</h3><p>${e(r.note)}</p></li>`).join('')}</ol></section>
+<nav class="article-pagination" aria-label="Previous and next articles">${adjacent(previous,'← PREVIOUS ARTICLE')}${adjacent(next,'NEXT ARTICLE →')}</nav>
+</article><aside class="article-rail"><div class="article-rail-sticky"><div class="eyebrow">ON THIS PAGE</div><nav class="article-toc" aria-label="Article sections">${toc}</nav><div class="article-related-nav"><span class="eyebrow">REFERENCE NAVIGATION</span><a href="../../library.html#subject/${subject.id}">Browse ${e(subject.shortTitle)} ↗</a><a href="#references">Original sources ↓</a><a href="../../library.html#articles">All ${lessons.length} articles ↗</a></div></div></aside></div>
 </main>
-<footer><span>ENMING GROUP · Understand. Implement. Question.</span><span><a href="../../course.html#fieldnotes">All topic guides ↗</a></span></footer>
-</div><div id="toast" role="status" aria-live="polite"></div><noscript>The full article and source links work without JavaScript. Enable JavaScript to save your progress.</noscript>
+<footer><span>ENMING GROUP · Ideas, methods & original sources.</span><span><a href="../../library.html#articles">All articles ↗</a></span></footer>
+</div><div id="toast" role="status" aria-live="polite"></div><noscript>The full article and source links are available without JavaScript.</noscript>
 </body></html>`;
 }

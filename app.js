@@ -1,149 +1,199 @@
-const STORAGE_KEY = 'research-fieldnotes-v1';
 const BUILD_VERSION = 'development';
+const PAGE_SIZE = 24;
 const main = document.querySelector('#main');
-const defaults = () => ({ topics: {}, papers: {}, weeks: {}, notes: {}, startDate: '' });
-let modules = [], papers = [], schedule = [], topicGuides = {}, state = defaults();
-let curriculumFilter = 'all', curriculumQuery = '', paperModule = 'all', paperQuery = '', paperStatus = 'all';
-let guideQuery = '', guideModule = 'all', guidePage = 1;
-let toastTimer;
-const escape = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch]);
-const pad = n => String(n).padStart(2, '0');
-const percent = (n, total) => total ? Math.round(n / total * 100) : 0;
-const modulePapers = id => papers.filter(p => p.moduleIds.includes(id));
-const moduleProgress = m => m.topics.filter(t => state.topics[t.id]).length;
-const priorities = m => m.priorities.map(p => `<span class="priority ${p.toLowerCase()}">${p}</span>`).join(' ');
-const external = (url, label, className = '') => `<a class="${className}" href="${escape(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
-const groupLabels = { foundations: 'FOUNDATIONS', core: 'CORE SKILLS', frontiers: 'ADVANCED TOPICS', research: 'RESEARCH PRACTICE' };
-function toast(message) { const el = document.querySelector('#toast'); el.textContent = message; el.classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('visible'), 3400); }
-function save() { let saved=true; try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { saved=false; toast('Browser storage is unavailable. Export your progress to keep a backup.'); } updateProgress(); return saved; }
-function updateProgress() { const all = modules.flatMap(m => m.topics); const done = all.filter(t => state.topics[t.id]).length; const pct = percent(done, all.length); document.querySelector('#side-percent').textContent = `${pct}%`; document.querySelector('#side-progress').style.width = `${pct}%`; document.querySelector('#side-count').textContent = `${done} / ${all.length} topics completed · Saved locally`; }
-function validDate(value) { return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(`${value}T12:00:00`).valueOf()) && localISO(new Date(`${value}T12:00:00`)) === value; }
-function localISO(date) { return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`; }
-function normalizeState(data) {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid progress format');
-  const out = defaults();
-  // Keep dormant records from removed modules in backups; progress totals use the active syllabus.
-  for (const [key, pattern] of Object.entries({topics:/^\d{2}-\d{2}$/,papers:/^[a-z0-9-]+$/,weeks:/^\d{1,3}$/})) {
-    const source = data[key]; if (source && typeof source === 'object' && !Array.isArray(source)) for (const [id,value] of Object.entries(source)) if (pattern.test(id)&&value===true) out[key][id] = true;
-  }
-  if(data.notes&&typeof data.notes==='object'&&!Array.isArray(data.notes))for(const [id,note] of Object.entries(data.notes))if(/^\d{2}$/.test(id)&&typeof note==='string')out.notes[id]=note.slice(0,20000);
-  if (validDate(data.startDate)) out.startDate = data.startDate;
-  return out;
+let subjects = [], papers = [], articles = [], topicIndex = {};
+let loaded = false, loading = false;
+const filters = { subjects: '', articles: '', articleSubject: 'all', articlePage: 1, papers: '', paperSubject: 'all' };
+const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+const plural = (count, singular, multiple = singular + 's') => `${count} ${count === 1 ? singular : multiple}`;
+const subjectPapers = id => papers.filter(paper => paper.moduleIds.includes(id));
+const subjectName = id => subjects.find(subject => subject.id === id)?.shortTitle || '';
+const articleURL = id => `./learn/${encodeURIComponent(id)}/`;
+const matches = (values, query) => {
+  const text = values.join(' ').toLocaleLowerCase('en');
+  return query.trim().toLocaleLowerCase('en').split(/\s+/).filter(Boolean).every(term => text.includes(term));
+};
+
+function external(url, label, className = '') {
+  if (!/^https?:\/\//i.test(url)) return `<span>${escape(label)}</span>`;
+  return `<a class="${escape(className)}" href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)} <span aria-hidden="true">↗</span></a>`;
 }
-function weekDate(week) { if (!state.startDate) return ''; const start = new Date(`${state.startDate}T12:00:00`); start.setDate(start.getDate() + (week - 1) * 7); const end = new Date(start); end.setDate(end.getDate() + 6); const fmt = d => `${d.getMonth()+1}/${d.getDate()}`; return `${fmt(start)}–${fmt(end)}`; }
-function currentWeek() { return schedule.find(w => !state.weeks[w.week]) || schedule.at(-1); }
-function readingsForWeek(week) {
-  if (week.readingIds?.length) return week.readingIds.map(id=>papers.find(p=>p.id===id)).filter(Boolean);
-  const selected = [], limit = week.readingLimit || 2;
-  for (const id of week.readingModuleIds) { const paper = modulePapers(id).find(p => p.level === 'essential' && !selected.includes(p)); if (paper && selected.length < limit) selected.push(paper); }
-  for (const id of week.readingModuleIds) for (const paper of modulePapers(id)) if (!selected.includes(paper) && selected.length < limit) selected.push(paper);
-  return selected;
+
+function subjectOptions(selected) {
+  return `<option value="all">All subjects</option>${subjects.map(subject => `<option value="${escape(subject.id)}" ${selected === subject.id ? 'selected' : ''}>${escape(subject.shortTitle)}</option>`).join('')}`;
 }
-function art() { return `<div class="hero-art" aria-hidden="true"><svg viewBox="0 0 440 315" fill="none"><ellipse cx="224" cy="155" rx="138" ry="86" transform="rotate(-28 224 155)" stroke="#bdc8aa"/><ellipse cx="224" cy="155" rx="130" ry="87" transform="rotate(36 224 155)" stroke="#bdc8aa"/><ellipse cx="224" cy="155" rx="73" ry="126" transform="rotate(18 224 155)" stroke="#c5ceb5"/><path d="M122 90L226 155L330 104M226 155L302 230M226 155L113 222M226 155L241 47" stroke="#a4b28d" stroke-dasharray="4 5"/><circle cx="226" cy="155" r="49" fill="#e4ebd5" stroke="#bccaa7"/><circle cx="226" cy="155" r="37" fill="#f8f9ef" stroke="#a4b58b"/><path d="M206 164L217 145L228 163L241 138M209 146L238 163" stroke="#7d9364" stroke-width="1.5"/><circle cx="206" cy="164" r="4" fill="#a1b681"/><circle cx="217" cy="145" r="4" fill="#bfcba7"/><circle cx="228" cy="163" r="4" fill="#8ea774"/><circle cx="241" cy="138" r="4" fill="#c5d5ad"/><circle cx="238" cy="163" r="4" fill="#b4c79a"/><rect x="79" y="66" width="90" height="45" rx="8" fill="#fafbf3" stroke="#ced7bd"/><text x="124" y="85" text-anchor="middle" fill="#7b896a" font-family="sans-serif" font-size="8">01 / FOUNDATIONS</text><text x="124" y="101" text-anchor="middle" fill="#4f6140" font-family="Georgia" font-style="italic" font-size="15">∇L(θ)</text><rect x="291" y="83" width="90" height="43" rx="8" fill="#eeebf4" stroke="#d1cadf"/><text x="336" y="100" text-anchor="middle" fill="#9585a6" font-family="sans-serif" font-size="8">02 / UNDERSTAND</text><text x="336" y="115" text-anchor="middle" fill="#796789" font-family="Georgia" font-size="13">Q · K · V</text><rect x="259" y="218" width="91" height="42" rx="8" fill="#f8f1e4" stroke="#ddd0b9"/><text x="304" y="235" text-anchor="middle" fill="#a69579" font-family="sans-serif" font-size="8">03 / EXPLORE</text><text x="304" y="250" text-anchor="middle" fill="#8d7b5f" font-family="Georgia" font-style="italic" font-size="13">What if ?</text><circle cx="113" cy="222" r="7" fill="#b7c599" stroke="#f3f6e8" stroke-width="3"/><circle cx="241" cy="47" r="5" fill="#b7c599"/><path d="M360 180v14m-7-7h14M150 268v10m-5-5h10" stroke="#a4b38d"/><text x="158" y="300" fill="#8b9978" font-family="sans-serif" font-size="7" letter-spacing="2">CONNECT THE DOTS.</text></svg></div>`; }
+
+function subjectCard(subject) {
+  return `<a class="library-subject-card" data-subject-id="${escape(subject.id)}" href="#subject/${encodeURIComponent(subject.id)}"><span class="library-subject-number" aria-hidden="true">${escape(subject.id)}</span><h3>${escape(subject.title)}</h3><p>${escape(subject.summary)}</p><span class="library-card-meta">${plural(subject.topics.length, 'article')} <span aria-hidden="true">·</span> ${plural(subjectPapers(subject.id).length, 'reading')}<span class="library-arrow" aria-hidden="true">↗</span></span></a>`;
+}
+
+function emptyResults(kind) {
+  return `<div class="library-empty"><h2>No matching ${kind}.</h2><p>Try another keyword or clear the filters.</p><button type="button" class="library-button" data-clear-filter="${kind}">Clear search and filters</button></div>`;
+}
+
 function overview() {
-  const total = modules.reduce((n,m) => n+m.topics.length, 0), week = currentWeek();
-  const groups = [
-    {title:'Build the foundations',subtitle:'Mathematics, engineering & neural networks',priority:'P0',icon:'∑',color:'sage',ids:['01','02','03','04']},
-    {title:'Understand modern AI',subtitle:'Language, vision & generative models',priority:'P1',icon:'⌘',color:'lavender',ids:['05','06','07','08','09','10','11','12']}
-  ];
-  main.innerHTML = `<div class="intro-line"><span class="eyebrow">A FIELD GUIDE TO AI RESEARCH</span><span class="outline-tag">MENTORSHIP · OPEN CURRICULUM</span></div><section class="hero"><div class="hero-copy"><div class="eyebrow">FROM FIRST PRINCIPLES TO YOUR FIRST PAPER</div><h1>Strong foundations.<br><em>Thoughtful research.</em></h1><p>From understanding a gradient to asking a research question.<br>A learning map for your journey into AI research.</p><div class="hero-actions"><a class="button primary" href="#curriculum">Start learning <span>↗</span></a><a class="quiet-link" href="#schedule">View schedule <span>→</span></a></div></div>${art()}</section><section class="stats" aria-label="Course at a glance"><div class="stat"><strong>${modules.length}</strong><span><b>Modules</b>Connected foundations</span></div><div class="stat"><strong>${total}</strong><span><b>Topics</b>Things to understand</span></div><div class="stat"><strong>${papers.length}</strong><span><b>Readings</b>Papers & guides</span></div><div class="stat"><strong>${schedule.length}</strong><span><b>Suggested weeks</b>At your own pace</span></div></section><a class="fieldnotes-banner" href="#fieldnotes"><div><span class="eyebrow">${Object.keys(topicGuides).length} TOPIC EXPLAINERS</span><h2>Learn the idea. Work the example.</h2><p>Intuition, practice questions, and original sources for every topic.</p></div><span class="fieldnotes-banner-link">Explore guides →</span></a><div class="overview-columns"><section><div class="section-heading"><h2>Your learning path</h2><a class="text-link" href="#curriculum">All modules ↗</a></div><div class="route-grid">${groups.map(g => `<a class="route-card" href="#curriculum" ${g.ids.length>1?`data-stage-link="${g.priority}"`:''}><div class="card-top"><span class="route-icon ${g.color}" aria-hidden="true">${g.icon}</span><span class="priority ${g.priority.toLowerCase()}">${g.priority}</span></div><h3>${g.title}</h3><p>${g.subtitle}</p><div class="route-card-bottom"><span>${pad(g.ids.length)} MODULE${g.ids.length>1?'S':''} <span>·</span> ${g.ids.reduce((n,id)=>n+modules.find(m=>m.id===id).topics.length,0)} topics</span><b>↗</b></div></a>`).join('')}</div></section><aside class="overview-rail"><div class="focus-card"><div class="eyebrow">${schedule.every(w=>state.weeks[w.week])?'YOUR LEARNING JOURNEY':'YOUR NEXT STEP'}</div><div class="corner-spark" aria-hidden="true">✳</div><div class="week-number">Week ${pad(week.week)}</div><h3>${escape(week.title)}</h3><p>${escape(week.focus)}</p><a class="button" href="#schedule/week-${week.week}">View this week <span>↗</span></a></div><div class="mentor-note"><div class="eyebrow">A NOTE FROM YOUR MENTOR</div><p><b>Understanding comes before checking a box.</b><br>For each paper, ask: What problem does it solve? Why does the method work? What experiment could I run to test it?</p></div></aside></div><section class="start-reading"><div class="section-heading"><h2>On your reading desk</h2><a class="text-link" href="#papers">Browse readings ↗</a></div><div class="reading-strip">${['deep-learning-book','attention','clip'].map((id,i) => {const p=papers.find(x=>x.id===id);return p?`<article class="mini-paper"><span class="paper-index">0${i+1}</span><div><h3>${external(p.url,`${escape(p.title)} ↗`)}</h3><p>${escape(p.authors)} · ${p.year}</p></div></article>`:''}).join('')}</div></section>`;
+  main.innerHTML = `<header class="library-intro"><p class="library-eyebrow">THE REFERENCE LIBRARY</p><h1>A place to understand<br>the ideas behind AI.</h1><p>Explanations, worked examples, and original sources, organized by subject. Find a concept, follow a question, or return to a useful paper.</p><form class="library-search-form" id="library-search-form" role="search"><label for="library-search" class="library-visually-hidden">Search library articles</label><input id="library-search" type="search" placeholder="Search a concept or method…"><button type="submit" class="library-button library-button-dark">Search articles <span aria-hidden="true">→</span></button></form><div class="library-totals" aria-label="Library contents"><a href="#subjects"><strong>${subjects.length}</strong> subjects</a><a href="#articles"><strong>${articles.length}</strong> articles</a><a href="#papers"><strong>${papers.length}</strong> papers &amp; guides</a></div></header><section class="library-section" aria-labelledby="overview-subjects-title"><div class="library-section-heading"><div><p class="library-eyebrow">BROWSE BY SUBJECT</p><h2 id="overview-subjects-title">From foundations to multimodal models.</h2></div><a class="library-text-link" href="#subjects">Explore subjects <span aria-hidden="true">→</span></a></div><div class="library-subject-grid">${subjects.map(subjectCard).join('')}</div></section><section class="library-reading-note"><div><p class="library-eyebrow">ORIGINAL SOURCES</p><h2>Keep the papers close.</h2><p>The reading collection brings together foundational papers, books, and practical guides. Each article also links to sources for its particular topic.</p></div><a class="library-button" href="#papers">Browse papers <span aria-hidden="true">↗</span></a></section>`;
 }
-function curriculum() {
-  main.innerHTML = `<div class="page-heading"><div><div class="eyebrow">THE LEARNING MAP</div><h1>Connect the dots.</h1><p>Build intuition, then implement it. Work from P0 foundations to P2 advanced extensions, one concept and one experiment at a time.</p></div><div class="heading-links"><a class="button secondary" href="#fieldnotes">Browse topic guides ↗</a><a class="quiet-link" href="#schedule">View schedule →</a></div></div><div class="toolbar"><div class="filter-tabs" aria-label="Filter by priority">${[['all','All modules'],['P0','P0 · Foundations'],['P1','P1 · Core'],['P2','P2 · Advanced']].map(([id,label])=>`<button data-curriculum-filter="${id}" class="${curriculumFilter===id?'active':''}" aria-pressed="${curriculumFilter===id}">${label}</button>`).join('')}</div><label class="search-wrap"><span aria-hidden="true">⌕</span><input id="curriculum-search" type="search" placeholder="Search modules or topics…" aria-label="Search modules or topics" value="${escape(curriculumQuery)}"></label></div><div id="curriculum-results"></div>`;
-  curriculumResults();
+
+function subjectList() {
+  main.innerHTML = `<header class="library-page-heading"><p class="library-eyebrow">SUBJECT INDEX</p><h1>Explore a subject.</h1><p>Browse ${subjects.length} areas of AI, from mathematical foundations to vision-language models. Each subject gathers its articles and relevant reading in one place.</p></header><div class="library-toolbar"><label class="library-search-control" for="subject-search"><span class="library-visually-hidden">Search subjects or topics</span><input id="subject-search" type="search" placeholder="Search subjects or topics…" value="${escape(filters.subjects)}"></label></div><div id="subject-results"></div>`;
+  subjectResults();
 }
-function curriculumResults() {
-  const q = curriculumQuery.toLocaleLowerCase().trim();
-  const filtered = modules.filter(m => (curriculumFilter==='all'||m.priorities.includes(curriculumFilter)) && [m.title,m.subtitle,m.summary,...m.topics.map(t=>t.text)].join(' ').toLocaleLowerCase().includes(q));
-  document.querySelector('#curriculum-results').innerHTML = `<div class="results-label" role="status">${filtered.length} / ${modules.length} modules ${q?`· Results for “${escape(curriculumQuery)}”`:''}</div><div class="module-list">${filtered.map(m => {const done=moduleProgress(m);return `<a href="#module/${m.id}" class="module-row"><span class="module-number">${m.id}</span><div><div class="module-title-line"><h3>${escape(m.title)}</h3>${priorities(m)}</div><p>${escape(m.summary)} · ${m.topics.length} topics · ${modulePapers(m.id).length} readings</p></div><div class="module-meta">${done} / ${m.topics.length} understood<div class="progress-track"><span style="width:${percent(done,m.topics.length)}%"></span></div></div><span class="row-arrow">↗</span></a>`}).join('') || '<div class="empty"><h3>No matching topics</h3><p>Try Transformer, LoRA, or another keyword, or switch to All modules.</p></div>'}</div>`;
+
+function subjectResults() {
+  const results = subjects.filter(subject => matches([subject.title, subject.shortTitle, subject.summary, ...subject.topics.map(topic => topic.text)], filters.subjects));
+  document.querySelector('#subject-results').innerHTML = `<p class="library-results-label" role="status" aria-live="polite">${plural(results.length, 'subject')}</p><div class="library-subject-grid">${results.map(subjectCard).join('') || emptyResults('subjects')}</div>`;
 }
-function paperReference(p) { return `<article class="paper-reference"><span class="paper-year">${p.year} / ${p.kind==='paper'?'PAPER':p.kind==='guide'?'GUIDE':'BOOK'} · ${p.level==='essential'?'Essential':'Further reading'}</span><h3>${external(p.url,`${escape(p.title)} ↗`)}</h3><p>${escape(p.note)}</p><label class="reading-check"><input type="checkbox" data-paper="${p.id}" ${state.papers[p.id]?'checked':''}>Read</label></article>`; }
-function topicChecklist(m) {
-  let section='';
-  return m.topics.map(t=>{
-    const guide=topicGuides[t.id];
-    let heading='';if(t.section&&t.section!==section){section=t.section;heading=`<div class="checklist-group">${escape(section)}</div>`;}
-    return `${heading}<div class="check-item topic-check-item ${state.topics[t.id]?'checked':''}"><div class="topic-line"><input type="checkbox" id="topic-check-${t.id}" data-topic="${t.id}" data-module="${m.id}" aria-labelledby="topic-label-${t.id}" ${state.topics[t.id]?'checked':''}><a class="topic-title" id="topic-label-${t.id}" href="./learn/${t.id}/">${escape(t.text)}</a><a class="topic-explainer" href="./learn/${t.id}/" aria-label="Read the guide: ${escape(t.text)}">Read guide <span aria-hidden="true">→</span></a></div><div class="topic-reading-links">${(guide?.references||[]).map(r=>`<a href="${escape(r.url)}" target="_blank" rel="noopener noreferrer" title="${escape(r.note)}"><span class="source-kind">${r.kind==='paper'?'Paper':r.kind==='book'?'Book':'Guide'}</span>${escape(r.title)} <span aria-hidden="true">↗</span></a>`).join('')}</div></div>`;
+
+function topicReferences(references) {
+  return `<ul class="library-source-list">${references.map(reference => `<li><span class="library-kind">${escape(reference.kind === 'book' ? 'Book' : reference.kind === 'guide' ? 'Guide' : 'Paper')}</span>${external(reference.url, reference.title)}${reference.note ? `<p>${escape(reference.note)}</p>` : ''}</li>`).join('')}</ul>`;
+}
+
+function subjectDetail(id) {
+  const subject = subjects.find(item => item.id === id);
+  if (!subject) return notFound();
+  let currentSection = '';
+  const topics = subject.topics.map(topic => {
+    const article = topicIndex[topic.id];
+    let heading = '';
+    if (topic.section && topic.section !== currentSection) {
+      currentSection = topic.section;
+      heading = `<h2 class="library-topic-section">${escape(currentSection)}</h2>`;
+    }
+    return `${heading}<article class="library-topic" data-topic-id="${escape(topic.id)}"><div class="library-topic-heading"><h3><a href="${articleURL(topic.id)}">${escape(topic.text)}</a></h3><a class="library-text-link" href="${articleURL(topic.id)}" aria-label="Read article: ${escape(topic.text)}">Read article <span aria-hidden="true">→</span></a></div>${article?.summary ? `<p class="library-topic-summary">${escape(article.summary)}</p>` : ''}${topicReferences(article?.references || [])}</article>`;
   }).join('');
+  const related = subjectPapers(id);
+  main.innerHTML = `<header class="library-page-heading library-subject-heading"><a class="library-back-link" href="#subjects">← All subjects</a><p class="library-eyebrow">SUBJECT ${escape(subject.id)}</p><h1>${escape(subject.title)}</h1><p>${escape(subject.summary)}</p><p class="library-subject-count">${plural(subject.topics.length, 'article')} <span aria-hidden="true">·</span> ${plural(related.length, 'reading')}</p></header><div class="library-subject-layout"><section class="library-topic-list" aria-label="Articles and topic sources">${topics}</section><aside class="library-related" aria-labelledby="related-reading-title"><h2 id="related-reading-title">Related reading</h2>${related.map(paper => `<article class="library-related-paper"><p class="library-paper-meta">${escape(paper.year)} <span aria-hidden="true">·</span> ${escape(paper.kind)}</p><h3>${external(paper.url, paper.title)}</h3><p>${escape(paper.note)}</p></article>`).join('')}<a class="library-text-link" href="#papers">All papers &amp; guides <span aria-hidden="true">→</span></a></aside></div>`;
 }
-function fieldnotes() {
-  main.innerHTML=`<div class="page-heading"><div><div class="eyebrow">TOPIC GUIDES</div><h1>One concept. A clearer picture.</h1><p>Explore ${Object.keys(topicGuides).length} focused guides with intuition, worked examples, practice questions, and links to the original sources.</p></div><a class="button secondary" href="#curriculum">Back to curriculum ↗</a></div><div class="toolbar"><label class="search-wrap guide-search"><span aria-hidden="true">⌕</span><input type="search" id="guide-search" aria-label="Search topic guides" placeholder="Search a concept, method, or question…" value="${escape(guideQuery)}"></label><select class="select-filter" id="guide-module" aria-label="Filter guides by module"><option value="all">All modules</option>${modules.map(m=>`<option value="${m.id}" ${guideModule===m.id?'selected':''}>${m.id} · ${escape(m.shortTitle)}</option>`).join('')}</select></div><div id="guide-results"></div>`;
-  guideResults();
+
+function articleList() {
+  main.innerHTML = `<header class="library-page-heading"><p class="library-eyebrow">ARTICLE INDEX</p><h1>Look up an idea.</h1><p>${articles.length} articles with clear explanations, worked examples, and links to original sources.</p></header><div class="library-toolbar"><label class="library-search-control" for="article-search"><span class="library-visually-hidden">Search articles</span><input type="search" id="article-search" placeholder="Search concepts, methods, or sources…" value="${escape(filters.articles)}"></label><label class="library-select-control" for="article-subject"><span class="library-visually-hidden">Filter articles by subject</span><select id="article-subject">${subjectOptions(filters.articleSubject)}</select></label></div><div id="article-results"></div>`;
+  articleResults();
 }
-function guideResults() {
-  const query=guideQuery.trim().toLocaleLowerCase();
-  const entries=Object.values(topicGuides).filter(g=>(guideModule==='all'||g.moduleId===guideModule)&&[g.title,g.topic,g.summary,...g.references.map(r=>r.title)].join(' ').toLocaleLowerCase().includes(query));
-  const pages=Math.max(1,Math.ceil(entries.length/24));guidePage=Math.min(guidePage,pages);
-  document.querySelector('#guide-results').innerHTML=`<div class="results-label" role="status">${entries.length} topic guides · Page ${guidePage} of ${pages}</div><div class="guide-grid">${entries.slice((guidePage-1)*24,guidePage*24).map(g=>`<a class="guide-card" href="./learn/${g.topicId}/"><div class="card-top"><span class="eyebrow">GUIDE ${g.topicId.replace('-','.')}</span><span class="small muted">${g.minutes} min read</span></div><h2>${escape(g.title)}</h2><p>${escape(g.summary)}</p><div class="guide-card-bottom"><span>${g.references.length} primary ${g.references.length===1?'source':'sources'} ${state.topics[g.topicId]?'· Understood':''}</span><b aria-hidden="true">↗</b></div></a>`).join('')||'<div class="empty"><h3>No matching guides</h3><p>Try a different keyword or choose another module.</p></div>'}</div>${entries.length>24?`<div class="guide-pagination"><button class="button secondary" data-guide-page="${guidePage-1}" ${guidePage===1?'disabled':''}>← Previous</button><span>Page ${guidePage} / ${pages}</span><button class="button secondary" data-guide-page="${guidePage+1}" ${guidePage===pages?'disabled':''}>Next →</button></div>`:''}`;
+
+function articleResults() {
+  const results = articles.filter(article => (filters.articleSubject === 'all' || article.moduleId === filters.articleSubject) && matches([article.title, article.topic, article.summary, subjectName(article.moduleId), ...article.references.map(reference => reference.title)], filters.articles));
+  const pages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
+  filters.articlePage = Math.max(1, Math.min(filters.articlePage, pages));
+  const visible = results.slice((filters.articlePage - 1) * PAGE_SIZE, filters.articlePage * PAGE_SIZE);
+  document.querySelector('#article-results').innerHTML = `<p class="library-results-label" role="status" aria-live="polite">${plural(results.length, 'article')}${results.length > PAGE_SIZE ? ` <span aria-hidden="true">·</span> Page ${filters.articlePage} of ${pages}` : ''}</p><div class="library-article-grid">${visible.map(article => `<article class="library-article-card" data-topic-id="${escape(article.topicId)}"><a class="library-article-subject" href="#subject/${encodeURIComponent(article.moduleId)}">${escape(subjectName(article.moduleId))}</a><h2><a href="${articleURL(article.topicId)}">${escape(article.title)}</a></h2><p>${escape(article.summary)}</p><div class="library-article-meta"><span>${escape(article.minutes)} min read <span aria-hidden="true">·</span> ${plural(article.references.length, 'source')}</span><a href="${articleURL(article.topicId)}" aria-label="Read article: ${escape(article.title)}">Read article <span aria-hidden="true">↗</span></a></div></article>`).join('') || emptyResults('articles')}</div>${results.length > PAGE_SIZE ? `<nav class="library-pagination" aria-label="Article pages"><button type="button" class="library-button" data-article-page="${filters.articlePage - 1}" ${filters.articlePage === 1 ? 'disabled' : ''}>← Previous</button><span>Page ${filters.articlePage} of ${pages}</span><button type="button" class="library-button" data-article-page="${filters.articlePage + 1}" ${filters.articlePage === pages ? 'disabled' : ''}>Next →</button></nav>` : ''}`;
 }
-function moduleDetail(id) {
-  const m = modules.find(x=>x.id===id); if (!m) return notFound();
-  const done = moduleProgress(m);
-  main.innerHTML = `<div class="module-detail-header"><a class="back-link" href="#curriculum">← Back to curriculum</a><div class="eyebrow">MODULE ${m.id} / ${groupLabels[m.group]}</div><h1>${escape(m.title)}</h1><p>${escape(m.subtitle)} <span style="padding:0 8px">·</span> ${m.topics.length} topics</p>${m.note?`<div class="callout">${escape(m.note)}</div>`:''}${m.formula?`<div class="formula">${escape(m.formula)}</div>`:''}</div><div class="detail-layout"><section><div class="panel"><div class="section-heading"><h2 style="margin:0">Topics & reading</h2><span class="small muted" id="module-done">${done} / ${m.topics.length} understood</span></div><div class="checklist">${topicChecklist(m)}</div></div>${m.assessment?`<div class="panel"><h2>Put your understanding to the test.</h2><p class="small" style="line-height:2;margin-bottom:0">${escape(m.assessment)}</p></div>`:''}<div class="panel"><h2>My research notes</h2><label for="module-notes" class="small muted">Capture questions, experiment ideas, and topics for your next mentor meeting.</label><textarea class="notes" id="module-notes" data-notes="${m.id}" maxlength="20000" placeholder="The key intuition is…&#10;I would still like to understand…" style="margin-top:12px">${escape(state.notes[m.id]||'')}</textarea><p class="small muted" style="margin:8px 0 0" id="notes-status">Saved automatically in this browser</p></div></section><aside class="detail-aside"><div class="panel"><div class="check-progress"><span>MODULE PROGRESS</span><strong id="module-percent">${percent(done,m.topics.length)}%</strong></div><div class="progress-track"><span id="module-progress" style="width:${percent(done,m.topics.length)}%"></span></div><p class="small muted" style="margin:14px 0 0">Check off a topic when you understand it. This is your personal progress.</p></div><div class="panel"><h2>Related reading <span class="small muted">${modulePapers(id).length} resources</span></h2>${modulePapers(id).map(paperReference).join('')}</div><div class="panel"><h2>In your schedule</h2>${schedule.filter(w=>w.moduleIds.includes(id)).map(w=>`<p class="small" style="margin-bottom:9px"><a href="#schedule/week-${w.week}">Week ${pad(w.week)} · ${escape(w.title)} ↗</a></p>`).join('')}</div></aside></div>`;
-}
-function library() {
-  main.innerHTML = `<div class="page-heading"><div><div class="eyebrow">THE READING ROOM</div><h1>Build on good research.</h1><p>Selected original papers and official learning materials. Read with a question in mind, and connect methods, experiments, and your own ideas.</p></div></div><div class="toolbar paper-toolbar"><label class="search-wrap"><span aria-hidden="true">⌕</span><input type="search" id="paper-search" placeholder="Search titles, authors, or reading focus…" aria-label="Search readings" value="${escape(paperQuery)}"></label><select class="select-filter" id="paper-module" aria-label="Filter readings by module"><option value="all">All modules</option>${modules.map(m=>`<option value="${m.id}" ${paperModule===m.id?'selected':''}>${m.id} · ${escape(m.shortTitle)}</option>`).join('')}</select><div class="filter-tabs" aria-label="Filter by reading status">${[['all','All'],['unread','Unread'],['read','Read']].map(([id,label])=>`<button data-paper-status="${id}" class="${paperStatus===id?'active':''}" aria-pressed="${paperStatus===id}">${label}</button>`).join('')}</div></div><div id="paper-results"></div>`;
+
+function paperList() {
+  main.innerHTML = `<header class="library-page-heading"><p class="library-eyebrow">READING COLLECTION</p><h1>Go to the source.</h1><p>${papers.length} papers, books, and guides connected to the subjects in this library.</p></header><div class="library-toolbar"><label class="library-search-control" for="paper-search"><span class="library-visually-hidden">Search papers and guides</span><input type="search" id="paper-search" placeholder="Search titles, authors, or ideas…" value="${escape(filters.papers)}"></label><label class="library-select-control" for="paper-subject"><span class="library-visually-hidden">Filter papers by subject</span><select id="paper-subject">${subjectOptions(filters.paperSubject)}</select></label></div><div id="paper-results"></div>`;
   paperResults();
 }
+
 function paperResults() {
-  const q = paperQuery.toLocaleLowerCase().trim();
-  const found = papers.filter(p=>(paperModule==='all'||p.moduleIds.includes(paperModule))&&(paperStatus==='all'||Boolean(state.papers[p.id])===(paperStatus==='read'))&&[p.title,p.authors,p.note,String(p.year)].join(' ').toLocaleLowerCase().includes(q));
-  document.querySelector('#paper-results').innerHTML = `<div class="results-label" role="status">${found.length} readings · Read ${papers.filter(p=>state.papers[p.id]).length} / ${papers.length}</div><div class="paper-grid">${found.map(p=>`<article class="paper-card ${state.papers[p.id]?'read':''}"><div class="card-top"><span class="priority ${p.level==='further'?'p1':''}">${p.level==='essential'?'Essential':'Further reading'}</span><span class="small muted">${p.year} / ${p.kind==='paper'?'PAPER':p.kind==='book'?'BOOK':'GUIDE'}</span></div><h3>${external(p.url,`${escape(p.title)} ↗`)}</h3><div class="authors">${escape(p.authors)}</div><p style="margin-top:12px">${escape(p.note)}</p><div class="paper-card-bottom"><label class="reading-check"><input type="checkbox" data-paper="${p.id}" ${state.papers[p.id]?'checked':''}>Read</label><a class="text-link" href="#module/${p.moduleIds[0]}">Module ${p.moduleIds.join(' / ')} ↗</a></div></article>`).join('')||'<div class="empty"><h3>No matching readings</h3><p>Try a different keyword or filter.</p></div>'}</div>`;
+  const results = papers.filter(paper => (filters.paperSubject === 'all' || paper.moduleIds.includes(filters.paperSubject)) && matches([paper.title, paper.authors, paper.note, paper.year, ...paper.moduleIds.map(subjectName)], filters.papers));
+  document.querySelector('#paper-results').innerHTML = `<p class="library-results-label" role="status" aria-live="polite">${plural(results.length, 'reading')}</p><div class="library-paper-grid">${results.map(paper => `<article class="library-paper-card" data-paper-id="${escape(paper.id)}"><p class="library-paper-meta">${escape(paper.year)} <span aria-hidden="true">·</span> ${escape(paper.kind === 'book' ? 'Book' : paper.kind === 'guide' ? 'Guide' : 'Paper')}</p><h2>${external(paper.url, paper.title)}</h2><p class="library-paper-authors">${escape(paper.authors)}</p><p>${escape(paper.note)}</p><div class="library-paper-subjects">${paper.moduleIds.map(id => `<a href="#subject/${encodeURIComponent(id)}">${escape(subjectName(id))}</a>`).join('')}</div></article>`).join('') || emptyResults('papers')}</div>`;
 }
-function schedulePage(targetWeek) {
-  const next = currentWeek();
-  main.innerHTML = `<div class="page-heading"><div><div class="eyebrow">ONE WEEK AT A TIME</div><h1>Research takes steady practice.</h1><p>A suggested ${schedule.length}-week path: understand → read → experiment → discuss with your mentor. Adjust the pace to your background and available time. Use the optional P2 extensions to go deeper in relevant topics.</p></div></div><div class="schedule-settings"><label for="start-date">My start date</label><input type="date" id="start-date" value="${escape(state.startDate)}"><button class="button secondary" id="clear-date" ${state.startDate?'':'disabled'}>Clear</button><span class="settings-note">Saved locally · Leave blank for week numbers · Suggested dates, not deadlines</span></div><div class="legend-row"><span><i class="dot sage"></i>Foundations</span><span><i class="dot lavender"></i>Core skills</span><span>${schedule.filter(w=>state.weeks[w.week]).length} / ${schedule.length} weeks completed</span></div><div class="timeline">${schedule.map(w=>`<article id="week-${w.week}" class="week-card ${state.weeks[w.week]?'done':''} ${w.week===next.week?'current':''}"><div class="week-label"><span>WEEK</span><strong>${pad(w.week)}</strong><small>${weekDate(w.week)||'At your pace'}</small>${w.optional?'<span class="priority p2" style="display:inline-block;margin-top:10px">Optional</span>':''}</div><div class="week-content"><h3>${escape(w.title)}</h3><p>${escape(w.focus)}</p><div class="deliverable"><b>Deliverable</b>${escape(w.deliverable)}</div><div class="week-links">${w.moduleIds.map(id=>`<a href="#module/${id}">${id} · ${escape(modules.find(m=>m.id===id).shortTitle)}</a>`).join('')}</div></div><div class="week-reading"><div class="eyebrow">READ & REFLECT</div>${readingsForWeek(w).map(p=>external(p.url,`${escape(p.title)} ↗`)).join('')}<label class="week-status"><input type="checkbox" data-week="${w.week}" ${state.weeks[w.week]?'checked':''}>Week completed</label></div></article>`).join('')}</div>`;
-  if (targetWeek && /^week-\d+$/.test(targetWeek)) requestAnimationFrame(()=>document.getElementById(targetWeek)?.scrollIntoView({block:'start'}));
+
+function notFound() {
+  main.innerHTML = '<section class="library-empty"><h1>This page is not in the library.</h1><p>Browse the subject index or search the article collection.</p><a class="library-button" href="#overview">Back to the library</a></section>';
 }
-function notFound() { main.innerHTML = '<div class="empty"><h1>This page is not on the map.</h1><a class="button primary" href="#overview">Back to overview →</a></div>'; }
-function route() {
-  if (!modules.length || !schedule.length) return;
+
+function route(event) {
+  if (!loaded) return;
   const [rawView, id] = location.hash.slice(1).split('/');
-  const view = rawView || 'overview';
-  const nav = view==='module'||view==='fieldnotes'?'curriculum':view;
-  document.querySelectorAll('[data-nav]').forEach(a=>{ const active=a.dataset.nav===nav; a.classList.toggle('active',active); if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current'); });
-  const labels={overview:'Overview',curriculum:'Curriculum',schedule:'Schedule',papers:'Reading room',fieldnotes:'Topic guides'};
-  document.querySelector('#page-label').textContent=labels[view]||labels[nav]||'Course';
-  document.title=`${view==='module'?(modules.find(m=>m.id===id)?.shortTitle||'Module'):labels[view]||labels[nav]||'Research'} · enming group`;
-  if(view==='overview'||view==='')overview();else if(view==='curriculum')curriculum();else if(view==='module')moduleDetail(id);else if(view==='papers')library();else if(view==='fieldnotes')fieldnotes();else if(view==='schedule')schedulePage(id);else notFound();
-  if(!id||view!=='schedule')window.scrollTo({top:0});
+  const aliases = { curriculum: 'subjects', fieldnotes: 'articles', module: 'subject', schedule: 'overview' };
+  const view = aliases[rawView] || rawView || 'overview';
+  const activeNav = view === 'subject' ? 'subjects' : view;
+  document.querySelectorAll('[data-library-nav]').forEach(link => {
+    const active = link.dataset.libraryNav === activeNav;
+    link.classList.toggle('active', active);
+    if (active) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+  const titles = { overview: 'Library', subjects: 'Subjects', articles: 'Articles', papers: 'Papers' };
+  const title = view === 'subject' ? subjects.find(subject => subject.id === id)?.shortTitle || 'Subject' : titles[view] || 'Library';
+  document.title = `${title} · enming group`;
+  document.querySelector('#library-page-label').textContent = title;
+  if (view === 'overview') overview();
+  else if (view === 'subjects') subjectList();
+  else if (view === 'subject') subjectDetail(id);
+  else if (view === 'articles') articleList();
+  else if (view === 'papers') paperList();
+  else notFound();
+  if (event?.type === 'hashchange') main.focus({ preventScroll: true });
+  window.scrollTo({ top: 0 });
 }
-document.addEventListener('click', e=>{
-  if(e.target.closest('.skip-link')){e.preventDefault();main.focus();main.scrollIntoView({block:'start'});return;}
-  const stage=e.target.closest('[data-stage-link]'); if(stage){curriculumFilter=stage.dataset.stageLink;curriculumQuery='';if(location.hash==='#curriculum')curriculum();}
-  const filter=e.target.closest('[data-curriculum-filter]');if(filter){curriculumFilter=filter.dataset.curriculumFilter;curriculum();}
-  const status=e.target.closest('[data-paper-status]');if(status){paperStatus=status.dataset.paperStatus;library();}
-  const page=e.target.closest('[data-guide-page]');if(page){guidePage=Number(page.dataset.guidePage);guideResults();document.querySelector('#guide-results').scrollIntoView({block:'start'});}
-  if(e.target.closest('#backup-open'))document.querySelector('#backup-dialog').showModal();
-  if(e.target.closest('#import-open'))document.querySelector('#import-progress').click();
-  if(e.target.closest('[data-close-dialog]'))document.querySelector('#backup-dialog').close();
-  if(e.target.closest('#clear-date')){state.startDate='';save();schedulePage();}
-  if(e.target.closest('#export-progress')){const blob=new Blob([JSON.stringify({source:'research-fieldnotes',version:1,exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`enming-group-progress-${localISO(new Date())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Progress exported');}
+
+function clearFilter(kind) {
+  if (kind === 'subjects') { filters.subjects = ''; subjectList(); document.querySelector('#subject-search').focus(); }
+  if (kind === 'articles') { filters.articles = ''; filters.articleSubject = 'all'; filters.articlePage = 1; articleList(); document.querySelector('#article-search').focus(); }
+  if (kind === 'papers') { filters.papers = ''; filters.paperSubject = 'all'; paperList(); document.querySelector('#paper-search').focus(); }
+}
+
+document.addEventListener('submit', event => {
+  if (event.target.id !== 'library-search-form') return;
+  event.preventDefault();
+  filters.articles = document.querySelector('#library-search').value;
+  filters.articleSubject = 'all';
+  filters.articlePage = 1;
+  location.hash = '#articles';
 });
-document.addEventListener('input', e=>{
-  if(e.target.id==='curriculum-search'){curriculumQuery=e.target.value;curriculumResults();}
-  if(e.target.id==='paper-search'){paperQuery=e.target.value;paperResults();}
-  if(e.target.id==='guide-search'){guideQuery=e.target.value;guidePage=1;guideResults();}
-  if(e.target.dataset.notes){state.notes[e.target.dataset.notes]=e.target.value;const saved=save();document.querySelector('#notes-status').textContent=saved?'Saved automatically in this browser':'Could not save locally. Export your progress to back up these notes.';}
+
+document.addEventListener('input', event => {
+  if (event.target.id === 'subject-search') { filters.subjects = event.target.value; subjectResults(); }
+  if (event.target.id === 'article-search') { filters.articles = event.target.value; filters.articlePage = 1; articleResults(); }
+  if (event.target.id === 'paper-search') { filters.papers = event.target.value; paperResults(); }
 });
-document.addEventListener('change', async e=>{
-  const el=e.target;
-  if(el.dataset.topic){state.topics[el.dataset.topic]=el.checked;save();el.closest('.check-item').classList.toggle('checked',el.checked);const m=modules.find(x=>x.id===el.dataset.module),done=moduleProgress(m),pct=percent(done,m.topics.length);document.querySelector('#module-done').textContent=`${done} / ${m.topics.length} understood`;document.querySelector('#module-percent').textContent=`${pct}%`;document.querySelector('#module-progress').style.width=`${pct}%`;}
-  if(el.dataset.paper){state.papers[el.dataset.paper]=el.checked;save();if(location.hash==='#papers')paperResults();}
-  if(el.dataset.week){state.weeks[el.dataset.week]=el.checked;save();const top=window.scrollY;schedulePage();window.scrollTo({top});}
-  if(el.id==='paper-module'){paperModule=el.value;paperResults();}
-  if(el.id==='guide-module'){guideModule=el.value;guidePage=1;guideResults();}
-  if(el.id==='start-date'){if(el.value&&!validDate(el.value)){toast('Please enter a valid date');return;}state.startDate=el.value;save();schedulePage();}
-  if(el.id==='import-progress'){
-    const file=el.files[0];if(!file)return;
-    try{if(file.size>2000000)throw new Error('File too large. Choose a JSON backup exported from this course.');const imported=JSON.parse(await file.text());if(imported.source!=='research-fieldnotes'||imported.version!==1)throw new Error('This is not a valid course progress backup');const parsed=normalizeState(imported.data);if(!window.confirm('Importing will replace the progress and notes in this browser. Continue?'))return;state=parsed;save();route();document.querySelector('#backup-dialog').close();toast('Progress imported');}catch(error){toast(error.message||'Import failed. Please check your JSON backup.');}finally{el.value='';}
+
+document.addEventListener('change', event => {
+  if (event.target.id === 'article-subject') { filters.articleSubject = event.target.value; filters.articlePage = 1; articleResults(); }
+  if (event.target.id === 'paper-subject') { filters.paperSubject = event.target.value; paperResults(); }
+});
+
+document.addEventListener('click', event => {
+  if (event.target.closest('.skip-link')) { event.preventDefault(); main.focus(); main.scrollIntoView({ block: 'start' }); return; }
+  const clear = event.target.closest('[data-clear-filter]');
+  if (clear) clearFilter(clear.dataset.clearFilter);
+  const page = event.target.closest('[data-article-page]');
+  if (page && !page.disabled) {
+    const requested = Number(page.dataset.articlePage);
+    if (Number.isInteger(requested)) {
+      filters.articlePage = requested;
+      articleResults();
+      const results = document.querySelector('#article-results');
+      results.setAttribute('tabindex', '-1');
+      results.focus({ preventScroll: true });
+      results.scrollIntoView({ block: 'start' });
+    }
   }
+  if (event.target.closest('[data-library-retry]')) loadLibrary();
 });
-window.addEventListener('hashchange',route);
-window.addEventListener('pageshow',event=>{if(event.persisted&&modules.length){try{const saved=localStorage.getItem(STORAGE_KEY);state=saved?normalizeState(JSON.parse(saved)):defaults();updateProgress();route();}catch{toast('Saved progress could not be refreshed. Reload or restore a backup.');}}});
-window.addEventListener('storage',e=>{if(e.key===STORAGE_KEY){try{state=e.newValue?normalizeState(JSON.parse(e.newValue)):defaults();updateProgress();if(!document.activeElement?.matches('textarea,input[type="search"]'))route();}catch{ /* Ignore malformed data from another tab. */ }}});
-try {
-  [modules,papers,schedule,topicGuides] = await Promise.all(['curriculum','papers','schedule','topic-index'].map(async name=>{const r=await fetch(`./data/${name}.json?v=${BUILD_VERSION}`,{cache:'no-cache'});if(!r.ok)throw new Error(`${name}: ${r.status}`);return r.json();}));
-  try {const saved=localStorage.getItem(STORAGE_KEY);if(saved)state=normalizeState(JSON.parse(saved));} catch {toast('The course loaded, but saved progress could not be read. Import a backup to restore it.');}
-  updateProgress();route();
-} catch(error) { console.error('Course load failed:',error);main.innerHTML='<div class="empty"><h1>Course materials could not be loaded.</h1><p>Check your connection and refresh. For local use, run npm run dev in the project folder and open the local address.</p><button class="button primary" onclick="location.reload()">Reload</button></div>'; }
+
+window.addEventListener('hashchange', route);
+
+async function loadLibrary() {
+  if (loading) return;
+  loading = true;
+  main.setAttribute('aria-busy', 'true');
+  main.innerHTML = '<p class="library-loading" role="status">Opening the library…</p>';
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const data = await Promise.all(['curriculum', 'papers', 'topic-index'].map(async name => {
+      const response = await fetch(`./data/${name}.json?v=${BUILD_VERSION}`, { cache: 'no-cache', signal: controller.signal });
+      if (!response.ok) throw new Error(`${name}: ${response.status}`);
+      return response.json();
+    }));
+    if (!Array.isArray(data[0]) || !Array.isArray(data[1]) || !data[2] || typeof data[2] !== 'object') throw new Error('Invalid library data.');
+    [subjects, papers, topicIndex] = data;
+    articles = subjects.flatMap(subject => subject.topics.map(topic => topicIndex[topic.id]).filter(Boolean));
+    if (articles.length !== subjects.reduce((total, subject) => total + subject.topics.length, 0)) throw new Error('The article index is incomplete.');
+    loaded = true;
+    route();
+  } catch (error) {
+    loaded = false;
+    console.error('Library loading failed:', error);
+    main.innerHTML = '<section class="library-empty" role="alert"><h1>The library could not be opened.</h1><p>Check your connection and try again.</p><button type="button" class="library-button" data-library-retry>Try again</button></section>';
+  } finally {
+    clearTimeout(timeout);
+    loading = false;
+    main.setAttribute('aria-busy', 'false');
+  }
+}
+
+const ready = loadLibrary();

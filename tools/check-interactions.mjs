@@ -1,87 +1,170 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
-import {loadLessons,makeTopicIndex} from './lessons.mjs';
+import {loadLessons,makeTopicIndex,lessonDocument,escapeHTML} from './lessons.mjs';
 
-// Unit-check shared progress without depending on a browser or replacing browser QA.
-const source=await readFile('lesson.js','utf8');
-const key='research-fieldnotes-v1';
-function harness(initial,{blocked=false}={}){
-  const storage=new Map(initial===undefined?[]:[[key,initial]]);
-  const elements=new Map();const events=new Map();
-  function element(id){if(!elements.has(id))elements.set(id,{checked:false,textContent:'',listeners:{},classList:{add(){},remove(){}},addEventListener(type,fn){this.listeners[type]=fn;}});return elements.get(id);}
-  vm.runInNewContext(source,{
-    document:{body:{dataset:{topicId:'04-03'}},querySelector:element},
-    localStorage:{getItem(k){if(blocked)throw new Error('Blocked');return storage.get(k)||null;},setItem(k,v){if(blocked)throw new Error('Blocked');storage.set(k,v);}},
-    window:{addEventListener(type,fn){events.set(type,fn);}},
-    navigator:{clipboard:{writeText:async()=>{}}},location:{href:'https://example.com/learn/04-03/'},
-    setTimeout:()=>1,clearTimeout:()=>{}
-  });
-  return {storage,element,events};
-}
-const original={topics:{'01-01':true},papers:{attention:true},weeks:{1:true},notes:{'04':'Keep this existing note, including 数学 and <symbols>.'},startDate:'2026-10-01'};
-const test=harness(JSON.stringify(original));
-const checkbox=test.element('#topic-understood');
-assert.equal(checkbox.checked,false);
-checkbox.checked=true;checkbox.listeners.change();
-assert.deepEqual(JSON.parse(test.storage.get(key)),{...original,topics:{...original.topics,'04-03':true}},'Article completion preserves notes, readings, schedule and previous topics');
-checkbox.checked=false;checkbox.listeners.change();
-assert.equal(JSON.parse(test.storage.get(key)).topics['04-03'],false);
-test.storage.set(key,JSON.stringify({...original,topics:{'04-03':true}}));test.events.get('storage')({key});
-assert.equal(checkbox.checked,true,'An update in the course tab is reflected in the article');
-test.storage.set(key,JSON.stringify(original));test.events.get('pageshow')({persisted:true});
-assert.equal(checkbox.checked,false,'Browser back/forward restores current progress from storage');
-const corrupted=harness('{broken');corrupted.element('#topic-understood').checked=true;corrupted.element('#topic-understood').listeners.change();
-assert.equal(corrupted.storage.get(key),'{broken','Malformed progress is never overwritten');
-assert.equal(corrupted.element('#topic-understood').checked,false);
-const blocked=harness(undefined,{blocked:true});blocked.element('#topic-understood').checked=true;blocked.element('#topic-understood').listeners.change();
-assert.equal(blocked.element('#topic-understood').checked,false,'Failed writes are not shown as saved');
-const fresh=harness();fresh.element('#topic-understood').checked=true;fresh.element('#topic-understood').listeners.change();
-assert.equal(JSON.parse(fresh.storage.get(key)).topics['04-03'],true,'New readers can save progress');
-console.log('PASS · article progress preserves existing data, synchronizes across tabs, and handles unavailable or corrupt storage');
-
-const course=await loadLessons({partial:true});
+// Exercise the real handlers with a small DOM adapter; this is not browser layout QA.
+const course=await loadLessons();
 const topicIndex=makeTopicIndex(course);
-const fixtures={curriculum:course.modules,'topic-index':topicIndex,papers:JSON.parse(await readFile('data/papers.json','utf8')),schedule:JSON.parse(await readFile('data/schedule.json','utf8'))};
-const uiElements=new Map(),uiEvents=new Map(),windowEvents=new Map();
-function uiElement(selector){if(!uiElements.has(selector))uiElements.set(selector,{innerHTML:'',textContent:'',style:{},classList:{add(){},remove(){},toggle(){}},scrollIntoView(){},focus(){}});return uiElements.get(selector);}
-const appSource=await readFile('app.js','utf8');
-const location={hash:''};
-const uiStorage=new Map();
-const app=await vm.runInNewContext(`(async()=>{${appSource}\nreturn {route,fieldnotes};})()`,{
-  document:{querySelector:uiElement,querySelectorAll:()=>[],addEventListener(type,fn){uiEvents.set(type,fn);},getElementById:id=>uiElement('#'+id)},
-  localStorage:{getItem:key=>uiStorage.get(key)||null,setItem:(key,val)=>uiStorage.set(key,val)},
-  fetch:async (url,options)=>{assert(url.endsWith('?v=development'),'Course data requests include the build version');assert.equal(options.cache,'no-cache','Course data is revalidated');return {ok:true,json:async()=>fixtures[url.split('?')[0].replace('./data/','').replace('.json','')]};},
-  window:{addEventListener(type,fn){windowEvents.set(type,fn);},scrollTo(){}},location,console,
-  requestAnimationFrame:fn=>fn(),setTimeout:()=>1,clearTimeout:()=>{}
-});
-assert(uiElement('#main').innerHTML.includes('TOPIC EXPLAINERS'),'Homepage links to the article collection');
-assert(uiElement('#main').innerHTML.includes('<strong>12</strong>')&&uiElement('#main').innerHTML.includes('<strong>174</strong>'),'Course overview reflects the retained syllabus');
-location.hash='#schedule';app.route();
-assert.equal((uiElement('#main').innerHTML.match(/class="week-card/g)||[]).length,20,'Schedule contains twenty weeks');
-location.hash='#module/13';app.route();
-assert(uiElement('#main').innerHTML.includes('This page is not on the map.'),'Removed modules cannot be opened');
-const readyModule=course.modules.find(m=>m.topics.every(t=>topicIndex[t.id]));
-assert(readyModule,'At least one module is complete for interaction checks');
-location.hash=`#module/${readyModule.id}`;app.route();
-const checklistHTML=uiElement('#main').innerHTML;
-for(const topic of readyModule.topics){assert(checklistHTML.includes(`href="./learn/${topic.id}/"`));assert(checklistHTML.includes(topicIndex[topic.id].references[0].url.replaceAll('&','&amp;')));}
-assert(!/<label[^>]*>[\s\S]*?class="topic-title"[\s\S]*?<\/label>/.test(checklistHTML),'Article links are outside checkbox labels');
-uiStorage.set(key,JSON.stringify({...original,topics:{[readyModule.topics[0].id]:true}}));
-windowEvents.get('pageshow')({persisted:true});
-assert(uiElement('#main').innerHTML.includes(`id="topic-label-${readyModule.topics[0].id}"`));
-assert(uiElement('#main').innerHTML.includes('1 / '+readyModule.topics.length+' understood'),'Returning to a cached course page reflects article progress');
-uiStorage.set(key,JSON.stringify({...original,topics:{'01-01':true,'13-01':true},papers:{attention:true,moviechat:true},weeks:{1:true,21:true},notes:{'04':'Retained note','13':'Archived personal note'}}));
-windowEvents.get('pageshow')({persisted:true});
-uiEvents.get('input')({target:{dataset:{notes:'01'},value:'A new learning note'}});
-const preserved=JSON.parse(uiStorage.get(key));
-assert.equal(preserved.topics['13-01'],true);assert.equal(preserved.notes['13'],'Archived personal note');assert.equal(preserved.weeks['21'],true);assert.equal(preserved.papers.moviechat,true);
-assert(uiElement('#side-count').textContent.startsWith('1 / 174'),'Dormant progress is preserved without contributing to course totals');
-location.hash='#fieldnotes';app.route();
-assert.equal((uiElement('#guide-results').innerHTML.match(/class="guide-card"/g)||[]).length,Math.min(24,course.lessons.length),'Guide collection is paginated');
-uiEvents.get('input')({target:{id:'guide-search',value:'zzzz-unmatched-lesson-query',dataset:{}}});
-assert(uiElement('#guide-results').innerHTML.includes('No matching guides'),'Guide search has a usable empty state');
-uiEvents.get('input')({target:{id:'guide-search',value:'',dataset:{}}});
-await uiEvents.get('change')({target:{id:'guide-module',value:readyModule.id,dataset:{}}});
-assert.equal((uiElement('#guide-results').innerHTML.match(/class="guide-card"/g)||[]).length,readyModule.topics.length,'Module filtering selects the expected articles');
-console.log('PASS · curriculum source links, standalone article links, search, pagination and module filtering render correctly');
+const fixtures={curriculum:course.modules,'topic-index':topicIndex,papers:JSON.parse(await readFile('data/papers.json','utf8'))};
+const [appSource,lessonSource,libraryHTML,legacyHTML]=await Promise.all(['app.js','lesson.js','library.html','course.html'].map(file=>readFile(file,'utf8')));
+function storageGuard(context){
+  const accesses=[];
+  // Throw on property access, including a read caught by application error handling.
+  // Existing valid, corrupt, or unrelated records cannot be touched without this access.
+  for(const target of [context,context.window])for(const name of ['localStorage','sessionStorage','indexedDB'])Object.defineProperty(target,name,{get(){accesses.push(name);throw new Error('Reference pages must not access browser storage');}});
+  return ()=>assert.deepEqual(accesses,[],'Browsing never accesses browser storage, even for reads');
+}
+function element(){
+  const attributes=new Map(),classes=new Set(),listeners=new Map();
+  return {innerHTML:'',textContent:'',style:{},dataset:{},value:'',disabled:false,
+    classList:{add:(...items)=>items.forEach(item=>classes.add(item)),remove:(...items)=>items.forEach(item=>classes.delete(item)),contains:item=>classes.has(item),toggle(item,force){const add=force??!classes.has(item);add?classes.add(item):classes.delete(item);return add;}},
+    setAttribute:(name,value)=>attributes.set(name,String(value)),getAttribute:name=>attributes.get(name)??null,removeAttribute:name=>attributes.delete(name),
+    addEventListener(type,fn){listeners.set(type,fn);},listeners,focusCount:0,focus(){this.focusCount++;},scrollIntoView(){},matches(){return false;}
+  };
+}
+const personalUI=/type=["']checkbox["']|id=["'](?:backup-dialog|import-progress|export-progress|start-date|module-notes|topic-understood|completion-status|side-progress|side-count)["']|data-(?:topic|paper|week|notes)=|My research notes|Mark as read|Save progress/i;
+function assertReferenceUI(markup){assert(!personalUI.test(markup),'Reference views have no progress, checklist, notes, backup, or reading-status controls');assert(!/href=["'][^"']*#schedule/.test(markup),'No schedule navigation is rendered');}
+
+async function libraryHarness({data=fixtures,fail=false}={}){
+  const elements=new Map(),events=new Map(),windowEvents=new Map(),requests=[],errors=[];
+  const get=selector=>{if(!elements.has(selector))elements.set(selector,element());return elements.get(selector);};
+  const navigation=[...libraryHTML.matchAll(/data-library-nav="([^"]+)"/g)].map(match=>{const link=element();link.dataset.libraryNav=match[1];return link;});
+  const location={hash:'',href:'https://enmingzz.github.io/vlm-project/library.html',search:'',reload(){}};
+  const context={
+    document:{querySelector:get,querySelectorAll:selector=>selector==='[data-library-nav]'?navigation:[],getElementById:id=>get('#'+id),addEventListener:(type,fn)=>events.set(type,fn),title:''},
+    window:{addEventListener:(type,fn)=>windowEvents.set(type,fn),scrollTo(){}},location,URL,AbortController,
+    fetch:async(url,options)=>{
+      requests.push(url);assert(url.endsWith('?v=development'),'Library requests carry the build version');assert.equal(options.cache,'no-cache','Library data is revalidated');
+      const name=url.split('?')[0].replace('./data/','').replace('.json','');
+      assert(Object.hasOwn(data,name),`Only reference data is fetched, got ${name}`);
+      if(fail)throw new Error('Temporary connection failure');
+      return {ok:true,json:async()=>structuredClone(data[name])};
+    },console:{error:(...args)=>errors.push(args),warn:(...args)=>errors.push(args),log(){}},
+    requestAnimationFrame:fn=>fn(),setTimeout:()=>1,clearTimeout(){}
+  };
+  const assertStorageUntouched=storageGuard(context);
+  const api=await vm.runInNewContext(`(async()=>{${appSource}\nawait ready; return {route};})()`,context,{filename:'app.js'});
+  const go=hash=>{location.hash=hash;api.route();assertReferenceUI(get('#main').innerHTML);};
+  const dispatch=async(type,target)=>{assert(events.has(type),`${type} handler exists`);await events.get(type)({target:{dataset:{},...target},preventDefault(){}});assertReferenceUI([...elements.values()].map(el=>el.innerHTML).join(''));};
+  const click=async dataset=>dispatch('click',{dataset,closest(selector){const key=selector.match(/^\[data-([\w-]+)\]$/)?.[1]?.replace(/-([a-z])/g,(_,letter)=>letter.toUpperCase());return key&&Object.hasOwn(dataset,key)?this:null;}});
+  return {get,go,dispatch,click,requests,errors,windowEvents,location,navigation,assertStorageUntouched};
+}
+const library=await libraryHarness();
+const markup=selector=>library.get(selector).innerHTML;
+const ids=(selector,attribute)=>[...markup(selector).matchAll(new RegExp(`data-${attribute}="([^"]+)"`,'g'))].map(match=>match[1]);
+assert.equal(library.errors.length,0,'Library loads without runtime errors');
+assert.deepEqual(library.requests.map(url=>url.split('?')[0]).sort(),['./data/curriculum.json','./data/papers.json','./data/topic-index.json'],'The schedule is never fetched');
+assertReferenceUI(libraryHTML+markup('#main'));
+assert.equal(library.get('#main').focusCount,0,'Initial loading does not steal keyboard focus');
+for(const count of [12,174,29])assert(markup('#main').includes(`<strong>${count}</strong>`),`Overview shows ${count} reference resources`);
+for(const route of ['subjects','articles','papers'])assert(markup('#main').includes(`href="#${route}"`),`Overview links to ${route}`);
+library.go('#subjects');
+assert.equal(library.navigation.find(link=>link.dataset.libraryNav==='subjects')?.getAttribute('aria-current'),'page','Navigation exposes the current reference section');
+assert.deepEqual(ids('#subject-results','subject-id'),course.modules.map(subject=>subject.id),'Every subject can be browsed');
+await library.dispatch('input',{id:'subject-search',value:'TRANSFORMER'});
+assert(markup('#subject-results').includes('Transformer'),'Subject search ignores case and finds subject/topic text');
+await library.dispatch('input',{id:'subject-search',value:'zzzz-unmatched-subject'});
+assert.deepEqual(ids('#subject-results','subject-id'),[],'Subject search can show an empty result');
+await library.click({clearFilter:'subjects'});
+assert.deepEqual(ids('#subject-results','subject-id'),course.modules.map(subject=>subject.id),'Clearing subject search restores all subjects');
+for(const subject of course.modules){
+  library.go(`#subject/${subject.id}`);
+  const page=markup('#main');
+  assert(page.includes(escapeHTML(subject.title)),`${subject.id}: subject heading`);
+  for(const topic of subject.topics){
+    assert(page.includes(`href="./learn/${topic.id}/"`),`${topic.id}: standalone article link`);
+    for(const reference of topicIndex[topic.id].references)assert(page.includes(`href="${escapeHTML(reference.url)}"`),`${topic.id}: original source link`);
+  }
+  assert(!/\bP[012]\b/.test(page),`${subject.id}: no course priority badges`);
+}
+library.go('#subject/13');assert(!markup('#main').includes('href="./learn/13-'),'Removed subjects cannot be opened');
+assert(/not found|not in the library/i.test(markup('#main')),'Unknown subject has a useful missing-page message');
+library.go('#articles');
+const articleIds=Object.keys(topicIndex);
+assert.deepEqual(ids('#article-results','topic-id'),articleIds.slice(0,24),'Articles are paginated');
+await library.click({articlePage:'2'});
+assert.deepEqual(ids('#article-results','topic-id'),articleIds.slice(24,48),'Next page shows distinct articles');
+assert.equal(library.get('#article-results').getAttribute('tabindex'),'-1','Updated article results can receive programmatic focus');
+assert.equal(library.get('#article-results').focusCount,1,'Pagination moves focus to the new article results');
+await library.click({articlePage:'1'});
+assert.deepEqual(ids('#article-results','topic-id'),articleIds.slice(0,24),'Previous page returns to the first articles');
+await library.dispatch('input',{id:'article-search',value:'zzzz-unmatched-article'});
+assert.deepEqual(ids('#article-results','topic-id'),[]);
+assert(/no matching|no articles/i.test(markup('#article-results')),'Article search has a usable empty state');
+await library.dispatch('input',{id:'article-search',value:''});
+await library.dispatch('change',{id:'article-subject',value:'04'});
+assert.deepEqual(ids('#article-results','topic-id'),course.modules.find(subject=>subject.id==='04').topics.map(topic=>topic.id),'Subject filtering selects the expected articles');
+await library.dispatch('input',{id:'article-search',value:'zzzz-unmatched-article'});
+assert.deepEqual(ids('#article-results','topic-id'),[],'Article search combines with the subject filter');
+await library.click({clearFilter:'articles'});
+assert.deepEqual(ids('#article-results','topic-id'),articleIds.slice(0,24),'Clearing article filters restores the complete collection');
+await library.dispatch('input',{id:'article-search',value:'ATTENTION'});
+assert(ids('#article-results','topic-id').some(id=>id.startsWith('04-')),'Article search ignores case');
+await library.dispatch('input',{id:'article-search',value:''});
+library.go('#overview');library.get('#library-search').value='ATTENTION';
+await library.dispatch('submit',{id:'library-search-form'});
+assert.equal(library.location.hash,'#articles','Overview search opens the article collection');
+library.windowEvents.get('hashchange')({type:'hashchange'});
+assert(ids('#article-results','topic-id').some(id=>id.startsWith('04-')),'Overview search query is applied');
+assert.equal(library.get('#main').focusCount,1,'Reference navigation moves keyboard focus to the new page');
+await library.click({clearFilter:'articles'});
+library.go('#papers');
+assert.deepEqual(ids('#paper-results','paper-id'),fixtures.papers.map(paper=>paper.id),'All curated readings remain browseable');
+for(const paper of fixtures.papers)assert(markup('#paper-results').includes(`href="${escapeHTML(paper.url)}"`),`${paper.id}: paper source link`);
+await library.dispatch('input',{id:'paper-search',value:'ATTENTION IS ALL YOU NEED'});
+assert.deepEqual(ids('#paper-results','paper-id'),['attention'],'Paper search ignores case');
+await library.dispatch('change',{id:'paper-subject',value:'01'});
+assert.deepEqual(ids('#paper-results','paper-id'),[],'Paper search combines with the subject filter');
+await library.dispatch('input',{id:'paper-search',value:''});
+assert.deepEqual(ids('#paper-results','paper-id'),fixtures.papers.filter(paper=>paper.moduleIds.includes('01')).map(paper=>paper.id),'Paper subject filter selects relevant readings');
+await library.click({clearFilter:'papers'});
+assert.deepEqual(ids('#paper-results','paper-id'),fixtures.papers.map(paper=>paper.id),'Clearing paper filters restores the collection');
+for(const [legacy,canonical] of [['#curriculum','#subjects'],['#fieldnotes','#articles'],['#module/04','#subject/04'],['#schedule','#overview'],['#schedule/week-5','#overview']]){
+  library.go(canonical);const expected=markup('#main');library.go(legacy);assert.equal(markup('#main'),expected,`${legacy}: old bookmark opens the canonical library view`);
+}
+const unsafe='<img src=x onerror="window.injected=true"> & "quoted"';
+library.go('#articles');await library.dispatch('input',{id:'article-search',value:unsafe});
+assert(!markup('#article-results').includes(unsafe),'Search text is not interpreted as HTML');
+const escapedData=structuredClone(fixtures);escapedData.curriculum[0].title=unsafe;escapedData['topic-index']['01-01'].title=unsafe;escapedData.papers[0].title=unsafe;
+const escaped=await libraryHarness({data:escapedData});
+for(const [hash,selector] of [['#subjects','#subject-results'],['#articles','#article-results'],['#papers','#paper-results']]){
+  escaped.go(hash);const content=escaped.get(selector).innerHTML;assert(content.includes(escapeHTML(unsafe))&&!content.includes(unsafe),'Reference metadata is escaped before HTML insertion');
+}
+escaped.assertStorageUntouched();
+const failed=await libraryHarness({fail:true});assert(/could not|unable|failed/i.test(failed.get('#main').innerHTML),'Unavailable reference data has a meaningful error state');failed.assertStorageUntouched();
+for(const type of ['pageshow','storage'])library.windowEvents.get(type)?.({persisted:true,key:'research-fieldnotes-v1',newValue:'{broken'});
+library.assertStorageUntouched();
+
+// Copy-link and section indicators remain useful without a personal state store.
+async function articleHarness({clipboardFails=false}={}){
+  const controls=new Map(),events=new Map(),copied=[],observed=[];let observeEntries;
+  const get=selector=>{if(!controls.has(selector))controls.set(selector,element());return controls.get(selector);};
+  const toc=[element(),element(),element(),element()];toc.forEach((link,i)=>link.setAttribute('href',i%2?'#references':'#section-intuition'));
+  const sections=[{id:'section-intuition'},{id:'references'}];
+  class IntersectionObserver{constructor(callback){observeEntries=callback;}observe(section){observed.push(section.id);}}
+  const context={document:{querySelector:get,querySelectorAll:selector=>selector==='.article-section'?sections:toc},window:{IntersectionObserver,addEventListener:(type,fn)=>events.set(type,fn)},IntersectionObserver,
+    navigator:{clipboard:{async writeText(value){if(clipboardFails)throw new Error('Unavailable');copied.push(value);}}},location:{href:'https://enmingzz.github.io/vlm-project/learn/04-03/#references'},setTimeout:()=>1,clearTimeout(){}};
+  const assertStorageUntouched=storageGuard(context);
+  vm.runInNewContext(lessonSource,context,{filename:'lesson.js'});
+  await get('#copy-article').listeners.get('click')();
+  if(clipboardFails)assert(/copy.*address|browser/i.test(get('#toast').textContent),'Unavailable clipboard has a useful fallback');
+  else assert.deepEqual(copied,[context.location.href],'Copy link preserves the exact article section URL');
+  assert.deepEqual(observed,sections.map(section=>section.id),'All article sections are observed');
+  observeEntries([{isIntersecting:true,target:sections[1]}]);
+  toc.forEach((link,i)=>assert.equal(link.getAttribute('aria-current'),i%2?'location':null,'Desktop and mobile section navigation indicate the current location'));
+  for(const type of ['pageshow','storage'])events.get(type)?.({persisted:true,key:'research-fieldnotes-v1'});
+  assertStorageUntouched();
+}
+assert(lessonDocument(course.lessons[0],course).includes('id="copy-article"'),'The tested copy-link button is rendered');
+await articleHarness();await articleHarness({clipboardFails:true});
+
+const inlineScripts=[...legacyHTML.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(match=>match[1]).filter(script=>script.trim());
+assert(inlineScripts.length,'Old course bookmarks have a redirect script');
+for(const hash of ['','#overview','#curriculum','#module/04','#schedule/week-5','#papers','#fieldnotes']){
+  const redirects=[],fallback={href:''};
+  for(const source of inlineScripts)vm.runInNewContext(source,{location:{hash,search:'?from=saved',replace:url=>redirects.push(url)},document:{getElementById:id=>{assert.equal(id,'library-redirect-link');return fallback;}}});
+  assert.deepEqual(redirects,['./library.html?from=saved'+hash],'The course compatibility page preserves search and hash');
+  assert.equal(fallback.href,'./library.html?from=saved'+hash,'The visible fallback preserves the old bookmark destination');
+}
+console.log('PASS · library routes, legacy links, browse/search/combined filters, pagination, source links, safe text, article controls, and zero browser-storage access');
