@@ -1,0 +1,2634 @@
+{
+  "reviewer": "OpenAI Codex",
+  "scope": "Full factual and source-support audit plus source-reading enrichment of articles 01-01 through 04-18 (modules 01–04 only). Shared curriculum/paper data, website code, commits and publication are outside this agent's edit scope.",
+  "reviewedTopicIds": [
+    "01-01",
+    "01-02",
+    "01-03",
+    "01-04",
+    "01-05",
+    "01-06",
+    "01-07",
+    "01-08",
+    "01-09",
+    "01-10",
+    "01-11",
+    "02-01",
+    "02-02",
+    "02-03",
+    "02-04",
+    "02-05",
+    "02-06",
+    "02-07",
+    "02-08",
+    "02-09",
+    "02-10",
+    "02-11",
+    "02-12",
+    "02-13",
+    "02-14",
+    "03-01",
+    "03-02",
+    "03-03",
+    "03-04",
+    "03-05",
+    "03-06",
+    "03-07",
+    "03-08",
+    "03-09",
+    "03-10",
+    "03-11",
+    "03-12",
+    "04-01",
+    "04-02",
+    "04-03",
+    "04-04",
+    "04-05",
+    "04-06",
+    "04-07",
+    "04-08",
+    "04-09",
+    "04-10",
+    "04-11",
+    "04-12",
+    "04-13",
+    "04-14",
+    "04-15",
+    "04-16",
+    "04-17",
+    "04-18"
+  ],
+  "enrichedTopicIds": [
+    "01-01",
+    "01-02",
+    "01-03",
+    "01-04",
+    "01-05",
+    "01-06",
+    "01-07",
+    "01-08",
+    "01-09",
+    "01-10",
+    "01-11",
+    "02-01",
+    "02-02",
+    "02-03",
+    "02-04",
+    "02-05",
+    "02-06",
+    "02-07",
+    "02-08",
+    "02-09",
+    "02-10",
+    "02-11",
+    "02-12",
+    "02-13",
+    "02-14",
+    "03-01",
+    "03-02",
+    "03-03",
+    "03-04",
+    "03-05",
+    "03-06",
+    "03-07",
+    "03-08",
+    "03-09",
+    "03-10",
+    "03-11",
+    "03-12",
+    "04-01",
+    "04-02",
+    "04-03",
+    "04-04",
+    "04-05",
+    "04-06",
+    "04-07",
+    "04-08",
+    "04-09",
+    "04-10",
+    "04-11",
+    "04-12",
+    "04-13",
+    "04-14",
+    "04-15",
+    "04-16",
+    "04-17",
+    "04-18"
+  ],
+  "coverage": {
+    "modules": {
+      "01": 11,
+      "02": 14,
+      "03": 12,
+      "04": 18
+    },
+    "articlesReadInFull": 55,
+    "readFields": [
+      "title",
+      "summary",
+      "prerequisites",
+      "every section paragraph",
+      "all formulas",
+      "all code",
+      "exercise prompt",
+      "exercise answer",
+      "every takeaway",
+      "every reference title, URL and note"
+    ],
+    "sourceReadingSections": 55,
+    "sourceReadingWords": 7926,
+    "sourceReadingWordRange": {
+      "minimum": 134,
+      "maximum": 170
+    },
+    "consolidatedChanges": 30,
+    "articlesWithCorrectionsOrReferenceImprovements": 23,
+    "uniqueFinalArticleReferences": 55,
+    "executedChecks": 53,
+    "storedCodeSnippetsExecuted": [
+      "02-01",
+      "02-04",
+      "02-06",
+      "02-07",
+      "02-09",
+      "04-18"
+    ],
+    "retainedIdentity": "Topic IDs, article ordering, titles, summaries, prerequisite IDs and existing section IDs preserved; source-reading was appended."
+  },
+  "evidence": {
+    "beforeSnapshot": "review/audit-01-04-before.json",
+    "executionEvidence": "review/audit-01-04-execution.json",
+    "baselineClaudeReview": "review/claude-baseline-01-04-findings.json",
+    "expandedClaudeReview": "review/claude-expanded-01-04-findings.json",
+    "expandedResolutions": "review/expanded-resolutions-01-04.json",
+    "beforeSha256": {
+      "01": "3c6b7132343b6a6556c2ebc3238395c106b5a0a912be368b5032fb392286f323",
+      "02": "52b35b7eaf20ea62f2038199b5024cd4ea78154e4f9049a8a29cfba678e000c7",
+      "03": "35696ec1dcde9d3f279de6703a83bd0cef4fe31bcb059a2486c64b3b089cb59e",
+      "04": "275aa5eb1ad05a07448f9fd338618dcb8ce2c6ef7f7847f8f051c3bf82d5e84f"
+    },
+    "finalSha256": {
+      "01": "5a18c62607f640d1b9f99ed406dbb92f1f5b4857521a0679d5cdca18a1cf336b",
+      "02": "92765c64d4162ec6d9c5c9a7e8f936926f6970d9abae351596e58cccdf40ff93",
+      "03": "8283e3538a77b5671e3ed81882de8f6f2ce103bc164c58a1f486eea5a37f77df",
+      "04": "574462aaf325dfe3243c389e7c07da0e052e6d3e46030827e5fb6f9ef5a8cee0"
+    }
+  },
+  "methodology": [
+    "Read every assigned article in full and reasoned through stated equations, assumptions, worked examples, exercise answers, implementation semantics and reference relevance.",
+    "Used primary books, papers, official documentation and official repository source. Where a large book chapter could not be opened fully, relevant primary-site indexed passages were read; these are labeled separately below.",
+    "Executed numerical and functional examples with local CPU PyTorch 2.11.0 and Python 3.13.2. The execution evidence names each check and its scope. A final memory-unit arithmetic check ran in Node. GPU performance claims were checked against primary sources rather than benchmarked.",
+    "Independently validated baseline Claude suggestions rather than treating that reasoning-only review as a source. Accepted narrowly justified clarifications, rejected renumbering for the nonsequential library, and avoided broad nonlinear-network expectation claims.",
+    "Added original, topic-specific source-reading sections linking each article's mechanism or example to its references and limitations. Added direct sources where the original references were too general; did not force research papers onto elementary mathematics or programming topics."
+  ],
+  "issues": [
+    {
+      "topicId": "01-02",
+      "field": "references",
+      "severity": "low",
+      "reason": "The numerical-computation chapter does not document the broadcasting rules central to this article; the official tensor semantics do.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/notes/broadcasting.html"
+      ],
+      "before": [
+        {
+          "title": "Deep Learning — Linear Algebra",
+          "url": "https://www.deeplearningbook.org/contents/linear_algebra.html",
+          "kind": "book",
+          "note": "Review dimensions of linear maps and matrix products."
+        },
+        {
+          "title": "Deep Learning — Numerical Computation",
+          "url": "https://www.deeplearningbook.org/contents/numerical.html",
+          "kind": "book",
+          "note": "Connect shape mistakes to reliable numerical implementations."
+        }
+      ],
+      "after": [
+        {
+          "title": "Deep Learning — Linear Algebra",
+          "url": "https://www.deeplearningbook.org/contents/linear_algebra.html",
+          "kind": "book",
+          "note": "Review dimensions of linear maps and matrix products."
+        },
+        {
+          "title": "PyTorch — Broadcasting Semantics",
+          "url": "https://docs.pytorch.org/docs/stable/notes/broadcasting.html",
+          "kind": "guide",
+          "note": "Check trailing-axis compatibility, inserted singleton dimensions, and examples where broadcasting creates a larger result than intended."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "01-02",
+      "field": "sections.2.paragraphs.0",
+      "severity": "low",
+      "reason": "Align the English subtraction direction with the independently executed numeric residual example.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/notes/broadcasting.html"
+      ],
+      "before": "Broadcasting aligns shapes from the right. Two axes are compatible when they are equal or one has size one; missing leading axes act like ones. That convenience can silently create a pairwise operation: subtracting predictions [B, 1] from labels [B] produces [B, B], rather than B individual residuals. Explicitly reshape labels, and assert named dimensions at module boundaries. Avoid a plain transpose on higher-dimensional tensors when only the feature and sequence axes should swap.",
+      "after": "Broadcasting aligns shapes from the right. Two axes are compatible when they are equal or one has size one; missing leading axes act like ones. That convenience can silently create a pairwise operation: subtracting labels [B] from predictions [B, 1] (predictions − labels) produces [B, B], rather than B individual residuals. Explicitly reshape labels, and assert named dimensions at module boundaries. Avoid a plain transpose on higher-dimensional tensors when only the feature and sequence axes should swap.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "01-03",
+      "field": "sections.1.paragraphs.0",
+      "severity": "medium",
+      "reason": "The original direction-preservation wording excluded negative and zero eigenvalues. Clarify the real-vector limitation of the geometric eigenvector explanation. Previous articles use row vectors; stating the SVD convention prevents swapping input and output singular directions.",
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/linear_algebra.html"
+      ],
+      "before": "An eigenvector of a square matrix retains its direction under the map, changing only by an eigenvalue. The singular value decomposition works for rectangular matrices too: A = UΣVᵀ. The right singular vectors specify input directions, singular values specify their nonnegative gains, and left singular vectors specify corresponding output directions. Keeping the largest r singular values gives the best rank-r approximation in Frobenius norm, although that matrix error does not directly guarantee task accuracy.",
+      "after": "An eigenvector of a square matrix is a nonzero vector mapped to a scalar multiple of itself. For real eigenvalues, a negative value reverses its direction and zero maps it to the zero vector. Some real matrices, such as a 90-degree planar rotation, have no real eigenvectors. The singular value decomposition works for rectangular matrices too: A = UΣVᵀ. For the column-vector convention y = Ax, a right singular vector vᵢ is mapped to σᵢuᵢ: V specifies input directions and U output directions. In the row-vector convention y = xW used earlier, W = UΣVᵀ instead maps uᵢᵀ to σᵢvᵢᵀ, so those roles swap. Keeping the largest r singular values gives the best rank-r approximation in Frobenius norm, although that matrix error does not directly guarantee task accuracy.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "01-04",
+      "field": "references",
+      "severity": "low",
+      "reason": "Add direct primary-source support for the clarified mechanism and reading instructions.",
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/numerical.html",
+        "https://www.deeplearningbook.org/contents/mlp.html"
+      ],
+      "before": [
+        {
+          "title": "Deep Learning — Numerical Computation",
+          "url": "https://www.deeplearningbook.org/contents/numerical.html",
+          "kind": "book",
+          "note": "Read gradient-based optimization and the use of derivatives in multivariable functions."
+        }
+      ],
+      "after": [
+        {
+          "title": "Deep Learning — Numerical Computation",
+          "url": "https://www.deeplearningbook.org/contents/numerical.html",
+          "kind": "book",
+          "note": "Read gradient-based optimization and the use of derivatives in multivariable functions."
+        },
+        {
+          "title": "Deep Learning — Deep Feedforward Networks",
+          "url": "https://www.deeplearningbook.org/contents/mlp.html",
+          "kind": "book",
+          "note": "Read computational graphs, the chain rule, backpropagation, and the addition of gradient contributions from shared paths."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "01-05",
+      "field": "sections.1.paragraphs.0",
+      "severity": "low",
+      "reason": "The Taylor prediction is deterministic, not a probabilistic expectation.",
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/numerical.html"
+      ],
+      "before": "For parameters θ and a small displacement Δ, the loss is approximately L(θ) + ∇L(θ)ᵀΔ. Choosing Δ = −η∇L gives an expected first-order change of −η‖∇L‖². For L(w) = aw²/2 with a > 0, the update is exactly w_next = (1 − ηa)w. It converges when 0 < ηa < 2. Larger curvature therefore requires a smaller stable step.",
+      "after": "For parameters θ and a small displacement Δ, the loss is approximately L(θ) + ∇L(θ)ᵀΔ. Choosing Δ = −η∇L gives a predicted first-order change of −η‖∇L‖². For L(w) = aw²/2 with a > 0, the update is exactly w_next = (1 − ηa)w. It converges when 0 < ηa < 2. Larger curvature therefore requires a smaller stable step.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "01-10",
+      "field": "references",
+      "severity": "low",
+      "reason": "Add verified primary follow-up on Adam convergence and an explicit source-reading caveat. Reddi et al. identify a flaw in the original analysis and convex counterexamples; no universal failure claim is made.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1904.09237"
+      ],
+      "before": [
+        {
+          "title": "Adam: A Method for Stochastic Optimization",
+          "url": "https://arxiv.org/abs/1412.6980",
+          "kind": "paper",
+          "note": "Read moment estimates, bias correction, and the update algorithm."
+        },
+        {
+          "title": "Decoupled Weight Decay Regularization",
+          "url": "https://arxiv.org/abs/1711.05101",
+          "kind": "paper",
+          "note": "Read why decoupled weight decay differs from an L2 penalty under adaptive optimization."
+        }
+      ],
+      "after": [
+        {
+          "title": "Adam: A Method for Stochastic Optimization",
+          "url": "https://arxiv.org/abs/1412.6980",
+          "kind": "paper",
+          "note": "Read moment estimates, bias correction, and the update algorithm."
+        },
+        {
+          "title": "Decoupled Weight Decay Regularization",
+          "url": "https://arxiv.org/abs/1711.05101",
+          "kind": "paper",
+          "note": "Read why decoupled weight decay differs from an L2 penalty under adaptive optimization."
+        },
+        {
+          "title": "On the Convergence of Adam and Beyond",
+          "url": "https://arxiv.org/abs/1904.09237",
+          "kind": "paper",
+          "note": "Read the flaw identified in the original convergence analysis, the convex counterexample, and the distinct assumptions used to analyze the proposed variants."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "01-10",
+      "field": "sections.1.formula",
+      "severity": "low",
+      "reason": "Make bias correction and epsilon placement outside the square root unambiguous, matching Algorithm 1.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1412.6980"
+      ],
+      "before": "mₜ = β₁mₜ₋₁ + (1 − β₁)gₜ;  vₜ = β₂vₜ₋₁ + (1 − β₂)gₜ²",
+      "after": "mₜ = β₁mₜ₋₁ + (1 − β₁)gₜ;  vₜ = β₂vₜ₋₁ + (1 − β₂)gₜ²\nm̂ₜ = mₜ/(1 − β₁ᵗ);  v̂ₜ = vₜ/(1 − β₂ᵗ)\nθₜ = θₜ₋₁ − η·m̂ₜ/(√v̂ₜ + ε)",
+      "status": "corrected"
+    },
+    {
+      "topicId": "01-11",
+      "field": "sections.0.paragraphs.0",
+      "severity": "medium",
+      "reason": "Separate overfitting under the sampling distribution from distribution shift and evaluation leakage, which require different diagnoses.",
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/ml.html"
+      ],
+      "before": "A model is useful when it performs on examples it did not fit. Overfitting occurs when improvements on training data fail to transfer to the intended deployment distribution. The gap can arise from memorization, excessive model selection, leakage, or genuine distribution shift. More training accuracy is therefore evidence about fitting capacity, not sufficient evidence that a model is ready for a new population.",
+      "after": "A model is useful when it performs on examples it did not fit. Overfitting means fitting training-specific patterns that fail to generalize to fresh examples from the same data-generating distribution. A deployment failure can also arise from distribution shift, and leakage can make an evaluation misleading; neither is by itself evidence of overfitting. More training accuracy is therefore evidence about fitting capacity, not sufficient evidence that a model is ready for a new population.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-01",
+      "field": "sections.2.code",
+      "severity": "medium",
+      "reason": "Returning zero for an empty metric can silently report a perfect validation loss; fail explicitly instead.",
+      "sourceUrls": [
+        "https://docs.python.org/3/library/exceptions.html#ValueError"
+      ],
+      "before": "class RunningMean:\n    def __init__(self):\n        self.total, self.count = 0.0, 0\n    def update(self, value):\n        self.total += value\n        self.count += 1\n    def value(self):\n        return self.total / self.count if self.count else 0.0",
+      "after": "class RunningMean:\n    def __init__(self):\n        self.total, self.count = 0.0, 0\n    def update(self, value):\n        self.total += value\n        self.count += 1\n    def value(self):\n        if self.count == 0:\n            raise ValueError(\"Mean is undefined before any updates\")\n        return self.total / self.count",
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-03",
+      "field": "exercise.answer",
+      "severity": "low",
+      "reason": "Qualify the answer for plain commit and distinguish documented automatic-staging and pathspec modes.",
+      "sourceUrls": [
+        "https://git-scm.com/docs/git-commit"
+      ],
+      "before": "The staged snapshot enters the commit, while later edits remain in the working tree. Inspect the staged diff to see what will be recorded, and the ordinary diff to see changes that are still unstaged.",
+      "after": "With a plain git commit, the staged snapshot enters the commit while later edits remain in the working tree. Inspect git diff --staged to see that snapshot and git diff for unstaged edits. By contrast, git commit -a includes current changes to tracked files, and git commit train.py records that named tracked file’s current contents rather than its earlier staged version.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-03",
+      "field": "references",
+      "severity": "low",
+      "reason": "Add direct primary-source support for the clarified mechanism and reading instructions.",
+      "sourceUrls": [
+        "https://git-scm.com/book/en/v2",
+        "https://git-scm.com/docs/git-commit"
+      ],
+      "before": [
+        {
+          "title": "Pro Git",
+          "url": "https://git-scm.com/book/en/v2",
+          "kind": "book",
+          "note": "Read recording changes, basic branching and merging, and the contributing-to-a-project workflow."
+        }
+      ],
+      "after": [
+        {
+          "title": "Pro Git",
+          "url": "https://git-scm.com/book/en/v2",
+          "kind": "book",
+          "note": "Read recording changes, basic branching and merging, and the contributing-to-a-project workflow."
+        },
+        {
+          "title": "Git — git-commit",
+          "url": "https://git-scm.com/docs/git-commit",
+          "kind": "guide",
+          "note": "Compare a plain commit of the index with -a and explicit-path modes, which use current tracked-file contents."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-04",
+      "field": "references",
+      "severity": "low",
+      "reason": "Add a targeted primary reference for einsum output and diagonal semantics. Add a targeted primary reference for view, stride, and reshape-copy behavior.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/generated/torch.einsum.html",
+        "https://docs.pytorch.org/docs/stable/tensor_view.html"
+      ],
+      "before": [
+        {
+          "title": "PyTorch — Tensors",
+          "url": "https://docs.pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html",
+          "kind": "guide",
+          "note": "Review tensor attributes, reshaping, matrix products, and shared storage."
+        }
+      ],
+      "after": [
+        {
+          "title": "PyTorch — Tensors",
+          "url": "https://docs.pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html",
+          "kind": "guide",
+          "note": "Review tensor attributes, reshaping, matrix products, and shared storage."
+        },
+        {
+          "title": "PyTorch — torch.einsum",
+          "url": "https://docs.pytorch.org/docs/stable/generated/torch.einsum.html",
+          "kind": "guide",
+          "note": "Read explicit output subscripts, omitted-axis summation, and repeated labels within one operand; compare ij->i with ii->i."
+        },
+        {
+          "title": "PyTorch — Tensor Views",
+          "url": "https://docs.pytorch.org/docs/stable/tensor_view.html",
+          "kind": "guide",
+          "note": "Distinguish shared-storage views, permuted strides, and reshape operations that may need a copy."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-04",
+      "field": "sections.1.paragraphs.0",
+      "severity": "medium",
+      "reason": "Repeated labels alone do not define einsum reduction; omitted output labels and within-operand diagonal selection are distinct rules.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/main/generated/torch.einsum.html"
+      ],
+      "before": "Start with a projected tensor shaped [B, T, H·D]. Reshape it to [B, T, H, D], then permute to [B, H, T, D] for attention. The first operation splits a feature axis; the second moves the head axis. Einsum can make a contraction explicit: 'btd,dh->bth' projects features while retaining batch and time. Repeated labels identify contracted dimensions unless they are included in the output labels.",
+      "after": "Start with a projected tensor shaped [B, T, H·D]. Reshape it to [B, T, H, D], then permute to [B, H, T, D] for attention. The first operation splits a feature axis; the second moves the head axis. Einsum can make a contraction explicit: 'btd,dh->bth' projects features while retaining batch and time. With an explicit output, dimensions whose labels are omitted from that output are summed, whether or not a label repeats across operands. Repeating a label within one operand selects its diagonal; for example, 'ii->i' extracts a diagonal without summing it.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-07",
+      "field": "references",
+      "severity": "low",
+      "reason": "Add a targeted primary reference for registered buffers and module-call hooks.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html"
+      ],
+      "before": [
+        {
+          "title": "PyTorch — Build the Neural Network",
+          "url": "https://docs.pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html",
+          "kind": "guide",
+          "note": "Read module construction, nested layers, parameters, and forward execution."
+        }
+      ],
+      "after": [
+        {
+          "title": "PyTorch — Build the Neural Network",
+          "url": "https://docs.pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html",
+          "kind": "guide",
+          "note": "Read module construction, nested layers, parameters, and forward execution."
+        },
+        {
+          "title": "PyTorch — Module",
+          "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html",
+          "kind": "guide",
+          "note": "Inspect parameter and buffer registration, state_dict contents, and the hooks invoked by calling a module."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-08",
+      "field": "references",
+      "severity": "low",
+      "reason": "Add a targeted primary reference for custom collation and iterable worker sharding.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/data.html"
+      ],
+      "before": [
+        {
+          "title": "PyTorch — Datasets & DataLoaders",
+          "url": "https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html",
+          "kind": "guide",
+          "note": "Read custom datasets, batching, sampling, and DataLoader responsibilities."
+        }
+      ],
+      "after": [
+        {
+          "title": "PyTorch — Datasets & DataLoaders",
+          "url": "https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html",
+          "kind": "guide",
+          "note": "Read custom datasets, batching, sampling, and DataLoader responsibilities."
+        },
+        {
+          "title": "PyTorch — torch.utils.data",
+          "url": "https://docs.pytorch.org/docs/stable/data.html",
+          "kind": "guide",
+          "note": "Read collate_fn, drop_last, and iterable-dataset examples that shard data across workers to avoid duplicate samples."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-09",
+      "field": "exercise.answer",
+      "severity": "medium",
+      "reason": "Gradient accumulation equals a combined mean for fixed per-example losses, but batch-dependent operations can change those losses. A CPU BatchNorm counterexample was executed.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html",
+        "https://docs.pytorch.org/docs/stable/notes/amp_examples.html"
+      ],
+      "before": "Divide each by four before backward if the goal is the mean loss over the combined batch. Otherwise the accumulated gradient is four times larger. Unequal microbatch sizes require weighting by valid examples or tokens instead of a simple factor of four.",
+      "after": "Divide each by four before backward if the goal is the mean loss over the combined batch. Otherwise the accumulated gradient is four times larger. Unequal microbatch sizes require weighting by valid examples or tokens instead of a simple factor of four. Matching a single large-batch gradient also requires the same per-example forward computation: training-mode BatchNorm changes its statistics across microbatches, and stochastic operations need consistent realizations. Loss scaling alone does not guarantee identical updates.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-09",
+      "field": "references",
+      "severity": "low",
+      "reason": "Add a targeted primary reference for the BatchNorm exception to large-batch equivalence.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html"
+      ],
+      "before": [
+        {
+          "title": "PyTorch — Optimizing Model Parameters",
+          "url": "https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html",
+          "kind": "guide",
+          "note": "Trace gradient clearing, backward, optimizer steps, and evaluation loops."
+        }
+      ],
+      "after": [
+        {
+          "title": "PyTorch — Optimizing Model Parameters",
+          "url": "https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html",
+          "kind": "guide",
+          "note": "Trace gradient clearing, backward, optimizer steps, and evaluation loops."
+        },
+        {
+          "title": "PyTorch — BatchNorm1d",
+          "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html",
+          "kind": "guide",
+          "note": "Check which dimensions supply training statistics and why splitting a batch can change the forward computation before gradient accumulation."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-10",
+      "field": "sections.0.paragraphs.0",
+      "severity": "medium",
+      "reason": "Learned weights alone do not include state such as BatchNorm running statistics; inference restoration also needs the matching input and mode conventions.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/tutorials/beginner/saving_loading_models.html"
+      ],
+      "before": "For inference, model weights and the exact architecture may be enough to reconstruct predictions. Resuming training requires more: optimizer moments, schedule position, mixed-precision scaler state when used, and the current training step. A checkpoint that restores weights but resets those components starts a related experiment rather than continuing the same trajectory. Decide the recovery goal before a long job begins.",
+      "after": "For inference, restore the architecture, learned parameters, and persistent model buffers, together with matching preprocessing and evaluation mode. BatchNorm running statistics are one example of non-parameter state that can affect predictions. Resuming training requires more: optimizer moments, schedule position, mixed-precision scaler state when used, and the current training step. A checkpoint that restores weights but resets those components starts a related experiment rather than continuing the same trajectory. Decide the recovery goal before a long job begins.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-10",
+      "field": "sections.1.paragraphs.0",
+      "severity": "medium",
+      "reason": "The unqualified state_dict definition incorrectly suggested that optimizer dictionaries are flat tensor maps.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html",
+        "https://docs.pytorch.org/tutorials/beginner/saving_loading_models.html"
+      ],
+      "before": "A state_dict maps names to persistent tensors. Save model and optimizer state dictionaries alongside configuration, tokenizer or preprocessing versions, and a data identifier. For closer reproduction, record random-number-generator states and the sampler position. Exact continuation across different hardware or library versions may still be unavailable because kernels and numerical behavior can differ. Store the checkpoint format version so future code can interpret it deliberately.",
+      "after": "A model state_dict normally maps parameter and persistent-buffer names to tensors; modules can also define extra state. An optimizer state_dict has a different structure, containing per-parameter state and parameter-group settings. Save model and optimizer state dictionaries alongside configuration, tokenizer or preprocessing versions, and a data identifier. For closer reproduction, record random-number-generator states and the sampler position. Exact continuation across different hardware or library versions may still be unavailable because kernels and numerical behavior can differ. Store the checkpoint format version so future code can interpret it deliberately.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "02-14",
+      "field": "sections.1.paragraphs.0",
+      "severity": "low",
+      "reason": "Correct the grammatical typo without changing the measurement advice.",
+      "sourceUrls": [],
+      "before": "Optimizer step, processed examples, processed tokens, and wall-clock time answer different questions. Two runs with different batch sizes may look similar against steps while consuming very different compute. Log validation metrics with an explicit split name and aggregation rule. For a variable-length language task, token-weighted loss is not generally equal to the mean of per-batch means. Keep the raw enough information to reconstruct the comparison.",
+      "after": "Optimizer step, processed examples, processed tokens, and wall-clock time answer different questions. Two runs with different batch sizes may look similar against steps while consuming very different compute. Log validation metrics with an explicit split name and aggregation rule. For a variable-length language task, token-weighted loss is not generally equal to the mean of per-batch means. Keep enough raw information to reconstruct the comparison.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "03-05",
+      "field": "sections.1.paragraphs.0",
+      "severity": "low",
+      "reason": "The original statement explicitly assumed zero-mean inputs and was valid under that restriction; the added second-moment derivation clarifies why ReLU requires the factor of two.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1502.01852",
+        "https://proceedings.mlr.press/v9/glorot10a.html"
+      ],
+      "before": "A preactivation sums fan_in weighted inputs. Under simplifying independence and zero-mean assumptions, its variance scales roughly with fan_in times weight variance times input variance. Xavier initialization balances incoming and outgoing widths, often using variance 2/(fan_in + fan_out). Kaiming initialization accounts for rectification and commonly uses variance 2/fan_in for ReLU forward signal preservation. The chosen mode and activation gain matter; these are not interchangeable names for arbitrary small random weights.",
+      "after": "A preactivation sums fan_in weighted inputs. Under simplifying independence assumptions and zero-mean weights, preactivation variance scales roughly as fan_in · Var(w) · E[x²]. This becomes fan_in · Var(w) · Var(x) when inputs are also zero-mean. ReLU outputs generally are not: for a symmetric zero-mean preactivation z, E[ReLU(z)²] = Var(z)/2. Xavier initialization balances incoming and outgoing widths, often using variance 2/(fan_in + fan_out). Kaiming initialization accounts for rectification and commonly uses variance 2/fan_in for ReLU forward signal preservation. The chosen mode and activation gain matter; these are not interchangeable names for arbitrary small random weights.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "03-08",
+      "field": "references",
+      "severity": "low",
+      "reason": "Make the original-paper scaling convention explicit; no claim of identical whole-network expected predictions is added.",
+      "sourceUrls": [
+        "https://jmlr.org/papers/v15/srivastava14a.html"
+      ],
+      "before": [
+        {
+          "title": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting",
+          "url": "https://jmlr.org/papers/v15/srivastava14a.html",
+          "kind": "paper",
+          "note": "Read random unit removal and prediction-time scaling."
+        },
+        {
+          "title": "Decoupled Weight Decay Regularization",
+          "url": "https://arxiv.org/abs/1711.05101",
+          "kind": "paper",
+          "note": "Read decoupled parameter shrinkage under adaptive optimization."
+        }
+      ],
+      "after": [
+        {
+          "title": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting",
+          "url": "https://jmlr.org/papers/v15/srivastava14a.html",
+          "kind": "paper",
+          "note": "Read random unit removal and the original paper’s test-time weight scaling. Compare that convention with this article’s inverted dropout, which rescales retained activations during training."
+        },
+        {
+          "title": "Decoupled Weight Decay Regularization",
+          "url": "https://arxiv.org/abs/1711.05101",
+          "kind": "paper",
+          "note": "Read decoupled parameter shrinkage under adaptive optimization."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "03-09",
+      "field": "references",
+      "severity": "low",
+      "reason": "Add a targeted primary reference for lookup gradient and padding behavior.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.Embedding.html"
+      ],
+      "before": [
+        {
+          "title": "Efficient Estimation of Word Representations in Vector Space",
+          "url": "https://arxiv.org/abs/1301.3781",
+          "kind": "paper",
+          "note": "Read how predictive objectives learn useful vector representations of words."
+        }
+      ],
+      "after": [
+        {
+          "title": "Efficient Estimation of Word Representations in Vector Space",
+          "url": "https://arxiv.org/abs/1301.3781",
+          "kind": "paper",
+          "note": "Read how predictive objectives learn useful vector representations of words."
+        },
+        {
+          "title": "PyTorch — Embedding",
+          "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Embedding.html",
+          "kind": "guide",
+          "note": "Inspect input/output shapes, padding_idx, and the optional scale_grad_by_freq setting; the worked example uses ordinary summed lookup gradients."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "03-11",
+      "field": "references",
+      "severity": "low",
+      "reason": "The book supports recurrence, gates, and gradient propagation; the official PyTorch example directly demonstrates chunking and state detachment, without assuming that the book contains the specific implementation.",
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/rnn",
+        "https://github.com/pytorch/examples/blob/main/word_language_model/main.py"
+      ],
+      "before": [
+        {
+          "title": "Deep Learning — Sequence Modeling",
+          "url": "https://www.deeplearningbook.org/contents/rnn.html",
+          "kind": "book",
+          "note": "Read recurrent state, gated networks, and truncated backpropagation through time."
+        },
+        {
+          "title": "On the difficulty of training Recurrent Neural Networks",
+          "url": "https://arxiv.org/abs/1211.5063",
+          "kind": "paper",
+          "note": "Study vanishing and exploding gradients in recurrent computation."
+        }
+      ],
+      "after": [
+        {
+          "title": "Deep Learning — Sequence Modeling",
+          "url": "https://www.deeplearningbook.org/contents/rnn.html",
+          "kind": "book",
+          "note": "Read recurrent state, time-unrolled computation, long-range gradients, and gated networks."
+        },
+        {
+          "title": "On the difficulty of training Recurrent Neural Networks",
+          "url": "https://arxiv.org/abs/1211.5063",
+          "kind": "paper",
+          "note": "Study vanishing and exploding gradients in recurrent computation."
+        },
+        {
+          "title": "PyTorch Examples — Word Language Model",
+          "url": "https://github.com/pytorch/examples/blob/main/word_language_model/main.py",
+          "kind": "guide",
+          "note": "Trace get_batch, repackage_hidden, and the recurrent training loop to see chunked sequences and hidden-state detachment."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "03-12",
+      "field": "references",
+      "severity": "low",
+      "reason": "Add a targeted primary reference for cosine scheduling rather than the Transformer paper’s different decay rule. Use the verified primary cosine-annealing paper, as requested, while distinguishing SGDR restarts from a single decay phase.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html",
+        "https://arxiv.org/abs/1608.03983"
+      ],
+      "before": [
+        {
+          "title": "On the difficulty of training Recurrent Neural Networks",
+          "url": "https://arxiv.org/abs/1211.5063",
+          "kind": "paper",
+          "note": "Read the gradient-norm clipping motivation and method."
+        },
+        {
+          "title": "Attention Is All You Need",
+          "url": "https://arxiv.org/abs/1706.03762",
+          "kind": "paper",
+          "note": "Inspect the original Transformer's warmup and learning-rate schedule."
+        }
+      ],
+      "after": [
+        {
+          "title": "On the difficulty of training Recurrent Neural Networks",
+          "url": "https://arxiv.org/abs/1211.5063",
+          "kind": "paper",
+          "note": "Read the gradient-norm clipping motivation and method."
+        },
+        {
+          "title": "Attention Is All You Need",
+          "url": "https://arxiv.org/abs/1706.03762",
+          "kind": "paper",
+          "note": "Inspect the original Transformer's warmup and learning-rate schedule."
+        },
+        {
+          "title": "SGDR: Stochastic Gradient Descent with Warm Restarts",
+          "url": "https://arxiv.org/abs/1608.03983",
+          "kind": "paper",
+          "note": "Read cosine annealing within a run and the separate restart policy; contrast these with the original Transformer’s inverse-square-root decay after warmup."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "03-12",
+      "field": "sections.0.paragraphs.0",
+      "severity": "medium",
+      "reason": "A gradient-norm bound is not a general optimizer-update bound; Adam normalizes gradients and momentum/decay add state-dependent effects.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1211.5063",
+        "https://arxiv.org/abs/1412.6980"
+      ],
+      "before": "Early training, representation formation, and late refinement may benefit from different update magnitudes. A learning-rate schedule specifies how the optimizer's base step size changes with progress. Warmup gradually increases that rate at the beginning. Gradient clipping instead reacts to the current gradient, preventing an unusually large norm from producing an excessive update. These mechanisms address different situations and should be recorded separately.",
+      "after": "Early training, representation formation, and late refinement may benefit from different update magnitudes. A learning-rate schedule specifies how the optimizer's base step size changes with progress. Warmup gradually increases that rate at the beginning. Gradient clipping instead reacts to the current gradient and caps its norm. For plain SGD without momentum or decay this bounds the step norm by learning rate times the threshold; adaptive scaling, momentum, or weight decay mean the same bound does not generally apply to the complete parameter update. These mechanisms address different situations and should be recorded separately.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "04-03",
+      "field": "sections.2.paragraphs.0",
+      "severity": "low",
+      "reason": "The earlier outputs multiplied prematurely rounded weights, so their final displayed decimals differed from the exact softmax computation. Recomputed in CPU float64 and checked against SDPA.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1706.03762",
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html"
+      ],
+      "before": "Choose Q = K = [[1, 0], [0, 1]] and V = [[2, 0], [0, 4]]. The first query has raw scores [1, 0]. Dividing by √2 gives [0.7071, 0]. Exponentiation gives approximately [2.0281, 1], and normalization produces [0.6698, 0.3302]. Its output is 0.6698·[2, 0] + 0.3302·[0, 4] = [1.3396, 1.3208]. The second query swaps the weights, producing approximately [0.6604, 2.6792]. Notice that the output mixes values, not keys.",
+      "after": "Choose Q = K = [[1, 0], [0, 1]] and V = [[2, 0], [0, 4]]. The first query has raw scores [1, 0]. Dividing by √2 gives [0.7071, 0]. Exponentiation gives approximately [2.0281, 1], and normalization produces approximately [0.66976155, 0.33023845]. Using unrounded weights, its output is approximately [1.33952310, 1.32095380]. The second query swaps the weights, producing approximately [0.66047690, 2.67904620]. Notice that the output mixes values, not keys.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "04-15",
+      "field": "references",
+      "severity": "low",
+      "reason": "Verified Pope et al. primary paper explicitly separates prefill and decode configurations; it is a more direct source for this article’s main framing.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2211.05102"
+      ],
+      "before": [
+        {
+          "title": "Fast Transformer Decoding: One Write-Head is All You Need",
+          "url": "https://arxiv.org/abs/1911.02150",
+          "kind": "paper",
+          "note": "Read the incremental decoding cost analysis and memory-bandwidth motivation."
+        },
+        {
+          "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+          "url": "https://arxiv.org/abs/2205.14135",
+          "kind": "paper",
+          "note": "Relate large attention workloads to GPU memory traffic and tiling."
+        }
+      ],
+      "after": [
+        {
+          "title": "Fast Transformer Decoding: One Write-Head is All You Need",
+          "url": "https://arxiv.org/abs/1911.02150",
+          "kind": "paper",
+          "note": "Read the incremental decoding cost analysis and memory-bandwidth motivation."
+        },
+        {
+          "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+          "url": "https://arxiv.org/abs/2205.14135",
+          "kind": "paper",
+          "note": "Relate large attention workloads to GPU memory traffic and tiling."
+        },
+        {
+          "title": "Efficiently Scaling Transformer Inference",
+          "url": "https://arxiv.org/abs/2211.05102",
+          "kind": "paper",
+          "note": "Compare the separate prefill and decode measurements and latency/throughput trade-offs under stated batch sizes and hardware configurations."
+        }
+      ],
+      "status": "corrected"
+    },
+    {
+      "topicId": "04-17",
+      "field": "sections.1.paragraphs.0",
+      "severity": "low",
+      "reason": "Distinguish the batched multi-head tensor from one per-head attention matrix; the original 32 MiB arithmetic was correct for the full tensor.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1706.03762",
+        "https://arxiv.org/abs/2205.14135"
+      ],
+      "before": "For sequence length T and model width D, standard projections cost roughly O(TD²). With total head width D, score computation and value mixing cost O(T²D). Naively storing attention weights requires O(BHT²) elements, while a KV cache is linear in T. For B = 2, H = 8, T = 1024, one FP16 attention matrix alone occupies 32 MiB, excluding logits, gradients, and every other layer.",
+      "after": "For sequence length T and model width D, standard projections cost roughly O(TD²). With total head width D, score computation and value mixing cost O(T²D). Naively storing attention weights requires O(BHT²) elements, while a KV cache is linear in T. For B = 2, H = 8, T = 1024, the full FP16 attention-weight tensor for one layer contains 16 matrices of size 1024 × 1024 and occupies 32 MiB. Each individual matrix occupies 2 MiB; these counts exclude logits, gradients, and every other layer.",
+      "status": "corrected"
+    },
+    {
+      "topicId": "04-18",
+      "field": "references",
+      "severity": "low",
+      "reason": "Add a targeted primary reference for the pre-LN variant implemented by TinyBlock.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2002.04745"
+      ],
+      "before": [
+        {
+          "title": "Attention Is All You Need",
+          "url": "https://arxiv.org/abs/1706.03762",
+          "kind": "paper",
+          "note": "Use the attention, residual, and FFN equations as a construction reference."
+        },
+        {
+          "title": "PyTorch — Scaled Dot-Product Attention",
+          "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+          "kind": "guide",
+          "note": "Compare the explicit computation with the library reference implementation."
+        }
+      ],
+      "after": [
+        {
+          "title": "Attention Is All You Need",
+          "url": "https://arxiv.org/abs/1706.03762",
+          "kind": "paper",
+          "note": "Use the attention, residual, and FFN equations as a construction reference."
+        },
+        {
+          "title": "PyTorch — Scaled Dot-Product Attention",
+          "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+          "kind": "guide",
+          "note": "Compare the explicit computation with the library reference implementation."
+        },
+        {
+          "title": "On Layer Normalization in the Transformer Architecture",
+          "url": "https://arxiv.org/abs/2002.04745",
+          "kind": "paper",
+          "note": "Compare pre-LN and post-LN residual equations; this educational block uses pre-LN, while the original Transformer used post-LN."
+        }
+      ],
+      "status": "corrected"
+    }
+  ],
+  "reviewedArticleDetails": [
+    {
+      "topicId": "01-01",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Row-vector multiplication, transpose, scalar/vector/matrix norms, and distinct Frobenius versus spectral interpretations.",
+      "executedChecks": [
+        "Matrix product and norms",
+        "Enriched equal-Frobenius example"
+      ],
+      "sourceReadingWordCount": 141,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/linear_algebra.html"
+      ]
+    },
+    {
+      "topicId": "01-02",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Batch/token/feature dimensions, contraction dimensions, and accidental cross-example broadcasting.",
+      "executedChecks": [
+        "Projection and accidental broadcast",
+        "Enriched accidental broadcast"
+      ],
+      "sourceReadingWordCount": 143,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/linear_algebra.html",
+        "https://docs.pytorch.org/docs/stable/notes/broadcasting.html"
+      ]
+    },
+    {
+      "topicId": "01-03",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Rank, singular-value gain, rank-one approximation error, negative/zero eigenvalues, nonsymmetric behavior, and row/column SVD conventions.",
+      "executedChecks": [
+        "SVD rank and approximation",
+        "Final SVD conventions and nonnormal example"
+      ],
+      "sourceReadingWordCount": 142,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/linear_algebra.html"
+      ]
+    },
+    {
+      "topicId": "01-04",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Chain-rule paths, scalar/partial derivatives, total gradients, and finite-difference scale.",
+      "executedChecks": [
+        "Autograd and centered finite difference"
+      ],
+      "sourceReadingWordCount": 149,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/numerical.html",
+        "https://www.deeplearningbook.org/contents/mlp.html"
+      ]
+    },
+    {
+      "topicId": "01-05",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "First-order Taylor prediction, quadratic step-size stability, ill-conditioning, and deterministic versus stochastic gradients.",
+      "executedChecks": [
+        "Quadratic updates"
+      ],
+      "sourceReadingWordCount": 136,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/numerical.html"
+      ]
+    },
+    {
+      "topicId": "01-06",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Joint/conditional probabilities, Bayes base rates, moments, and scaling of variance.",
+      "executedChecks": [
+        "Bayes and variance",
+        "Enriched base-rate variation"
+      ],
+      "sourceReadingWordCount": 134,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/prob.html"
+      ]
+    },
+    {
+      "topicId": "01-07",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Bernoulli/categorical/Gaussian assumptions; logits are not probabilities and distribution family must match the outcome.",
+      "executedChecks": [],
+      "sourceReadingWordCount": 143,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/prob.html"
+      ]
+    },
+    {
+      "topicId": "01-08",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Independent-example likelihood, log sums, Bernoulli MLE, Gaussian fixed-variance assumptions, and finite-support caveats.",
+      "executedChecks": [
+        "Bernoulli likelihood"
+      ],
+      "sourceReadingWordCount": 139,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/ml.html"
+      ]
+    },
+    {
+      "topicId": "01-09",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Entropy versus cross-entropy versus directional KL, natural-log units, and zero-support divergence.",
+      "executedChecks": [
+        "Entropy/KL",
+        "Enriched cross-entropy and KL"
+      ],
+      "sourceReadingWordCount": 135,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/prob.html"
+      ]
+    },
+    {
+      "topicId": "01-10",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Momentum, Adam moments and bias correction, epsilon placement, and decoupled weight decay.",
+      "executedChecks": [
+        "Final Adam first bias-corrected step"
+      ],
+      "sourceReadingWordCount": 159,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1412.6980",
+        "https://arxiv.org/abs/1711.05101",
+        "https://arxiv.org/abs/1904.09237"
+      ]
+    },
+    {
+      "topicId": "01-11",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Overfitting versus distribution shift and leakage; validation reuse and group/time-based splitting.",
+      "executedChecks": [],
+      "sourceReadingWordCount": 140,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/ml.html"
+      ]
+    },
+    {
+      "topicId": "02-01",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Independent instance state, generator exhaustion, decorator/function use, imports, and explicit empty-metric failure.",
+      "executedChecks": [
+        "Final stored RunningMean snippet"
+      ],
+      "sourceReadingWordCount": 141,
+      "referenceUrls": [
+        "https://docs.python.org/3/tutorial/classes.html",
+        "https://docs.python.org/3/tutorial/modules.html",
+        "https://docs.python.org/3/reference/compound_stmts.html#function-definitions"
+      ]
+    },
+    {
+      "topicId": "02-02",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Process environments, shell working directories, exported variables, child inheritance, and reproducible launch context.",
+      "executedChecks": [],
+      "sourceReadingWordCount": 147,
+      "referenceUrls": [
+        "https://www.gnu.org/software/bash/manual/html_node/Environment.html"
+      ]
+    },
+    {
+      "topicId": "02-03",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Working tree/index/commit distinctions, staged versus unstaged diffs, and plain/pathspec/automatic-staging commit modes.",
+      "executedChecks": [],
+      "sourceReadingWordCount": 153,
+      "referenceUrls": [
+        "https://git-scm.com/book/en/v2",
+        "https://git-scm.com/docs/git-commit"
+      ]
+    },
+    {
+      "topicId": "02-04",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Reshape versus permutation, layout/view semantics, einsum explicit output reduction and diagonal selection.",
+      "executedChecks": [
+        "Stored tensor snippet and einsum counterexamples"
+      ],
+      "sourceReadingWordCount": 142,
+      "referenceUrls": [
+        "https://docs.pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html",
+        "https://docs.pytorch.org/docs/stable/generated/torch.einsum.html",
+        "https://docs.pytorch.org/docs/stable/tensor_view.html"
+      ]
+    },
+    {
+      "topicId": "02-05",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Batched matrix contraction versus elementwise broadcasting; trailing-dimension compatibility and example-wise scaling.",
+      "executedChecks": [
+        "Batched products"
+      ],
+      "sourceReadingWordCount": 143,
+      "referenceUrls": [
+        "https://docs.pytorch.org/docs/stable/notes/broadcasting.html",
+        "https://docs.pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html"
+      ]
+    },
+    {
+      "topicId": "02-06",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Executed graph construction, leaf gradient accumulation, detach/no_grad boundaries, and derivative checks.",
+      "executedChecks": [
+        "Stored autograd snippet and accumulation"
+      ],
+      "sourceReadingWordCount": 143,
+      "referenceUrls": [
+        "https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html"
+      ]
+    },
+    {
+      "topicId": "02-07",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Parameters/buffers/child registration, module invocation versus direct forward, hooks and state/device movement.",
+      "executedChecks": [
+        "Stored Affine snippet and registration/hooks"
+      ],
+      "sourceReadingWordCount": 140,
+      "referenceUrls": [
+        "https://docs.pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html",
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html"
+      ]
+    },
+    {
+      "topicId": "02-08",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Padding versus valid token counts, collation, shuffling, iterable-worker duplication, and batch aggregation.",
+      "executedChecks": [
+        "Padding count"
+      ],
+      "sourceReadingWordCount": 142,
+      "referenceUrls": [
+        "https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html",
+        "https://docs.pytorch.org/docs/stable/data.html"
+      ]
+    },
+    {
+      "topicId": "02-09",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Training-loop order, loss reduction and gradient accumulation; batch-dependent forward computations and randomness.",
+      "executedChecks": [
+        "Stored loop; accumulation equivalence and counterexample"
+      ],
+      "sourceReadingWordCount": 147,
+      "referenceUrls": [
+        "https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html",
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html"
+      ]
+    },
+    {
+      "topicId": "02-10",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Inference state versus resumable training state, model/optimizer state_dict structures, snapshots, and restart continuity.",
+      "executedChecks": [
+        "In-memory Adam continuation and buffer inventory"
+      ],
+      "sourceReadingWordCount": 149,
+      "referenceUrls": [
+        "https://docs.pytorch.org/tutorials/beginner/saving_loading_models.html"
+      ]
+    },
+    {
+      "topicId": "02-11",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "GPU asynchrony, live tensors versus allocator reservation, synchronization and empty_cache limitations.",
+      "executedChecks": [],
+      "sourceReadingWordCount": 142,
+      "referenceUrls": [
+        "https://docs.pytorch.org/docs/stable/notes/cuda.html"
+      ]
+    },
+    {
+      "topicId": "02-12",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "FP16/BF16 range and precision, autocast/gradient scaling roles, unscale-before-clipping arithmetic and hardware dependence.",
+      "executedChecks": [
+        "Clipping before unscale arithmetic"
+      ],
+      "sourceReadingWordCount": 149,
+      "referenceUrls": [
+        "https://docs.pytorch.org/tutorials/recipes/recipes/amp_recipe.html"
+      ]
+    },
+    {
+      "topicId": "02-13",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Failure localization from shape/device/finite-value invariants, anomaly detection and targeted debugging limitations.",
+      "executedChecks": [],
+      "sourceReadingWordCount": 146,
+      "referenceUrls": [
+        "https://docs.pytorch.org/docs/stable/notes/cuda.html",
+        "https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html"
+      ]
+    },
+    {
+      "topicId": "02-14",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Metric axes, examples/tokens per step, elapsed cost, logging overhead and reconstructable configuration.",
+      "executedChecks": [],
+      "sourceReadingWordCount": 148,
+      "referenceUrls": [
+        "https://docs.pytorch.org/tutorials/beginner/introyt/tensorboardyt_tutorial.html"
+      ]
+    },
+    {
+      "topicId": "03-01",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Affine composition, nonlinear expressiveness, parameter counts and hidden-width interpretation.",
+      "executedChecks": [
+        "MLP parameter count"
+      ],
+      "sourceReadingWordCount": 140,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/mlp.html"
+      ]
+    },
+    {
+      "topicId": "03-02",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Reverse-mode local derivatives, matrix transpose shapes, fan-out gradient sums and shared weights.",
+      "executedChecks": [
+        "Two-layer manual gradients"
+      ],
+      "sourceReadingWordCount": 138,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/mlp.html"
+      ]
+    },
+    {
+      "topicId": "03-03",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "ReLU and zero convention, sigmoid/tanh saturation, exact GELU/SiLU and gradient effects.",
+      "executedChecks": [
+        "Activation definitions"
+      ],
+      "sourceReadingWordCount": 143,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1606.08415",
+        "https://www.deeplearningbook.org/contents/mlp.html"
+      ]
+    },
+    {
+      "topicId": "03-04",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Likelihood-compatible losses, logits versus probabilities, softmax cross-entropy gradient and reduction.",
+      "executedChecks": [
+        "Softmax cross-entropy derivative"
+      ],
+      "sourceReadingWordCount": 138,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/mlp.html"
+      ]
+    },
+    {
+      "topicId": "03-05",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Xavier/He fan scales, second moment versus variance, independence/symmetry assumptions and row/column initialization conventions.",
+      "executedChecks": [
+        "Kaiming scale",
+        "Final symmetric-ReLU second moment"
+      ],
+      "sourceReadingWordCount": 145,
+      "referenceUrls": [
+        "https://proceedings.mlr.press/v9/glorot10a.html",
+        "https://arxiv.org/abs/1502.01852"
+      ]
+    },
+    {
+      "topicId": "03-06",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "BatchNorm/LayerNorm/RMSNorm reduction axes, centering, epsilon, affine transforms and train/eval differences.",
+      "executedChecks": [
+        "LayerNorm/RMSNormexample"
+      ],
+      "sourceReadingWordCount": 137,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1502.03167",
+        "https://arxiv.org/abs/1607.06450",
+        "https://arxiv.org/abs/1910.07467"
+      ]
+    },
+    {
+      "topicId": "03-07",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Residual identities, projected shortcuts, width/spatial mismatches and limitations of identity-gradient intuition.",
+      "executedChecks": [
+        "Projectedshortcutshape"
+      ],
+      "sourceReadingWordCount": 144,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1512.03385"
+      ]
+    },
+    {
+      "topicId": "03-08",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Inverted dropout activation expectation versus full nonlinear-network predictions; original scaling convention and AdamW distinction.",
+      "executedChecks": [
+        "Inverteddropout expectation"
+      ],
+      "sourceReadingWordCount": 143,
+      "referenceUrls": [
+        "https://jmlr.org/papers/v15/srivastava14a.html",
+        "https://arxiv.org/abs/1711.05101"
+      ]
+    },
+    {
+      "topicId": "03-09",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Embedding matrix/table shapes, repeated IDs and gradient addition, padding behavior, optimizer effects and parameter counts.",
+      "executedChecks": [
+        "Embeddinglookup andgradients"
+      ],
+      "sourceReadingWordCount": 138,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1301.3781",
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.Embedding.html"
+      ]
+    },
+    {
+      "topicId": "03-10",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Cross-correlation/convolution implementation, locality/sharing, padding/stride/dilation output formula and parameter count.",
+      "executedChecks": [
+        "Convolution parameters andoutput"
+      ],
+      "sourceReadingWordCount": 145,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/convnets.html"
+      ]
+    },
+    {
+      "topicId": "03-11",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Recurrent hidden state and gates, long-range Jacobians, state resets, padding and detachment versus forward memory.",
+      "executedChecks": [
+        "Detachedrecurrent state"
+      ],
+      "sourceReadingWordCount": 170,
+      "referenceUrls": [
+        "https://www.deeplearningbook.org/contents/rnn.html",
+        "https://arxiv.org/abs/1211.5063",
+        "https://github.com/pytorch/examples/blob/main/word_language_model/main.py"
+      ]
+    },
+    {
+      "topicId": "03-12",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Warmup and schedule units, Transformer inverse-square-root versus SGDR cosine decay, and clipping gradient versus full optimizer step.",
+      "executedChecks": [
+        "Globalclipping example"
+      ],
+      "sourceReadingWordCount": 150,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1211.5063",
+        "https://arxiv.org/abs/1706.03762",
+        "https://arxiv.org/abs/1608.03983"
+      ]
+    },
+    {
+      "topicId": "04-01",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Fixed-vector bottleneck, content-dependent alignment, weighted-value aggregation and interpretability limitations.",
+      "executedChecks": [],
+      "sourceReadingWordCount": 142,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1409.0473",
+        "https://arxiv.org/abs/1706.03762"
+      ]
+    },
+    {
+      "topicId": "04-02",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Query/key/value roles, unequal key/value widths, score/output shapes and joint key/value permutation.",
+      "executedChecks": [
+        "QKVshapes",
+        "Enriched key/value permutation"
+      ],
+      "sourceReadingWordCount": 144,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1706.03762"
+      ]
+    },
+    {
+      "topicId": "04-03",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Exact numeric Q/K/V computation, scale and variance assumptions, row softmax, causal restriction and constant-value invariance.",
+      "executedChecks": [
+        "Numericshowcase, SDPAandmask"
+      ],
+      "sourceReadingWordCount": 145,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1706.03762",
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html"
+      ]
+    },
+    {
+      "topicId": "04-04",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Different query/source sequence lengths, cross-attention shape and source/query information flow.",
+      "executedChecks": [
+        "Cross-attention dimensions"
+      ],
+      "sourceReadingWordCount": 141,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1706.03762"
+      ]
+    },
+    {
+      "topicId": "04-05",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Head projection/concatenation, per-head widths and comparable parameter-budget assumptions.",
+      "executedChecks": [
+        "Headpartition"
+      ],
+      "sourceReadingWordCount": 141,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1706.03762"
+      ]
+    },
+    {
+      "topicId": "04-06",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Causal/padding masks, SDPA versus MultiheadAttention boolean conventions and cache-position nonsquare alignment.",
+      "executedChecks": [
+        "SDPAbooleanandnon-squarecausalsemantics"
+      ],
+      "sourceReadingWordCount": 141,
+      "referenceUrls": [
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html"
+      ]
+    },
+    {
+      "topicId": "04-07",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Encoder/causal decoder/cross-attentive decoder information paths, parallel teacher-forced training and leakage constraints.",
+      "executedChecks": [],
+      "sourceReadingWordCount": 146,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1706.03762"
+      ]
+    },
+    {
+      "topicId": "04-08",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Learned/sinusoidal positions, permutation behavior, trained position range and extrapolation limitations.",
+      "executedChecks": [
+        "Positionrange"
+      ],
+      "sourceReadingWordCount": 147,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1706.03762"
+      ]
+    },
+    {
+      "topicId": "04-09",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "RoPE block rotations, relative-angle identity, content dependence, cache-position consistency and extrapolation limits.",
+      "executedChecks": [
+        "RoPErotations"
+      ],
+      "sourceReadingWordCount": 146,
+      "referenceUrls": [
+        "https://arxiv.org/abs/2104.09864"
+      ]
+    },
+    {
+      "topicId": "04-10",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Pre-LN/post-LN residual equations, final normalization and zero-branch identity.",
+      "executedChecks": [
+        "Zerobranchidentity"
+      ],
+      "sourceReadingWordCount": 139,
+      "referenceUrls": [
+        "https://arxiv.org/abs/2002.04745"
+      ]
+    },
+    {
+      "topicId": "04-11",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Position-wise FFN feature transformation, shared weights, hidden expansion and parameter counts including biases.",
+      "executedChecks": [
+        "FFNparametercounts"
+      ],
+      "sourceReadingWordCount": 144,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1706.03762"
+      ]
+    },
+    {
+      "topicId": "04-12",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "SwiGLU gating equation, three projection matrices and matched hidden-width/parameter budget.",
+      "executedChecks": [
+        "SwiGLUmatchedbudget"
+      ],
+      "sourceReadingWordCount": 142,
+      "referenceUrls": [
+        "https://arxiv.org/abs/2002.05202"
+      ]
+    },
+    {
+      "topicId": "04-13",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "MHA/MQA/GQA query versus K/V head counts, cache ratios, hardware/quality trade-offs and valid nonsequential reference link.",
+      "executedChecks": [
+        "GQAcacheratio"
+      ],
+      "sourceReadingWordCount": 144,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1911.02150",
+        "https://arxiv.org/abs/2305.13245"
+      ]
+    },
+    {
+      "topicId": "04-14",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Causal prefix reuse, new-token keys/values, per-layer storage formula, positional consistency and unchanged-prefix assumptions.",
+      "executedChecks": [
+        "KVcachebytes"
+      ],
+      "sourceReadingWordCount": 149,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1911.02150",
+        "https://arxiv.org/abs/2305.13245"
+      ]
+    },
+    {
+      "topicId": "04-15",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Prefill/decode workload differences, TTFT versus inter-token latency, generated-token convention and configuration-specific throughput.",
+      "executedChecks": [
+        "Latencycrossover"
+      ],
+      "sourceReadingWordCount": 149,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1911.02150",
+        "https://arxiv.org/abs/2205.14135",
+        "https://arxiv.org/abs/2211.05102"
+      ]
+    },
+    {
+      "topicId": "04-16",
+      "status": "reviewed-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Tiled exact attention, online softmax rescaling, HBM traffic versus arithmetic and floating-point caveats.",
+      "executedChecks": [],
+      "sourceReadingWordCount": 148,
+      "referenceUrls": [
+        "https://arxiv.org/abs/2205.14135",
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html"
+      ]
+    },
+    {
+      "topicId": "04-17",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Dense score storage versus projection work, quadratic/linear length scaling, cache storage and unit conversion.",
+      "executedChecks": [
+        "Attentionstorageandscaling",
+        "Final per-head versus full-tensor MiB arithmetic"
+      ],
+      "sourceReadingWordCount": 148,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1706.03762",
+        "https://arxiv.org/abs/2205.14135"
+      ]
+    },
+    {
+      "topicId": "04-18",
+      "status": "corrected-or-reference-improved-and-enriched",
+      "fullArticleRead": true,
+      "reasoningFocus": "Educational causal pre-LN block, float64 autograd, mask causality, SDPA equivalence and zero-residual identity.",
+      "executedChecks": [
+        "StoredTinyBlockcodebehavior"
+      ],
+      "sourceReadingWordCount": 146,
+      "referenceUrls": [
+        "https://arxiv.org/abs/1706.03762",
+        "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+        "https://arxiv.org/abs/2002.04745"
+      ]
+    }
+  ],
+  "checkedSources": [
+    {
+      "url": "https://www.deeplearningbook.org/contents/linear_algebra.html",
+      "title": "Deep Learning — Linear Algebra",
+      "kind": "book",
+      "topicIds": [
+        "01-01",
+        "01-02",
+        "01-03"
+      ],
+      "verificationMethod": "Primary book HTML, targeted passages",
+      "checkedClaims": "Norms, shapes, eigenvectors, SVD and column-vector convention; original numerical examples independently recomputed.",
+      "accessedUrl": "https://www.deeplearningbook.org/contents/linear_algebra.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/notes/broadcasting.html",
+      "title": "PyTorch — Broadcasting Semantics",
+      "kind": "guide",
+      "topicIds": [
+        "01-02",
+        "02-05"
+      ],
+      "verificationMethod": "Official documentation indexed passages and CPU examples",
+      "checkedClaims": "Right-aligned compatible dimensions and the [B,1] minus [B] expansion pitfall.",
+      "accessedUrl": "https://docs.pytorch.org/docs/stable/notes/broadcasting.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://www.deeplearningbook.org/contents/numerical.html",
+      "title": "Deep Learning — Numerical Computation",
+      "kind": "book",
+      "topicIds": [
+        "01-04",
+        "01-05"
+      ],
+      "verificationMethod": "Primary book HTML, targeted passages",
+      "checkedClaims": "Taylor/gradient reasoning, numerical scale, and conditioning; removed as a direct broadcasting citation.",
+      "accessedUrl": "https://www.deeplearningbook.org/contents/numerical.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://www.deeplearningbook.org/contents/mlp.html",
+      "title": "Deep Learning — Deep Feedforward Networks",
+      "kind": "book",
+      "topicIds": [
+        "01-04",
+        "03-01",
+        "03-02",
+        "03-03",
+        "03-04"
+      ],
+      "verificationMethod": "Primary-site indexed excerpts; full page exceeded tool size limit",
+      "checkedClaims": "MLP composition, output likelihoods, chain rule/backpropagation and shared-path gradients.",
+      "accessedUrl": "https://www.deeplearningbook.org/contents/mlp.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://www.deeplearningbook.org/contents/prob.html",
+      "title": "Deep Learning — Probability and Information Theory",
+      "kind": "book",
+      "topicIds": [
+        "01-06",
+        "01-07",
+        "01-09"
+      ],
+      "verificationMethod": "Primary book HTML, targeted passages",
+      "checkedClaims": "Conditional probability, moments, probability families, entropy, cross-entropy and KL.",
+      "accessedUrl": "https://www.deeplearningbook.org/contents/prob.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://www.deeplearningbook.org/contents/ml.html",
+      "title": "Deep Learning — Machine Learning Basics",
+      "kind": "book",
+      "topicIds": [
+        "01-08",
+        "01-11"
+      ],
+      "verificationMethod": "Primary-site indexed excerpts; full page exceeded tool size limit",
+      "checkedClaims": "Maximum likelihood, conditional Gaussian/fixed variance connection to squared error, overfitting/generalization.",
+      "accessedUrl": "https://www.deeplearningbook.org/contents/ml.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1412.6980",
+      "title": "Adam: A Method for Stochastic Optimization",
+      "kind": "paper",
+      "topicIds": [
+        "01-10"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted equations",
+      "checkedClaims": "Algorithm 1 moment estimates, bias correction, epsilon outside the square root; local first-step Adam computation.",
+      "accessedUrl": "https://arxiv.org/pdf/1412.6980",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1711.05101",
+      "title": "Decoupled Weight Decay Regularization",
+      "kind": "paper",
+      "topicIds": [
+        "01-10",
+        "03-08"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted claims",
+      "checkedClaims": "Weight decay vs L2 equivalence for conventional SGD and inequivalence under adaptive scaling.",
+      "accessedUrl": "https://arxiv.org/pdf/1711.05101",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1904.09237",
+      "title": "On the Convergence of Adam and Beyond",
+      "kind": "paper",
+      "topicIds": [
+        "01-10"
+      ],
+      "verificationMethod": "Primary arXiv abstract and PDF, authors/venue and targeted introduction",
+      "checkedClaims": "Reddi, Kale and Kumar; ICLR 2018 paper identifies a flaw in the original Adam proof and constructs convex nonconvergence examples; distinct assumptions apply to proposed variants.",
+      "accessedUrl": "https://arxiv.org/pdf/1904.09237",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.python.org/3/tutorial/classes.html",
+      "title": "Python Tutorial — Classes",
+      "kind": "guide",
+      "topicIds": [
+        "02-01"
+      ],
+      "verificationMethod": "Official documentation HTML and targeted search",
+      "checkedClaims": "Instance state, iterator/generator protocol, yield and exhaustion.",
+      "accessedUrl": "https://docs.python.org/3/tutorial/classes.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.python.org/3/tutorial/modules.html",
+      "title": "Python Tutorial — Modules",
+      "kind": "guide",
+      "topicIds": [
+        "02-01"
+      ],
+      "verificationMethod": "Official documentation HTML, targeted passages",
+      "checkedClaims": "Module imports, namespace use and main entry-point guard.",
+      "accessedUrl": "https://docs.python.org/3/tutorial/modules.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.python.org/3/reference/compound_stmts.html#function-definitions",
+      "title": "Python Language Reference — Function Definitions",
+      "kind": "guide",
+      "topicIds": [
+        "02-01"
+      ],
+      "verificationMethod": "Official language reference HTML, targeted passages",
+      "checkedClaims": "Function definitions and decorator application semantics.",
+      "accessedUrl": "https://docs.python.org/3/reference/compound_stmts.html#function-definitions",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://www.gnu.org/software/bash/manual/html_node/Environment.html",
+      "title": "Bash Reference Manual — Environment",
+      "kind": "guide",
+      "topicIds": [
+        "02-02"
+      ],
+      "verificationMethod": "Official manual indexed text via working official alias",
+      "checkedClaims": "Exported environments, child-process inheritance and temporary command assignments.",
+      "accessedUrl": "https://www.gnu.org/s/bash/manual/html_node/Environment.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://git-scm.com/book/en/v2",
+      "title": "Pro Git",
+      "kind": "book",
+      "topicIds": [
+        "02-03"
+      ],
+      "verificationMethod": "Official book chapter HTML, targeted passages",
+      "checkedClaims": "Working tree, index/staging, commits, and ordinary versus staged diffs.",
+      "accessedUrl": "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://git-scm.com/docs/git-commit",
+      "title": "Git — git-commit",
+      "kind": "guide",
+      "topicIds": [
+        "02-03"
+      ],
+      "verificationMethod": "Official reference HTML, targeted commit modes",
+      "checkedClaims": "Plain commit uses the index; -a includes tracked changes; pathspec commit records named tracked working-tree contents.",
+      "accessedUrl": "https://git-scm.com/docs/git-commit",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html",
+      "title": "PyTorch — Tensors",
+      "kind": "guide",
+      "topicIds": [
+        "02-04",
+        "02-05"
+      ],
+      "verificationMethod": "Official tutorial HTML and local CPU execution",
+      "checkedClaims": "Tensor shapes, dimensions, shared storage, matrix/elementwise products and reshape/permutation examples.",
+      "accessedUrl": "https://docs.pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/generated/torch.einsum.html",
+      "title": "PyTorch — torch.einsum",
+      "kind": "guide",
+      "topicIds": [
+        "02-04"
+      ],
+      "verificationMethod": "Official current/main API documentation and local CPU execution",
+      "checkedClaims": "Explicit output reduction, shared labels, within-operand diagonal selection; ij->i and ii->i tested.",
+      "accessedUrl": "https://docs.pytorch.org/docs/main/generated/torch.einsum.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/tensor_view.html",
+      "title": "PyTorch — Tensor Views",
+      "kind": "guide",
+      "topicIds": [
+        "02-04"
+      ],
+      "verificationMethod": "Official current/main documentation and local CPU reasoning/tests",
+      "checkedClaims": "Views share storage; strides change with permutation; reshape may copy.",
+      "accessedUrl": "https://docs.pytorch.org/docs/main/tensor_view.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html",
+      "title": "PyTorch — Automatic Differentiation",
+      "kind": "guide",
+      "topicIds": [
+        "02-06",
+        "02-13"
+      ],
+      "verificationMethod": "Official tutorial HTML/indexed passages and CPU execution",
+      "checkedClaims": "Recorded computation, leaf gradients, no_grad/detach and gradient accumulation.",
+      "accessedUrl": "https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html",
+      "title": "PyTorch — Build the Neural Network",
+      "kind": "guide",
+      "topicIds": [
+        "02-07"
+      ],
+      "verificationMethod": "Official tutorial indexed passages and CPU execution",
+      "checkedClaims": "nn.Module init/forward, parameter registration and nested layers.",
+      "accessedUrl": "https://docs.pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html",
+      "title": "PyTorch — Module",
+      "kind": "guide",
+      "topicIds": [
+        "02-07"
+      ],
+      "verificationMethod": "Official API indexed passages and CPU execution",
+      "checkedClaims": "Persistent buffers, state_dict, optional extra state, module-call hooks and nested registration.",
+      "accessedUrl": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html",
+      "title": "PyTorch — Datasets & DataLoaders",
+      "kind": "guide",
+      "topicIds": [
+        "02-08"
+      ],
+      "verificationMethod": "Official tutorial indexed passages",
+      "checkedClaims": "Dataset indexing/length and DataLoader batching/shuffling abstractions.",
+      "accessedUrl": "https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/data.html",
+      "title": "PyTorch — torch.utils.data",
+      "kind": "guide",
+      "topicIds": [
+        "02-08"
+      ],
+      "verificationMethod": "Official API indexed passages",
+      "checkedClaims": "Custom collate_fn, iterable worker replicas/sharding, and drop_last semantics.",
+      "accessedUrl": "https://docs.pytorch.org/docs/stable/data.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html",
+      "title": "PyTorch — Optimizing Model Parameters",
+      "kind": "guide",
+      "topicIds": [
+        "02-09"
+      ],
+      "verificationMethod": "Official tutorial indexed passages and CPU training-loop execution",
+      "checkedClaims": "Zeroing gradients, backward pass, optimizer step and loss aggregation.",
+      "accessedUrl": "https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html",
+      "title": "PyTorch — BatchNorm1d",
+      "kind": "guide",
+      "topicIds": [
+        "02-09"
+      ],
+      "verificationMethod": "Official API indexed passages and CPU counterexample",
+      "checkedClaims": "Batch-dependent training statistics make gradient accumulation unlike one large-batch forward; running-stat settings matter.",
+      "accessedUrl": "https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/beginner/saving_loading_models.html",
+      "title": "PyTorch — Saving and Loading Models",
+      "kind": "guide",
+      "topicIds": [
+        "02-10"
+      ],
+      "verificationMethod": "Official tutorial HTML and CPU in-memory continuation test",
+      "checkedClaims": "Model and optimizer state structures, persistent buffers, evaluation mode and copying checkpoint state.",
+      "accessedUrl": "https://docs.pytorch.org/tutorials/beginner/saving_loading_models.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/notes/cuda.html",
+      "title": "PyTorch — CUDA Semantics",
+      "kind": "guide",
+      "topicIds": [
+        "02-11",
+        "02-13"
+      ],
+      "verificationMethod": "Official current/main documentation indexed passages; no GPU execution",
+      "checkedClaims": "Asynchrony, allocated versus reserved caching-allocator memory, synchronization and empty_cache limits.",
+      "accessedUrl": "https://docs.pytorch.org/docs/main/notes/cuda.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/recipes/recipes/amp_recipe.html",
+      "title": "PyTorch — Automatic Mixed Precision",
+      "kind": "guide",
+      "topicIds": [
+        "02-12"
+      ],
+      "verificationMethod": "Official recipe indexed passages; arithmetic checked on CPU",
+      "checkedClaims": "Autocast, loss scaling, unscale before clipping and hardware/workload dependence; no actual AMP GPU run.",
+      "accessedUrl": "https://docs.pytorch.org/tutorials/recipes/recipes/amp_recipe.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/beginner/introyt/tensorboardyt_tutorial.html",
+      "title": "PyTorch — TensorBoard Support",
+      "kind": "guide",
+      "topicIds": [
+        "02-14"
+      ],
+      "verificationMethod": "Official tutorial indexed passages",
+      "checkedClaims": "Scalar logging, global steps and validation metrics; article's experiment-comparison guidance is original synthesis.",
+      "accessedUrl": "https://docs.pytorch.org/tutorials/beginner/introyt/tensorboardyt_tutorial.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1606.08415",
+      "title": "Gaussian Error Linear Units (GELUs)",
+      "kind": "paper",
+      "topicIds": [
+        "03-03"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted definitions",
+      "checkedClaims": "Exact GELU xΦ(x), smoothness and the related xσ(x) activation; article distinguishes exact and approximate evaluation.",
+      "accessedUrl": "https://arxiv.org/pdf/1606.08415",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://proceedings.mlr.press/v9/glorot10a.html",
+      "title": "Understanding the difficulty of training deep feedforward neural networks",
+      "kind": "paper",
+      "topicIds": [
+        "03-05"
+      ],
+      "verificationMethod": "Primary publisher paper PDF, targeted equations",
+      "checkedClaims": "Fan-in/fan-out signal scale and Xavier uniform/variance convention.",
+      "accessedUrl": "https://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1502.01852",
+      "title": "Delving Deep into Rectifiers",
+      "kind": "paper",
+      "topicIds": [
+        "03-05"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted derivation",
+      "checkedClaims": "Independence assumptions, second moments, symmetric ReLU half-second-moment, and variance 2/fan_in.",
+      "accessedUrl": "https://arxiv.org/pdf/1502.01852",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1502.03167",
+      "title": "Batch Normalization",
+      "kind": "paper",
+      "topicIds": [
+        "03-06"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted definitions",
+      "checkedClaims": "Training minibatch statistics, learned affine scale/shift, and inference statistics.",
+      "accessedUrl": "https://arxiv.org/pdf/1502.03167",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1607.06450",
+      "title": "Layer Normalization",
+      "kind": "paper",
+      "topicIds": [
+        "03-06"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted definitions",
+      "checkedClaims": "Layer-local normalization axes vs batch coupling and train/evaluation behavior.",
+      "accessedUrl": "https://arxiv.org/pdf/1607.06450",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1910.07467",
+      "title": "Root Mean Square Layer Normalization",
+      "kind": "paper",
+      "topicIds": [
+        "03-06"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted definitions",
+      "checkedClaims": "RMS normalization without mean subtraction and rescaling invariance assumptions.",
+      "accessedUrl": "https://arxiv.org/pdf/1910.07467",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1512.03385",
+      "title": "Deep Residual Learning for Image Recognition",
+      "kind": "paper",
+      "topicIds": [
+        "03-07"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted equations",
+      "checkedClaims": "F(x)+x residual connection and projected shortcuts for mismatched dimensions.",
+      "accessedUrl": "https://arxiv.org/pdf/1512.03385",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://jmlr.org/papers/v15/srivastava14a.html",
+      "title": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting",
+      "kind": "paper",
+      "topicIds": [
+        "03-08"
+      ],
+      "verificationMethod": "Primary publisher paper PDF, targeted explanation",
+      "checkedClaims": "Original training dropout and prediction-time outgoing-weight scaling; no whole-network expectation equivalence asserted.",
+      "accessedUrl": "https://jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1301.3781",
+      "title": "Efficient Estimation of Word Representations in Vector Space",
+      "kind": "paper",
+      "topicIds": [
+        "03-09"
+      ],
+      "verificationMethod": "Primary paper PDF, introductory method descriptions",
+      "checkedClaims": "Learned word representations and predictive training objectives; implementation-specific lookup behavior checked against PyTorch Embedding.",
+      "accessedUrl": "https://arxiv.org/pdf/1301.3781",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Embedding.html",
+      "title": "PyTorch — Embedding",
+      "kind": "guide",
+      "topicIds": [
+        "03-09"
+      ],
+      "verificationMethod": "Official API indexed passages and CPU lookup-gradient execution",
+      "checkedClaims": "Lookup shapes, repeated-row gradient accumulation, padding_idx and scale_grad_by_freq.",
+      "accessedUrl": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Embedding",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://www.deeplearningbook.org/contents/convnets.html",
+      "title": "Deep Learning — Convolutional Networks",
+      "kind": "book",
+      "topicIds": [
+        "03-10"
+      ],
+      "verificationMethod": "Primary-site indexed excerpts; full page exceeded tool size limit",
+      "checkedClaims": "Local connectivity, parameter sharing, translation equivariance, and pooling; convolution shapes/counts independently executed.",
+      "accessedUrl": "https://www.deeplearningbook.org/contents/convnets.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://www.deeplearningbook.org/contents/rnn.html",
+      "title": "Deep Learning — Sequence Modeling",
+      "kind": "book",
+      "topicIds": [
+        "03-11"
+      ],
+      "verificationMethod": "Primary-site indexed chapter passages; full HTML exceeded tool size limit",
+      "checkedClaims": "Time-unrolled graph, sequential dependency, long-range Jacobians, gated state and clipping; truncation implementation additionally verified against official PyTorch example.",
+      "accessedUrl": "https://www.deeplearningbook.org/contents/rnn",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1211.5063",
+      "title": "On the difficulty of training Recurrent Neural Networks",
+      "kind": "paper",
+      "topicIds": [
+        "03-11",
+        "03-12"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted gradient analysis and algorithm",
+      "checkedClaims": "Repeated Jacobians, vanishing/exploding gradients and global norm clipping, distinguished from a complete adaptive-optimizer step bound.",
+      "accessedUrl": "https://arxiv.org/pdf/1211.5063",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://github.com/pytorch/examples/blob/main/word_language_model/main.py",
+      "title": "PyTorch Examples — Word Language Model",
+      "kind": "guide",
+      "topicIds": [
+        "03-11"
+      ],
+      "verificationMethod": "Official repository source, targeted functions",
+      "checkedClaims": "get_batch chunks sequence positions; repackage_hidden detaches tensors; recurrent training carries values but breaks previous graph history.",
+      "accessedUrl": "https://github.com/pytorch/examples/blob/main/word_language_model/main.py",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1706.03762",
+      "title": "Attention Is All You Need",
+      "kind": "paper",
+      "topicIds": [
+        "03-12",
+        "04-01",
+        "04-02",
+        "04-03",
+        "04-04",
+        "04-05",
+        "04-07",
+        "04-08",
+        "04-11",
+        "04-17",
+        "04-18"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted architecture/equations/training sections",
+      "checkedClaims": "Scaled attention, Q/K/V, heads, masks, encoder/decoder information flow, positional encoding, post-LN, FFN, quadratic pair work, and linear warmup followed by inverse-square-root decay.",
+      "accessedUrl": "https://arxiv.org/pdf/1706.03762",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1608.03983",
+      "title": "SGDR: Stochastic Gradient Descent with Warm Restarts",
+      "kind": "paper",
+      "topicIds": [
+        "03-12"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted schedule equation",
+      "checkedClaims": "Cosine annealing and a distinct warm-restart policy; neither is attributed to the original Transformer schedule.",
+      "accessedUrl": "https://arxiv.org/pdf/1608.03983",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1409.0473",
+      "title": "Neural Machine Translation by Jointly Learning to Align and Translate",
+      "kind": "paper",
+      "topicIds": [
+        "04-01"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted motivation and mechanism",
+      "checkedClaims": "Fixed-vector bottleneck, soft alignment over source annotations, and context-dependent reading.",
+      "accessedUrl": "https://arxiv.org/pdf/1409.0473",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+      "title": "PyTorch — Scaled Dot-Product Attention",
+      "kind": "guide",
+      "topicIds": [
+        "04-03",
+        "04-06",
+        "04-16",
+        "04-18"
+      ],
+      "verificationMethod": "Official API indexed passages and CPU float64 execution",
+      "checkedClaims": "True means permitted for boolean SDPA masks, upper-left nonsquare causal alignment, explicit dropout probability and attention formula.",
+      "accessedUrl": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html",
+      "title": "PyTorch — MultiheadAttention",
+      "kind": "guide",
+      "topicIds": [
+        "04-06"
+      ],
+      "verificationMethod": "Official API indexed passages",
+      "checkedClaims": "MultiheadAttention's boolean masking convention differs from SDPA; compare actual API contracts.",
+      "accessedUrl": "https://docs.pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/2104.09864",
+      "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+      "kind": "paper",
+      "topicIds": [
+        "04-09"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted rotation derivation",
+      "checkedClaims": "Pairwise rotary transformations and relative-position query-key identity; long-context quality is not guaranteed by formula extrapolation.",
+      "accessedUrl": "https://arxiv.org/pdf/2104.09864",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/2002.04745",
+      "title": "On Layer Normalization in the Transformer Architecture",
+      "kind": "paper",
+      "topicIds": [
+        "04-10",
+        "04-18"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted architecture and optimization discussion",
+      "checkedClaims": "Pre-LN versus post-LN equations, final normalization, and initialization/warmup findings with stated scope.",
+      "accessedUrl": "https://arxiv.org/pdf/2002.04745",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/2002.05202",
+      "title": "GLU Variants Improve Transformer",
+      "kind": "paper",
+      "topicIds": [
+        "04-12"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted equations and experimental controls",
+      "checkedClaims": "GLU/SwiGLU definitions and hidden-width adjustment for comparable parameter budgets.",
+      "accessedUrl": "https://arxiv.org/pdf/2002.05202",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/1911.02150",
+      "title": "Fast Transformer Decoding: One Write-Head is All You Need",
+      "kind": "paper",
+      "topicIds": [
+        "04-13",
+        "04-14",
+        "04-15"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted incremental-decoding cost discussion",
+      "checkedClaims": "Shared K/V across query heads, cache bandwidth and incremental decoding limitations.",
+      "accessedUrl": "https://arxiv.org/pdf/1911.02150",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/2305.13245",
+      "title": "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
+      "kind": "paper",
+      "topicIds": [
+        "04-13",
+        "04-14"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted grouped-head mechanism",
+      "checkedClaims": "Intermediate K/V head groups, quality/efficiency trade-off and grouping configuration.",
+      "accessedUrl": "https://arxiv.org/pdf/2305.13245",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/2205.14135",
+      "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+      "kind": "paper",
+      "topicIds": [
+        "04-15",
+        "04-16",
+        "04-17"
+      ],
+      "verificationMethod": "Primary paper PDF, targeted algorithm/complexity explanation",
+      "checkedClaims": "Exact tiled attention, online normalization and reduced HBM traffic without changing dense quadratic pair arithmetic.",
+      "accessedUrl": "https://arxiv.org/pdf/2205.14135",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    },
+    {
+      "url": "https://arxiv.org/abs/2211.05102",
+      "title": "Efficiently Scaling Transformer Inference",
+      "kind": "paper",
+      "topicIds": [
+        "04-15"
+      ],
+      "verificationMethod": "Primary paper PDF, author/title and targeted performance tables",
+      "checkedClaims": "Pope et al.; separate prefill/decode measurements and batch/configuration-specific latency-throughput results.",
+      "accessedUrl": "https://arxiv.org/pdf/2211.05102",
+      "scope": "Targeted verification of relevant claims; not a claim that the entire external source was exhaustively audited."
+    }
+  ],
+  "supplementarySourceChecks": [
+    {
+      "url": "https://docs.python.org/3/library/exceptions.html#ValueError",
+      "topicIds": [
+        "02-01"
+      ],
+      "checkedClaims": "ValueError is appropriate when a method has no valid mean before observations.",
+      "verificationMethod": "Official Python documentation search/HTML"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/notes/amp_examples.html",
+      "topicIds": [
+        "02-09",
+        "02-12"
+      ],
+      "checkedClaims": "Accumulation, consistent scaling and unscale/clipping order.",
+      "verificationMethod": "Official documentation indexed passages"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html",
+      "topicIds": [
+        "03-12"
+      ],
+      "checkedClaims": "Cosine schedule and T_max semantics; final article uses the original SGDR paper as its third reference.",
+      "verificationMethod": "Official API indexed passages"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/nn.init.html",
+      "topicIds": [
+        "03-05"
+      ],
+      "checkedClaims": "Fan convention and matrix-orientation assumptions for Xavier/Kaiming initialization.",
+      "verificationMethod": "Official API indexed passages"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/2.14/generated/torch.nn.LSTM.html",
+      "topicIds": [
+        "03-11"
+      ],
+      "checkedClaims": "Cell/hidden state, gates, additive cell update and recurrent shapes.",
+      "verificationMethod": "Official versioned API HTML, targeted LSTM equations"
+    },
+    {
+      "url": "https://openreview.net/forum?id=ryQu7f-RZ",
+      "topicIds": [
+        "01-10"
+      ],
+      "checkedClaims": "Direct page inaccessible due browser verification; not treated as evidence. Verified arXiv 1904.09237 supplies the primary text instead.",
+      "verificationMethod": "Access attempted; verification challenge"
+    }
+  ],
+  "claudeBaselineDisposition": {
+    "reviewerProvenance": "Separate parent-run Claude Code output labels its reviewer as Claude (claude-opus-5-5). It was explicitly a reasoning-only pass without tools, browsing or execution. This audit's source checks and execution are by OpenAI Codex.",
+    "findings": [
+      {
+        "findingNumber": 1,
+        "topicId": "01-02",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted: broadcasting claims now cite the official Broadcasting Semantics page; the numerical-computation chapter is not used as their direct support.",
+        "sourceUrls": [
+          "https://docs.pytorch.org/docs/stable/notes/broadcasting.html"
+        ]
+      },
+      {
+        "findingNumber": 2,
+        "topicId": "01-03",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted: eigenvectors map to scalar multiples; negative and zero eigenvalues and lack of real eigenvectors are stated explicitly.",
+        "sourceUrls": [
+          "https://www.deeplearningbook.org/contents/linear_algebra.html"
+        ]
+      },
+      {
+        "findingNumber": 3,
+        "topicId": "01-03",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted: column and row conventions are explicit; both singular-vector identities were executed on a nonsymmetric matrix.",
+        "sourceUrls": [
+          "https://www.deeplearningbook.org/contents/linear_algebra.html"
+        ]
+      },
+      {
+        "findingNumber": 4,
+        "topicId": "01-05",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted as a wording clarification: deterministic Taylor prediction is now called predicted rather than expected.",
+        "sourceUrls": [
+          "https://www.deeplearningbook.org/contents/numerical.html"
+        ]
+      },
+      {
+        "findingNumber": 5,
+        "topicId": "01-10",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted: added Algorithm 1 bias corrections and epsilon outside the square root; first-step Adam behavior was executed.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/1412.6980"
+        ]
+      },
+      {
+        "findingNumber": 6,
+        "topicId": "02-01",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted: an empty RunningMean raises ValueError instead of reporting a misleading zero; final snippet was executed.",
+        "sourceUrls": [
+          "https://docs.python.org/3/library/exceptions.html#ValueError"
+        ]
+      },
+      {
+        "findingNumber": 7,
+        "topicId": "02-03",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted: the exercise now specifies plain git commit and distinguishes documented -a and pathspec behavior. No repository history mutation was needed.",
+        "sourceUrls": [
+          "https://git-scm.com/docs/git-commit",
+          "https://git-scm.com/book/en/v2"
+        ]
+      },
+      {
+        "findingNumber": 8,
+        "topicId": "02-04",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted: explicit-output einsum reduction and within-operand diagonal semantics were corrected and executed.",
+        "sourceUrls": [
+          "https://docs.pytorch.org/docs/stable/generated/torch.einsum.html",
+          "https://docs.pytorch.org/docs/stable/tensor_view.html",
+          "https://docs.pytorch.org/docs/main/generated/torch.einsum.html"
+        ]
+      },
+      {
+        "findingNumber": 9,
+        "topicId": "03-05",
+        "originalSeverity": "low",
+        "decision": "accepted-clarification",
+        "reason": "Accepted as a clarification, not proof that the original restricted claim was false: the original explicitly assumed zero-mean inputs. The general second-moment equation and ReLU symmetry condition now explain the factor of two.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/1502.01852",
+          "https://proceedings.mlr.press/v9/glorot10a.html"
+        ]
+      },
+      {
+        "findingNumber": 10,
+        "topicId": "03-08",
+        "originalSeverity": "low",
+        "decision": "accepted-in-part",
+        "reason": "Accepted with a narrower claim: original test-time weight scaling versus inverted training scaling is explained. The suggested whole-network 'equivalent in expectation' phrasing was not adopted; only the masked activation expectation is guaranteed.",
+        "sourceUrls": [
+          "https://jmlr.org/papers/v15/srivastava14a.html"
+        ]
+      },
+      {
+        "findingNumber": 11,
+        "topicId": "03-12",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted: added the verified SGDR paper and explicitly separated its cosine schedule/restarts from Transformer inverse-square-root decay.",
+        "sourceUrls": [
+          "https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html",
+          "https://arxiv.org/abs/1608.03983",
+          "https://arxiv.org/abs/1211.5063",
+          "https://arxiv.org/abs/1412.6980"
+        ]
+      },
+      {
+        "findingNumber": 12,
+        "topicId": "04-03",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted: output values were recomputed with unrounded float64 softmax weights and checked against SDPA rather than copying the reviewer's rounded hand calculation.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/1706.03762",
+          "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html"
+        ]
+      },
+      {
+        "findingNumber": 13,
+        "topicId": "04-13",
+        "originalSeverity": "low",
+        "decision": "rejected",
+        "reason": "Rejected: this is a nonsequential reference library. A valid prerequisite link to 04-14 is useful; stable IDs and article ordering are preserved.",
+        "sourceUrls": []
+      },
+      {
+        "findingNumber": 14,
+        "topicId": "04-15",
+        "originalSeverity": "low",
+        "decision": "accepted",
+        "reason": "Accepted: verified Pope et al. arXiv 2211.05102 directly discusses separate prefill/decode configurations and added it to the article.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/2211.05102"
+        ]
+      }
+    ],
+    "counts": {
+      "acceptedIncludingQualified": 13,
+      "rejected": 1
+    }
+  },
+  "claudeExpandedDisposition": {
+    "articleFindings": [
+      {
+        "range": "01-04",
+        "findingIndex": 0,
+        "topicId": "01-02",
+        "disposition": "accepted",
+        "reason": "Changed both the practice explanation and enriched numeric example to explicitly use predictions minus labels/targets. The stored numeric example was independently executed and is correct for this operation.",
+        "sourceUrls": [
+          "https://docs.pytorch.org/docs/stable/notes/broadcasting.html"
+        ]
+      },
+      {
+        "range": "01-04",
+        "findingIndex": 1,
+        "topicId": "01-04",
+        "disposition": "accepted",
+        "reason": "Added the official Deep Feedforward Networks chapter for computational graphs, chain rule, path summation and backpropagation. Primary-site chapter excerpts directly verify those subjects; Numerical Computation remains for derivative notation and numerical concerns.",
+        "sourceUrls": [
+          "https://www.deeplearningbook.org/contents/mlp.html",
+          "https://www.deeplearningbook.org/contents/numerical.html"
+        ]
+      },
+      {
+        "range": "01-04",
+        "findingIndex": 2,
+        "topicId": "04-17",
+        "disposition": "accepted",
+        "reason": "Corrected both passages to identify the full batched multi-head attention-weight tensor: 16 matrices use 32 MiB in total, while each 1024 by 1024 FP16 matrix uses 2 MiB. The original total arithmetic was correct.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/1706.03762",
+          "https://arxiv.org/abs/2205.14135"
+        ]
+      },
+      {
+        "range": "01-04",
+        "findingIndex": 3,
+        "topicId": "04-13",
+        "disposition": "rejected",
+        "reason": "This is a nonsequential reference library, so a valid prerequisite may have a later ID. The source-reading paragraph already explains that the cache stores keys and values reused by future queries, not old queries; the visible prerequisite links to the dedicated explanation. Stable IDs are preserved.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/1911.02150",
+          "https://arxiv.org/abs/2305.13245"
+        ]
+      }
+    ],
+    "additionalChangesAfterSnapshot": [
+      {
+        "topicId": "03-11",
+        "change": "Added the official PyTorch word-language-model example as a third reference; clarified the book note and reading paragraph to separate recurrent concepts from the concrete chunking/repackage_hidden implementation.",
+        "verification": "Inspected get_batch, repackage_hidden and recurrent training in the official source; the earlier CPU detach check confirms unchanged numeric values and disconnected autograd history.",
+        "sourceUrls": [
+          "https://github.com/pytorch/examples/blob/main/word_language_model/main.py",
+          "https://www.deeplearningbook.org/contents/rnn"
+        ]
+      },
+      {
+        "topicId": "01-10",
+        "change": "Added Reddi, Kale and Kumar, On the Convergence of Adam and Beyond, and a source-reading paragraph on the flawed original convergence proof and convex counterexamples.",
+        "verification": "Verified authors, ICLR 2018 attribution, abstract and introduction from the primary arXiv paper. OpenReview required a browser verification challenge, so the accessible arXiv source is the link.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/1904.09237"
+        ]
+      }
+    ],
+    "sharedPaperFindings": "Indices 4–6 are handled and recorded by the parent, not this agent."
+  },
+  "unresolved": [],
+  "limitations": [
+    "No audit guarantees absence of all errors. The full article text was reviewed, but external sources were checked selectively for relevant claims, not exhaustively line by line.",
+    "Four large Deep Learning chapters (Machine Learning Basics, Deep Feedforward Networks, Convolutional Networks, and Sequence Modeling) exceeded the web tool's full-page retrieval limit. Relevant primary-site indexed passages were available and inspected; exact implementation claims also used official PyTorch sources. This is a source-access scope limit, not a claim of having read those full pages through the tool.",
+    "Rolling Python/PyTorch documentation showed newer online versions than the local Python 3.13.2/PyTorch 2.11.0+cpu test environment. Core claims were checked against the current documentation and relevant CPU behavior; compatibility with every version is not established.",
+    "No CUDA execution, AMP GPU training, FlashAttention kernel benchmark, model-scale training, external-dataset experiment or checkpoint-file I/O was performed. In-memory optimizer restoration and mathematical memory/latency calculations do not establish real hardware performance.",
+    "Git modes were verified using official documentation without creating commits. OpenReview's verification challenge prevented directly reading that copy of Reddi et al.; the verified primary arXiv copy was used.",
+    "Claude's expanded snapshot predates the final 03-11 citation improvement and subsequent accepted corrections/Adam reference addition. The exact deltas and independent verification are documented in expanded-resolutions-01-04.json."
+  ],
+  "sharedFileCorrectionsNeeded": [],
+  "assessment": "All 55 assigned articles were fully reviewed and enriched. Thirty consolidated corrections, clarifications or reference improvements across 23 articles are recorded with original and final evidence. Fifty-three actual execution checks passed, including all six stored Python snippets and targeted numerical/API counterexamples. No unresolved substantive scientific defect remains from these reviews; the stated source-access and execution limits still apply."
+}

@@ -1,0 +1,2414 @@
+{
+  "scope": "Factual audit and paper-focused enrichment of data/lessons/05.json through 08.json",
+  "reviewer": "OpenAI Codex agent /root/papers",
+  "reviewDate": "2026-10-16",
+  "status": "All 51 articles fully read and enriched; baseline and expanded Claude findings independently adjudicated; corrections and focused verification complete.",
+  "reviewedTopicIds": [
+    "05-01",
+    "05-02",
+    "05-03",
+    "05-04",
+    "05-05",
+    "05-06",
+    "05-07",
+    "05-08",
+    "05-09",
+    "05-10",
+    "05-11",
+    "05-12",
+    "05-13",
+    "05-14",
+    "06-01",
+    "06-02",
+    "06-03",
+    "06-04",
+    "06-05",
+    "06-06",
+    "06-07",
+    "06-08",
+    "06-09",
+    "06-10",
+    "06-11",
+    "06-12",
+    "07-01",
+    "07-02",
+    "07-03",
+    "07-04",
+    "07-05",
+    "07-06",
+    "07-07",
+    "07-08",
+    "07-09",
+    "07-10",
+    "07-11",
+    "08-01",
+    "08-02",
+    "08-03",
+    "08-04",
+    "08-05",
+    "08-06",
+    "08-07",
+    "08-08",
+    "08-09",
+    "08-10",
+    "08-11",
+    "08-12",
+    "08-13",
+    "08-14"
+  ],
+  "enrichedTopicIds": [
+    "05-01",
+    "05-02",
+    "05-03",
+    "05-04",
+    "05-05",
+    "05-06",
+    "05-07",
+    "05-08",
+    "05-09",
+    "05-10",
+    "05-11",
+    "05-12",
+    "05-13",
+    "05-14",
+    "06-01",
+    "06-02",
+    "06-03",
+    "06-04",
+    "06-05",
+    "06-06",
+    "06-07",
+    "06-08",
+    "06-09",
+    "06-10",
+    "06-11",
+    "06-12",
+    "07-01",
+    "07-02",
+    "07-03",
+    "07-04",
+    "07-05",
+    "07-06",
+    "07-07",
+    "07-08",
+    "07-09",
+    "07-10",
+    "07-11",
+    "08-01",
+    "08-02",
+    "08-03",
+    "08-04",
+    "08-05",
+    "08-06",
+    "08-07",
+    "08-08",
+    "08-09",
+    "08-10",
+    "08-11",
+    "08-12",
+    "08-13",
+    "08-14"
+  ],
+  "coverage": {
+    "articleCount": 51,
+    "moduleCounts": {
+      "05": 14,
+      "06": 12,
+      "07": 11,
+      "08": 14
+    },
+    "readInFull": [
+      "title and summary",
+      "prerequisites",
+      "all section paragraphs",
+      "formulas",
+      "exercise prompt and answer",
+      "takeaways",
+      "reference titles, URLs, and reading notes"
+    ],
+    "articleCodeBlocks": 0,
+    "notes": "No runnable code blocks occur in these 51 articles. All formulas and numerical examples were statically reviewed; selected arithmetic and tensor properties were independently executed below."
+  },
+  "enrichment": {
+    "sectionId": "source-reading",
+    "paragraphsPerArticle": 2,
+    "wordCount": 7664,
+    "minimumWords": 140,
+    "maximumWords": 171,
+    "perTopic": [
+      {
+        "topicId": "05-01",
+        "words": 140
+      },
+      {
+        "topicId": "05-02",
+        "words": 147
+      },
+      {
+        "topicId": "05-03",
+        "words": 143
+      },
+      {
+        "topicId": "05-04",
+        "words": 143
+      },
+      {
+        "topicId": "05-05",
+        "words": 140
+      },
+      {
+        "topicId": "05-06",
+        "words": 145
+      },
+      {
+        "topicId": "05-07",
+        "words": 143
+      },
+      {
+        "topicId": "05-08",
+        "words": 142
+      },
+      {
+        "topicId": "05-09",
+        "words": 146
+      },
+      {
+        "topicId": "05-10",
+        "words": 151
+      },
+      {
+        "topicId": "05-11",
+        "words": 154
+      },
+      {
+        "topicId": "05-12",
+        "words": 143
+      },
+      {
+        "topicId": "05-13",
+        "words": 171
+      },
+      {
+        "topicId": "05-14",
+        "words": 145
+      },
+      {
+        "topicId": "06-01",
+        "words": 149
+      },
+      {
+        "topicId": "06-02",
+        "words": 147
+      },
+      {
+        "topicId": "06-03",
+        "words": 149
+      },
+      {
+        "topicId": "06-04",
+        "words": 157
+      },
+      {
+        "topicId": "06-05",
+        "words": 150
+      },
+      {
+        "topicId": "06-06",
+        "words": 151
+      },
+      {
+        "topicId": "06-07",
+        "words": 152
+      },
+      {
+        "topicId": "06-08",
+        "words": 150
+      },
+      {
+        "topicId": "06-09",
+        "words": 149
+      },
+      {
+        "topicId": "06-10",
+        "words": 149
+      },
+      {
+        "topicId": "06-11",
+        "words": 157
+      },
+      {
+        "topicId": "06-12",
+        "words": 158
+      },
+      {
+        "topicId": "07-01",
+        "words": 146
+      },
+      {
+        "topicId": "07-02",
+        "words": 147
+      },
+      {
+        "topicId": "07-03",
+        "words": 147
+      },
+      {
+        "topicId": "07-04",
+        "words": 149
+      },
+      {
+        "topicId": "07-05",
+        "words": 147
+      },
+      {
+        "topicId": "07-06",
+        "words": 154
+      },
+      {
+        "topicId": "07-07",
+        "words": 151
+      },
+      {
+        "topicId": "07-08",
+        "words": 150
+      },
+      {
+        "topicId": "07-09",
+        "words": 152
+      },
+      {
+        "topicId": "07-10",
+        "words": 161
+      },
+      {
+        "topicId": "07-11",
+        "words": 155
+      },
+      {
+        "topicId": "08-01",
+        "words": 149
+      },
+      {
+        "topicId": "08-02",
+        "words": 150
+      },
+      {
+        "topicId": "08-03",
+        "words": 153
+      },
+      {
+        "topicId": "08-04",
+        "words": 155
+      },
+      {
+        "topicId": "08-05",
+        "words": 148
+      },
+      {
+        "topicId": "08-06",
+        "words": 144
+      },
+      {
+        "topicId": "08-07",
+        "words": 158
+      },
+      {
+        "topicId": "08-08",
+        "words": 150
+      },
+      {
+        "topicId": "08-09",
+        "words": 161
+      },
+      {
+        "topicId": "08-10",
+        "words": 154
+      },
+      {
+        "topicId": "08-11",
+        "words": 155
+      },
+      {
+        "topicId": "08-12",
+        "words": 152
+      },
+      {
+        "topicId": "08-13",
+        "words": 147
+      },
+      {
+        "topicId": "08-14",
+        "words": 158
+      }
+    ],
+    "method": "Original topic-specific reading prompts connect the cited source to equations, tensor shapes, examples, assumptions, comparison design, and limitations. They do not claim that toy examples are experiments reported by the papers."
+  },
+  "issues": [
+    {
+      "topicId": "07-10",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "For T dispatched tokens, k assignments, hidden width d, and b bytes per activation value",
+      "after": "For T input tokens, k selected experts per token, hidden width d, and b bytes per activation value",
+      "reason": "Defines T before replication and k per token so the kT payload formula cannot be read as counting dispatched assignments twice.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1701.06538",
+        "https://arxiv.org/html/2401.04088v1"
+      ]
+    },
+    {
+      "topicId": "08-01",
+      "severity": "low",
+      "field": "sections.0.paragraphs.0",
+      "before": "Flattening that grid produces a vector, but nearby coordinates no longer visibly express the original spatial arrangement.",
+      "after": "Flattening preserves all pixel values when the original shape and ordering are known. What changes is the representation: a generic dense layer does not automatically exploit the image's two-dimensional neighborhood structure.",
+      "reason": "Separates an invertible reshape from the architectural inductive bias; flattening alone does not destroy spatial information.",
+      "sourceUrls": [
+        "https://arxiv.org/html/2010.11929"
+      ]
+    },
+    {
+      "topicId": "08-02",
+      "severity": "low",
+      "field": "sections.0.paragraphs.0",
+      "before": "Each output channel combines information from all input channels within the kernel footprint.",
+      "after": "In a standard ungrouped convolution, each output channel combines all input channels within the kernel footprint. Grouped and depthwise convolutions restrict those channel connections.",
+      "reason": "The all-input-channel statement applies to groups=1, not to every convolution.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/2.11/generated/torch.nn.Conv2d.html"
+      ]
+    },
+    {
+      "topicId": "08-03",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "Appending CLS gives [B, 197, 768].",
+      "after": "Prepending CLS, as in the original ViT, gives [B, 197, 768].",
+      "reason": "Corrects the placement of the original ViT classification token; the sequence shape is unchanged.",
+      "sourceUrls": [
+        "https://arxiv.org/html/2010.11929"
+      ]
+    },
+    {
+      "topicId": "08-03",
+      "severity": "medium",
+      "field": "sections.2.paragraphs.0",
+      "before": "Without spatial position information, a standard self-attention stack cannot distinguish arbitrary permutations of otherwise identical patch embeddings in the intended image layout.",
+      "after": "Without positional information, standard self-attention is permutation-equivariant: reordering patch tokens reorders their token-level outputs. A mean-pooled or fixed-CLS image representation is invariant to that reordering, so patch content alone does not specify the spatial layout.",
+      "reason": "Distinguishes equivariant token outputs from invariant pooled or CLS outputs instead of implying that all outputs are unchanged by permutations.",
+      "sourceUrls": [
+        "https://arxiv.org/html/2010.11929"
+      ]
+    },
+    {
+      "topicId": "08-14",
+      "severity": "low",
+      "field": "summary",
+      "before": "Promptable segmentation uses user-specified spatial cues to identify a region, and video segmentation additionally requires memory across frames.",
+      "after": "Promptable segmentation uses spatial cues to identify a region; SAM 2 uses temporal memory to maintain the selected object across video frames.",
+      "reason": "Attributes streaming memory to SAM 2 rather than claiming every video-segmentation architecture must use memory.",
+      "sourceUrls": [
+        "https://arxiv.org/html/2408.00714v2"
+      ]
+    },
+    {
+      "topicId": "05-02",
+      "severity": "low",
+      "field": "sections.2.paragraphs.0",
+      "before": "Changing the tokenizer changes token IDs and segmentation, so an embedding table trained for one vocabulary cannot generally interpret another. Inspect exact tokenization for spaces, Unicode, numbers, and code before interpreting length or errors. Different tokenizers can produce different perplexities on the same text because the prediction units differ. Longer vocabularies may shorten sequences but enlarge embeddings and output projections, making tokenization an architectural and systems trade-off.",
+      "after": "Changing the tokenizer changes token IDs and segmentation, so an embedding table trained for one vocabulary cannot generally interpret another. Inspect exact tokenization for spaces, Unicode, numbers, and code before interpreting length or errors. Different tokenizers can produce different perplexities on the same text because the prediction units differ. Larger vocabularies may shorten tokenized sequences but enlarge the embedding table and output projection, making tokenization an architectural and systems trade-off.",
+      "reason": "Clarify vocabulary size rather than token length.",
+      "sourceUrls": [],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-03",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "For [BOS, A, B, EOS], one explicit training pair uses inputs [BOS, A, B] and targets [A, B, EOS]. Logits have shape [B, T−1, V], with one V-way classification problem per valid target. Some model APIs accept the full sequence as both input and labels and perform the shift internally; others expect pre-shifted tensors. Applying both conventions shifts twice. Check the interface with a tiny sequence whose expected targets you can list by hand.",
+      "after": "For [BOS, A, B, EOS], one explicit training pair uses inputs [BOS, A, B] and targets [A, B, EOS]. Here T = 4 is the full sequence length, leaving T−1 = 3 target positions. For N_batch such examples, logits have shape [N_batch, T−1, V], with one V-way classification problem per valid target. Some model APIs accept the full sequence as both input and labels and perform the shift internally; others expect pre-shifted tensors. Applying both conventions shifts twice. Check the interface with a tiny sequence whose expected targets you can list by hand.",
+      "reason": "Avoid using B for both a token name and the batch dimension.",
+      "sourceUrls": [],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-06",
+      "severity": "low",
+      "field": "sections.0.paragraphs.0",
+      "before": "GPT-style models are associated with causal decoding, while BERT uses bidirectional encoding trained with a masked-token objective. LLaMA is also a causal decoder family, so its differences from GPT are often block-level and training-design choices rather than a different autoregressive factorization. Family names span multiple releases; a careful comparison names the exact paper or checkpoint instead of assuming one configuration describes every descendant.",
+      "after": "GPT-style models are associated with causal decoding, while original BERT uses bidirectional encoding pretrained with masked language modeling and next-sentence prediction. LLaMA is also a causal decoder family, so its differences from GPT are often block-level and training-design choices rather than a different autoregressive factorization. Family names span multiple releases; a careful comparison names the exact paper or checkpoint instead of assuming one configuration describes every descendant.",
+      "reason": "Include both original BERT pretraining objectives without generalizing to every later encoder.",
+      "sourceUrls": [
+        "https://arxiv.org/html/1810.04805"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-06",
+      "severity": "low",
+      "field": "exercise.answer",
+      "before": "BERT reads bidirectionally and predicts masked tokens, whereas LLaMA uses causal next-token prediction. Both GPT-style decoders and LLaMA use causal generation, so their differences can center on normalization, position encoding, FFNs, data, and training choices.",
+      "after": "Original BERT reads bidirectionally and trains with masked-token prediction plus next-sentence prediction, whereas LLaMA uses causal next-token prediction. Both GPT-style decoders and LLaMA use causal generation, so their differences can center on normalization, position encoding, FFNs, data, and training choices.",
+      "reason": "Keep the exercise consistent with original BERT's two-objective pretraining.",
+      "sourceUrls": [
+        "https://arxiv.org/html/1810.04805"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-06",
+      "severity": "low",
+      "field": "references.0.note",
+      "before": "Read attention visibility and masked-language pretraining.",
+      "after": "Compare bidirectional attention with both original pretraining objectives: masked language modeling and next-sentence prediction.",
+      "reason": "Direct readers to both original objectives.",
+      "sourceUrls": [
+        "https://arxiv.org/html/1810.04805"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-09",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "Temperature divides logits by a positive value before softmax: lower temperature sharpens probabilities, while higher temperature flattens them. Top-k keeps a fixed number of highest-scoring candidates. Top-p keeps a smallest high-probability prefix whose cumulative probability reaches a chosen threshold, so its candidate count adapts to uncertainty. After filtering, probabilities must be renormalized. Greedy decoding is a limiting or separate selection rule; literally dividing by temperature zero is undefined.",
+      "after": "Temperature divides logits by a positive value before softmax: lower temperature sharpens probabilities, while higher temperature flattens them. Top-k keeps a fixed number of highest-scoring candidates. Top-p keeps a smallest high-probability prefix whose cumulative probability reaches a chosen threshold, so its candidate count adapts to uncertainty. After filtering, probabilities must be renormalized. Greedy decoding is a limiting or separate selection rule; literally dividing by temperature zero is undefined. Positive temperature scaling preserves the ranking and therefore top-k membership, but it can change the top-p nucleus. When combining controls, report whether temperature is applied before truncation.",
+      "reason": "Clarify the interaction of temperature and probability-mass truncation; positive scaling preserves order.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1904.09751"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "07-02",
+      "severity": "medium",
+      "field": "sections.2.paragraphs.0",
+      "before": "Use four experts with d = 16 and h = 32. Each two-matrix expert has 1,024 weight parameters, so the collection has 4,096. Route a batch of token vectors, run only selected experts, and restore the original token order before the residual addition. A useful debugging test sends every token to one chosen expert and checks that the layer matches that standalone MLP. A frequent error is returning tokens in dispatch order, which silently mixes representations between sequence positions while leaving tensor shapes apparently valid.",
+      "after": "Use four experts with d = 16 and h = 32. Each two-matrix expert has 1,024 weight parameters, so the collection has 4,096. Route a batch of token vectors, run only selected experts, and restore the original token order before the residual addition. A useful debugging test sends every token to one chosen expert and checks that the MoE contribution, before residual addition, equals the standalone MLP output multiplied by its gate weight. Exact equality to the unweighted MLP requires a gate of one. A frequent error is returning tokens in dispatch order, which silently mixes representations between sequence positions while leaving tensor shapes apparently valid.",
+      "reason": "A correct Switch-style top-one layer retains its selected probability multiplier; ignoring that gate creates a false debugging failure.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/2101.03961"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "07-03",
+      "severity": "low",
+      "field": "sections.2.paragraphs.0",
+      "before": "Suppose a router produces probabilities [0.55, 0.25, 0.15, 0.05]. A top-two rule chooses experts zero and one. If selected weights are renormalized, their weights become 0.6875 and 0.3125. If they are not, their total contribution remains scaled by 0.8. Those are different layer definitions. During debugging, log logits, selected indices, gate weights, and per-expert token counts. Extreme logits early in training can make assignments overly concentrated, while perfectly balanced counts alone do not prove that routing improves task quality.",
+      "after": "Suppose a router produces probabilities [0.55, 0.25, 0.15, 0.05]. Using zero-based indexing, a top-two rule chooses experts at indices 0 and 1. If selected weights are renormalized, their weights become 0.6875 and 0.3125. If they are not, their total contribution remains scaled by 0.8. Those are different layer definitions. During debugging, log logits, selected indices, gate weights, and per-expert token counts. Extreme logits early in training can make assignments overly concentrated, while perfectly balanced counts alone do not prove that routing improves task quality.",
+      "reason": "Make the indexing convention explicit.",
+      "sourceUrls": [],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "07-03",
+      "severity": "low",
+      "field": "exercise.answer",
+      "before": "Experts one and two. Their selected mass is 0.8, so the weights are 0.625 and 0.375.",
+      "after": "The experts at zero-based indices 1 and 2, namely the second and third experts with probabilities 0.5 and 0.3. Their selected mass is 0.8, so the weights are 0.625 and 0.375.",
+      "reason": "Remove ambiguity between expert indices and ordinal positions.",
+      "sourceUrls": [],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "07-06",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "A common top-one balancing term uses f_e, the fraction of tokens assigned to expert e, and P_e, the mean routing probability for e across the batch. The product sum penalizes concentration when assignment frequency and probability mass align. A coefficient sets the strength of this auxiliary loss relative to the task loss. Assignment counts are discrete, while the probability averages provide a differentiable path. This specific form is only one design; other routers use different balancing mechanisms.",
+      "after": "A common top-one balancing term uses f_e, the fraction of tokens assigned to expert e, and P_e, the mean routing probability for e across the batch. The product sum penalizes concentration when assignment frequency and probability mass align. Let N_E denote the number of experts. A coefficient λ sets the strength of this auxiliary loss relative to the task loss. Assignment counts are discrete, while the probability averages provide a differentiable path. This specific form is only one design; other routers use different balancing mechanisms.",
+      "reason": "Define expert count and explicit loss coefficient without overloading the expert-function symbol.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/2101.03961"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "07-06",
+      "severity": "low",
+      "field": "sections.1.formula",
+      "before": "L_balance = E Σₑ fₑ Pₑ",
+      "after": "L_balance = N_E Σₑ fₑ Pₑ; L_total = L_task + λ L_balance",
+      "reason": "Show separately the dimensionless balance statistic and its contribution to total loss.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/2101.03961"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-13",
+      "severity": "low",
+      "field": "references",
+      "before": [
+        {
+          "title": "Deduplicating Training Data Makes Language Models Better",
+          "url": "https://arxiv.org/abs/2107.06499",
+          "kind": "paper",
+          "note": "Read duplicate detection and the effects of repeated training content."
+        },
+        {
+          "title": "LLaMA: Open and Efficient Foundation Language Models",
+          "url": "https://arxiv.org/abs/2302.13971",
+          "kind": "paper",
+          "note": "Inspect corpus composition and preprocessing decisions in a pretraining pipeline."
+        }
+      ],
+      "after": [
+        {
+          "title": "Deduplicating Training Data Makes Language Models Better",
+          "url": "https://arxiv.org/abs/2107.06499",
+          "kind": "paper",
+          "note": "Read duplicate detection and the effects of repeated training content."
+        },
+        {
+          "title": "LLaMA: Open and Efficient Foundation Language Models",
+          "url": "https://arxiv.org/abs/2302.13971",
+          "kind": "paper",
+          "note": "Inspect corpus composition and preprocessing decisions in a pretraining pipeline."
+        },
+        {
+          "title": "Efficient Sequence Packing without Cross-contamination: Accelerating Large Language Models without Impacting Performance",
+          "url": "https://arxiv.org/abs/2107.02027",
+          "kind": "paper",
+          "note": "Inspect how packed BERT preserves sequence independence through attention masks, position handling, and per-sequence loss accounting."
+        }
+      ],
+      "reason": "Add a direct primary source for the packing and cross-document attention claims.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2107.02027",
+        "https://arxiv.org/html/2107.02027v2"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-13",
+      "severity": "low",
+      "field": "sections.3.paragraphs.1",
+      "before": "Construct a tiny corpus containing an exact copy, a lightly edited copy, and two genuinely different documents sharing a standard disclaimer. Predict what document hashing and a substring-based rule would remove. Then consider an evaluation example copied into a training document: deduplicating only within the training partition will not necessarily detect that boundary crossing. Packing introduces another independent decision about attention and targets. Keep a record of which changes remove content, which change sampling frequency, and which merely rearrange tokens; otherwise an efficiency improvement may be mistaken for a data-quality result.",
+      "after": "Construct a tiny corpus containing an exact copy, a lightly edited copy, and two different documents sharing a disclaimer. Predict what document hashing and a substring rule would remove. Then read Efficient Sequence Packing without Cross-contamination for the separate layout problem. Its worked system uses BERT, so do not import its bidirectional objective into a causal decoder; instead inspect the principle of preventing attention across independent sequences. Draw a packed mask, mark position indices, and specify which targets enter the loss. These checks distinguish removing duplicated content from rearranging the same content efficiently, and expose when an apparent throughput optimization also changes supervision.",
+      "reason": "Tie the source-reading exercise to the newly verified packing reference while preserving the BERT-versus-causal distinction.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2107.02027",
+        "https://arxiv.org/html/2107.02027v2"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "07-10",
+      "severity": "low",
+      "field": "references",
+      "before": [
+        {
+          "title": "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer",
+          "url": "https://arxiv.org/abs/1701.06538",
+          "kind": "paper",
+          "note": "Read the discussion of computational and communication constraints in sparse expert layers."
+        },
+        {
+          "title": "DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models",
+          "url": "https://arxiv.org/abs/2401.06066",
+          "kind": "paper",
+          "note": "Inspect the expert design alongside efficiency considerations."
+        }
+      ],
+      "after": [
+        {
+          "title": "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer",
+          "url": "https://arxiv.org/abs/1701.06538",
+          "kind": "paper",
+          "note": "Read the discussion of computational and communication constraints in sparse expert layers."
+        },
+        {
+          "title": "DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models",
+          "url": "https://arxiv.org/abs/2401.06066",
+          "kind": "paper",
+          "note": "Inspect the expert design alongside efficiency considerations."
+        },
+        {
+          "title": "GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding",
+          "url": "https://arxiv.org/abs/2006.16668",
+          "kind": "paper",
+          "note": "Trace expert dispatch as resharding between token and expert dimensions, then inspect the AllToAll communication and runtime breakdown."
+        }
+      ],
+      "reason": "Add a direct source for the all-to-all expert-parallel implementation.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2006.16668",
+        "https://arxiv.org/html/2006.16668"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "07-10",
+      "severity": "low",
+      "field": "sections.3.paragraphs.0",
+      "before": "The original sparse MoE paper is useful for understanding why conditional computation creates a systems problem as well as a modeling opportunity. Trace a token representation from its original device to its selected expert and back. Count the activation values moved, not only the weights held by each device. The expert-parallel layout can reduce local weight storage while introducing communication on the critical path.",
+      "after": "Read GShard's expert dispatch and resharding discussion alongside the original sparse MoE paper. Trace a token representation from its original device to its selected expert and back. In GShard, inspect the change from a token-partitioned layout to an expert-partitioned layout and identify the AllToAll operation that connects them. Count activation values moved, not only weights held by each device. This connects conditional computation to a concrete distributed execution plan.",
+      "reason": "Connect the new reading section directly to GShard's documented dispatch/AllToAll implementation.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2006.16668",
+        "https://arxiv.org/html/2006.16668"
+      ],
+      "origin": "Claude baseline finding validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-07",
+      "severity": "low",
+      "field": "references",
+      "before": [
+        {
+          "title": "LLaMA: Open and Efficient Foundation Language Models",
+          "url": "https://arxiv.org/abs/2302.13971",
+          "kind": "paper",
+          "note": "Inspect large-scale next-token pretraining and corpus composition."
+        },
+        {
+          "title": "Training language models to follow instructions with human feedback",
+          "url": "https://arxiv.org/abs/2203.02155",
+          "kind": "paper",
+          "note": "Read the supervised demonstration stage before preference-based training."
+        }
+      ],
+      "after": [
+        {
+          "title": "LLaMA: Open and Efficient Foundation Language Models",
+          "url": "https://arxiv.org/abs/2302.13971",
+          "kind": "paper",
+          "note": "Inspect large-scale next-token pretraining and corpus composition."
+        },
+        {
+          "title": "Training language models to follow instructions with human feedback",
+          "url": "https://arxiv.org/abs/2203.02155",
+          "kind": "paper",
+          "note": "Read the supervised demonstration stage before preference-based training."
+        },
+        {
+          "title": "Don't Stop Pretraining: Adapt Language Models to Domains and Tasks",
+          "url": "https://arxiv.org/abs/2004.10964",
+          "kind": "paper",
+          "note": "Compare domain-adaptive and task-adaptive pretraining on unlabeled text before supervised task training."
+        }
+      ],
+      "reason": "Added a primary domain/task-adaptive pretraining source to support the continued-pretraining discussion.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2004.10964"
+      ],
+      "origin": "Independent OpenAI audit; subsequently corroborated by Claude baseline"
+    },
+    {
+      "topicId": "08-02",
+      "severity": "low",
+      "field": "references",
+      "before": [
+        {
+          "title": "Deep Residual Learning for Image Recognition",
+          "url": "https://arxiv.org/abs/1512.03385",
+          "kind": "paper",
+          "note": "Read the residual mapping formulation and projection shortcuts."
+        }
+      ],
+      "after": [
+        {
+          "title": "Deep Residual Learning for Image Recognition",
+          "url": "https://arxiv.org/abs/1512.03385",
+          "kind": "paper",
+          "note": "Read the residual mapping formulation and projection shortcuts."
+        },
+        {
+          "title": "PyTorch Conv2d Documentation",
+          "url": "https://docs.pytorch.org/docs/2.11/generated/torch.nn.Conv2d.html",
+          "kind": "guide",
+          "note": "Check grouped/depthwise channel connectivity, kernel parameter shapes, and the output-size formula."
+        }
+      ],
+      "reason": "Added official Conv2d documentation for standard versus grouped/depthwise connectivity and shape accounting.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/2.11/generated/torch.nn.Conv2d.html"
+      ],
+      "origin": "Independent OpenAI audit; subsequently corroborated by Claude baseline"
+    },
+    {
+      "topicId": "05-02",
+      "severity": "low",
+      "field": "sections.3.paragraphs.0",
+      "before": "Sennrich and colleagues address rare-word representation through subword units; SentencePiece addresses the tokenizer as a reproducible component that can operate on raw sentences. Read them together while keeping algorithm and preprocessing separate. On paper, represent a sentence with explicit spaces and punctuation, apply two chosen merge rules, and list the vocabulary entries needed to reverse the segmentation.",
+      "after": "Sennrich-style BPE learns merges within pre-tokenized words; word-end markers preserve the word boundaries. Reproduce two within-word merges and show how the boundary markers let you rejoin the pieces. For SentencePiece, start with normalized text and represent spaces using ▁. Inspect its whitespace and segmentation settings, then compare the information needed to reconstruct that representation. Reconstructing normalized text does not guarantee recovery of the original raw text.",
+      "reason": "Separate within-word BPE boundary conventions from SentencePiece's normalized-text representation; reject unconditional raw-text losslessness.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/1508.07909",
+        "https://arxiv.org/pdf/1808.06226"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-12",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "A rough estimate for dense Transformer training is C ≈ 6ND, with N parameters and D training tokens, ignoring important architecture- and sequence-dependent overheads. Under fixed C, doubling N roughly halves the affordable D in this approximation. The best balance depends on how loss responds to both capacity and data. Compute-optimal training also differs from deployment-optimal design: a smaller model trained longer may be attractive when inference will be repeated many times.",
+      "after": "A rough estimate for dense Transformer training is C ≈ 6ND, with N parameters and D training tokens, ignoring important architecture- and sequence-dependent overheads. In Kaplan et al., N counts non-embedding parameters and the estimate omits context-dependent attention FLOPs. Check each study's parameter-count and compute conventions before comparing allocation rules. Under fixed C, doubling N roughly halves the affordable D in this approximation. The best balance depends on how loss responds to both capacity and data. Compute-optimal training also differs from deployment-optimal design: a smaller model trained longer may be attractive when inference will be repeated many times.",
+      "reason": "Specify Kaplan's non-embedding parameter and context-dependent-compute conventions.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/2001.08361"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-14",
+      "severity": "low",
+      "field": "exercise.answer",
+      "before": "It is only one additional correct answer. Inspect paired disagreements, uncertainty, prompt and sampling variation, and whether either model used the test set for selection. A broader or repeated evaluation may show that the difference is unstable.",
+      "after": "It is a net difference of one correct answer, not necessarily one disagreement: B could answer 10 questions correctly that A misses, while A answers 9 correctly that B misses. Inspect paired disagreements, uncertainty, prompt and sampling variation, and whether either model used the test set for selection. A broader or repeated evaluation may show that the difference is unstable.",
+      "reason": "Distinguish the difference in correct-answer totals from the number of discordant paired outcomes.",
+      "sourceUrls": [],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "06-03",
+      "severity": "low",
+      "field": "sections.2.paragraphs.0",
+      "before": "Take d_in = 8, d_out = 6, and r = 2. Full matrix adaptation has 48 trainable values; the two adapter matrices have 16 + 12 = 28. A high rank is not necessarily parameter-efficient for tiny layers. Test the implementation by comparing the two-path output with the output of an explicitly merged matrix using fixed weights and dropout disabled. The outputs should agree within numerical tolerance, and frozen W should receive no parameter gradient.",
+      "after": "Take d_in = 8, d_out = 6, and r = 2. Full matrix adaptation has 48 trainable values; the two adapter matrices have 16 + 12 = 28, a saving. The break-even rank is d_in d_out/(d_in + d_out) = 48/14 ≈ 3.43. Rank 4 would require 56 adapter values, exceeding the full matrix's 48. Tiny layers leave little room for parameter-efficient ranks. Test the implementation by comparing the two-path output with the output of an explicitly merged matrix using fixed weights and dropout disabled. The outputs should agree within numerical tolerance, and frozen W should receive no parameter gradient.",
+      "reason": "Use the same dimensions to show both a saving rank and an inefficient rank.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2106.09685"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "06-10",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "For rsLoRA, the adapter multiplier is α/√r. With α = 16 and r = 64, that multiplier is 2; standard α/r would be 0.25. For a conceptual DoRA weight vector, write w′ = m(v + Δv)/‖v + Δv‖. The normalization isolates a direction, while m controls length. Actual matrix implementations must specify which axis defines a weight vector and how norms are computed. A zero or tiny norm needs numerically careful handling.",
+      "after": "For rsLoRA, the adapter multiplier is α/√r. With α = 16 and r = 64, that multiplier is 2; standard α/r would be 0.25. For a conceptual DoRA weight vector, write w′ = m(v + Δv)/‖v + Δv‖. The normalization isolates a direction, while m controls length. Actual matrix implementations must specify which axis defines a weight vector and how norms are computed. A zero or tiny norm needs numerically careful handling. In the paper's matrix convention, V starts at W₀ and m at W₀'s column norms, so zero BA preserves the initial weight for nonzero columns. Its memory-saving variant detaches the norm denominator from backpropagation while recomputing its value in each forward pass. The forward expression is unchanged, but the gradients differ.",
+      "reason": "Primary DoRA text specifies pretrained column-norm magnitude initialization and a detached-denominator memory-saving variant.",
+      "sourceUrls": [
+        "https://arxiv.org/html/2402.09353v3"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "06-10",
+      "severity": "low",
+      "field": "references.1.note",
+      "before": "Inspect the magnitude–direction decomposition and its implementation.",
+      "after": "Inspect the magnitude–direction decomposition, pretrained column-norm initialization, and the variant that detaches the denominator during backpropagation.",
+      "reason": "Direct readers to the implementation assumptions behind the forward parameterization.",
+      "sourceUrls": [
+        "https://arxiv.org/html/2402.09353v3"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "06-12",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "Prepare tokenized examples with appropriate labels and padding masks. For causal language modeling, decide whether loss covers all text or only the desired response tokens; the choice affects the learning objective. Run a single batch first, inspect the loss, and verify that adapter gradients are finite and nonzero after an appropriate initialization step. Check that the optimizer contains only intended parameters. Quantized workflows also require the supported preparation steps for the installed PEFT and Transformers versions.",
+      "after": "Prepare tokenized examples with appropriate labels and padding masks. For causal language modeling, decide whether loss covers all text or only the desired response tokens; the choice affects the learning objective. Run a single batch first and inspect the loss. With standard random-A, zero-B initialization, the task-loss gradient for A is zero on the first backward pass; B can receive a nonzero gradient. After B changes, gradients can reach A. Check finite gradients and the expected pattern for the actual initialization, data, and objective, rather than requiring every tensor to be nonzero. Check that the optimizer contains only intended parameters. Quantized workflows also require the supported preparation steps for the installed PEFT and Transformers versions.",
+      "reason": "State the initial LoRA gradient pattern explicitly without promising nonzero B or later A gradients for degenerate data/loss cases.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/2106.09685"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    }
+  ],
+  "checkedSources": [
+    {
+      "url": "https://arxiv.org/abs/2005.14165",
+      "title": "Language Models are Few-Shot Learners",
+      "topicIds": [
+        "05-01",
+        "05-05",
+        "05-06",
+        "05-11"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2302.13971",
+      "title": "LLaMA: Open and Efficient Foundation Language Models",
+      "topicIds": [
+        "05-01",
+        "05-03",
+        "05-06",
+        "05-07",
+        "05-13"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/pdf/2302.13971",
+      "focus": "Original LLaMA block choices: pre-normalization, RMSNorm, SwiGLU, and RoPE."
+    },
+    {
+      "url": "https://arxiv.org/abs/1508.07909",
+      "title": "Neural Machine Translation of Rare Words with Subword Units",
+      "topicIds": [
+        "05-02"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/pdf/1508.07909",
+      "focus": "Within-word BPE merges and word-boundary markers rather than arbitrary cross-word merging."
+    },
+    {
+      "url": "https://arxiv.org/abs/1808.06226",
+      "title": "SentencePiece: A simple and language independent subword tokenizer and detokenizer for Neural Text Processing",
+      "topicIds": [
+        "05-02"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/pdf/1808.06226",
+      "focus": "SentencePiece raw-text input, supported BPE and unigram models, and preprocessing distinction. Explicit normalized-text reconstruction contract and configurable normalization/whitespace behavior."
+    },
+    {
+      "url": "https://huggingface.co/docs/transformers/perplexity",
+      "title": "Hugging Face — Perplexity of Fixed-Length Models",
+      "topicIds": [
+        "05-03",
+        "05-04",
+        "05-14"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Official documentation passages",
+      "focus": "Internal next-token shift, ignored labels, sliding windows, and aggregation; count valid labels after shifting rather than blindly subtracting a constant."
+    },
+    {
+      "url": "https://arxiv.org/abs/1810.04805",
+      "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+      "topicIds": [
+        "05-05",
+        "05-06"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/1810.04805",
+      "focus": "Original BERT bidirectional information flow and joint MLM plus NSP objectives."
+    },
+    {
+      "url": "https://arxiv.org/abs/1910.10683",
+      "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+      "topicIds": [
+        "05-05"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2203.02155",
+      "title": "Training language models to follow instructions with human feedback",
+      "topicIds": [
+        "05-07",
+        "05-08"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2004.10964",
+      "title": "Don't Stop Pretraining: Adapt Language Models to Domains and Tasks",
+      "topicIds": [
+        "05-07"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://huggingface.co/docs/transformers/chat_templating",
+      "title": "Hugging Face — Chat Templates",
+      "topicIds": [
+        "05-08"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Official documentation passages",
+      "focus": "Role serialization, generation prompts, and avoiding duplicate special tokens when applying templates."
+    },
+    {
+      "url": "https://arxiv.org/abs/1904.09751",
+      "title": "The Curious Case of Neural Text Degeneration",
+      "topicIds": [
+        "05-09"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/1904.09751",
+      "focus": "Nucleus construction and distinction between a model distribution and a decoding procedure."
+    },
+    {
+      "url": "https://arxiv.org/abs/2307.03172",
+      "title": "Lost in the Middle: How Language Models Use Long Contexts",
+      "topicIds": [
+        "05-10"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2104.09864",
+      "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+      "topicIds": [
+        "05-10"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2001.08361",
+      "title": "Scaling Laws for Neural Language Models",
+      "topicIds": [
+        "05-12"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/pdf/2001.08361",
+      "focus": "Non-embedding parameter definition and omitted context-dependent attention cost in the approximate 6N compute per training token."
+    },
+    {
+      "url": "https://arxiv.org/abs/2203.15556",
+      "title": "Training Compute-Optimal Large Language Models",
+      "topicIds": [
+        "05-12"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2203.15556",
+      "focus": "Compute allocation and empirical scaling-law assumptions; the article's 6ND arithmetic is an approximation."
+    },
+    {
+      "url": "https://arxiv.org/abs/2107.06499",
+      "title": "Deduplicating Training Data Makes Language Models Better",
+      "topicIds": [
+        "05-13"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2107.02027",
+      "title": "Efficient Sequence Packing without Cross-contamination: Accelerating Large Language Models without Impacting Performance",
+      "topicIds": [
+        "05-13"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2107.02027v2",
+      "focus": "Packed BERT sequence isolation through block masks, position indexing, and loss accounting."
+    },
+    {
+      "url": "https://arxiv.org/abs/2009.03300",
+      "title": "Measuring Massive Multitask Language Understanding",
+      "topicIds": [
+        "05-14"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2106.09685",
+      "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+      "topicIds": [
+        "06-01",
+        "06-02",
+        "06-03",
+        "06-04",
+        "06-05",
+        "06-06",
+        "06-11",
+        "06-12"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/pdf/2106.09685",
+      "focus": "Factor dimensions, alpha/r scaling, random A and zero B initialization, merge algebra."
+    },
+    {
+      "url": "https://arxiv.org/abs/1902.00751",
+      "title": "Parameter-Efficient Transfer Learning for NLP",
+      "topicIds": [
+        "06-01",
+        "06-07"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2312.03732",
+      "title": "A Rank Stabilization Scaling Factor for Fine-Tuning with LoRA",
+      "topicIds": [
+        "06-04",
+        "06-10"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/pdf/2312.03732",
+      "focus": "Rank-stabilized alpha/sqrt(r) scaling rather than a different low-rank factorization."
+    },
+    {
+      "url": "https://huggingface.co/docs/peft/v0.21.0/package_reference/lora",
+      "title": "Hugging Face PEFT LoRA Reference",
+      "topicIds": [
+        "06-05",
+        "06-06",
+        "06-08",
+        "06-12"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Official documentation passages",
+      "focus": "Resolved the pinned reference and checked target_modules, rank_pattern, initialization, rsLoRA, and documented quantization/merge caveats; no installed PEFT version claimed."
+    },
+    {
+      "url": "https://arxiv.org/abs/2101.00190",
+      "title": "Prefix-Tuning: Optimizing Continuous Prompts for Generation",
+      "topicIds": [
+        "06-07"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2104.08691",
+      "title": "The Power of Scale for Parameter-Efficient Prompt Tuning",
+      "topicIds": [
+        "06-07"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2305.14314",
+      "title": "QLoRA: Efficient Finetuning of Quantized LLMs",
+      "topicIds": [
+        "06-08",
+        "06-09",
+        "06-11"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/pdf/2305.14314",
+      "focus": "NF4 storage, block quantization, double-quantized scale metadata, and frozen quantized-base adaptation."
+    },
+    {
+      "url": "https://arxiv.org/abs/2402.09353",
+      "title": "DoRA: Weight-Decomposed Low-Rank Adaptation",
+      "topicIds": [
+        "06-10"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2402.09353v3",
+      "focus": "DoRA magnitude/direction decomposition and the weight-normalization convention. Pretrained column-norm initialization and the detached norm denominator in the memory-saving variant."
+    },
+    {
+      "url": "https://huggingface.co/docs/peft/quicktour",
+      "title": "Hugging Face PEFT Quicktour",
+      "topicIds": [
+        "06-12"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Official documentation passages",
+      "focus": "Adapter configuration/weights save and reload workflow and the requirement for the matching base model."
+    },
+    {
+      "url": "https://arxiv.org/abs/1701.06538",
+      "title": "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer",
+      "topicIds": [
+        "07-01",
+        "07-03",
+        "07-05",
+        "07-10"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2401.04088",
+      "title": "Mixtral of Experts",
+      "topicIds": [
+        "07-01",
+        "07-02",
+        "07-04",
+        "07-05",
+        "07-08",
+        "07-09",
+        "07-11"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2401.04088v1",
+      "focus": "Top-two selected-expert gating, total versus active parameters, and expert architecture."
+    },
+    {
+      "url": "https://arxiv.org/abs/2101.03961",
+      "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity",
+      "topicIds": [
+        "07-02",
+        "07-03",
+        "07-04",
+        "07-06",
+        "07-07",
+        "07-11"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/pdf/2101.03961",
+      "focus": "Retained top-one gate, auxiliary f/P balance term, capacity, dispatch and all-to-all pseudocode."
+    },
+    {
+      "url": "https://arxiv.org/abs/2401.06066",
+      "title": "DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models",
+      "topicIds": [
+        "07-08",
+        "07-10",
+        "07-11"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2401.06066",
+      "focus": "Fine-grained experts and shared experts; distinctions from hard-coded semantic specialty."
+    },
+    {
+      "url": "https://arxiv.org/abs/2006.16668",
+      "title": "GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding",
+      "topicIds": [
+        "07-10"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2006.16668",
+      "focus": "Expert dispatch resharding, AllToAll operation, and communication runtime breakdown."
+    },
+    {
+      "url": "https://arxiv.org/abs/2010.11929",
+      "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+      "topicIds": [
+        "08-01",
+        "08-03",
+        "08-04",
+        "08-12"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2010.11929",
+      "focus": "Patch embeddings, prepended CLS, position embeddings, and limitations of position-free token processing."
+    },
+    {
+      "url": "https://arxiv.org/abs/1512.03385",
+      "title": "Deep Residual Learning for Image Recognition",
+      "topicIds": [
+        "08-01",
+        "08-02",
+        "08-04"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/2.11/generated/torch.nn.Conv2d.html",
+      "title": "PyTorch Conv2d Documentation",
+      "topicIds": [
+        "08-02"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Official documentation passages",
+      "focus": "Grouped and depthwise connectivity, parameter shape, and spatial output-size formula; pinned guide matched installed CPU torch 2.11 for independent shape checks."
+    },
+    {
+      "url": "https://arxiv.org/abs/2002.05709",
+      "title": "A Simple Framework for Contrastive Learning of Visual Representations",
+      "topicIds": [
+        "08-05",
+        "08-07"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2005.12872",
+      "title": "End-to-End Object Detection with Transformers",
+      "topicIds": [
+        "08-05",
+        "08-13"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2005.12872",
+      "focus": "Set prediction for detection and the distinction between boxes and dense pixel masks."
+    },
+    {
+      "url": "https://arxiv.org/abs/2111.06377",
+      "title": "Masked Autoencoders Are Scalable Vision Learners",
+      "topicIds": [
+        "08-06"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2104.14294",
+      "title": "Emerging Properties in Self-Supervised Vision Transformers",
+      "topicIds": [
+        "08-06",
+        "08-11"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2104.14294",
+      "focus": "Teacher/student outputs, EMA, centering, sharpening, and observed patch representation behavior."
+    },
+    {
+      "url": "https://arxiv.org/abs/1807.03748",
+      "title": "Representation Learning with Contrastive Predictive Coding",
+      "topicIds": [
+        "08-07"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2103.00020",
+      "title": "Learning Transferable Visual Models From Natural Language Supervision",
+      "topicIds": [
+        "08-08",
+        "08-09"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/pdf/2103.00020",
+      "focus": "Normalized image/text embeddings, paired batch similarity matrices, and symmetric contrastive objective."
+    },
+    {
+      "url": "https://arxiv.org/abs/2303.15343",
+      "title": "Sigmoid Loss for Language Image Pre-Training",
+      "topicIds": [
+        "08-10"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/pdf/2303.15343",
+      "focus": "Pairwise sigmoid loss, learned bias, diagonal/off-diagonal labels, and division by batch size B."
+    },
+    {
+      "url": "https://arxiv.org/abs/2304.07193",
+      "title": "DINOv2: Learning Robust Visual Features without Supervision",
+      "topicIds": [
+        "08-11",
+        "08-12"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2304.07193",
+      "focus": "Image-level and patch-level self-supervised objectives, and global versus dense representations."
+    },
+    {
+      "url": "https://arxiv.org/abs/2304.02643",
+      "title": "Segment Anything",
+      "topicIds": [
+        "08-13",
+        "08-14"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Abstract and bibliographic identity; article explanation also reviewed using established mathematical/model knowledge"
+    },
+    {
+      "url": "https://arxiv.org/abs/2408.00714",
+      "title": "SAM 2: Segment Anything in Images and Videos",
+      "topicIds": [
+        "08-14"
+      ],
+      "status": "resolved",
+      "verificationDate": "2026-10-16",
+      "identityCheck": "Direct citation URL opened; source title and primary authorship or official documentation identity matched.",
+      "inspection": "Targeted relevant full-text passages",
+      "fullTextUrl": "https://arxiv.org/html/2408.00714v2",
+      "focus": "SAM 2 streaming memory rather than a universal memory requirement for all video segmentation."
+    }
+  ],
+  "sourceVerificationSummary": {
+    "uniqueCitationUrls": 45,
+    "allDirectCitationUrlsResolved": true,
+    "newReferenceUrls": [
+      "https://arxiv.org/abs/2004.10964",
+      "https://docs.pytorch.org/docs/2.11/generated/torch.nn.Conv2d.html",
+      "https://arxiv.org/abs/2107.02027",
+      "https://arxiv.org/abs/2006.16668"
+    ],
+    "accessFallbacks": [
+      {
+        "attempt": "https://arxiv.org/html/2305.14314v5",
+        "resolution": "Alternate primary PDF used: https://arxiv.org/pdf/2305.14314"
+      },
+      {
+        "attempt": "https://arxiv.org/html/2303.15343",
+        "resolution": "Alternate primary PDF used: https://arxiv.org/pdf/2303.15343"
+      },
+      {
+        "attempt": "DINO arXiv PDF and attempted CVF PDF",
+        "resolution": "Primary arXiv HTML used: https://arxiv.org/html/2104.14294"
+      },
+      {
+        "attempt": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html",
+        "resolution": "Stable URL produced redirect-only output; pinned 2.11 official documentation opened and cited."
+      }
+    ]
+  },
+  "externalReview": {
+    "artifact": "review/claude-baseline-05-08-findings.json",
+    "reviewerAsReported": "Claude (claude-opus-5-5)",
+    "scope": "Original baseline articles, all 51 topic IDs",
+    "reviewerLimitations": "Baseline review explicitly reports no browsing, tools, or code execution. Its source suggestions were validated separately in this OpenAI audit.",
+    "findings": 12,
+    "accepted": 11,
+    "rejectedRequestedChange": 1,
+    "dispositions": [
+      {
+        "finding": 1,
+        "topicId": "05-02",
+        "disposition": "accepted",
+        "reason": "Replaced longer vocabularies with larger vocabularies and specified tokenized sequences."
+      },
+      {
+        "finding": 2,
+        "topicId": "05-03",
+        "disposition": "accepted",
+        "reason": "Defined T=4 and used N_batch to avoid collision with the example token B."
+      },
+      {
+        "finding": 3,
+        "topicId": "05-06",
+        "disposition": "accepted",
+        "reason": "Full BERT primary text confirms original pretraining uses MLM and NSP. Added NSP to the explanation, answer, and reading note.",
+        "sourceUrls": [
+          "https://arxiv.org/html/1810.04805"
+        ]
+      },
+      {
+        "finding": 4,
+        "topicId": "05-07",
+        "disposition": "accepted-already-addressed",
+        "reason": "Independent audit had already added the verified Don't Stop Pretraining source and a specific reading discussion.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/2004.10964"
+        ]
+      },
+      {
+        "finding": 5,
+        "topicId": "05-09",
+        "disposition": "accepted",
+        "reason": "Added preservation of top-k membership and possible change to nucleus membership under positive temperature scaling, with operation-order reporting. Verified independently by a numerical example.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/1904.09751"
+        ]
+      },
+      {
+        "finding": 6,
+        "topicId": "05-13",
+        "disposition": "accepted",
+        "reason": "Verified the suggested packing paper's title and full text; added its reference and a BERT-qualified reading exercise about masks, positions, and targets.",
+        "sourceUrls": [
+          "https://arxiv.org/html/2107.02027v2"
+        ]
+      },
+      {
+        "finding": 7,
+        "topicId": "06-05",
+        "disposition": "rejected-requested-url-change",
+        "reason": "The version-pinned PEFT v0.21.0 URL resolves and documents rank_pattern, initialization, and relevant LoRA behavior. No installed PEFT environment is prescribed by these conceptual articles, and the text already asks readers to record versions. Unversioning a verified reference would reduce specificity.",
+        "sourceUrls": [
+          "https://huggingface.co/docs/peft/v0.21.0/package_reference/lora"
+        ]
+      },
+      {
+        "finding": 8,
+        "topicId": "07-02",
+        "disposition": "accepted",
+        "reason": "Switch primary text explicitly multiplies the expert output by its retained gate. The debugging test now compares the pre-residual MoE contribution with the gate-weighted standalone expert, or requires a unit gate.",
+        "sourceUrls": [
+          "https://arxiv.org/pdf/2101.03961"
+        ]
+      },
+      {
+        "finding": 9,
+        "topicId": "07-03",
+        "disposition": "accepted",
+        "reason": "Made zero-based indexing explicit and added second/third ordinal positions in the answer."
+      },
+      {
+        "finding": 10,
+        "topicId": "07-06",
+        "disposition": "accepted-clarification",
+        "reason": "The original unscaled statistic was mathematically valid, but N_E and an explicit lambda-weighted total loss remove symbol and scaling ambiguity.",
+        "sourceUrls": [
+          "https://arxiv.org/pdf/2101.03961"
+        ]
+      },
+      {
+        "finding": 11,
+        "topicId": "07-10",
+        "disposition": "accepted",
+        "reason": "Verified GShard's full-text AllToAll and dispatch discussion, added the reference, and connected the paper-reading section to token/expert resharding.",
+        "sourceUrls": [
+          "https://arxiv.org/html/2006.16668"
+        ]
+      },
+      {
+        "finding": 12,
+        "topicId": "08-02",
+        "disposition": "accepted-already-addressed",
+        "reason": "Independent audit had already qualified the all-channel claim to ungrouped convolution and cited official grouped/depthwise documentation; CPU examples also checked standard and depthwise parameter counts.",
+        "sourceUrls": [
+          "https://docs.pytorch.org/docs/2.11/generated/torch.nn.Conv2d.html"
+        ]
+      }
+    ]
+  },
+  "executedChecks": {
+    "engine": {
+      "python": "CPython",
+      "numpy": "2.2.4",
+      "torch": "2.11.0+cpu",
+      "device": "cpu",
+      "seed": 7
+    },
+    "count": 52,
+    "checks": [
+      {
+        "name": "05-01 sequence probability and nats",
+        "result": [
+          0.1,
+          2.3025850929940455
+        ],
+        "expected": [
+          0.1,
+          2.302585092994046
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "05-03 valid real-to-real targets",
+        "result": 4,
+        "expected": 4,
+        "status": "passed"
+      },
+      {
+        "name": "05-04 equal-token perplexity aggregation",
+        "result": 7.999999999999998,
+        "expected": 8,
+        "status": "passed"
+      },
+      {
+        "name": "05-09 nucleus renormalization",
+        "result": [
+          0.625,
+          0.37499999999999994
+        ],
+        "expected": [
+          0.625,
+          0.375
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "05-12 fixed-compute doubling N token ratio",
+        "result": 0.5,
+        "expected": 0.5,
+        "status": "passed"
+      },
+      {
+        "name": "05-14 one percentage point over 100 questions",
+        "result": 1.0000000000000009,
+        "expected": 1,
+        "status": "passed"
+      },
+      {
+        "name": "06-01 trainable parameter denominators",
+        "result": [
+          0.01,
+          0.0196078431372549
+        ],
+        "expected": [
+          0.01,
+          0.0196078431372549
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-02 identity matrix rank",
+        "result": 2,
+        "expected": 2,
+        "status": "passed"
+      },
+      {
+        "name": "06-03 LoRA counts",
+        "result": [
+          48,
+          28,
+          16384,
+          1048576,
+          15,
+          16
+        ],
+        "expected": [
+          48,
+          28,
+          16384,
+          1048576,
+          15,
+          16
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-04 standard LoRA scales",
+        "result": [
+          2,
+          0.5,
+          2
+        ],
+        "expected": [
+          2,
+          0.5,
+          2
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-05 projection budgets",
+        "result": [
+          16384,
+          16384,
+          5120,
+          8192
+        ],
+        "expected": [
+          16384,
+          16384,
+          5120,
+          8192
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-07 soft prompt parameter count",
+        "result": 15360,
+        "expected": 15360,
+        "status": "passed"
+      },
+      {
+        "name": "06-08 decimal GB base payload",
+        "result": [
+          0.5,
+          2
+        ],
+        "expected": [
+          0.5,
+          2
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-09 block-scale storage bits",
+        "result": [
+          4.5,
+          4.5
+        ],
+        "expected": [
+          4.5,
+          4.5
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-10 rsLoRA and LoRA scales",
+        "result": [
+          2,
+          0.25,
+          0.5
+        ],
+        "expected": [
+          2,
+          0.25,
+          0.5
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "07-01 stored and active expert parameters",
+        "result": [
+          80,
+          20,
+          60,
+          0.3333333333333333
+        ],
+        "expected": [
+          80,
+          20,
+          60,
+          0.3333333333333333
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "07-02 two-layer expert matrix counts",
+        "result": [
+          1024,
+          4096,
+          16384,
+          65536
+        ],
+        "expected": [
+          1024,
+          4096,
+          16384,
+          65536
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "07-03 selected gates",
+        "result": [
+          0.6875,
+          0.3125,
+          0.625,
+          0.37499999999999994
+        ],
+        "expected": [
+          0.6875,
+          0.3125,
+          0.625,
+          0.375
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "07-04 assignment counts",
+        "result": [
+          240,
+          40
+        ],
+        "expected": [
+          240,
+          40
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "07-05 weighted expert outputs",
+        "result": [
+          [
+            1.5,
+            1
+          ],
+          [
+            3.4,
+            1.8000000000000003
+          ]
+        ],
+        "expected": [
+          [
+            1.5,
+            1
+          ],
+          [
+            3.4,
+            1.8
+          ]
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "07-06 balance statistic",
+        "result": [
+          1,
+          4,
+          1.0999999999999999
+        ],
+        "expected": [
+          1,
+          4,
+          1.1
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "07-07 capacity and overflow",
+        "result": [
+          20,
+          5,
+          0.21739130434782608
+        ],
+        "expected": [
+          20,
+          5,
+          0.21739130434782608
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "07-08 base-rate lift",
+        "result": 0.8749999999999999,
+        "expected": 0.875,
+        "status": "passed"
+      },
+      {
+        "name": "07-09 total and active parameters",
+        "result": [
+          100,
+          40,
+          90,
+          45
+        ],
+        "expected": [
+          100,
+          40,
+          90,
+          45
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "07-10 logical dispatch payload bytes",
+        "result": 8388608,
+        "expected": 8388608,
+        "status": "passed"
+      },
+      {
+        "name": "08-01 patch dimensions",
+        "result": [
+          196,
+          3072,
+          16,
+          192
+        ],
+        "expected": [
+          196,
+          3072,
+          16,
+          192
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-02 standard convolution output sizes",
+        "result": [
+          32,
+          16,
+          432
+        ],
+        "expected": [
+          32,
+          16,
+          432
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-03 ViT shapes",
+        "result": [
+          197,
+          768,
+          257,
+          192
+        ],
+        "expected": [
+          197,
+          768,
+          257,
+          192
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-04 attention matrix growth",
+        "result": 16,
+        "expected": 16,
+        "status": "passed"
+      },
+      {
+        "name": "08-05 horizontal continuous box flip",
+        "result": [
+          70,
+          90
+        ],
+        "expected": [
+          70,
+          90
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-07 InfoNCE values",
+        "result": [
+          0.8807970779778824,
+          0.1269280110429725,
+          2.0794415416798357
+        ],
+        "expected": [
+          0.8807970779778823,
+          0.1269280110429725,
+          2.0794415416798357
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-08 pair scores",
+        "result": [
+          32,
+          32
+        ],
+        "expected": [
+          32,
+          32
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-09 temperature probabilities",
+        "result": [
+          0.7310585786300049,
+          0.9999546021312976
+        ],
+        "expected": [
+          0.7310585786300049,
+          0.9999546021312976
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-10 pair losses and counts",
+        "result": [
+          0.1269280110429725,
+          2.1269280110429727,
+          4,
+          12
+        ],
+        "expected": [
+          0.1269280110429725,
+          2.1269280110429727,
+          4,
+          12
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-12 pooled shape",
+        "result": [
+          2,
+          768
+        ],
+        "expected": [
+          2,
+          768
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-13 mask IoU",
+        "result": 0.42857142857142855,
+        "expected": 0.42857142857142855,
+        "status": "passed"
+      },
+      {
+        "name": "06-06 zero-B initial function matches base",
+        "result": 0,
+        "expected": 0,
+        "status": "passed"
+      },
+      {
+        "name": "06-06 initial A gradient is zero",
+        "result": 0,
+        "expected": 0,
+        "status": "passed"
+      },
+      {
+        "name": "06-06 gradients through frozen base plus zero-B adapter",
+        "status": "passed",
+        "result": {
+          "B_gradient_nonzero": true,
+          "input_gradient_nonzero": true,
+          "frozen_base_gradient": null
+        }
+      },
+      {
+        "name": "06-06 both-zero factors both have zero gradient",
+        "result": [
+          0,
+          0
+        ],
+        "expected": [
+          0,
+          0
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-03 and 06-12 two-path vs merged output",
+        "result": 5.329070518200751e-15,
+        "expected": 0,
+        "status": "passed"
+      },
+      {
+        "name": "07-03 normalized top-one gate gradient vanishes",
+        "result": 2.135281233186855e-16,
+        "expected": 0,
+        "status": "passed"
+      },
+      {
+        "name": "07-02 retained gate changes standalone expert value",
+        "result": [
+          1.1958438750353113,
+          2.3916877500706226
+        ],
+        "expected": [
+          1.1958438750353113,
+          2.3916877500706226
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-02 CPU Conv2d shapes and weight count",
+        "result": [
+          1,
+          16,
+          32,
+          32,
+          1,
+          16,
+          16,
+          16,
+          432
+        ],
+        "expected": [
+          1,
+          16,
+          32,
+          32,
+          1,
+          16,
+          16,
+          16,
+          432
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "08-02 depthwise restricted parameter count",
+        "result": 27,
+        "expected": 27,
+        "status": "passed"
+      },
+      {
+        "name": "08-03 no-position attention permutation equivariance",
+        "result": 8.881784197001252e-16,
+        "expected": 0,
+        "status": "passed"
+      },
+      {
+        "name": "08-03 fixed CLS output invariant",
+        "result": 4.440892098500626e-16,
+        "expected": 0,
+        "status": "passed"
+      },
+      {
+        "name": "08-12 mean pooling permutation invariant",
+        "result": 2.220446049250313e-16,
+        "expected": 0,
+        "status": "passed"
+      },
+      {
+        "name": "08-10 SigLIP sum-per-batch vs pair mean factor",
+        "result": 4,
+        "expected": 4,
+        "status": "passed"
+      },
+      {
+        "name": "05-03 valid shifted labels with ignored leading label",
+        "result": 2,
+        "expected": 2,
+        "status": "passed"
+      },
+      {
+        "name": "05-09 temperature and nucleus cardinality",
+        "result": [
+          1,
+          2,
+          3
+        ],
+        "expected": [
+          1,
+          2,
+          3
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "05-09 positive temperature preserves ranking",
+        "result": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "expected": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "status": "passed"
+      }
+    ],
+    "description": "Independent inline Python audit snippets executed using math, NumPy, and CPU PyTorch. This is not execution of article-supplied code, checkpoint training, or reproduction of published results.",
+    "tolerance": "Numerical assertions used numpy.allclose with rtol/atol 1e-9, tightened to 1e-12 for selected algebra/equivariance checks."
+  },
+  "staticChecks": {
+    "status": "passed",
+    "checks": [
+      "51 expected unique topic IDs preserved",
+      "all prerequisites reference an existing article and none references itself",
+      "all 51 articles have exactly one source-reading section and four section IDs",
+      "every article has one to three HTTPS primary-source/official-documentation references",
+      "no Han characters in owned article JSON",
+      "all owned JSON parses",
+      "original formulas, examples, and exercise answers reviewed in full; no unexecuted article code blocks"
+    ]
+  },
+  "unresolved": [],
+  "limitations": [
+    "Reference identity was verified for every citation; targeted full-text passages were inspected for specialist claims, not every page of all 45 sources.",
+    "The audit does not prove absence of errors. Explanations and source-reading sections should still receive independent technical review.",
+    "No large model training, GPU memory benchmark, published score replication, distributed all-to-all run, or PEFT integration environment was executed.",
+    "Live documentation may change after the verification date. The pinned PEFT page was verified as documentation, not as a guarantee about every installed PEFT/model combination.",
+    "Other modules' article contents were outside this audit; prerequisite IDs were checked structurally across the repository.",
+    "Independent audit snippets ran in a local CPU environment and validate toy arithmetic/algebra, not production performance."
+  ],
+  "filesReviewed": [
+    {
+      "path": "data/lessons/05.json",
+      "sha256": "a5f91a8aada6432759861cce520e0c9c80e0a9f23e8d3983efb52b8a1baf7214"
+    },
+    {
+      "path": "data/lessons/06.json",
+      "sha256": "32f32c19f1ac6fbb1357e981a70604698e8851c578987eb765b4452cddfa4459"
+    },
+    {
+      "path": "data/lessons/07.json",
+      "sha256": "3e3ecbcf339fdcd62d1e8ffff0478d5c0046155d8a1d3eb95c4cc163a9f055b2"
+    },
+    {
+      "path": "data/lessons/08.json",
+      "sha256": "d168790f04fcef2fa335f4096470ed8b7fd1e45252baa7e175a1a76970d3437d"
+    }
+  ],
+  "expandedExternalReview": {
+    "artifact": "review/claude-expanded-05-08-findings.json",
+    "resolutions": "review/expanded-resolutions-05-08.json",
+    "reviewerAsReported": "Claude (claude-opus-5-5)",
+    "findings": 6,
+    "acceptedWithRefinements": 6,
+    "dispositions": [
+      {
+        "range": "05-08",
+        "findingIndex": 0,
+        "topicId": "05-02",
+        "disposition": "accepted-with-qualified-wording",
+        "reason": "Verified Sennrich's within-word merges and boundary markers, and SentencePiece's explicit normalized-text reconstruction contract. Replaced the ambiguous exercise. Did not adopt the suggestion of universally lossless raw-text reconstruction or unrestricted cross-whitespace merges: normalization and segmentation settings matter.",
+        "sourceUrls": [
+          "https://arxiv.org/pdf/1508.07909",
+          "https://arxiv.org/pdf/1808.06226"
+        ]
+      },
+      {
+        "range": "05-08",
+        "findingIndex": 1,
+        "topicId": "05-12",
+        "disposition": "accepted",
+        "reason": "Kaplan's primary text excludes embeddings from N and omits context-dependent attention costs in its 6N-per-token estimate. Added these conventions and instructed readers to compare each study's accounting rather than assuming identical parameter definitions.",
+        "sourceUrls": [
+          "https://arxiv.org/pdf/2001.08361"
+        ]
+      },
+      {
+        "range": "05-08",
+        "findingIndex": 2,
+        "topicId": "05-14",
+        "disposition": "accepted",
+        "reason": "The accuracy gap is a net correct-answer difference; the number of paired disagreements can be much larger. Added a concrete 10-versus-9 discordance example. Did not add a standalone binomial-standard-error or named-test prescription because the existing paired-analysis guidance suffices and avoids implying independent-model uncertainty.",
+        "sourceUrls": []
+      },
+      {
+        "range": "05-08",
+        "findingIndex": 3,
+        "topicId": "06-03",
+        "disposition": "accepted",
+        "reason": "The original rank-2 example saves parameters; added the exact break-even threshold and rank-4 counterexample for the same layer. Independently verified 48/14 = 3.42857..., rank-2 count 28, and rank-4 count 56.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/2106.09685"
+        ]
+      },
+      {
+        "range": "05-08",
+        "findingIndex": 4,
+        "topicId": "06-10",
+        "disposition": "accepted",
+        "reason": "DoRA's primary text initializes V=W0 and magnitudes from column norms, then documents a memory-saving detached-denominator variant. Added both, qualified initial reconstruction to nonzero norm columns, and emphasized that detachment preserves forward values while changing gradients. CPU autograd checks confirmed the distinction.",
+        "sourceUrls": [
+          "https://arxiv.org/html/2402.09353v3"
+        ]
+      },
+      {
+        "range": "05-08",
+        "findingIndex": 5,
+        "topicId": "06-12",
+        "disposition": "accepted-with-qualified-wording",
+        "reason": "Made the standard zero-B first-backward pattern explicit: task-loss gradient for A is zero, B can receive gradients, and A can receive gradients after B changes. Did not adopt guarantees that B or later A must be nonzero. Verified both a nondegenerate two-step case and a zero-input counterexample.",
+        "sourceUrls": [
+          "https://arxiv.org/pdf/2106.09685"
+        ]
+      }
+    ],
+    "limitations": "Claude's expanded review was reasoning-only; source claims and proposed edits were independently checked by OpenAI. Two suggestions required qualifications to avoid raw-text-losslessness and guaranteed-nonzero-gradient overstatements."
+  },
+  "expandedExecutedChecks": {
+    "count": 12,
+    "checks": [
+      {
+        "name": "05-14 paired outcomes 71 shared, 9 A-only, 10 B-only, 10 both wrong",
+        "result": [
+          80,
+          81,
+          19,
+          1,
+          100
+        ],
+        "expected": [
+          80,
+          81,
+          19,
+          1,
+          100
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-03 break-even rank and two adapter budgets",
+        "result": [
+          3.4285714285714284,
+          28,
+          56
+        ],
+        "expected": [
+          3.4285714285714284,
+          28,
+          56
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "05-12 fixed-compute arithmetic remains valid",
+        "result": 120000000000000000000,
+        "expected": 120000000000000000000,
+        "status": "passed"
+      },
+      {
+        "name": "05-02 normalization can change raw text",
+        "status": "passed",
+        "result": "Python Unicode NFKC maps fullwidth A to ASCII A; this is a normalization illustration, not a SentencePiece integration run."
+      },
+      {
+        "name": "06-10 column-norm initialization reconstructs W0",
+        "result": [
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            2
+          ]
+        ],
+        "expected": [
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            2
+          ]
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-10 full normalization derivative",
+        "result": [
+          -0.32000000000000006,
+          0.23999999999999977
+        ],
+        "expected": [
+          -0.32,
+          0.24
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-10 detached norm has same forward",
+        "result": [
+          3,
+          4
+        ],
+        "expected": [
+          3,
+          4
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-10 detached norm changes direction gradient",
+        "result": [
+          1,
+          2
+        ],
+        "expected": [
+          1,
+          2
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-10 magnitude gradient unchanged",
+        "result": [
+          2.2,
+          2.2
+        ],
+        "expected": [
+          2.2,
+          2.2
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-12 initial task-loss gradients",
+        "result": [
+          0,
+          18
+        ],
+        "expected": [
+          0,
+          18
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-12 nondegenerate next-step A gradients",
+        "result": [
+          [
+            8.640000000000002,
+            17.280000000000005
+          ]
+        ],
+        "expected": [
+          [
+            8.64,
+            17.28
+          ]
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-12 zero-input counterexample to guaranteed nonzero B",
+        "result": 0,
+        "expected": 0,
+        "status": "passed"
+      }
+    ],
+    "description": "Independent arithmetic, Unicode normalization illustration, and CPU PyTorch autograd checks of changed material. These supplement the original 52 checks; no article code blocks or full model training were executed."
+  }
+}

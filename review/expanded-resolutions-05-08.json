@@ -1,0 +1,325 @@
+{
+  "reviewer": "OpenAI Codex agent /root/papers",
+  "reviewDate": "2026-10-16",
+  "sourceReview": "review/claude-expanded-05-08-findings.json",
+  "findings": [
+    {
+      "range": "05-08",
+      "findingIndex": 0,
+      "topicId": "05-02",
+      "disposition": "accepted-with-qualified-wording",
+      "reason": "Verified Sennrich's within-word merges and boundary markers, and SentencePiece's explicit normalized-text reconstruction contract. Replaced the ambiguous exercise. Did not adopt the suggestion of universally lossless raw-text reconstruction or unrestricted cross-whitespace merges: normalization and segmentation settings matter.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/1508.07909",
+        "https://arxiv.org/pdf/1808.06226"
+      ]
+    },
+    {
+      "range": "05-08",
+      "findingIndex": 1,
+      "topicId": "05-12",
+      "disposition": "accepted",
+      "reason": "Kaplan's primary text excludes embeddings from N and omits context-dependent attention costs in its 6N-per-token estimate. Added these conventions and instructed readers to compare each study's accounting rather than assuming identical parameter definitions.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/2001.08361"
+      ]
+    },
+    {
+      "range": "05-08",
+      "findingIndex": 2,
+      "topicId": "05-14",
+      "disposition": "accepted",
+      "reason": "The accuracy gap is a net correct-answer difference; the number of paired disagreements can be much larger. Added a concrete 10-versus-9 discordance example. Did not add a standalone binomial-standard-error or named-test prescription because the existing paired-analysis guidance suffices and avoids implying independent-model uncertainty.",
+      "sourceUrls": []
+    },
+    {
+      "range": "05-08",
+      "findingIndex": 3,
+      "topicId": "06-03",
+      "disposition": "accepted",
+      "reason": "The original rank-2 example saves parameters; added the exact break-even threshold and rank-4 counterexample for the same layer. Independently verified 48/14 = 3.42857..., rank-2 count 28, and rank-4 count 56.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2106.09685"
+      ]
+    },
+    {
+      "range": "05-08",
+      "findingIndex": 4,
+      "topicId": "06-10",
+      "disposition": "accepted",
+      "reason": "DoRA's primary text initializes V=W0 and magnitudes from column norms, then documents a memory-saving detached-denominator variant. Added both, qualified initial reconstruction to nonzero norm columns, and emphasized that detachment preserves forward values while changing gradients. CPU autograd checks confirmed the distinction.",
+      "sourceUrls": [
+        "https://arxiv.org/html/2402.09353v3"
+      ]
+    },
+    {
+      "range": "05-08",
+      "findingIndex": 5,
+      "topicId": "06-12",
+      "disposition": "accepted-with-qualified-wording",
+      "reason": "Made the standard zero-B first-backward pattern explicit: task-loss gradient for A is zero, B can receive gradients, and A can receive gradients after B changes. Did not adopt guarantees that B or later A must be nonzero. Verified both a nondegenerate two-step case and a zero-input counterexample.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/2106.09685"
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "topicId": "05-02",
+      "severity": "low",
+      "field": "sections.3.paragraphs.0",
+      "before": "Sennrich and colleagues address rare-word representation through subword units; SentencePiece addresses the tokenizer as a reproducible component that can operate on raw sentences. Read them together while keeping algorithm and preprocessing separate. On paper, represent a sentence with explicit spaces and punctuation, apply two chosen merge rules, and list the vocabulary entries needed to reverse the segmentation.",
+      "after": "Sennrich-style BPE learns merges within pre-tokenized words; word-end markers preserve the word boundaries. Reproduce two within-word merges and show how the boundary markers let you rejoin the pieces. For SentencePiece, start with normalized text and represent spaces using ▁. Inspect its whitespace and segmentation settings, then compare the information needed to reconstruct that representation. Reconstructing normalized text does not guarantee recovery of the original raw text.",
+      "reason": "Separate within-word BPE boundary conventions from SentencePiece's normalized-text representation; reject unconditional raw-text losslessness.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/1508.07909",
+        "https://arxiv.org/pdf/1808.06226"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-12",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "A rough estimate for dense Transformer training is C ≈ 6ND, with N parameters and D training tokens, ignoring important architecture- and sequence-dependent overheads. Under fixed C, doubling N roughly halves the affordable D in this approximation. The best balance depends on how loss responds to both capacity and data. Compute-optimal training also differs from deployment-optimal design: a smaller model trained longer may be attractive when inference will be repeated many times.",
+      "after": "A rough estimate for dense Transformer training is C ≈ 6ND, with N parameters and D training tokens, ignoring important architecture- and sequence-dependent overheads. In Kaplan et al., N counts non-embedding parameters and the estimate omits context-dependent attention FLOPs. Check each study's parameter-count and compute conventions before comparing allocation rules. Under fixed C, doubling N roughly halves the affordable D in this approximation. The best balance depends on how loss responds to both capacity and data. Compute-optimal training also differs from deployment-optimal design: a smaller model trained longer may be attractive when inference will be repeated many times.",
+      "reason": "Specify Kaplan's non-embedding parameter and context-dependent-compute conventions.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/2001.08361"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "05-14",
+      "severity": "low",
+      "field": "exercise.answer",
+      "before": "It is only one additional correct answer. Inspect paired disagreements, uncertainty, prompt and sampling variation, and whether either model used the test set for selection. A broader or repeated evaluation may show that the difference is unstable.",
+      "after": "It is a net difference of one correct answer, not necessarily one disagreement: B could answer 10 questions correctly that A misses, while A answers 9 correctly that B misses. Inspect paired disagreements, uncertainty, prompt and sampling variation, and whether either model used the test set for selection. A broader or repeated evaluation may show that the difference is unstable.",
+      "reason": "Distinguish the difference in correct-answer totals from the number of discordant paired outcomes.",
+      "sourceUrls": [],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "06-03",
+      "severity": "low",
+      "field": "sections.2.paragraphs.0",
+      "before": "Take d_in = 8, d_out = 6, and r = 2. Full matrix adaptation has 48 trainable values; the two adapter matrices have 16 + 12 = 28. A high rank is not necessarily parameter-efficient for tiny layers. Test the implementation by comparing the two-path output with the output of an explicitly merged matrix using fixed weights and dropout disabled. The outputs should agree within numerical tolerance, and frozen W should receive no parameter gradient.",
+      "after": "Take d_in = 8, d_out = 6, and r = 2. Full matrix adaptation has 48 trainable values; the two adapter matrices have 16 + 12 = 28, a saving. The break-even rank is d_in d_out/(d_in + d_out) = 48/14 ≈ 3.43. Rank 4 would require 56 adapter values, exceeding the full matrix's 48. Tiny layers leave little room for parameter-efficient ranks. Test the implementation by comparing the two-path output with the output of an explicitly merged matrix using fixed weights and dropout disabled. The outputs should agree within numerical tolerance, and frozen W should receive no parameter gradient.",
+      "reason": "Use the same dimensions to show both a saving rank and an inefficient rank.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2106.09685"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "06-10",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "For rsLoRA, the adapter multiplier is α/√r. With α = 16 and r = 64, that multiplier is 2; standard α/r would be 0.25. For a conceptual DoRA weight vector, write w′ = m(v + Δv)/‖v + Δv‖. The normalization isolates a direction, while m controls length. Actual matrix implementations must specify which axis defines a weight vector and how norms are computed. A zero or tiny norm needs numerically careful handling.",
+      "after": "For rsLoRA, the adapter multiplier is α/√r. With α = 16 and r = 64, that multiplier is 2; standard α/r would be 0.25. For a conceptual DoRA weight vector, write w′ = m(v + Δv)/‖v + Δv‖. The normalization isolates a direction, while m controls length. Actual matrix implementations must specify which axis defines a weight vector and how norms are computed. A zero or tiny norm needs numerically careful handling. In the paper's matrix convention, V starts at W₀ and m at W₀'s column norms, so zero BA preserves the initial weight for nonzero columns. Its memory-saving variant detaches the norm denominator from backpropagation while recomputing its value in each forward pass. The forward expression is unchanged, but the gradients differ.",
+      "reason": "Primary DoRA text specifies pretrained column-norm magnitude initialization and a detached-denominator memory-saving variant.",
+      "sourceUrls": [
+        "https://arxiv.org/html/2402.09353v3"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "06-10",
+      "severity": "low",
+      "field": "references.1.note",
+      "before": "Inspect the magnitude–direction decomposition and its implementation.",
+      "after": "Inspect the magnitude–direction decomposition, pretrained column-norm initialization, and the variant that detaches the denominator during backpropagation.",
+      "reason": "Direct readers to the implementation assumptions behind the forward parameterization.",
+      "sourceUrls": [
+        "https://arxiv.org/html/2402.09353v3"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    },
+    {
+      "topicId": "06-12",
+      "severity": "low",
+      "field": "sections.1.paragraphs.0",
+      "before": "Prepare tokenized examples with appropriate labels and padding masks. For causal language modeling, decide whether loss covers all text or only the desired response tokens; the choice affects the learning objective. Run a single batch first, inspect the loss, and verify that adapter gradients are finite and nonzero after an appropriate initialization step. Check that the optimizer contains only intended parameters. Quantized workflows also require the supported preparation steps for the installed PEFT and Transformers versions.",
+      "after": "Prepare tokenized examples with appropriate labels and padding masks. For causal language modeling, decide whether loss covers all text or only the desired response tokens; the choice affects the learning objective. Run a single batch first and inspect the loss. With standard random-A, zero-B initialization, the task-loss gradient for A is zero on the first backward pass; B can receive a nonzero gradient. After B changes, gradients can reach A. Check finite gradients and the expected pattern for the actual initialization, data, and objective, rather than requiring every tensor to be nonzero. Check that the optimizer contains only intended parameters. Quantized workflows also require the supported preparation steps for the installed PEFT and Transformers versions.",
+      "reason": "State the initial LoRA gradient pattern explicitly without promising nonzero B or later A gradients for degenerate data/loss cases.",
+      "sourceUrls": [
+        "https://arxiv.org/pdf/2106.09685"
+      ],
+      "origin": "Expanded Claude finding independently validated by OpenAI audit"
+    }
+  ],
+  "verification": {
+    "description": "12 independent inline Python/CPU PyTorch checks; no model training, SentencePiece integration, or PEFT training run.",
+    "count": 12,
+    "checks": [
+      {
+        "name": "05-14 paired outcomes 71 shared, 9 A-only, 10 B-only, 10 both wrong",
+        "result": [
+          80,
+          81,
+          19,
+          1,
+          100
+        ],
+        "expected": [
+          80,
+          81,
+          19,
+          1,
+          100
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-03 break-even rank and two adapter budgets",
+        "result": [
+          3.4285714285714284,
+          28,
+          56
+        ],
+        "expected": [
+          3.4285714285714284,
+          28,
+          56
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "05-12 fixed-compute arithmetic remains valid",
+        "result": 120000000000000000000,
+        "expected": 120000000000000000000,
+        "status": "passed"
+      },
+      {
+        "name": "05-02 normalization can change raw text",
+        "status": "passed",
+        "result": "Python Unicode NFKC maps fullwidth A to ASCII A; this is a normalization illustration, not a SentencePiece integration run."
+      },
+      {
+        "name": "06-10 column-norm initialization reconstructs W0",
+        "result": [
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            2
+          ]
+        ],
+        "expected": [
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            2
+          ]
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-10 full normalization derivative",
+        "result": [
+          -0.32000000000000006,
+          0.23999999999999977
+        ],
+        "expected": [
+          -0.32,
+          0.24
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-10 detached norm has same forward",
+        "result": [
+          3,
+          4
+        ],
+        "expected": [
+          3,
+          4
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-10 detached norm changes direction gradient",
+        "result": [
+          1,
+          2
+        ],
+        "expected": [
+          1,
+          2
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-10 magnitude gradient unchanged",
+        "result": [
+          2.2,
+          2.2
+        ],
+        "expected": [
+          2.2,
+          2.2
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-12 initial task-loss gradients",
+        "result": [
+          0,
+          18
+        ],
+        "expected": [
+          0,
+          18
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-12 nondegenerate next-step A gradients",
+        "result": [
+          [
+            8.640000000000002,
+            17.280000000000005
+          ]
+        ],
+        "expected": [
+          [
+            8.64,
+            17.28
+          ]
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "06-12 zero-input counterexample to guaranteed nonzero B",
+        "result": 0,
+        "expected": 0,
+        "status": "passed"
+      }
+    ]
+  },
+  "unresolved": [],
+  "finalFiles": [
+    {
+      "path": "data/lessons/05.json",
+      "sha256": "a5f91a8aada6432759861cce520e0c9c80e0a9f23e8d3983efb52b8a1baf7214"
+    },
+    {
+      "path": "data/lessons/06.json",
+      "sha256": "32f32c19f1ac6fbb1357e981a70604698e8851c578987eb765b4452cddfa4459"
+    },
+    {
+      "path": "data/lessons/07.json",
+      "sha256": "3e3ecbcf339fdcd62d1e8ffff0478d5c0046155d8a1d3eb95c4cc163a9f055b2"
+    },
+    {
+      "path": "data/lessons/08.json",
+      "sha256": "d168790f04fcef2fa335f4096470ed8b7fd1e45252baa7e175a1a76970d3437d"
+    }
+  ]
+}

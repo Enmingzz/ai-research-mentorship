@@ -1,0 +1,37 @@
+{
+  "reviewDate": "2026-10-16",
+  "findings": [
+    {
+      "range": "01-04",
+      "findingIndex": 4,
+      "topicId": "paper:adam",
+      "disposition": "accepted as a useful historical clarification",
+      "reason": "The earlier note's warning was correct. The revised note now also names the original convex regret analysis and the later flaw/counterexamples, with the follow-up paper linked in article 01-10. Reddi et al.'s primary abstract and introduction were opened; no blanket claim that Adam always fails is made.",
+      "sourceUrls": ["https://arxiv.org/abs/1412.6980", "https://arxiv.org/abs/1904.09237", "https://arxiv.org/html/1904.09237v1"]
+    },
+    {
+      "range": "01-04",
+      "findingIndex": 5,
+      "topicId": "paper:scaling-laws",
+      "disposition": "accepted",
+      "reason": "Named Hoffmann et al. and their compute-optimal paper instead of an unspecified later result; the primary abstract confirms the different allocation. Article 05-12 already links both papers.",
+      "sourceUrls": ["https://arxiv.org/abs/2001.08361", "https://arxiv.org/abs/2203.15556"]
+    },
+    {
+      "range": "01-04",
+      "findingIndex": 6,
+      "topicId": "paper:deep-learning-book",
+      "disposition": "accepted as optional coverage improvement",
+      "reason": "The original chapter mapping was accurate. Added chapters 9 and 10 for convolutional and recurrent models after checking the official table of contents.",
+      "sourceUrls": ["https://www.deeplearningbook.org/"]
+    }
+  ],
+  "postSnapshotChanges": [
+    {
+      "topicId": "03-11",
+      "reason": "Added the official PyTorch word-language-model implementation to support chunking and hidden-state detachment. Root independently opened and inspected get_batch, repackage_hidden, and the recurrent training branch after the expanded Claude snapshot.",
+      "sourceUrls": ["https://github.com/pytorch/examples/blob/main/word_language_model/main.py"]
+    }
+  ],
+  "retrievalLimitations": ["OpenReview's Reddi paper page required browser verification; the authors' arXiv abstract and full HTML provided the primary evidence instead."]
+}

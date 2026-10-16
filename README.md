@@ -3,7 +3,7 @@
 A mentee-facing workspace for research projects and tasks, with an AI reference library alongside it. Maintain assignments locally in `data/projects.json` and push updates to publish them. The public website contains no repository-management or source-code backlinks.
 
 - [Research homepage](https://enmingzz.github.io/vlm-project/): shared projects, links, and tasks.
-- [Reference library](https://enmingzz.github.io/vlm-project/library.html): 12 subjects, 174 articles, and 29 reading resources, with search and subject filters.
+- [Reference library](https://enmingzz.github.io/vlm-project/library.html): 12 subjects, 174 articles, and 29 reading resources, with featured VLM papers, search, and subject filters.
 - [Example article](https://enmingzz.github.io/vlm-project/learn/04-03/): a standalone explanation with worked examples and original source links.
 
 Built with static HTML, CSS, and JavaScript, with no runtime dependencies. The repository is `Enmingzz/vlm-project`. Article paths remain `learn/<topicId>/` under the new site URL. On this site, `course.html` redirects to `library.html` and older topic hashes still resolve. Use the new site URL for sharing; the previous GitHub Pages base path is no longer the published address.
@@ -62,7 +62,7 @@ When removing a project, first move its tasks to another project or set their `p
 ## Use the Library
 
 - Open `library.html` to browse subjects, articles, and papers. Search for an idea or filter by subject.
-- Every topic links to an English article and relevant papers, textbooks, or official documentation.
+- Every topic links to an English article and relevant papers, textbooks, or official documentation. Original papers appear at the top of each article; a source-reading section connects their motivation, mechanism, assumptions, and limitations to the topic.
 - Articles at `learn/<topicId>/` are static pages that can be shared directly and read without JavaScript. Each has explanations, examples, related concepts, and sources.
 - Readers can open any topic in any order. There are no completion checkboxes, reading statuses, personal notes, schedules, or progress dashboards.
 
@@ -97,11 +97,21 @@ Subject IDs use `"01"`–`"12"`. The source schema retains the names `modules` a
 
 Each article has a `topicId`, `title`, `summary`, `prerequisites`, at least three `sections`, an `exercise` with a `prompt` and `answer`, `takeaways`, and `references`. Sections use a unique `id`, a `title`, and a `paragraphs` array. Optional `formula`, `code`, `language`, and `bullets` fields add worked material. Write plain text and Unicode mathematics; HTML is escaped when rendered.
 
-Article references contain `title`, `url`, `kind` (`paper`, `book`, or `guide`), and `note` describing the source. They appear beside the library topic and at the end of its article. Shared reading resources in `papers.json` additionally include `id`, `authors`, `year`, `moduleIds`, and `level` (`essential` or `further`).
+Article references contain `title`, `url`, `kind` (`paper`, `book`, or `guide`), and `note` describing the source. A lead source appears on each article card. Papers are highlighted above the article body, with the full source list at the end; topics without papers highlight their books or official guides. Shared reading resources in `papers.json` additionally include `id`, `authors`, `year`, `moduleIds`, and `level` (`essential` or `further`).
+
+Keep the `source-reading` section specific to the topic and its cited sources. Explain what the source contributes, connect it to a concrete mechanism or example, and distinguish reported evidence from general advice. Do not invent paper section numbers or present a model-specific result as a universal guarantee.
 
 The historical `data/schedule.json` is retained in the repository but excluded from the published site. It is not loaded by the library.
 
 The build creates `dist/learn/<topicId>/index.html`, `dist/data/topic-index.json`, and `dist/sitemap.xml`. Edit source JSON rather than generated files. Checks validate topic coverage, references, prerequisites, and substantive article content. External source availability can change even when a URL is structurally valid.
+
+## Content Review
+
+The [content audit](review/content-audit.json) records the reviewed article IDs, source checks, actual Claude Code review passes, final content hashes, and verification limits. Per-subject reports and adjudicated findings are in `review/`. These are maintainer records and are not copied into the published site.
+
+Claude reviewed the baseline and expanded content with tools disabled. Original-paper verification and executable numerical/code checks were performed separately, and proposed corrections were assessed before adoption. This is evidence of review, not a guarantee that every scientific statement is error-free. Future content changes need their own source verification; the stored hashes identify the version covered by this audit.
+
+The local review runner accepts the installed Claude Code executable path and uses its existing sign-in. Raw CLI envelopes and duplicate article snapshots are ignored by Git; curated findings and audit evidence are retained. No credentials belong in the repository.
 
 ## Local Preview and Validation
 

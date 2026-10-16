@@ -25,8 +25,16 @@
         "paragraphs": [
           "Importing a module executes its top-level statements. Creating a large dataset, connecting a tracker, or starting training during import makes reuse fragile and can interact badly with worker processes. Put the experiment entry point behind the main guard. Keep mutable per-instance state inside initialization rather than as a shared class attribute. Record configuration explicitly instead of relying on whichever global variable was last assigned in an interactive notebook."
         ],
-        "code": "class RunningMean:\n    def __init__(self):\n        self.total, self.count = 0.0, 0\n    def update(self, value):\n        self.total += value\n        self.count += 1\n    def value(self):\n        return self.total / self.count if self.count else 0.0",
+        "code": "class RunningMean:\n    def __init__(self):\n        self.total, self.count = 0.0, 0\n    def update(self, value):\n        self.total += value\n        self.count += 1\n    def value(self):\n        if self.count == 0:\n            raise ValueError(\"Mean is undefined before any updates\")\n        return self.total / self.count",
         "language": "python"
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the Python class and module tutorials as descriptions of execution and ownership, rather than as a list of syntax features. In RunningMean, total and count belong to each instance because initialization assigns them through self. Create two instances, update only one, and compare their values. This small example exposes the same ownership distinction that matters when several experiments construct datasets, models, or metric accumulators in one process.",
+          "The language reference is the appropriate source for decorator behavior. A decorated definition binds the result of applying the decorator, so a wrapper can change call behavior even when the function's visible name stays familiar. Separately, a generator preserves one suspended computation; creating another generator object starts another computation. These are different mechanisms. When training unexpectedly begins during import or an epoch contains no batches, trace ordinary Python execution before investigating framework internals."
+        ]
       }
     ],
     "exercise": {
@@ -84,6 +92,14 @@
         "paragraphs": [
           "Start with read-only observations: print the working directory, inspect the selected Python executable, list expected files, and check whether a training process is still alive. Quote paths containing spaces and avoid relying on interactive shell initialization in automated jobs. A process that disappears after a remote terminal closes may need a session manager or job scheduler. Environment variables are also a poor place to print indiscriminately, because they can contain credentials unrelated to the experiment."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "The Bash Environment manual explains which assignments are inherited by an external command. Relate its examples to a concrete training launch: an exported DATA_ROOT and an unexported local variable can look equally visible inside the shell, yet only the exported value ordinarily appears in the Python process environment. A command-prefixed assignment is another route for supplying that one child's environment without permanently changing the shell's value.",
+          "The important boundary is between processes, not between files. A child that changes its own environment does not thereby rewrite its parent's state. This also explains why running an activation script as a separate process can differ from evaluating it inside the current shell. The syntax in this article is specifically Bash syntax; PowerShell uses different environment-assignment commands. Preserve the conceptual distinction while translating commands for the actual shell, and inspect the selected executable before assuming an environment change took effect."
+        ]
       }
     ],
     "exercise": {
@@ -131,11 +147,19 @@
         "paragraphs": [
           "Before committing, inspect both unstaged and staged differences. A forgotten configuration change or generated result can silently alter reproducibility. Keep large model weights and secrets out of ordinary repository history; store versioned artifact references instead. Resolve merge conflicts by understanding the intended behavior from both branches, then run the relevant check. Choosing all changes from one side merely to remove conflict markers can erase an experiment's essential logic."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read Pro Git's discussion of recording changes with three versions of one file in mind: the last commit, the staged snapshot, and the current working copy. After staging a file and editing it again, the second edit belongs only to the working copy until it is included by staging or a commit mode that reads tracked working files. Comparing the two diffs explains why a plain commit can contain an earlier version of a file that looks different in the editor.",
+          "For an experiment, a commit identifier is useful evidence but not a complete environment description. Uncommitted changes, dataset revisions, downloaded weights, and runtime arguments can still alter the result. Connect the recorded source snapshot to those external inputs through the experiment record. When reviewing a merge, follow the behavior that each branch intended to preserve; syntactically resolving a conflict is insufficient if the resulting model or data pipeline now combines incompatible assumptions."
+        ]
       }
     ],
     "exercise": {
       "prompt": "You stage train.py, then edit it again before committing. Which version enters the commit? How can you verify the answer before committing?",
-      "answer": "The staged snapshot enters the commit, while later edits remain in the working tree. Inspect the staged diff to see what will be recorded, and the ordinary diff to see changes that are still unstaged."
+      "answer": "With a plain git commit, the staged snapshot enters the commit while later edits remain in the working tree. Inspect git diff --staged to see that snapshot and git diff for unstaged edits. By contrast, git commit -a includes current changes to tracked files, and git commit train.py records that named tracked file’s current contents rather than its earlier staged version."
     },
     "takeaways": [
       "A commit records the staged snapshot.",
@@ -147,6 +171,12 @@
         "url": "https://git-scm.com/book/en/v2",
         "kind": "book",
         "note": "Read recording changes, basic branching and merging, and the contributing-to-a-project workflow."
+      },
+      {
+        "title": "Git — git-commit",
+        "url": "https://git-scm.com/docs/git-commit",
+        "kind": "guide",
+        "note": "Compare a plain commit of the index with -a and explicit-path modes, which use current tracked-file contents."
       }
     ]
   },
@@ -169,7 +199,7 @@
         "id": "mechanism",
         "title": "Split heads, then reorder them",
         "paragraphs": [
-          "Start with a projected tensor shaped [B, T, H·D]. Reshape it to [B, T, H, D], then permute to [B, H, T, D] for attention. The first operation splits a feature axis; the second moves the head axis. Einsum can make a contraction explicit: 'btd,dh->bth' projects features while retaining batch and time. Repeated labels identify contracted dimensions unless they are included in the output labels."
+          "Start with a projected tensor shaped [B, T, H·D]. Reshape it to [B, T, H, D], then permute to [B, H, T, D] for attention. The first operation splits a feature axis; the second moves the head axis. Einsum can make a contraction explicit: 'btd,dh->bth' projects features while retaining batch and time. With an explicit output, dimensions whose labels are omitted from that output are summed, whether or not a label repeats across operands. Repeating a label within one operand selects its diagonal; for example, 'ii->i' extracts a diagonal without summing it."
         ]
       },
       {
@@ -180,6 +210,14 @@
         ],
         "code": "x = torch.arange(24).reshape(2, 3, 4)\ny = x.permute(0, 2, 1)\nprint(x.shape, y.shape)\nprint(y[0, 0])  # original feature 0 across three positions",
         "language": "python"
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Use the Tensor Views reference to inspect shape and stride together. The sequential-value tensor in this article makes a permutation observable: y[0, 0] contains original feature zero across positions, rather than an arbitrary group of three adjacent values. A view can share storage while changing indexing, and a reshape can copy when the requested arrangement is incompatible with existing strides. Similar shapes therefore do not imply identical storage or semantics.",
+          "The einsum reference makes a second distinction explicit. In ij->i, j is summed even though it appears only once in the input notation. In ii->i, repeating i within the matrix selects the diagonal and the output retains that index. Compare both examples with matrix multiplication before using a compact contraction in attention. The output labels specify which named axes survive; they are part of the computation, not an optional description added afterward."
+        ]
       }
     ],
     "exercise": {
@@ -196,6 +234,18 @@
         "url": "https://docs.pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html",
         "kind": "guide",
         "note": "Review tensor attributes, reshaping, matrix products, and shared storage."
+      },
+      {
+        "title": "PyTorch — torch.einsum",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.einsum.html",
+        "kind": "guide",
+        "note": "Read explicit output subscripts, omitted-axis summation, and repeated labels within one operand; compare ij->i with ii->i."
+      },
+      {
+        "title": "PyTorch — Tensor Views",
+        "url": "https://docs.pytorch.org/docs/stable/tensor_view.html",
+        "kind": "guide",
+        "note": "Distinguish shared-storage views, permuted strides, and reshape operations that may need a copy."
       }
     ]
   },
@@ -227,6 +277,14 @@
         "title": "Use explicit singleton dimensions",
         "paragraphs": [
           "To scale each head separately, reshape head weights to [1, 2, 1, 1]. This states exactly where variation is allowed. Broadcasting often avoids allocating repeated inputs, but the resulting output can still be huge: comparing all pairs of B examples creates B² entries. In-place operations are more restrictive because the destination cannot change shape. Prefer small shape assertions and a hand-calculated batch before optimizing a complicated contraction."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the broadcasting rules alongside the tensor tutorial's distinction between elementwise and matrix products. For the attention example, separate the leading [4, 2] batch/head dimensions from the final matrix dimensions before multiplying. The inner feature width 8 is contracted, while the two position lengths 7 and 9 remain. Replacing the matrix product with elementwise multiplication would not express the same comparisons, even if selected input dimensions happened to match.",
+          "A per-head scale is a useful diagnostic because its intended semantics are easy to state: all positions and features within one head receive the same multiplier. The shape [1, 2, 1, 1] records exactly that policy. If a future model happens to have feature width 2, the incorrect shape [2] might stop raising an error while still scaling features instead of heads. Test deliberately unequal dimensions to avoid letting coincidences conceal an axis mistake."
         ]
       }
     ],
@@ -284,6 +342,14 @@
         ],
         "code": "x = torch.tensor(2.0, requires_grad=True)\ny = x * x + 3 * x\ny.backward()\nprint(x.grad)  # 7",
         "language": "python"
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "The autograd tutorial distinguishes recording a computation from updating parameters. Use the small polynomial here to follow that boundary: backward produces the derivative 7 at x = 2, but x itself remains 2 until some update changes it. Repeated backward calls from independent computations add contributions into the leaf gradient. Inspect the parameter value and its gradient separately to avoid mistaking successful differentiation for successful learning.",
+          "Trace detach and no_grad through the same example. A detached value can still participate in later differentiable work with other parameters, but it no longer carries a path back through the original history. Evaluation mode is a separate switch that affects selected modules' behavior. This distinction is useful when reading saliency or attribution code: evaluating a model and differentiating its prediction with respect to an input can be intentional. Turning off gradient recording would prevent that calculation."
+        ]
       }
     ],
     "exercise": {
@@ -334,6 +400,14 @@
         ],
         "code": "class Affine(torch.nn.Module):\n    def __init__(self, d_in, d_out):\n        super().__init__()\n        self.weight = torch.nn.Parameter(torch.randn(d_in, d_out) * 0.02)\n        self.bias = torch.nn.Parameter(torch.zeros(d_out))\n    def forward(self, x):\n        return x @ self.weight + self.bias",
         "language": "python"
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Compare the network-building tutorial with the Module reference's inventory of registered state. The Affine example has two parameters because assigning nn.Parameter objects as attributes registers them. A useful audit is to list their names, move the module to another dtype, and examine its state dictionary. These operations should refer to the same intended model state, rather than to unrelated collections maintained by hand.",
+          "Now contrast a Python list of layers with ModuleList. Both can hold callable objects and produce numerical outputs, so a forward pass alone does not demonstrate correct registration. Registration determines whether framework traversal finds those children for parameter collection and mode changes. The Module reference also explains why model(x) matters: call hooks surround forward execution. This is especially relevant when instrumentation or debugging depends on hooks; bypassing them can make an otherwise plausible experiment report incomplete observations."
+        ]
       }
     ],
     "exercise": {
@@ -350,6 +424,12 @@
         "url": "https://docs.pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html",
         "kind": "guide",
         "note": "Read module construction, nested layers, parameters, and forward execution."
+      },
+      {
+        "title": "PyTorch — Module",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html",
+        "kind": "guide",
+        "note": "Inspect parameter and buffer registration, state_dict contents, and the hooks invoked by calling a module."
       }
     ]
   },
@@ -382,6 +462,14 @@
         "paragraphs": [
           "Shuffling changes minibatch composition and therefore the optimization trajectory. Worker processes and random augmentations introduce additional sources of randomness. Record seeds and sampler settings, and distinguish throughput experiments from changes to the training distribution. Drop-last behavior can discard examples, while an iterable dataset requires careful worker sharding to avoid duplicates. Check one epoch's sample IDs when data repetition or missing examples would affect conclusions."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the basic data tutorial for the separation between examples and batches, then use torch.utils.data for the detailed collation and worker rules. With lengths [2, 4, 3], a rectangular representation allocates twelve positions but contains only nine observations. The tensor shape, attention-validity mask, and loss-validity mask describe different aspects of that representation. For next-token prediction, identify valid shifted targets explicitly rather than blindly reusing an input-length count.",
+          "The iterable-dataset examples are particularly relevant to streaming corpora. Multiple workers can each receive a dataset replica, so independent iteration without sharding may repeat the same examples. Inspect sample identifiers across one small epoch before increasing worker count. Likewise, changing drop_last can change which observations contribute to an update. A throughput improvement should be reported separately from any simultaneous change in sample exposure, padding policy, or randomness; otherwise the comparison no longer isolates pipeline speed."
+        ]
       }
     ],
     "exercise": {
@@ -398,6 +486,12 @@
         "url": "https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html",
         "kind": "guide",
         "note": "Read custom datasets, batching, sampling, and DataLoader responsibilities."
+      },
+      {
+        "title": "PyTorch — torch.utils.data",
+        "url": "https://docs.pytorch.org/docs/stable/data.html",
+        "kind": "guide",
+        "note": "Read collate_fn, drop_last, and iterable-dataset examples that shard data across workers to avoid duplicate samples."
       }
     ]
   },
@@ -433,11 +527,19 @@
         ],
         "code": "model.train()\nfor x, y in loader:\n    optimizer.zero_grad(set_to_none=True)\n    logits = model(x)\n    loss = criterion(logits, y)\n    loss.backward()\n    optimizer.step()",
         "language": "python"
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Use the optimization tutorial to identify the state transition at each line of the loop: clearing gradients, computing predictions, constructing a loss, differentiating, and updating parameters. Keep those roles separate when adding accumulation. Four equal microbatch means divided by four produce the gradient of their average, provided all four computations evaluate the intended objective at the same parameters. An optimizer step between them changes that objective's evaluation points.",
+          "Consult the BatchNorm documentation before calling this an exact large-batch substitute. Batch statistics can change the forward values when the same examples are partitioned differently, so correct loss scaling cannot restore the missing full-batch statistics. Dropout realizations and other stochastic choices can also differ. For a clean verification, first use a deterministic model without batch-dependent operations, then add the actual architecture's components one at a time. Matching gradients on the simple case establishes the bookkeeping, not universal architectural equivalence."
+        ]
       }
     ],
     "exercise": {
       "prompt": "You average four microbatch losses of equal size to emulate one larger batch. Should you backpropagate each unscaled loss, or divide each by four first?",
-      "answer": "Divide each by four before backward if the goal is the mean loss over the combined batch. Otherwise the accumulated gradient is four times larger. Unequal microbatch sizes require weighting by valid examples or tokens instead of a simple factor of four."
+      "answer": "Divide each by four before backward if the goal is the mean loss over the combined batch. Otherwise the accumulated gradient is four times larger. Unequal microbatch sizes require weighting by valid examples or tokens instead of a simple factor of four. Matching a single large-batch gradient also requires the same per-example forward computation: training-mode BatchNorm changes its statistics across microbatches, and stochastic operations need consistent realizations. Loss scaling alone does not guarantee identical updates."
     },
     "takeaways": [
       "Loss reduction defines the scale of an update.",
@@ -449,6 +551,12 @@
         "url": "https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html",
         "kind": "guide",
         "note": "Trace gradient clearing, backward, optimizer steps, and evaluation loops."
+      },
+      {
+        "title": "PyTorch — BatchNorm1d",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html",
+        "kind": "guide",
+        "note": "Check which dimensions supply training statistics and why splitting a batch can change the forward computation before gradient accumulation."
       }
     ]
   },
@@ -465,14 +573,14 @@
         "id": "intuition",
         "title": "Different recovery goals need different state",
         "paragraphs": [
-          "For inference, model weights and the exact architecture may be enough to reconstruct predictions. Resuming training requires more: optimizer moments, schedule position, mixed-precision scaler state when used, and the current training step. A checkpoint that restores weights but resets those components starts a related experiment rather than continuing the same trajectory. Decide the recovery goal before a long job begins."
+          "For inference, restore the architecture, learned parameters, and persistent model buffers, together with matching preprocessing and evaluation mode. BatchNorm running statistics are one example of non-parameter state that can affect predictions. Resuming training requires more: optimizer moments, schedule position, mixed-precision scaler state when used, and the current training step. A checkpoint that restores weights but resets those components starts a related experiment rather than continuing the same trajectory. Decide the recovery goal before a long job begins."
         ]
       },
       {
         "id": "mechanism",
         "title": "Save named state with its context",
         "paragraphs": [
-          "A state_dict maps names to persistent tensors. Save model and optimizer state dictionaries alongside configuration, tokenizer or preprocessing versions, and a data identifier. For closer reproduction, record random-number-generator states and the sampler position. Exact continuation across different hardware or library versions may still be unavailable because kernels and numerical behavior can differ. Store the checkpoint format version so future code can interpret it deliberately."
+          "A model state_dict normally maps parameter and persistent-buffer names to tensors; modules can also define extra state. An optimizer state_dict has a different structure, containing per-parameter state and parameter-group settings. Save model and optimizer state dictionaries alongside configuration, tokenizer or preprocessing versions, and a data identifier. For closer reproduction, record random-number-generator states and the sampler position. Exact continuation across different hardware or library versions may still be unavailable because kernels and numerical behavior can differ. Store the checkpoint format version so future code can interpret it deliberately."
         ]
       },
       {
@@ -480,6 +588,14 @@
         "title": "Test the restore path early",
         "paragraphs": [
           "Save a small run, construct a fresh model and optimizer, load state, and compare predictions before proceeding. For a resume test, compare the next update with an uninterrupted run under controlled deterministic settings. Write checkpoints atomically where possible so interruption does not leave a half-written file. Keep a previous known-good copy. Loading serialized objects can have security implications, so use trusted checkpoints and the framework's restricted loading options appropriate to the file format."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "The saving-and-loading guide distinguishes a model state dictionary from a general training checkpoint. Inspect a BatchNorm-containing model to see persistent running statistics alongside learned parameters. Inspect Adam separately to see optimizer state and parameter-group configuration. These are different structures with different purposes, so a generic instruction to save the weights is too ambiguous when a later reader needs to reproduce predictions or continue optimization.",
+          "A useful restore comparison has two stages. First, load into a fresh architecture and compare evaluation outputs on identical inputs and preprocessing. Second, restore optimizer and other training state, then compare the next update against an uninterrupted run. The second stage is stricter: identical predictions before the step do not prove identical moment estimates or schedule positions. For stochastic data pipelines, also account for sample order and random state. Cross-version or cross-device bitwise identity is a separate requirement that a state dictionary alone cannot establish."
         ]
       }
     ],
@@ -529,6 +645,14 @@
         "paragraphs": [
           "CUDA launches are typically asynchronous with respect to the CPU. Timing only the Python call can measure launch overhead rather than completed GPU work. Synchronize at measurement boundaries or use CUDA events, while avoiding unnecessary synchronization in the normal training path. Pinned host memory and nonblocking copies can help overlap transfers in suitable pipelines, but they are not universal speed switches. Measure end-to-end throughput, and create small helper tensors on the input's device."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read CUDA Semantics as a guide to ownership and execution boundaries. Device movement answers where a tensor's data resides; the allocator statistics answer which allocations PyTorch currently uses or manages. Neither is identical to a system monitor's total process footprint. A debugging record should distinguish allocated bytes, reserved bytes, and the stage of the iteration at which each measurement was taken.",
+          "The asynchronous-execution discussion explains why a host-side timer around a kernel launch can be misleading. Decide whether the measurement concerns one kernel, a batch, or complete request latency, then place synchronization at the boundaries needed for that question. Excess synchronization inside normal execution can destroy useful overlap and create a different workload. Pinned memory and nonblocking transfers are mechanisms to investigate, not promised speedups. Their value depends on actual transfer sizes, stream coordination, available overlap, and the rest of the pipeline."
+        ]
       }
     ],
     "exercise": {
@@ -576,6 +700,14 @@
         "title": "Check accuracy as well as throughput",
         "paragraphs": [
           "Mixed precision can reduce activation memory and speed suitable matrix operations, but gains depend on model size, dimensions, and hardware support. A tiny model dominated by Python overhead may barely improve. Compare a fixed-batch loss and short learning curve with an FP32 reference, then measure complete training throughput. If gradients become nonfinite, inspect the loss and input ranges before assuming a different dtype alone will fix the underlying instability."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Follow the AMP recipe's ordering of autocast, scaled backward, unscaling, clipping, and optimizer stepping. The clipping example here isolates why the order matters: multiplying the loss changes recorded gradient magnitudes without changing the desired unscaled objective. A norm threshold applied before that scale is removed acts on a different numerical quantity. Reading a training script line by line is more informative than seeing that it contains an autocast context somewhere.",
+          "Precision choices also need a numerical baseline. Compare selected activations, loss values, and gradients against an FP32 computation before interpreting a throughput result. BF16's wider exponent range addresses a different problem from fractional precision, so fewer overflows do not guarantee equally accurate arithmetic. The recipe's speed claims are hardware- and workload-dependent; a CPU run cannot validate a CUDA kernel's benefit. Keep correctness checks, memory measurements, and wall-clock measurements separate so each result supports only the claim it actually tests."
         ]
       }
     ],
@@ -626,6 +758,14 @@
         "paragraphs": [
           "Appending a loss tensor to a list keeps graph references reachable; logging a detached scalar avoids that ownership. Ordinary backward frees most saved activations, so graph references alone do not prove a large leak. Retaining graphs for later backward or storing intermediate activations can be much more expensive. Emptying the CUDA cache does not free live tensors. If memory is stable but insufficient, reduce batch or sequence length; if it grows, trace retained references and graph lifetimes."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Use the autograd and CUDA references together to distinguish a live graph from unused allocator memory. A differentiable loss stored in a list keeps a Python-visible connection to graph nodes. Whether that retains large saved activations depends on backward and graph-retention behavior. By contrast, reserved but unused CUDA blocks can persist even after their tensors are no longer live. These mechanisms require different evidence and different fixes.",
+          "Construct a short diagnostic trace over repeated identical iterations: record live allocation after forward, after backward, and after dropping temporary references. Increasing memory at the same boundary is more suspicious than a single high peak. For nonfinite values, move the trace earlier through inputs, logits, loss, gradients, and updated parameters until the first invalid state appears. Gradient clipping cannot repair a NaN already created by an invalid forward operation, and empty_cache cannot release tensors still owned by application code."
+        ]
       }
     ],
     "exercise": {
@@ -671,7 +811,7 @@
         "id": "mechanism",
         "title": "Choose a meaningful horizontal axis",
         "paragraphs": [
-          "Optimizer step, processed examples, processed tokens, and wall-clock time answer different questions. Two runs with different batch sizes may look similar against steps while consuming very different compute. Log validation metrics with an explicit split name and aggregation rule. For a variable-length language task, token-weighted loss is not generally equal to the mean of per-batch means. Keep the raw enough information to reconstruct the comparison."
+          "Optimizer step, processed examples, processed tokens, and wall-clock time answer different questions. Two runs with different batch sizes may look similar against steps while consuming very different compute. Log validation metrics with an explicit split name and aggregation rule. For a variable-length language task, token-weighted loss is not generally equal to the mean of per-batch means. Keep enough raw information to reconstruct the comparison."
         ]
       },
       {
@@ -679,6 +819,14 @@
         "title": "Record failures and artifacts too",
         "paragraphs": [
           "Save representative predictions, error categories, checkpoints, and configuration snapshots rather than retaining only the best scalar score. Mark interrupted or diverged runs so they do not silently disappear from a comparison. Avoid logging every large tensor on every step, which can create overhead and storage costs. Separate configuration chosen before a run from notes added afterward, and preserve links between a reported result and its exact checkpoint."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "The TensorBoard tutorial demonstrates how a scalar is attached to a tag and a step. Treat those fields as part of the measurement definition. A tag such as validation/loss should identify the evaluated split and reduction, while the horizontal coordinate should identify optimizer steps, examples, tokens, or time. Reusing a tag for a different denominator can make two curves appear comparable even when their values answer different questions.",
+          "Extend the example with unequal final batches: a batch of ten observations and a batch of one observation should not receive equal weight when reporting a per-observation mean. Log enough counts to reconstruct the aggregate, alongside the source revision and configuration. The interface records values; it cannot establish that preprocessing, label mapping, or evaluation prompts match across runs. Link a reported result to a particular checkpoint and dataset version so a later inspection can recover the experiment behind the visualization."
         ]
       }
     ],

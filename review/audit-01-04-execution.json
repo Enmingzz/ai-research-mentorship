@@ -1,0 +1,351 @@
+{
+  "runtime": {
+    "python": "3.13.2",
+    "torch": "2.11.0+cpu",
+    "device": "cpu",
+    "cudaAvailable": false
+  },
+  "executedChecks": [
+    {
+      "topicId": "01-01",
+      "check": "Matrix product and norms",
+      "result": "pass",
+      "details": "xW=[-2,4]; Frobenius=5; spectral=4."
+    },
+    {
+      "topicId": "01-02",
+      "check": "Projection and accidental broadcast",
+      "result": "pass",
+      "details": "[2,5,8] projection; [16,16] residual before correction."
+    },
+    {
+      "topicId": "01-03",
+      "check": "SVD rank and approximation",
+      "result": "pass",
+      "details": "Two nonzero singular values; rank-one Frobenius error2."
+    },
+    {
+      "topicId": "01-04",
+      "check": "Autograd and centered finite difference",
+      "result": "pass",
+      "details": "Derivative12; partial derivatives7,2."
+    },
+    {
+      "topicId": "01-05",
+      "check": "Quadratic updates",
+      "result": "pass",
+      "details": "Learning rates0.1 and0.3 give losses0 and20."
+    },
+    {
+      "topicId": "01-06",
+      "check": "Bayes and variance",
+      "result": "pass",
+      "details": "Posterior0.3076923; Bernoulli variance0.1875; scaled variance3."
+    },
+    {
+      "topicId": "01-08",
+      "check": "Bernoulli likelihood",
+      "result": "pass",
+      "details": "MLE0.7; failure NLL1.2039728043nats."
+    },
+    {
+      "topicId": "01-09",
+      "check": "Entropy/KL",
+      "result": "pass",
+      "details": "H=CE=ln2; KL=0."
+    },
+    {
+      "topicId": "02-04",
+      "check": "Stored tensor snippet and einsum counterexamples",
+      "result": "pass",
+      "details": "Head permutation validated; repeated label can select a diagonal; nonrepeated omitted label is reduced."
+    },
+    {
+      "topicId": "02-05",
+      "check": "Batched products",
+      "result": "pass",
+      "details": "Shapes[4,2,7,9] and[3,5,6] verified."
+    },
+    {
+      "topicId": "02-06",
+      "check": "Stored autograd snippet and accumulation",
+      "result": "pass",
+      "details": "Gradient7 in snippet; independent gradients3+5 accumulate to8."
+    },
+    {
+      "topicId": "02-07",
+      "check": "Stored Affine snippet and registration/hooks",
+      "result": "pass",
+      "details": "15parameters; ModuleList registers children; directforward bypasses hook."
+    },
+    {
+      "topicId": "02-08",
+      "check": "Padding count",
+      "result": "pass",
+      "details": "12slots,9real positions,3padding."
+    },
+    {
+      "topicId": "02-09",
+      "check": "Stored loop; accumulation equivalence and counterexample",
+      "result": "pass",
+      "details": "Loop updates weights; equal microbatch means match for Linear; BatchNorm max full-vs-micro forward difference=1.895513."
+    },
+    {
+      "topicId": "02-10",
+      "check": "In-memory Adam continuation and buffer inventory",
+      "result": "pass",
+      "details": "Restored state matches next update; fresh Adam differs; optimizerdict nestedstate/param_groups, BatchNormbuffer present. No checkpointfile I/O executed."
+    },
+    {
+      "topicId": "02-12",
+      "check": "Clipping before unscale arithmetic",
+      "result": "pass",
+      "details": "A scalednorm clippedto1 leaves unscalednorm1/1024."
+    },
+    {
+      "topicId": "03-01",
+      "check": "MLP parameter count",
+      "result": "pass",
+      "details": "67parameters including biases."
+    },
+    {
+      "topicId": "03-02",
+      "check": "Two-layer manual gradients",
+      "result": "pass",
+      "details": "Weightandbias gradients equal autograd float64."
+    },
+    {
+      "topicId": "03-03",
+      "check": "Activation definitions",
+      "result": "pass",
+      "details": "ReLUzero convention and exactGELUformula verified."
+    },
+    {
+      "topicId": "03-04",
+      "check": "Softmax cross-entropy derivative",
+      "result": "pass",
+      "details": "Gradient[0.1,0.7,-0.8]."
+    },
+    {
+      "topicId": "03-05",
+      "check": "Kaiming scale",
+      "result": "pass",
+      "details": "Variance0.02,std0.1414213562."
+    },
+    {
+      "topicId": "03-06",
+      "check": "LayerNorm/RMSNormexample",
+      "result": "pass",
+      "details": "CenteredLN[-1,1]; RMSretainspositive signs."
+    },
+    {
+      "topicId": "03-07",
+      "check": "Projectedshortcutshape",
+      "result": "pass",
+      "details": "[8,128,16,16] matches mainbranch."
+    },
+    {
+      "topicId": "03-08",
+      "check": "Inverteddropout expectation",
+      "result": "pass",
+      "details": "Retainedvalue8, expectation6."
+    },
+    {
+      "topicId": "03-09",
+      "check": "Embeddinglookup andgradients",
+      "result": "pass",
+      "details": "Two unique rows; repeatedrowgradient2; vocabularycount38.4million."
+    },
+    {
+      "topicId": "03-10",
+      "check": "Convolution parameters andoutput",
+      "result": "pass",
+      "details": "448parameters;32to16spatial."
+    },
+    {
+      "topicId": "03-11",
+      "check": "Detachedrecurrent state",
+      "result": "pass",
+      "details": "Numericalvalues identical, autogradhistory disconnected."
+    },
+    {
+      "topicId": "03-12",
+      "check": "Globalclipping example",
+      "result": "pass",
+      "details": "[3,4] norm5 rescales to[1.2,1.6]."
+    },
+    {
+      "topicId": "04-02",
+      "check": "QKVshapes",
+      "result": "pass",
+      "details": "Scores[6,10];output[6,12]."
+    },
+    {
+      "topicId": "04-03",
+      "check": "Numericshowcase, SDPAandmask",
+      "result": "pass",
+      "details": "weights=[[0.6697615493266569, 0.33023845067334306], [0.33023845067334306, 0.6697615493266569]];outputs=[[1.3395230986533138, 1.3209538026933723], [0.6604769013466861, 2.6790461973066275]]"
+    },
+    {
+      "topicId": "04-04",
+      "check": "Cross-attention dimensions",
+      "result": "pass",
+      "details": "8querypositions retained for120sourceframes."
+    },
+    {
+      "topicId": "04-05",
+      "check": "Headpartition",
+      "result": "pass",
+      "details": "Widths32and16;concatenation unchanged."
+    },
+    {
+      "topicId": "04-06",
+      "check": "SDPAbooleanandnon-squarecausalsemantics",
+      "result": "pass",
+      "details": "Trueparticipates;is_causal for1x3usesupperleft, allowingonlykey0. Cacheddecodingmusthandlepositions."
+    },
+    {
+      "topicId": "04-08",
+      "check": "Positionrange",
+      "result": "pass",
+      "details": "Learnedrow600notin512rows;sin/cosposition0defined."
+    },
+    {
+      "topicId": "04-09",
+      "check": "RoPErotations",
+      "result": "pass",
+      "details": "Relativeangleidentity and0/1dotproductsexamples verified."
+    },
+    {
+      "topicId": "04-10",
+      "check": "Zerobranchidentity",
+      "result": "pass",
+      "details": "PostnormLN(x)differsfromx;prenormx+0identical."
+    },
+    {
+      "topicId": "04-11",
+      "check": "FFNparametercounts",
+      "result": "pass",
+      "details": "524288weights;33088includingexamplebiases."
+    },
+    {
+      "topicId": "04-12",
+      "check": "SwiGLUmatchedbudget",
+      "result": "pass",
+      "details": "Hidden1024matchesordinary1536atfixedD."
+    },
+    {
+      "topicId": "04-13",
+      "check": "GQAcacheratio",
+      "result": "pass",
+      "details": "32to8KVheads yields onequartercache."
+    },
+    {
+      "topicId": "04-14",
+      "check": "KVcachebytes",
+      "result": "pass",
+      "details": "12800elements and25600bytes."
+    },
+    {
+      "topicId": "04-15",
+      "check": "Latencycrossover",
+      "result": "pass",
+      "details": "WithTTFTincludingfirsttoken, totalcompletioncrossoveratN=27.6667tokens;Bfasterfrom28tokens."
+    },
+    {
+      "topicId": "04-17",
+      "check": "Attentionstorageandscaling",
+      "result": "pass",
+      "details": "32MiBFP16matrix;4xlengthgives16xpairwork,4xprojection/cache."
+    },
+    {
+      "topicId": "04-18",
+      "check": "StoredTinyBlockcodebehavior",
+      "result": "pass",
+      "details": "CPUfloat64 shape, finiteallparametergradients, futuretokeninvariance, SDPAreferenceagreement,andzeroresidualidentity allpass."
+    },
+    {
+      "topicId": "02-01",
+      "check": "Final stored RunningMean snippet",
+      "result": "pass",
+      "details": "Empty metric raises ValueError; updates 2 and 4 average to 3; instance state is independent."
+    },
+    {
+      "topicId": "01-01",
+      "check": "Enriched equal-Frobenius example",
+      "result": "pass",
+      "details": "Both Frobenius norms are 4; spectral norms are 4 and sqrt(8)."
+    },
+    {
+      "topicId": "01-02",
+      "check": "Enriched accidental broadcast",
+      "result": "pass",
+      "details": "A [2,1] prediction minus [2] targets produces the stated [2,2] matrix."
+    },
+    {
+      "topicId": "01-03",
+      "check": "Final SVD conventions and nonnormal example",
+      "result": "pass",
+      "details": "Both column and row singular-vector relations hold; eigenvalues 1,1 coexist with gain sqrt(101)."
+    },
+    {
+      "topicId": "01-06",
+      "check": "Enriched base-rate variation",
+      "result": "pass",
+      "details": "Technical-document prior 0.5 gives keyword posterior 0.8."
+    },
+    {
+      "topicId": "01-09",
+      "check": "Enriched cross-entropy and KL",
+      "result": "pass",
+      "details": "Cross-entropy 1.2039728043 nats; KL 0.5108256238 nats."
+    },
+    {
+      "topicId": "01-10",
+      "check": "Final Adam first bias-corrected step",
+      "result": "pass",
+      "details": "PyTorch agrees with m-hat=g, v-hat=g squared, and denominator abs(g)+epsilon on the first step."
+    },
+    {
+      "topicId": "03-05",
+      "check": "Final symmetric-ReLU second moment",
+      "result": "pass",
+      "details": "Variance 2.5 and ReLU second moment 1.25; post-ReLU variance is different from its second moment."
+    },
+    {
+      "topicId": "04-02",
+      "check": "Enriched key/value permutation",
+      "result": "pass",
+      "details": "Jointly permuting keys and values preserves the unmasked output."
+    },
+    {
+      "topicId": "04-17",
+      "check": "Final per-head versus full-tensor MiB arithmetic",
+      "result": "pass",
+      "details": "Executed in Node: 1024 × 1024 × 2 bytes is 2 MiB; B=2 and H=8 multiply that to 32 MiB."
+    }
+  ],
+  "storedCodeSnippetsExecuted": [
+    "02-01",
+    "02-04",
+    "02-06",
+    "02-07",
+    "02-09",
+    "04-18"
+  ],
+  "notes": [
+    "Tests used Python 3.13.2, PyTorch 2.11.0+cpu, and NumPy 2.2.4. No CUDA device was available.",
+    "The six stored snippets were executed. torch was supplied to snippets assuming that import; 02-09 used a tiny Linear model, MSE loss, SGD optimizer, and synthetic loader. Modified 02-01 was rerun after its correction.",
+    "No GPU execution, AMP training, FlashAttention kernel benchmark, external dataset, or checkpoint-file I/O was performed. Checkpoint continuation used in-memory state dictionaries.",
+    "Git commit modes were checked against official documentation; no Git history mutation was executed. Latency crossover is arithmetic, not a performance benchmark.",
+    "A first final-check run passed its numerical assertions but failed when serializing the report because a local path variable was shadowed by a tensor. The corrected run passed and wrote this report."
+  ],
+  "finalCodeHashes": {
+    "02-01": "f536c7a15fa01ec527df1d24a61b1f3d3c1e1b34f7ccfcb75f8829877d4a27fa",
+    "02-04": "b8ab7e5d97eecbf563c2bbe22d4c21d8a3b6e510a80dc6684aca5918c737b700",
+    "02-06": "b80c7c397fa4012e18e3fa7468c4305c9fa98515c0859e8ce2aa47fd6ba8249c",
+    "02-07": "fad6522672d152c19e7a16238954dc748d8935f1490adfd5113c3a273011bca8",
+    "02-09": "495884910c987009aa6cfac8c1a841f9289a5f947b6782fda8e6a80bbcb99627",
+    "04-18": "d4708d30ea0c167a520a1681c6d10a93fc0e62495741dcd23f4e766785a14624"
+  }
+}

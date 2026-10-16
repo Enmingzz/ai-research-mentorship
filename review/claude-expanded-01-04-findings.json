@@ -1,0 +1,404 @@
+{
+  "reviewer": "Claude (claude-opus-5-5), independent reasoning-only proofreading pass; no browsing, code execution, or paper access",
+  "reviewedTopicIds": [
+    "01-01",
+    "01-02",
+    "01-03",
+    "01-04",
+    "01-05",
+    "01-06",
+    "01-07",
+    "01-08",
+    "01-09",
+    "01-10",
+    "01-11",
+    "02-01",
+    "02-02",
+    "02-03",
+    "02-04",
+    "02-05",
+    "02-06",
+    "02-07",
+    "02-08",
+    "02-09",
+    "02-10",
+    "02-11",
+    "02-12",
+    "02-13",
+    "02-14",
+    "03-01",
+    "03-02",
+    "03-03",
+    "03-04",
+    "03-05",
+    "03-06",
+    "03-07",
+    "03-08",
+    "03-09",
+    "03-10",
+    "03-11",
+    "03-12",
+    "04-01",
+    "04-02",
+    "04-03",
+    "04-04",
+    "04-05",
+    "04-06",
+    "04-07",
+    "04-08",
+    "04-09",
+    "04-10",
+    "04-11",
+    "04-12",
+    "04-13",
+    "04-14",
+    "04-15",
+    "04-16",
+    "04-17",
+    "04-18"
+  ],
+  "reviewedPaperIds": [
+    "deep-learning-book",
+    "adam",
+    "pytorch-basics",
+    "pytorch-amp",
+    "resnet",
+    "layernorm",
+    "attention",
+    "rope",
+    "flashattention",
+    "llama",
+    "scaling-laws",
+    "lora",
+    "qlora",
+    "switch-transformer",
+    "mixtral",
+    "vit",
+    "clip",
+    "dino",
+    "vae",
+    "ddpm",
+    "flow-matching",
+    "llava",
+    "blip2",
+    "qwen25vl",
+    "distillation",
+    "llm-int8",
+    "ppo",
+    "dpo",
+    "instructgpt"
+  ],
+  "findings": [
+    {
+      "topicId": "01-02",
+      "severity": "low",
+      "confidence": "high",
+      "location": "practice, paragraph 1; source-reading, paragraph 2",
+      "originalText": "subtracting predictions [B, 1] from labels [B] produces [B, B] ... broadcasting yields [[0, −10], [10, 0]]",
+      "problem": "In English, 'subtracting predictions from labels' means labels − predictions. The numeric example uses predictions [[10], [20]] and targets [10, 20]. The stated result [[0, −10], [10, 0]] equals predictions − targets. Under labels − predictions, the result would be [[0, 10], [−10, 0]]. The shape claim [B, B] is correct either way, but the direction of the operation is inconsistent between the two passages.",
+      "suggestedCorrection": "Write 'subtracting labels [B] from predictions [B, 1] (predictions − labels) produces [B, B]'. Alternatively, state the operation explicitly in the numeric example, e.g. 'pred − target yields [[0, −10], [10, 0]]'.",
+      "verificationNeeded": false,
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/notes/broadcasting.html"
+      ]
+    },
+    {
+      "topicId": "01-04",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "references; source-reading, paragraph 1",
+      "originalText": "The Numerical Computation chapter supplies the derivative and Jacobian notation used here.",
+      "problem": "Chapter 4 does define gradients, Jacobians and Hessians, so the narrow notation claim is plausible. However, the article's central material is the chain rule over computational graphs, vector–Jacobian products in backpropagation, and summing contributions over shared paths. That material is developed in Chapter 6 (back-propagation and computational graphs), not Chapter 4. As written, the only reference does not support the article's main mechanism.",
+      "suggestedCorrection": "Add the Deep Feedforward Networks chapter as a reference for the chain rule, computational graphs and backpropagation. Keep Chapter 4 for gradient and Jacobian definitions and for finite-difference and numerical concerns.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/numerical.html",
+        "https://www.deeplearningbook.org/contents/mlp.html"
+      ]
+    },
+    {
+      "topicId": "04-17",
+      "severity": "low",
+      "confidence": "high",
+      "location": "mechanism, paragraph 1; source-reading, paragraph 2",
+      "originalText": "For B = 2, H = 8, T = 1024, one FP16 attention matrix alone occupies 32 MiB",
+      "problem": "The arithmetic is correct for the full attention-weight tensor: 2·8·1024² elements × 2 bytes = 32 MiB. That tensor contains B·H = 16 separate T×T matrices. A single 1024×1024 FP16 matrix occupies 2 MiB. Calling the whole tensor 'one attention matrix' could mislead readers doing their own memory accounting. The source-reading section's later wording ('one explicitly stored attention tensor') is accurate.",
+      "suggestedCorrection": "Say 'the full FP16 attention-weight tensor for one layer (B·H = 16 matrices of 1024×1024) occupies 32 MiB; each individual matrix is 2 MiB'.",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "04-13",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "prerequisites",
+      "originalText": "\"prerequisites\":[\"04-05\",\"04-14\"]",
+      "problem": "04-13 lists 04-14 (KV cache) as a prerequisite, but 04-14 comes after it in numeric order. The dependency itself is reasonable, since GQA is motivated by cache size. However, a mentee reading in order will meet the cache formula and cache-efficiency argument before the cache article. This is a structural ordering concern, not a technical error.",
+      "suggestedCorrection": "Either swap the order of 04-13 and 04-14, or add a one-sentence forward pointer in 04-13 explaining what a KV cache stores.",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "paper:adam",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "note, final sentence",
+      "originalText": "The original paper provides the mechanism and experiments; it does not establish that Adam is universally better or guaranteed to converge on every training problem.",
+      "problem": "The statement is not false, but it is incomplete in a way that could mislead. The original paper does contain a convergence (regret-bound) theorem for online convex optimization. Reddi, Kale & Kumar (ICLR 2018) later showed that this analysis contains an error and gave convex counterexamples where Adam fails to converge. Saying only that the paper provides 'mechanism and experiments' omits that the paper made a convergence claim that was later disputed.",
+      "suggestedCorrection": "Add: 'The paper also presents a regret bound for online convex optimization; later work (Reddi et al., On the Convergence of Adam and Beyond) identified a flaw in that analysis and constructed convex counterexamples, so the guarantee should not be relied on as stated.'",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/1412.6980",
+        "https://arxiv.org/abs/1904.09237 (Reddi et al.; arXiv ID from memory, verify)"
+      ]
+    },
+    {
+      "topicId": "paper:scaling-laws",
+      "severity": "low",
+      "confidence": "high",
+      "location": "note, final sentence",
+      "originalText": "later compute-optimal results show why a scaling prescription should not be treated as a universal constant.",
+      "problem": "The note makes a claim about 'later compute-optimal results' without naming the source, so a mentee cannot check it. The well-known example is Hoffmann et al. (2022, 'Chinchilla'). That paper reported a substantially different compute-optimal allocation between parameters and tokens than Kaplan et al., partly because it used different learning-rate schedules and fitting procedures.",
+      "suggestedCorrection": "Name the source: 'e.g., Hoffmann et al. (2022), Training Compute-Optimal Large Language Models, found a different parameter/data allocation under their experimental protocol.'",
+      "verificationNeeded": false,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2001.08361",
+        "https://arxiv.org/abs/2203.15556"
+      ]
+    },
+    {
+      "topicId": "paper:deep-learning-book",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "note, chapter summary",
+      "originalText": "Chapters 2–5 connect linear algebra, probability, numerical computation, and statistical learning; chapters 6–8 develop networks, regularization, and optimization.",
+      "problem": "The chapter mapping is accurate: Ch 2 Linear Algebra, 3 Probability, 4 Numerical Computation, 5 ML Basics, 6 Feedforward, 7 Regularization, 8 Optimization. However, module 03 articles also rely on Chapter 9 (Convolutional Networks, cited by 03-10) and Chapter 10 (Sequence Modeling, cited by 03-11). The note's summary does not reflect those uses. This is a coverage gap, not a misattribution.",
+      "suggestedCorrection": "Append: 'chapters 9–10 cover convolutional and recurrent sequence models used in module 03.'",
+      "verificationNeeded": false,
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/",
+        "https://www.deeplearningbook.org/contents/convnets.html",
+        "https://www.deeplearningbook.org/contents/rnn.html"
+      ]
+    }
+  ],
+  "numericalChecks": [
+    {
+      "topicId": "01-01",
+      "calculation": "xW for x=[2,−1], W=[[1,3],[4,2]]: first = 2·1 + (−1)·4 = −2; second = 2·3 + (−1)·2 = 4. Row view: 2·[1,3] − [4,2] = [−2,4].",
+      "result": "[−2, 4]; matches the text."
+    },
+    {
+      "topicId": "01-01",
+      "calculation": "Frobenius: diag(4,0) → √16 = 4; diag(√8,√8) → √(8+8) = 4. Spectral: 4 versus √8 ≈ 2.828. Exercise diag(3,4): Frobenius √(9+16) = 5, spectral = max|σ| = 4, attained by [0,1]W = [0,4].",
+      "result": "All values match."
+    },
+    {
+      "topicId": "01-02",
+      "calculation": "[2,5,12]@[12,8] → [2,5,8]; Q[2,5,8]@Kᵀ[2,8,5] → [2,5,5]. pred [[10],[20]] − target [10,20]: row0 = [0,−10], row1 = [10,0]. [16,1] op [16] → [16,16].",
+      "result": "Shapes and values match under predictions − targets. See the finding about subtraction direction."
+    },
+    {
+      "topicId": "01-03",
+      "calculation": "A=[[1,10],[0,1]]: triangular, so eigenvalues 1,1. A[0,1]ᵀ = [10,1]ᵀ, norm √(100+1) = √101 ≈ 10.05. Spectrum [5,2,0]: rank = 2; rank-1 Frobenius error = √(2²+0²) = 2, squared error 4. Ratio 2/0.001 = 2000.",
+      "result": "All values match."
+    },
+    {
+      "topicId": "01-03",
+      "calculation": "Row-vector SVD: W = UΣVᵀ ⇒ uᵢᵀW = (uᵢᵀU)ΣVᵀ = eᵢᵀΣVᵀ = σᵢvᵢᵀ. Column form: Avᵢ = UΣ(Vᵀvᵢ) = σᵢuᵢ.",
+      "result": "Both conventions are stated correctly."
+    },
+    {
+      "topicId": "01-04",
+      "calculation": "f(w) = (3w−1)², f′ = 2·3·(3w−1) = 6(3w−1), at w=1: 6·2 = 12. y = ab + a²: ∂y/∂a = b + 2a = 3 + 4 = 7; ∂y/∂b = a = 2.",
+      "result": "12, 7 and 2 match."
+    },
+    {
+      "topicId": "01-05",
+      "calculation": "L = 5w², ∇ = 10w, update factor 1 − 10η. η=0.1: w = 1 − 1 = 0, L = 0. η=0.3: w = 1 − 3 = −2, L = 5·4 = 20. Stability |1 − 10η| < 1 ⇔ 0 < η < 0.2. General aw²/2: |1 − ηa| < 1 ⇔ 0 < ηa < 2.",
+      "result": "All values match."
+    },
+    {
+      "topicId": "01-06",
+      "calculation": "P(T)=0.1, P(k|T)=0.8, P(k|¬T)=0.2. Joint cells: 0.08, 0.02, 0.18, 0.72 (sum 1). Posterior = 0.08/(0.08+0.18) = 0.3077. With prior 0.5: 0.4/(0.4+0.1) = 0.8.",
+      "result": "≈0.308 and 0.8 match."
+    },
+    {
+      "topicId": "01-06",
+      "calculation": "X ~ Bernoulli(0.25): E[X] = E[X²] = 0.25, Var = 0.25 − 0.0625 = 0.1875. Y = 4X: E = 1, Var = 16·0.1875 = 3.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "01-08",
+      "calculation": "d/dp[7 ln p + 3 ln(1−p)] = 7/p − 3/(1−p) = 0 ⇒ 7(1−p) = 3p ⇒ p = 0.7. NLL of a failure = −ln 0.3 = 1.20397 nats.",
+      "result": "p = 0.7 and ≈1.204 nats match."
+    },
+    {
+      "topicId": "01-09",
+      "calculation": "p = q = [0.5,0.5]: H = H(p,q) = ln 2 = 0.6931, KL = 0. q = [0.9,0.1]: H(p,q) = −0.5(ln 0.9 + ln 0.1) = 0.5(0.10536 + 2.30259) = 1.20397. KL = 1.20397 − 0.69315 = 0.51083.",
+      "result": "≈1.204 and ≈0.511 nats match."
+    },
+    {
+      "topicId": "01-10",
+      "calculation": "Step 1: m₁ = (1−β₁)g, m̂₁ = g; v₁ = (1−β₂)g², v̂₁ = g². Update = η·g/(|g|+ε) ≈ η·sign(g) when |g| ≫ ε.",
+      "result": "Matches the source-reading claim."
+    },
+    {
+      "topicId": "02-04",
+      "calculation": "x = arange(24).reshape(2,3,4), y = x.permute(0,2,1) has shape (2,4,3). y[0,0] = x[0,:,0] = [0,4,8], i.e. feature 0 across 3 positions. Exercise: [2,5,24] → reshape [2,5,3,8] → permute(0,2,1,3) → [2,3,5,8].",
+      "result": "Matches the code comment and the exercise."
+    },
+    {
+      "topicId": "02-05",
+      "calculation": "[4,2,7,8]@[4,2,8,9] → [4,2,7,9]. Scale [8] aligns with the last axis (8), so it is valid; scale [2] against 8 is incompatible. [3,5,4]@[1,4,6]: batch 3 vs 1 broadcasts to 3, inner 4 = 4 → [3,5,6]. Per-example scale [3,1,1].",
+      "result": "Matches."
+    },
+    {
+      "topicId": "02-06",
+      "calculation": "y = x² + 3x, dy/dx = 2x + 3 = 7 at x = 2. Accumulation: 3 + 5 = 8.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "02-08",
+      "calculation": "Lengths [2,4,3]: 3·4 = 12 slots, 2+4+3 = 9 real, 12 − 9 = 3 padding. Lengths [3,5,2] padded to 5 → [3,5].",
+      "result": "Matches."
+    },
+    {
+      "topicId": "02-12",
+      "calculation": "Gradient scaled by S = 1024 with clip threshold 1 applied before unscaling. Scaled norm = 1024·‖g‖. If 1024‖g‖ > 1, it is clipped to norm 1, then unscaled to 1/1024. The effective true-gradient threshold is therefore 1/1024 instead of 1.",
+      "result": "Consistent with the stated answer."
+    },
+    {
+      "topicId": "02-14",
+      "calculation": "32·1000 = 32,000 examples; 128·1000 = 128,000 examples (full batches).",
+      "result": "Matches."
+    },
+    {
+      "topicId": "03-01",
+      "calculation": "4·8 + 8 + 8·3 + 3 = 32 + 8 + 24 + 3 = 67. Without the activation: (xW₁ + b₁)W₂ + b₂ = x(W₁W₂) + (b₁W₂ + b₂).",
+      "result": "67 and the effective affine form match."
+    },
+    {
+      "topicId": "03-02",
+      "calculation": "Y = HW₂ + b₂ ⇒ ∂L/∂W₂ = HᵀG [D_h×B][B×D_out], ∂L/∂H = GW₂ᵀ, ∂L/∂Z = (GW₂ᵀ) ⊙ 1[Z>0], ∂L/∂W₁ = Xᵀ(∂L/∂Z). Shared-weight exercise: y = w(x+z) ⇒ g(x+z).",
+      "result": "Correct."
+    },
+    {
+      "topicId": "03-03",
+      "calculation": "ReLU([−2,0,3]) = [0,0,3]; left slope 0, right slope 1 at 0, so the derivative is undefined; subgradient 0 is common.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "03-04",
+      "calculation": "softmax − onehot = [0.1,0.7,0.2] − [0,0,1] = [0.1,0.7,−0.8]; sum = 0.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "03-05",
+      "calculation": "Kaiming fan_in = 100: Var = 2/100 = 0.02, sd = √0.02 = 0.14142. For symmetric zero-mean z, E[ReLU(z)²] = ½E[z²] = Var(z)/2.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "03-06",
+      "calculation": "x = [2,4]: mean 3, centered [−1,1], var 1 ⇒ LN (ε→0, no affine) = [−1,1]. RMS = √((4+16)/2) = √10 ≈ 3.162 ⇒ RMSNorm = [0.632, 1.265].",
+      "result": "Matches."
+    },
+    {
+      "topicId": "03-07",
+      "calculation": "1×1 conv, stride 2, padding 0 on 32: floor((32 − 1)/2) + 1 = 15 + 1 = 16; channels 64 → 128 ⇒ [8,128,16,16].",
+      "result": "Matches."
+    },
+    {
+      "topicId": "03-08",
+      "calculation": "p = 0.25, retained value 6/0.75 = 8; E = 0.75·8 + 0.25·0 = 6. Variance = 0.75·64 − 36 = 12 > 0.",
+      "result": "Matches (variance increases as stated)."
+    },
+    {
+      "topicId": "03-09",
+      "calculation": "50,000·768 = 38,400,000 parameters. IDs [4,4,9]: 2 distinct rows, output [3,32].",
+      "result": "Matches."
+    },
+    {
+      "topicId": "03-10",
+      "calculation": "Weights 16·3·3·3 = 432, plus 16 biases = 448. n_out = floor((32 + 2 − 1·2 − 1)/2 + 1) = floor(15.5 + 1) = 16.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "03-12",
+      "calculation": "‖[3,4]‖ = 5, scale 2/5 = 0.4 ⇒ [1.2,1.6] with norm 2. Elementwise clip to [−2,2] ⇒ [2,2], direction 45° vs atan(4/3) ≈ 53.1°.",
+      "result": "Matches; the directions differ."
+    },
+    {
+      "topicId": "04-02",
+      "calculation": "Q[6,8]·Kᵀ[8,10] = [6,10]; weights[6,10]·V[10,12] = [6,12].",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-03",
+      "calculation": "Q = K = I ⇒ QKᵀ = I. Row 1 scaled [1/√2, 0] = [0.70711, 0]. e^0.70711 = 2·e^0.013960 ≈ 2.028115. Sum = 3.028115. Weights ≈ [0.669762, 0.330238]. Output = [2·0.669762, 4·0.330238] = [1.339523, 1.320954]. Row 2: weights swapped ⇒ [0.660477, 2.679046]. Causal row 1 ⇒ [1,0] ⇒ [2,0].",
+      "result": "Matches the stated values to about 1e−8 (limited by hand precision)."
+    },
+    {
+      "topicId": "04-04",
+      "calculation": "Scores [5,196] and [8,120]; output lengths 5 and 8 follow the number of queries.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-05",
+      "calculation": "96/4 = 24; 128/4 = 32; 128/8 = 16. Concatenation always gives H·d_head = 128.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-06",
+      "calculation": "Causal i = 2 ⇒ keys {0,1,2}; removing padded key 1 ⇒ {0,2}. SDPA upper-left mask for L=1, S>1: tril(ones(1,S)) keeps only column 0.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-09",
+      "calculation": "R₀[1,0] = [1,0], R₉₀[1,0] = [0,1], dot = 0. Both rotated 90°: [0,1]·[0,1] = 1. R_mᵀR_n = R_{−m}R_n = R_{n−m}.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-11",
+      "calculation": "2·256·1024 = 524,288. 64·256 + 256 + 256·64 + 64 = 16,384 + 256 + 16,384 + 64 = 33,088.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-12",
+      "calculation": "2D·1536 = 3D·F ⇒ F = 3072/3 = 1024; both give 3072D weights.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-13",
+      "calculation": "Cache ∝ H_kv: 8/32 = 0.25.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-14",
+      "calculation": "2(K,V)·2 layers·1·100·4·8 = 12,800 elements; ×2 bytes = 25,600 bytes; linear in T.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-15",
+      "calculation": "A: 0.2 + (N−1)/20; B: 1 + (N−1)/50. Equal when (N−1)(0.05 − 0.02) = 0.8 ⇒ N − 1 = 26.67 ⇒ N ≈ 27.67. N=27: A 1.50 s, B 1.52 s. N=28: A 1.55 s, B 1.54 s.",
+      "result": "The crossover between 27 and 28 tokens matches."
+    },
+    {
+      "topicId": "04-16",
+      "calculation": "Doubling T ⇒ T² pairs grow by 4×. Running-max update m → m′ rescales old sums by exp(m − m′) ≤ 1.",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-17",
+      "calculation": "2·8·1024² = 16,777,216 elements × 2 bytes = 33,554,432 B = 32 MiB (a single 1024² FP16 matrix is 2 MiB). 512 → 2048 is 4×: pairwise 16×, projections 4×, KV cache 4×.",
+      "result": "Values match; see the wording finding."
+    },
+    {
+      "topicId": "04-18",
+      "calculation": "Code trace: qkv gives [B,T,3W], chunked to three [B,T,W]; scores [B,T,T] scaled by 1/√W (single head, so d_k = W). triu(diagonal=1) marks j > i as masked; softmax over the last axis; out(W→W); FFN W → 4W → W; two residual additions. Zeroing the out and last-FFN weights and biases yields the identity map.",
+      "result": "Code implements the described single-head pre-norm causal block; no defect found."
+    }
+  ],
+  "overallAssessment": "All 55 articles and 29 reading notes were reviewed. Every worked numerical example and exercise answer was recomputed by hand, and each agrees with the text. The checks covered Bayes posteriors, entropy and KL values, the Adam bias correction, initialization variances, convolution and parameter counts, the scaled-attention example, KV-cache byte counts, the prefill/decode crossover, and attention-memory figures. Sign and dimension conventions for row- versus column-vector SVD, backprop matrix gradients, the RoPE relative-angle identity, the clipping geometry, and the AMP unscale-before-clip ordering are stated correctly. Code snippets behave as described, including RunningMean, the permute example, the Affine module, the training loop, and TinyBlock. The new source-reading sections mostly add correctly scoped caveats, and their paper attributions are plausible as far as I can recall: inverse-sqrt rather than cosine decay in the original Transformer, test-time weight scaling in the original dropout paper, post-LN in the original Transformer, and SDPA dropout ignoring module eval mode. All paper-note titles, first authors, years and arXiv identifiers match my recollection. I found no high- or medium-severity definite errors. The findings are low-severity: one subtraction-direction inconsistency (01-02), a reference that does not cover the article's backprop mechanism (01-04), loose 'one matrix' wording for a B·H tensor (04-17), a forward-pointing prerequisite (04-13), an incomplete Adam convergence caveat, an unattributed Chinchilla reference, and an incomplete chapter summary for the Deep Learning book. This assessment does not establish that the content is error-free.",
+  "limitations": "This was a reasoning-only pass with no tools, so no paper, documentation page or URL was opened. All attribution judgments, including chapter contents, paper claims, PyTorch API conventions (SDPA boolean-mask meaning, upper-left causal alignment, dropout_p behavior in eval mode, MultiheadAttention key_padding_mask), and git commit path semantics, rely on memory and should be checked against current primary sources, since API behavior can change between versions. The arXiv ID given for Reddi et al. is from memory and is marked unverified. No code was executed; the code analysis is by manual tracing. Hand arithmetic was carried to roughly 7–8 significant digits. No previous version of the library was supplied, so regressions could not be checked by direct comparison; only internal consistency of the current version was assessed. Content for modules 05–12, referenced by several reading notes, was not supplied, so note-to-article consistency for those modules could not be checked."
+}

@@ -1,0 +1,391 @@
+{
+  "reviewer": "Claude (Opus 5.5), independent technical proofreading pass using reasoning only, with no browsing, paper access, or code execution",
+  "reviewedTopicIds": [
+    "09-01",
+    "09-02",
+    "09-03",
+    "09-04",
+    "09-05",
+    "09-06",
+    "09-07",
+    "09-08",
+    "09-09",
+    "09-10",
+    "09-11",
+    "09-12",
+    "09-13",
+    "09-14",
+    "09-15",
+    "09-16",
+    "09-17",
+    "09-18",
+    "09-19",
+    "09-20",
+    "10-01",
+    "10-02",
+    "10-03",
+    "10-04",
+    "10-05",
+    "10-06",
+    "10-07",
+    "10-08",
+    "10-09",
+    "10-10",
+    "10-11",
+    "10-12",
+    "10-13",
+    "10-14",
+    "11-01",
+    "11-02",
+    "11-03",
+    "11-04",
+    "11-05",
+    "11-06",
+    "11-07",
+    "11-08",
+    "11-09",
+    "11-10",
+    "11-11",
+    "11-12",
+    "11-13",
+    "11-14",
+    "11-15",
+    "11-16",
+    "12-01",
+    "12-02",
+    "12-03",
+    "12-04",
+    "12-05",
+    "12-06",
+    "12-07",
+    "12-08",
+    "12-09",
+    "12-10",
+    "12-11",
+    "12-12",
+    "12-13",
+    "12-14",
+    "12-15",
+    "12-16",
+    "12-17",
+    "12-18"
+  ],
+  "findings": [
+    {
+      "topicId": "09-14",
+      "severity": "low",
+      "confidence": "high",
+      "location": "sections[mechanism].formula and sections[source-reading] paragraphs 1–2",
+      "originalText": "Using one common convention, ε_guided = ε_uncond + w(ε_cond − ε_uncond). ... Some papers and implementations shift the scale by one, so compare equations rather than just numerical labels.",
+      "problem": "This is a clarity concern, not a mathematical error. The only cited source, Classifier-Free Diffusion Guidance, writes guidance (from memory) as ε̃ = (1+w)ε_cond − w ε_uncond. That is the shifted convention, in which w = 0 already gives the plain conditional model. The article's displayed convention is therefore not the one in the paper it tells students to read. The source-reading section warns about convention shifts in general but never says that the cited paper itself uses the other one. A mentee could carry a guidance value from the paper into the article's formula and be off by one.",
+      "suggestedCorrection": "Add a sentence such as: 'Ho and Salimans write ε̃ = (1+w)ε_cond − wε_uncond, so their w equals this article's w − 1. Their w = 0 is the ordinary conditional model, which corresponds to w = 1 here.'",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2207.12598"
+      ]
+    },
+    {
+      "topicId": "09-07",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "sections[intuition], sections[source-reading], references",
+      "originalText": "A β-VAE multiplies the prior KL term by β, changing the balance between reconstruction and latent regularization. ... Read Understanding Disentangling in β-VAE beside Neural Discrete Representation Learning.",
+      "problem": "This is an attribution gap. The β-VAE objective was introduced by Higgins et al. (ICLR 2017, 'β-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework'). The only β-VAE reference given is the follow-up by Burgess et al. (2018), which reinterprets β-VAE through information capacity and proposes capacity control. The claims in the article are consistent with Burgess et al. However, students may come away thinking Burgess et al. defined β-VAE.",
+      "suggestedCorrection": "Add Higgins et al. (2017) as the originating reference for the β-weighted objective. Keep Burgess et al. (2018) for the information-capacity interpretation and the target-capacity variant, and say that it is a follow-up analysis.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://openreview.net/forum?id=Sy2fzU9gl",
+        "https://arxiv.org/abs/1804.03599"
+      ]
+    },
+    {
+      "topicId": "09-09",
+      "severity": "low",
+      "confidence": "high",
+      "location": "references[0] versus sections[source-reading] paragraph 1; also 12-06 references",
+      "originalText": "references: \"Generative Adversarial Networks\" (https://arxiv.org/abs/1406.2661); source-reading: \"In Generative Adversarial Nets, separate the optimal-discriminator distribution analysis...\"",
+      "problem": "The same arXiv identifier appears under two titles: 'Generative Adversarial Networks' here and 'Generative Adversarial Nets' in the 09-09 prose and the 12-06 reference. Both titles exist: the arXiv listing uses 'Networks' and the NeurIPS 2014 proceedings use 'Nets'. The inconsistency can make students think these are two different papers.",
+      "suggestedCorrection": "Pick one citation form for the library, for example 'Goodfellow et al., Generative Adversarial Nets (NeurIPS 2014; arXiv:1406.2661)', and use it in both 09-09 and 12-06.",
+      "verificationNeeded": false,
+      "sourceUrls": [
+        "https://arxiv.org/abs/1406.2661"
+      ]
+    },
+    {
+      "topicId": "10-13",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "sections[source-reading] paragraph 2",
+      "originalText": "Suppose a model answers no to every question. On a dataset dominated by absent objects, raw accuracy can look strong despite detecting nothing.",
+      "problem": "The example is explicitly hypothetical. However, it comes right after a paragraph telling students to read POPE, so they may infer that POPE is skewed toward absent objects. From memory, POPE builds its questions balanced, sampling equal numbers of ground-truth and nonexistent objects per image. On POPE, an always-'no' policy would therefore score about 50% accuracy, not 'strong'. The general lesson is correct; only the implied link to POPE could mislead.",
+      "suggestedCorrection": "Add a clause such as: 'POPE itself balances present and absent queries, so this shortcut is mainly a risk for unbalanced probes. Still report precision, recall, and the yes-ratio, because balance alone does not reveal response bias.'",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2305.10355"
+      ]
+    },
+    {
+      "topicId": "10-06",
+      "severity": "low",
+      "confidence": "low",
+      "location": "references (PyTorch Autograd Mechanics URL); same pattern in 11-01, 11-03, 11-04, 11-13, 11-14, 11-15",
+      "originalText": "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+      "problem": "Several PyTorch references are pinned to documentation version '2.14'. I cannot confirm that this version exists or is published at these paths. If it does not, every one of these links breaks. Pinning a version is good practice for reproducibility, but it has to be a real release.",
+      "suggestedCorrection": "Check each pinned URL (profiler, autograd notes, checkpoint, DDP notes, FSDP, tensor parallel). If 2.14 is not published, use an existing release or '/docs/stable/' and record the access date.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+        "https://docs.pytorch.org/docs/2.14/profiler.html",
+        "https://docs.pytorch.org/docs/2.14/checkpoint.html",
+        "https://docs.pytorch.org/docs/2.14/notes/ddp.html",
+        "https://docs.pytorch.org/docs/2.14/fsdp.html",
+        "https://docs.pytorch.org/docs/2.14/distributed.tensor.parallel.html"
+      ]
+    }
+  ],
+  "numericalChecks": [
+    {
+      "topicId": "09-01",
+      "calculation": "Coordinate ratio 784/16. File-size comparison if the original image uses 8-bit pixels: 784×1 B versus 16×4 B.",
+      "result": "784/16 = 49, so the article's 49-fold coordinate reduction is correct. With 8-bit pixels, 784 B / 64 B = 12.25× in raw bytes. The 49× figure would hold only if the original pixels were also stored as FP32 (3136 B). This supports the article's answer that 49× in coordinates is not 49× in file size."
+    },
+    {
+      "topicId": "09-01",
+      "calculation": "Mechanism example: 784 inputs to 32 latents.",
+      "result": "784/32 = 24.5× fewer coordinates. This is consistent with the text, which does not claim a storage figure."
+    },
+    {
+      "topicId": "09-03",
+      "calculation": "Gap = log p(x) − ELBO = −20 − (−23). Source-reading example: ELBO rises from −25 to −22 with fixed evidence.",
+      "result": "Gap = 3 nats. With fixed evidence, a rise of 3 in the ELBO means the KL(q||p(z|x)) gap fell by 3 nats. Both statements are correct."
+    },
+    {
+      "topicId": "09-04",
+      "calculation": "KL = ½(μ² + σ² − ln σ² − 1). Case μ=1, σ²=1. Case μ=0, σ²=4.",
+      "result": "Case 1: ½(1 + 1 − 0 − 1) = 0.5 nats. Case 2: ln 4 = 1.3863, so ½(4 − 1.3863 − 1) = ½(1.6137) = 0.8069 ≈ 0.807 nats. Both match the article."
+    },
+    {
+      "topicId": "09-04",
+      "calculation": "Residuals 1 and 2: squared sum and mean.",
+      "result": "1 + 4 = 5; mean = 2.5. Matches the article."
+    },
+    {
+      "topicId": "09-05",
+      "calculation": "Practice: μ=2, σ=3, ε=−0.5, L=z².",
+      "result": "z = 2 + 3(−0.5) = 0.5. ∂L/∂μ = 2z·1 = 1. ∂L/∂σ = 2z·ε = 2(0.5)(−0.5) = −0.5. Matches."
+    },
+    {
+      "topicId": "09-05",
+      "calculation": "Source reading: ∂z/∂ℓ = ε·exp(ℓ/2)/2 at ℓ=0, ε=2. Exercise: μ=1, σ=2, ε=1, L=z².",
+      "result": "2·1/2 = 1, which matches. Exercise: z = 3, ∂L/∂μ = 6, ∂L/∂σ = 2·3·1 = 6. Matches."
+    },
+    {
+      "topicId": "09-07",
+      "calculation": "Fixed-length index bits for a 256-entry codebook.",
+      "result": "log₂ 256 = 8 bits. Matches."
+    },
+    {
+      "topicId": "09-08",
+      "calculation": "64×64 grid with 256 codes per location; ideal code length for p = 1/8; four equiprobable codes.",
+      "result": "4096 × 8 = 32,768 bits = 4096 bytes. −log₂(1/8) = 3 bits. Four equiprobable codes have entropy log₂ 4 = 2 bits, so a fixed 2-bit code is optimal, as stated."
+    },
+    {
+      "topicId": "09-10",
+      "calculation": "ᾱ = 0.64: √ᾱ and √(1−ᾱ). Two steps with α = 0.8 each. Exercise ᾱ = 0.25.",
+      "result": "√0.64 = 0.8 and √0.36 = 0.6. Two steps: ᾱ = 0.8×0.8 = 0.64, so the clean coefficient is 0.8, not 0.64. Exercise: √0.25 = 0.5 and √0.75 ≈ 0.8660. All match."
+    },
+    {
+      "topicId": "09-12",
+      "calculation": "SNR = ᾱ/(1−ᾱ) at 0.9 and 0.1. Data variance 4 at ᾱ = 0.5. Solve SNR = 1.",
+      "result": "0.9/0.1 = 9 and 0.1/0.9 = 1/9. Signal variance 0.5×4 = 2 against noise variance 0.5 gives an actual ratio of 4, while the conventional SNR stays 1. ᾱ/(1−ᾱ) = 1 gives ᾱ = 0.5. All match."
+    },
+    {
+      "topicId": "09-13",
+      "calculation": "a=0.8, s=0.6, x₀=2, ε=−1: compute x_t and v, then invert. Exercise a=0.6, s=0.8, x_t=1, v=0.5.",
+      "result": "x_t = 1.6 − 0.6 = 1.0. v = 0.8(−1) − 0.6(2) = −2. Inverse: x₀ = 0.8(1) − 0.6(−2) = 2 and ε = 0.6(1) + 0.8(−2) = −1, so both are recovered. Exercise: x̂₀ = 0.6 − 0.4 = 0.2 and ε̂ = 0.8 + 0.3 = 1.1. Consistency check: 0.6(0.2) + 0.8(1.1) = 1.0 = x_t, and a² + s² = 1. The algebraic inverse x₀ = a x_t − s v, ε = s x_t + a v is verified symbolically using a² + s² = 1."
+    },
+    {
+      "topicId": "09-14",
+      "calculation": "u = 2, c = 1, w = 3. Convention identity u + w(c−u) versus c + s(c−u).",
+      "result": "2 + 3(1 − 2) = −1. Matches. c + s(c−u) = u + (1+s)(c−u), so w = 1 + s. Matches."
+    },
+    {
+      "topicId": "09-15",
+      "calculation": "512² image with f = 8. 768×512 image with f = 8.",
+      "result": "64×64 = 4096 latent positions; 262,144/4096 = 64× fewer. 96×64 = 6144 positions. Both match."
+    },
+    {
+      "topicId": "09-16",
+      "calculation": "Score −(x−μ)/σ² at x=5, μ=1, σ²=4.",
+      "result": "−4/4 = −1. Matches."
+    },
+    {
+      "topicId": "09-17",
+      "calculation": "Brownian increment std for h = 0.04 and h = 0.01. Variance added by σ√h ε versus σhε.",
+      "result": "√0.04 = 0.2 and √0.01 = 0.1, so the std halves. Matches. The variances are σ²h and σ²h²; the second vanishes too fast as h → 0, as the article says."
+    },
+    {
+      "topicId": "09-18",
+      "calculation": "z=0, x=4, t=0.25. Exercise z=[0,2], x=[4,0], t=0.5.",
+      "result": "x_t = 0.75·0 + 0.25·4 = 1 and the velocity is 4. Exercise: x_t = [2,1] and x − z = [4,−2]. Both match."
+    },
+    {
+      "topicId": "09-19",
+      "calculation": "dx/dt = x, x₀ = 1, h = 0.5 with Euler and Heun. dx/dt = 2x with h = 0.1.",
+      "result": "Euler: 1 + 0.5 = 1.5. Heun: 1 + 0.25(1 + 1.5) = 1.625. Exact e^0.5 = 1.64872, so the errors are 0.149 (Euler) and 0.024 (Heun). Second case: 1 + 0.1·2 = 1.2 versus e^0.2 = 1.22140. All match."
+    },
+    {
+      "topicId": "10-02",
+      "calculation": "196 visual tokens + 32 text tokens. Tokenwise projection 768→2048 weight size. Exercise [2,256,1024] → width 4096.",
+      "result": "228 positions. Weight matrix 768×2048 = 1,572,864 parameters plus 2048 bias. Output shape [2,256,4096]. All match."
+    },
+    {
+      "topicId": "10-03",
+      "calculation": "64 visual positions + 20 text positions.",
+      "result": "84 positions. Matches."
+    },
+    {
+      "topicId": "10-08",
+      "calculation": "224² and 448² images with P = 16. Doubling effect on dense pairs.",
+      "result": "14² = 196 and 28² = 784 patches, a ratio of 4. Pairwise interactions grow by 784²/196² = 16. Matches."
+    },
+    {
+      "topicId": "10-09",
+      "calculation": "2×2 merge of a 24×16 grid and of a 20×30 grid.",
+      "result": "384 → 12×8 = 96 and 600 → 10×15 = 150. Both match."
+    },
+    {
+      "topicId": "10-11",
+      "calculation": "CER with S=1, D=1, I=0, N=5.",
+      "result": "2/5 = 0.4. Matches."
+    },
+    {
+      "topicId": "10-12",
+      "calculation": "8 frames × 196 tokens.",
+      "result": "1568 positions. Matches."
+    },
+    {
+      "topicId": "11-01",
+      "calculation": "[32,128]×[128,64] MACs and FLOPs. Throughput for 8 requests in 40 ms.",
+      "result": "32·128·64 = 262,144 MACs = 524,288 FLOPs under the 2-FLOP/MAC convention. Throughput 8/0.04 = 200 requests/s. Matches."
+    },
+    {
+      "topicId": "11-02",
+      "calculation": "Total and active parameters for both examples.",
+      "result": "100M + 8×50M = 500M total; 100M + 2×50M = 200M active under top-2. 30M + 6×20M = 150M total; 30M + 20M = 50M active under top-1. Matches."
+    },
+    {
+      "topicId": "11-03",
+      "calculation": "16 B × 1e8 parameters, expressed in GiB.",
+      "result": "1.6e9 B / 1,073,741,824 = 1.490 GiB. Matches."
+    },
+    {
+      "topicId": "11-04",
+      "calculation": "2×L×B×S×Hkv×dh×b with L=2, B=1, S=100, Hkv=4, dh=8, b=2. Effect of Hkv 32→8.",
+      "result": "2·2·1·100·4·8·2 = 25,600 bytes. Reducing Hkv from 32 to 8 gives a 4× reduction in raw KV bytes. Matches."
+    },
+    {
+      "topicId": "11-05",
+      "calculation": "s=0.1, x=0.26. Exercise s=0.25, x=0.6, z=0.",
+      "result": "0.26/0.1 = 2.6 → q = 3 → x̂ = 0.3 (error +0.04). 0.6/0.25 = 2.4 → q = 2 → x̂ = 0.5 (error −0.1). Matches."
+    },
+    {
+      "topicId": "11-07",
+      "calculation": "Softmax of logits [2,0] at T=1 and T=2. High-T gradient of the T²-scaled loss.",
+      "result": "e²/(e²+1) = 7.389/8.389 = 0.8808. e/(e+1) = 2.718/3.718 = 0.7311. For the gradient, softmax(z/T)_i ≈ 1/K + (z_i − z̄)/(KT), and ∂CE/∂z_i = (q_i − p_i)/T ≈ (z_i − v_i)/(K T²) for centered logits. Multiplying by T² gives (z_i − v_i)/K, matching the article and Hinton et al.'s 1/(N T²) result."
+    },
+    {
+      "topicId": "11-08",
+      "calculation": "Remove 16 output neurons from a 64×128 layer.",
+      "result": "Shape becomes [48,128], removing 25% of that matrix's weights. The next layer's input width must drop to 48. Matches."
+    },
+    {
+      "topicId": "11-09",
+      "calculation": "196 → 98 tokens: pairwise ratio. Weighted merge of feature 0 (9 patches) and feature 10 (1 patch).",
+      "result": "(196/98)² = 4. Weighted mean (9·0 + 1·10)/10 = 1; unweighted mean 5. Matches."
+    },
+    {
+      "topicId": "11-12",
+      "calculation": "Online-softmax rescale when the running max moves from 2 to 5. Doubling N for dense attention.",
+      "result": "Factor exp(2−5) = e^−3 ≈ 0.0498, applied to both the running sum and the value accumulator. Pairwise work grows by 2² = 4. Matches."
+    },
+    {
+      "topicId": "11-13",
+      "calculation": "Token-weighted combination of microbatches with 10 and 30 valid tokens. Omitting the 1/K factor with K = 4.",
+      "result": "Weights 10/40 = 0.25 and 30/40 = 0.75. Matches. Omitting 1/K gives 4× the mean gradient; under SGD the step is 4× larger. Under Adam, a constant c>0 scaling gives m→c·m and √v→c·√v, so the update ratio is unchanged up to ε. This supports the article's caveat."
+    },
+    {
+      "topicId": "11-15",
+      "calculation": "Serial 40+50+10 ms with compute halved. Serial versus overlapped 40/50 ms. Amdahl bound for 20%.",
+      "result": "40 + 25 + 10 = 75 ms. Serial 90 ms; ideal overlap max(40,50) = 50 ms. Maximum speedup 1/(1−0.2) = 1.25×. All match."
+    },
+    {
+      "topicId": "11-16",
+      "calculation": "Pareto dominance for A(90,20), B(91,25), C(89,22), D(92,18).",
+      "result": "A beats C on both axes (90>89, 20<22). A and B trade off (B is more accurate, A is faster), so neither dominates. D has 92 ≥ all accuracies and 18 ≤ all latencies, so it dominates A, B and C. Matches. Under the <23 ms constraint, C is also feasible but dominated; the text only names A and B, which is not wrong."
+    },
+    {
+      "topicId": "12-05",
+      "calculation": "KL(p||q) and KL(q||p) for p=(0.5,0.5), q=(0.9,0.1). Exercise p=(1,0), q=(0.5,0.5).",
+      "result": "KL(p||q) = 0.5 ln(0.5556) + 0.5 ln 5 = −0.2939 + 0.8047 = 0.5108 nats. KL(q||p) = 0.9 ln 1.8 + 0.1 ln 0.2 = 0.5290 − 0.1609 = 0.3681 nats. Exercise: KL(p||q) = ln 2 = 0.6931 and KL(q||p) = ∞. All match."
+    },
+    {
+      "topicId": "12-06",
+      "calculation": "JS for p=(1,0), q=(0,1) in bits.",
+      "result": "m = (0.5,0.5). KL(p||m) = 1·log₂(1/0.5) = 1 bit, and likewise for q, so JS = ½(1+1) = 1 bit. In nats this is ln 2. Matches."
+    },
+    {
+      "topicId": "12-07",
+      "calculation": "σ(2) and the effect of a constant shift.",
+      "result": "1/(1+e^−2) = 1/1.1353 = 0.8808. A shift cancels in rA − rB. Matches."
+    },
+    {
+      "topicId": "12-08",
+      "calculation": "Return for rewards [0,0,1] with γ = 0.9.",
+      "result": "0 + 0 + 0.9²·1 = 0.81. Matches."
+    },
+    {
+      "topicId": "12-09",
+      "calculation": "Bernoulli score (a−p)R at p=0.5, plus the expected gradient.",
+      "result": "Sample with a=1: 1·(1−0.5) = 0.5. Expectation: 0.5·0.5 + 0.5·0 = 0.25 = p(1−p). Matches."
+    },
+    {
+      "topicId": "12-10",
+      "calculation": "Advantage 5 − 3.",
+      "result": "2. Matches."
+    },
+    {
+      "topicId": "12-11",
+      "calculation": "PPO with A=2, r=1.4, ε=0.2. Exercise A=−2, r=0.5.",
+      "result": "First case: unclipped 2.8, clipped 1.2×2 = 2.4, min = 2.4. Exercise: unclipped −1, clipped 0.8×(−2) = −1.6, min = −1.6. The clipped branch is constant in r there, so the gradient is zero, as the article states."
+    },
+    {
+      "topicId": "12-12",
+      "calculation": "Group [1,3,5]: centering, normalization and RLOO. Group [0,0,1,1]: RLOO for a reward of 1. Check the k/(k−1) identity.",
+      "result": "Mean 3 → centered [−2,0,2]. Population std √(8/3) = 1.633 gives ≈ [−1.225,0,1.225]; sample std 2 gives [−1,0,1], which shows why the convention must be declared. RLOO for reward 1: 1 − 4 = −3 = (3/2)(−2). [0,0,1,1]: 1 − 1/3 = 2/3 = (4/3)(0.5); the full-mean residual is 0.5. All match the identity (k r_i − S)/(k−1) = k/(k−1)·(r_i − S/k)."
+    },
+    {
+      "topicId": "12-13",
+      "calculation": "DPO loss at initialization. Margin change when only the preferred response doubles in probability.",
+      "result": "−log σ(0) = ln 2 = 0.6931. Matches. The margin increases by β(ln 2 − 0) = β ln 2. Matches."
+    },
+    {
+      "topicId": "12-17",
+      "calculation": "Two-step trajectory importance weight with per-step ratios 2 and 3.",
+      "result": "2×3 = 6, not the mean 2.5. Matches."
+    },
+    {
+      "topicId": "12-18",
+      "calculation": "Rewards [2,0,5] after actions 1–3 with γ = 1.",
+      "result": "Full return 7 for every action. Reward-to-go: 2+0+5 = 7, 0+5 = 5, and 5. Matches [7,5,5]."
+    }
+  ],
+  "overallAssessment": "I reviewed all 68 articles. Every worked numerical example, exercise answer and source-reading calculation I recomputed matched the stated result; 45 checks are listed above. Formula signs, argument orders and dimensions were consistent throughout. This includes the ELBO and its gap KL, the Gaussian KL, reparameterization derivatives, DDPM marginals and SNR, the v-parameterization and its inverse, the CFG convention shift, Euler–Maruyama √h scaling, flow-matching targets, Heun steps, KV-cache sizing, affine quantization, the T² distillation scaling and its high-temperature limit, forward versus reverse KL, JS bounds, Bradley–Terry shift invariance, REINFORCE and baseline unbiasedness, the PPO clipping branches, the RLOO/GRPO identities, the DPO margin, trajectory importance ratios and reward-to-go. The new source-reading sections agree with the main sections and add correct, assumption-stated examples. I found no regressions or internal contradictions against the rest of each article. I found no high- or medium-severity definite errors. The five findings are all low severity: one paper-convention clarity issue (09-14), one attribution gap (09-07), one citation-title inconsistency (09-09/12-06), one potentially misleading juxtaposition with POPE's balanced design (10-13), and unverified version-pinned PyTorch documentation URLs. Several references use abbreviated titles (for example 'LLM.int8()', 'BLIP-2', 'H₂O: Heavy-Hitter Oracle'); this is a bibliographic completeness point, not a correctness issue. Hedging about guarantees is generally careful and well stated. This review does not establish that the content is error-free.",
+  "limitations": [
+    "No tool, web, paper or code access was used. Statements about what specific papers contain (for example the CFG equation form, POPE's balanced sampling, Qwen2.5-VL's merger and MRoPE details, KIVI's per-channel keys and per-token values, and the gold reward model in Gao et al.) are from memory and need primary-source confirmation.",
+    "No previous version of the articles was supplied. Regressions could only be checked as internal consistency within and across the supplied articles, not by comparing against an earlier revision.",
+    "Reference URLs were checked only for plausibility. The arXiv identifiers appear correct from memory, but these were not fetched: the version-pinned PyTorch '2.14' URLs, the St Andrews repository PDF for Endres & Schindelin, the Stanford EE364a slides URL, and the Spinning Up GitHub .rst path.",
+    "The articles describe code behavior in prose only, and none was executed. Statements about PyTorch semantics (requires_grad, no_grad, eval mode, checkpoint RNG handling, prune.remove) were judged against my understanding of documented behavior.",
+    "All 68 articles were reviewed in full. A single reasoning pass can still miss subtle issues, especially in qualitative claims about model-family internals that change between releases."
+  ]
+}

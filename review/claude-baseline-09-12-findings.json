@@ -1,0 +1,486 @@
+{
+  "reviewer": "Claude (claude-opus-5-5), independent technical proofreading pass. No tools, browsing, or code execution were used.",
+  "reviewedTopicIds": [
+    "09-01",
+    "09-02",
+    "09-03",
+    "09-04",
+    "09-05",
+    "09-06",
+    "09-07",
+    "09-08",
+    "09-09",
+    "09-10",
+    "09-11",
+    "09-12",
+    "09-13",
+    "09-14",
+    "09-15",
+    "09-16",
+    "09-17",
+    "09-18",
+    "09-19",
+    "09-20",
+    "10-01",
+    "10-02",
+    "10-03",
+    "10-04",
+    "10-05",
+    "10-06",
+    "10-07",
+    "10-08",
+    "10-09",
+    "10-10",
+    "10-11",
+    "10-12",
+    "10-13",
+    "10-14",
+    "11-01",
+    "11-02",
+    "11-03",
+    "11-04",
+    "11-05",
+    "11-06",
+    "11-07",
+    "11-08",
+    "11-09",
+    "11-10",
+    "11-11",
+    "11-12",
+    "11-13",
+    "11-14",
+    "11-15",
+    "11-16",
+    "12-01",
+    "12-02",
+    "12-03",
+    "12-04",
+    "12-05",
+    "12-06",
+    "12-07",
+    "12-08",
+    "12-09",
+    "12-10",
+    "12-11",
+    "12-12",
+    "12-13",
+    "12-14",
+    "12-15",
+    "12-16",
+    "12-17",
+    "12-18"
+  ],
+  "findings": [
+    {
+      "topicId": "11-16",
+      "severity": "medium",
+      "confidence": "high",
+      "location": "exercise.prompt / exercise.answer",
+      "originalText": "D has 92% accuracy, 18 ms latency, and the same memory as A and B above. Which points remain nondominated? ... D dominates both A and B on accuracy and latency, and also dominates C. Under these three measurements and equal memory, D is the only nondominated point among the four.",
+      "problem": "The prompt makes memory a third objective but gives memory values only for A, B and D. C's memory is never specified. If C used less memory than D, then C would not be dominated: it is worse on accuracy and latency but better on memory. So the stated answer depends on an assumption the prompt does not make. A careful student could correctly reach a different answer.",
+      "suggestedCorrection": "Change the prompt to: 'D has 92% accuracy, 18 ms latency, and all four configurations use the same peak memory.' Alternatively, give C an explicit memory value and answer accordingly.",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "11-13",
+      "severity": "low",
+      "confidence": "high",
+      "location": "exercise.answer",
+      "originalText": "The accumulated gradient is four times the intended combined-batch mean gradient. This changes the effective update and interacts with clipping, optimizer state, and regularization; it is not merely a logging difference.",
+      "problem": "The first sentence is correct. The second overstates the effect for adaptive optimizers. With plain SGD, a 4× gradient acts like a 4× learning rate. With Adam/AdamW, a uniform 4× gradient scale largely cancels in m/√v, apart from the ε term. In that case the update changes materially mainly through gradient-norm clipping thresholds and coupled L2 penalties added to the gradient. Decoupled AdamW weight decay is unaffected. Students may wrongly expect a 4× step size under Adam.",
+      "suggestedCorrection": "Add: 'The consequence is optimizer-dependent. Under SGD it acts like a 4× learning rate. Under Adam-style optimizers the scale largely cancels except through ε, clipping thresholds, and coupled L2 terms. Either way, the objective being optimized no longer matches the intended normalization.'",
+      "verificationNeeded": false,
+      "sourceUrls": [
+        "https://arxiv.org/abs/1412.6980"
+      ]
+    },
+    {
+      "topicId": "12-17",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "mechanism, paragraph 1",
+      "originalText": "Full trajectories can require products of ratios and additional treatment of state-distribution differences, making variance severe.",
+      "problem": "Trajectory-wise importance sampling with the product of per-step action ratios already corrects for the induced state distribution, because the transition probabilities cancel. No separate state-distribution correction is needed in that estimator. Methods that avoid the full product, such as one-step or stationary-distribution approaches, are the ones that need explicit state-distribution corrections or extra assumptions. As written, 'and' implies both are needed together.",
+      "suggestedCorrection": "Rewrite as: 'Full trajectories require either products of per-step ratios, whose variance can grow severely with horizon, or, if those products are avoided, explicit corrections or assumptions about state-distribution differences.'",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "11-12",
+      "severity": "low",
+      "confidence": "high",
+      "location": "practice, final sentence",
+      "originalText": "A faster attention kernel cannot accelerate input preprocessing or FFNs beyond the fraction of time they leave available.",
+      "problem": "The sentence is logically garbled. An attention kernel does not accelerate preprocessing or FFNs at all. The intended Amdahl-style point is that the end-to-end speedup is bounded by the fraction of runtime spent in attention.",
+      "suggestedCorrection": "Rewrite as: 'A faster attention kernel does not speed up preprocessing or FFNs; end-to-end speedup is bounded by the fraction of runtime spent in attention.' Optionally link to the Amdahl example in 11-15.",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "11-05",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "exercise.answer",
+      "originalText": "Different rounding rules only matter at ties in this example's scheme.",
+      "problem": "This holds only among round-to-nearest variants that differ in tie-breaking (half-even vs half-away-from-zero). Other rounding rules used in quantization give different results here even though 2.4 is not a tie. Floor gives q=2, ceiling gives q=3, and stochastic rounding (used in some low-precision and QAT settings) gives 3 with probability 0.4. The phrase 'different rounding rules' invites the broader reading.",
+      "suggestedCorrection": "Rewrite as: 'Using round-to-nearest, the tie-breaking convention matters only at exact ties such as 2.5. Floor, ceiling, or stochastic rounding would give different results.'",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "09-01",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "mechanism.formula",
+      "originalText": "L = mean ‖x − x̂‖²",
+      "problem": "The reduction is ambiguous. It could be a batch mean of the per-example squared norm, which is a sum over 784 pixels. Or it could be a per-pixel mean (the 'mean squared error' named in the paragraph). These differ by a factor of 784. Article 09-04 teaches that this exact choice changes the reconstruction/KL balance, so the formula should be unambiguous.",
+      "suggestedCorrection": "Write the reduction explicitly, e.g. 'L = (1/(N·D)) Σₙ Σ_d (x_{n,d} − x̂_{n,d})² (per-pixel MSE)', or state that the squared norm is summed per example and averaged over the batch.",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "09-04",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "intuition, paragraph 1",
+      "originalText": "binary cross-entropy corresponds to Bernoulli observations.",
+      "problem": "The statement is correct for binary data. However, BCE is very commonly applied to continuous intensities in [0,1], such as normalized grayscale pixels, as in the running example from 09-01. In that case BCE is not a normalized log-likelihood: the Bernoulli mass function is evaluated at non-binary values. The resulting objective is then not a true ELBO. Given the article's thesis that 'reconstruction is a likelihood choice', this caveat is pedagogically relevant.",
+      "suggestedCorrection": "Add: 'Applying BCE to continuous intensities in [0,1] is common in practice but does not define a normalized likelihood. Alternatives include binarizing the data or using a properly normalized distribution such as the continuous Bernoulli.'",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/1907.06845"
+      ]
+    },
+    {
+      "topicId": "11-04",
+      "severity": "low",
+      "confidence": "high",
+      "location": "references[0]",
+      "originalText": "H₂O: Heavy-Hitter Oracle — Examine retention of recent tokens and accumulated attention.",
+      "problem": "The article's core claims are the KV-cache size formula, the role of grouped-query attention in reducing Hkv, and the fact that eval() does not disable autograd. H₂O is a KV-eviction method (covered in 11-11) and does not directly support these claims. The reference is tangential for this article.",
+      "suggestedCorrection": "Cite a source for Hkv and grouped-query attention, such as the GQA paper. Cite PyTorch's autograd / no_grad / inference_mode documentation for the eval-vs-autograd distinction. Keep H₂O in 11-11.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2305.13245"
+      ]
+    },
+    {
+      "topicId": "12-14",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "references[1]",
+      "originalText": "DeepSeekMath — Read the group-relative policy optimization formulation.",
+      "problem": "The article contrasts RLHF with RL from verifiable rewards. DeepSeekMath introduces GRPO, but to my recollection its RL stage used a learned reward model rather than rule-based verifiable rewards. Its note also points only to the GRPO formulation. It therefore does not plausibly support the article's verifiable-reward claims. This should be confirmed against the paper.",
+      "suggestedCorrection": "Add or replace with sources where verifiable rewards are central. Candidates are Tülu 3, which introduced the term 'RL with verifiable rewards', and DeepSeek-R1, which uses rule-based accuracy/format rewards. Alternatively, rewrite the DeepSeekMath note as 'an example policy-optimization algorithm usable with either reward source'.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2402.03300",
+        "https://arxiv.org/abs/2411.15124",
+        "https://arxiv.org/abs/2501.12948"
+      ]
+    },
+    {
+      "topicId": "12-16",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "references[1]",
+      "originalText": "DeepSeekMath — Read the group-relative policy optimization formulation.",
+      "problem": "The article is about reward hacking and reward-model overoptimization under distribution shift. The cited note directs readers to the GRPO formulation, which does not support the article's central claim that optimizing a proxy reward can raise reported reward while true quality falls. A primary source on reward-model overoptimization would support it directly.",
+      "suggestedCorrection": "Replace with or add 'Scaling Laws for Reward Model Overoptimization' (Gao, Schulman, Hilton, 2022). That paper directly measures proxy-reward gains diverging from gold-reward quality.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2210.10760"
+      ]
+    },
+    {
+      "topicId": "12-06",
+      "severity": "low",
+      "confidence": "high",
+      "location": "references[0].note",
+      "originalText": "Read the distribution-matching analysis and its Jensen?Shannon connection.",
+      "problem": "This is a character-encoding error: the en dash in 'Jensen–Shannon' has been replaced by '?'. Separately, the same arXiv URL (1406.2661) is titled 'Generative Adversarial Networks' in 09-09 and 'Generative Adversarial Nets' in 12-06. Both names are in circulation (arXiv listing vs NeurIPS proceedings), so this is cosmetic, but the inconsistency could confuse readers.",
+      "suggestedCorrection": "Replace 'Jensen?Shannon' with 'Jensen–Shannon'. Optionally harmonize the title across 09-09 and 12-06.",
+      "verificationNeeded": false,
+      "sourceUrls": [
+        "https://arxiv.org/abs/1406.2661"
+      ]
+    }
+  ],
+  "numericalChecks": [
+    {
+      "topicId": "09-01",
+      "calculation": "784 / 16 coordinates; raw bytes with 8-bit pixels = 784 B vs 16 × 4 B = 64 B; with FP32 pixels = 3,136 B vs 64 B",
+      "result": "Coordinate ratio is 49×. The byte ratio is 12.25× for 8-bit source pixels or 49× for FP32 source pixels, before any coding. This supports the answer's 'No'."
+    },
+    {
+      "topicId": "09-03",
+      "calculation": "Gap = log p(x) − ELBO = −20 − (−23)",
+      "result": "3 nats, which is ≥ 0 and consistent with the bound. The comparison −95 > −100 confirms the second model has the higher ELBO."
+    },
+    {
+      "topicId": "09-04",
+      "calculation": "μ=1, σ²=1: ½(1 + 1 − ln 1 − 1) = ½(1)",
+      "result": "0.5 nats, matching the text."
+    },
+    {
+      "topicId": "09-04",
+      "calculation": "μ=0, σ²=4: ln 4 = 1.38629; ½(0 + 4 − 1.38629 − 1) = ½(1.61371)",
+      "result": "0.80685 ≈ 0.807 nats, matching the answer."
+    },
+    {
+      "topicId": "09-05",
+      "calculation": "Text example: z = 2 + 3(−0.5) = 0.5; ∂L/∂μ = 2z·1 = 1; ∂L/∂σ = 2z·ε = 2(0.5)(−0.5)",
+      "result": "z = 0.5, ∂L/∂μ = 1, ∂L/∂σ = −0.5, matching the text."
+    },
+    {
+      "topicId": "09-05",
+      "calculation": "Exercise: z = 1 + 2(1) = 3; ∂L/∂μ = 2·3 = 6; ∂L/∂σ = 2·3·1 = 6",
+      "result": "6 and 6, matching the answer."
+    },
+    {
+      "topicId": "09-07",
+      "calculation": "log₂ 256",
+      "result": "8 bits, matching the answer."
+    },
+    {
+      "topicId": "09-08",
+      "calculation": "64 × 64 = 4,096 positions; 4,096 × log₂256 = 4,096 × 8 = 32,768 bits; 32,768 / 8 = 4,096 bytes",
+      "result": "32,768 bits = 4,096 bytes, matching the text."
+    },
+    {
+      "topicId": "09-08",
+      "calculation": "−log₂(1/8) = log₂ 8",
+      "result": "3 bits, matching the answer."
+    },
+    {
+      "topicId": "09-10",
+      "calculation": "ᾱ=0.64: √0.64 = 0.8, √0.36 = 0.6. ᾱ=0.25: √0.25 = 0.5, √0.75 = 0.8660. Variance check: 0.25 + 0.75 = 1",
+      "result": "Coefficients (0.8, 0.6) and (0.5, 0.866), matching the text and answer."
+    },
+    {
+      "topicId": "09-12",
+      "calculation": "0.9 / 0.1 = 9; 0.1 / 0.9 = 0.111; ᾱ/(1−ᾱ) = 1 ⇒ ᾱ = 1 − ᾱ ⇒ ᾱ = 0.5",
+      "result": "SNR values 9 and 1/9, and SNR = 1 at ᾱ = 0.5, all matching."
+    },
+    {
+      "topicId": "09-13",
+      "calculation": "Inversion check: a·x_t − s·v = a²x₀ + asε − asε + s²x₀ = x₀; s·x_t + a·v = asx₀ + s²ε + a²ε − asx₀ = ε (using a² + s² = 1). Example: a=0.8, s=0.6 (0.64 + 0.36 = 1); x_t = 0.8·2 + 0.6·(−1) = 1.0; v = 0.8·(−1) − 0.6·2 = −2.0",
+      "result": "The inverse formulas are correct, and x_t = 1, v = −2 match the text. The rotation matrix [[a, s], [−s, a]] has determinant 1."
+    },
+    {
+      "topicId": "09-13",
+      "calculation": "Exercise: x̂₀ = 0.6·1 − 0.8·0.5 = 0.2; ε̂ = 0.8·1 + 0.6·0.5 = 1.1. Consistency: 0.6·0.2 + 0.8·1.1 = 0.12 + 0.88 = 1.0 = x_t",
+      "result": "0.2 and 1.1, matching and self-consistent."
+    },
+    {
+      "topicId": "09-13",
+      "calculation": "From x̂₀ = (x_t − s·ε̂)/a, an error δε gives an x₀ error of −(s/a)·δε",
+      "result": "The magnitude scales by s/a, as stated."
+    },
+    {
+      "topicId": "09-14",
+      "calculation": "2 + 3(1 − 2) = 2 − 3; w = 1: ε_u + (ε_c − ε_u) = ε_c",
+      "result": "−1 and w = 1, matching."
+    },
+    {
+      "topicId": "09-15",
+      "calculation": "512 / 8 = 64; (512²)/(64²) = 262,144 / 4,096 = 64; 768 / 8 = 96, 512 / 8 = 64, 96 × 64 = 6,144",
+      "result": "64× fewer positions, a 96 × 64 grid and 6,144 positions, all matching."
+    },
+    {
+      "topicId": "09-16",
+      "calculation": "−(5 − 1)/4",
+      "result": "−1, matching."
+    },
+    {
+      "topicId": "09-17",
+      "calculation": "√0.04 = 0.2; √0.01 = 0.1; the std ratio is 0.5 while the h ratio is 0.25",
+      "result": "The std halves, matching."
+    },
+    {
+      "topicId": "09-18",
+      "calculation": "Text: x_t = 0.75·0 + 0.25·4 = 1; u = 4 − 0 = 4. Exercise: x_t = 0.5[0, 2] + 0.5[4, 0] = [2, 1]; x − z = [4, −2]",
+      "result": "(1, 4) and ([2, 1], [4, −2]), matching."
+    },
+    {
+      "topicId": "09-19",
+      "calculation": "Euler: 1 + 0.5·1 = 1.5. Heun: predictor 1.5, so 1 + 0.25(1 + 1.5) = 1.625. e^0.5 = 1.64872. Errors are 0.149 (Euler) and 0.024 (Heun)",
+      "result": "1.5 and 1.625 vs 1.6487, matching. Heun is roughly 6× more accurate for 2 evaluations."
+    },
+    {
+      "topicId": "09-19",
+      "calculation": "Exercise: 1 + 0.1·2·1 = 1.2; e^0.2 = 1.22140",
+      "result": "1.2 vs 1.2214, matching."
+    },
+    {
+      "topicId": "10-02",
+      "calculation": "196 + 32 = 228. Token-wise projection keeps [2, 256] and changes the width 1024 → 4096",
+      "result": "228 positions and [2, 256, 4096], matching."
+    },
+    {
+      "topicId": "10-03",
+      "calculation": "64 + 20",
+      "result": "84, matching."
+    },
+    {
+      "topicId": "10-04",
+      "calculation": "576 visual tokens → 32 queries: 576 / 32",
+      "result": "An 18× reduction in sequence length, consistent with the bottleneck framing."
+    },
+    {
+      "topicId": "10-08",
+      "calculation": "224/16 = 14 → 14² = 196; 448/16 = 28 → 28² = 784 (4×); pairwise interactions 784² / 196² = 16",
+      "result": "196, 784, 4× patches and 16× pairwise interactions, matching."
+    },
+    {
+      "topicId": "10-09",
+      "calculation": "24 × 16 = 384 → 12 × 8 = 96 (÷4); 20 × 30 = 600 → 10 × 15 = 150 (÷4)",
+      "result": "96 and 150, matching."
+    },
+    {
+      "topicId": "10-11",
+      "calculation": "(S + D + I)/N = (1 + 1 + 0)/5",
+      "result": "0.4, matching."
+    },
+    {
+      "topicId": "10-12",
+      "calculation": "8 × 196",
+      "result": "1,568, matching."
+    },
+    {
+      "topicId": "11-01",
+      "calculation": "m·k·n = 32·128·64 = 262,144 MACs (524,288 FLOPs at 2 FLOPs/MAC); 8 / 0.040 s",
+      "result": "262,144 MACs and 200 requests/s, matching."
+    },
+    {
+      "topicId": "11-02",
+      "calculation": "Text: 100 + 8·50 = 500M total; 100 + 2·50 = 200M active. Exercise: 30 + 6·20 = 150M; top-1: 30 + 20 = 50M",
+      "result": "All matching."
+    },
+    {
+      "topicId": "11-03",
+      "calculation": "16 B × 10⁸ = 1.6 × 10⁹ B; 1.6 × 10⁹ / 2³⁰ = 1.6 × 10⁹ / 1,073,741,824",
+      "result": "1.490 GiB, matching."
+    },
+    {
+      "topicId": "11-04",
+      "calculation": "2·2·1·100·4·8·2 = 4·100 = 400; ×4 = 1,600; ×8 = 12,800; ×2 = 25,600",
+      "result": "25,600 bytes, matching. Doubling S doubles it, as stated."
+    },
+    {
+      "topicId": "11-05",
+      "calculation": "Text: 0.26/0.1 = 2.6 → 3 → 0.3 (error +0.04). Exercise: 0.6/0.25 = 2.4 → 2 → 0.5 (error −0.1)",
+      "result": "Matching, under round-to-nearest."
+    },
+    {
+      "topicId": "11-07",
+      "calculation": "Logits [2, 0]. T=1: 1/(1 + e^−2) = 1/1.13534 = 0.8808. T=2: logits [1, 0], so 1/(1 + e^−1) = 1/1.36788 = 0.7311",
+      "result": "0.881 and 0.731, matching."
+    },
+    {
+      "topicId": "11-08",
+      "calculation": "64 − 16 output neurons",
+      "result": "[48, 128], and the next layer's input width becomes 48, matching."
+    },
+    {
+      "topicId": "11-09",
+      "calculation": "(98/196)² = 0.5²",
+      "result": "0.25 of the pairwise count, i.e. quartered, matching."
+    },
+    {
+      "topicId": "11-10",
+      "calculation": "576 → 64 tokens = 9× fewer; a resampler with M=64, N=576 has M·N = 36,864 query–key pairs per head per layer, vs 576² = 331,776 pairs for full self-attention over N",
+      "result": "Consistent with the statement that the resampler has its own MN cost."
+    },
+    {
+      "topicId": "11-11",
+      "calculation": "32 recent + 96 retained",
+      "result": "128, matching the budget."
+    },
+    {
+      "topicId": "11-12",
+      "calculation": "(2N)² / N²",
+      "result": "4×, matching."
+    },
+    {
+      "topicId": "11-13",
+      "calculation": "Σ_{k=1..4} ∇(mean loss_k) without the 1/4 factor = 4 × (1/4)Σ∇(mean loss_k)",
+      "result": "4× the intended mean gradient, matching. The downstream effect depends on the optimizer (see finding)."
+    },
+    {
+      "topicId": "11-15",
+      "calculation": "Serial stages: 40 + 50/2 + 10 = 75 ms. Amdahl: 1/(1 − 0.2) = 1/0.8",
+      "result": "75 ms and 1.25×, matching."
+    },
+    {
+      "topicId": "11-16",
+      "calculation": "A(90, 20) vs C(89, 22): 90 > 89 and 20 < 22, so A dominates C. A vs B(91, 25): B is more accurate, A is faster, so neither dominates. Under 23 ms: A = 20 and C = 22 are feasible, B = 25 is not. D(92, 18) beats A, B and C on both axes",
+      "result": "The text is correct. The exercise answer is correct only if C's memory is also equal (see finding)."
+    },
+    {
+      "topicId": "12-05",
+      "calculation": "KL(p‖q) = 0.5 ln(0.5/0.9) + 0.5 ln(5) = 0.5(−0.58779) + 0.5(1.60944) = 0.51083. KL(q‖p) = 0.9 ln 1.8 + 0.1 ln 0.2 = 0.52901 − 0.16094 = 0.36806",
+      "result": "0.511 and 0.368 nats, matching."
+    },
+    {
+      "topicId": "12-05",
+      "calculation": "Exercise: KL(p‖q) = 1·ln(1/0.5) + 0 = ln 2 = 0.693; KL(q‖p) includes 0.5·ln(0.5/0)",
+      "result": "KL(p‖q) = ln 2 and KL(q‖p) = ∞, matching."
+    },
+    {
+      "topicId": "12-06",
+      "calculation": "m = (0.5, 0.5); KL(p‖m) = 1·log₂(1/0.5) = 1 bit = KL(q‖m); JS = ½·1 + ½·1",
+      "result": "1 bit (= ln 2 nats), matching."
+    },
+    {
+      "topicId": "12-07",
+      "calculation": "σ(2) = 1/(1 + e^−2) = 0.8808; (r_A + 100) − (r_B + 100) = r_A − r_B",
+      "result": "0.881, and the probability is unchanged by the shift, matching."
+    },
+    {
+      "topicId": "12-08",
+      "calculation": "0 + 0.9·0 + 0.9²·1 = 0.81; with γ = 1: 0 + 0 + 1",
+      "result": "0.81 and 1, matching."
+    },
+    {
+      "topicId": "12-09",
+      "calculation": "∂/∂z log σ(z) = 1 − p (a=1); ∂/∂z log(1 − σ(z)) = −p (a=0), so the score is (a − p). E[R(a)(a − p)] = p(1)(1 − p) + (1 − p)(0)(−p) = p(1 − p). At p = 0.5: sampled 1·0.5 = 0.5; expected 0.25",
+      "result": "Matching. The estimator is unbiased, and the sample value 0.5 differs from the expectation 0.25."
+    },
+    {
+      "topicId": "12-10",
+      "calculation": "5 − 3",
+      "result": "2, matching."
+    },
+    {
+      "topicId": "12-11",
+      "calculation": "Text: rA = 1.4·2 = 2.8; clip(1.4, 0.8, 1.2)·2 = 2.4; min = 2.4. Exercise: rA = 0.5·(−2) = −1; clip(0.5)·(−2) = 0.8·(−2) = −1.6; min = −1.6, a constant in θ, so zero gradient from this term",
+      "result": "2.4 and −1.6, matching the text and answer, including the interpretation."
+    },
+    {
+      "topicId": "12-12",
+      "calculation": "[1, 3, 5]: mean 3, so centered [−2, 0, 2]. Population std √(8/3) = 1.633 gives normalized ≈ [−1.22, 0, 1.22]; sample std 2 gives [−1, 0, 1]. RLOO for r = 1: (3 + 5)/2 = 4, so 1 − 4 = −3",
+      "result": "Matching. The std-estimate choice changes GRPO values, consistent with the text's 'declared standard-deviation estimate'."
+    },
+    {
+      "topicId": "12-12",
+      "calculation": "Exercise [0, 0, 1, 1]: the others' mean for an r = 1 response is 1/3, so 1 − 1/3 = 2/3. Identity check: RLOO = (k/(k − 1))(r − r̄) = (4/3)(1 − 0.5) = 2/3. Full-group centering gives 0.5",
+      "result": "2/3 vs 1/2, matching."
+    },
+    {
+      "topicId": "12-13",
+      "calculation": "Bracket = β[(0) − (0)] = 0; −log σ(0) = −log 0.5 = ln 2",
+      "result": "0.6931, matching."
+    }
+  ],
+  "overallAssessment": "All 68 articles were reviewed. The library is technically careful and unusually well hedged. It consistently separates related but distinct concepts: ELBO prior-KL vs posterior gap, α_t vs ᾱ_t, rollout vs reference policies in PPO, label masks vs attention masks, eval() vs no_grad, FLOP counts vs latency, and total vs active parameters. Every numerical example and exercise answer recomputed above is arithmetically correct; I found no sign errors in the KL, ELBO, PPO, DPO, v-prediction, CFG, flow-matching or REINFORCE formulas, and no dimensional errors in the shape traces. No high-severity errors were found. The most consequential issue is an underspecified Pareto exercise (11-16): the stated answer depends on an unstated memory assumption for configuration C. The remaining findings are low severity: an optimizer-dependent overstatement about unnormalized gradient accumulation (11-13); an imprecise statement about trajectory importance weighting and state-distribution correction (12-17); an ambiguous loss reduction (09-01); a missing BCE-on-continuous-data caveat (09-04); a rounding-rule overgeneralization (11-05); a garbled Amdahl sentence (11-12); an encoding typo (12-06); and three references that do not directly support their article's central claim (11-04, 12-14, 12-16). This review does not establish that the content is error-free.",
+  "limitations": [
+    "Tools were disabled for this pass. No paper, documentation page or URL was opened, and no code was executed. All arithmetic was recomputed by hand.",
+    "Reference titles, arXiv IDs and paper contents were checked only against my recollection. In particular, the claim that DeepSeekMath's RL used a learned reward model, and the suggested replacement IDs (2411.15124, 2501.12948, 2210.10760, 2305.13245, 1907.06845, 1412.6980), should be confirmed against the primary sources.",
+    "The version-pinned PyTorch documentation URLs (docs.pytorch.org/docs/2.14/...) in 11-01, 11-03, 11-13, 11-14 and 11-15 could not be verified to exist. If version 2.14 is not published, use /stable/ paths or a confirmed version.",
+    "Architecture details for Qwen2.5-VL, LLaVA, BLIP-2 and Mixtral (dynamic resolution, 2×2 merger, absolute-time MRoPE, Q-Former query interface, linear vs MLP projector, total vs active parameters) were checked from memory only.",
+    "Prerequisite topic IDs outside the supplied set (e.g. 01-xx through 08-xx) were not available, so cross-article consistency with those topics was not checked.",
+    "The review focused on scientific and pedagogical correctness as instructed. Style, tone and formatting were not assessed except where they affect meaning."
+  ]
+}

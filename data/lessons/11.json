@@ -27,6 +27,15 @@
         "paragraphs": [
           "Warm up the implementation, synchronize asynchronous GPU work around timing boundaries, and repeat measurements. Report hardware, precision, batch size, shapes, and whether preprocessing is included. A smaller FLOP count may still run slower when operations are fragmented or memory traffic dominates. Do not divide a theoretical peak FLOP rate into workload FLOPs and present the result as measured latency. Also distinguish milliseconds per batch from milliseconds per item; they answer different deployment questions."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the documentation: counting is not timing",
+        "paragraphs": [
+          "Read the PyTorch Profiler options with separate questions for operator counts and measured execution time. Its FLOP estimation covers selected operation families rather than every possible kernel. A reported estimate should therefore be labeled by its counting convention and coverage.",
+          "Imagine two matrix multiplications with the same scalar operation count, one large and contiguous and the other split into many tiny launches. The second can be slower because launch overhead and utilization differ. Arithmetic equality does not imply equal memory access patterns, scheduling efficiency, or latency.",
+          "Measure after warm-up using representative shapes and a consistent synchronization policy. Report batch size and distinguish time per batch, request latency, and throughput. If preprocessing runs concurrently, decide whether the metric includes it. A performance claim becomes interpretable when the timer's boundaries are as explicit as the arithmetic formula used beside it."
+        ]
       }
     ],
     "exercise": {
@@ -73,6 +82,15 @@
         "title": "Explain the deployment consequences",
         "paragraphs": [
           "A batch may collectively activate every expert even when each token activates only two. Loading only two experts for the whole batch therefore does not follow from top-2 routing. Communication, uneven expert loads, and matrix sizes can reduce the expected speed advantage. For a fair comparison, report total parameters, active parameters per token, routing configuration, and measured memory and latency. Deduplicate tied weights when counting unique stored parameters; counting a shared embedding twice inflates the capacity estimate."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: routing changes work, not the stored model",
+        "paragraphs": [
+          "In Mixtral of Experts, follow a token through the router and selected feedforward experts. Separate the experts selected for that token from the collection of experts stored for all possible tokens. Shared attention and other shared parameters still participate regardless of the routing choice.",
+          "Suppose two tokens select disjoint experts. Their individual active parameter counts may be small, yet processing the pair requires accessing the union of those experts. A larger batch can activate most of the model even when each token has sparse routing. This explains why per-token active parameters do not specify device memory needs.",
+          "Inspect load balance and communication alongside the nominal active count. If tokens concentrate on one expert, that expert can become a bottleneck while others sit idle. Compare latency and throughput at the intended batch and sequence lengths, and state whether experts are local, sharded, or transferred between devices."
         ]
       }
     ],
@@ -121,6 +139,15 @@
         "paragraphs": [
           "Measure memory after model loading, after forward, after backward, and after the optimizer step. The peak may occur during backward or a temporary parameter gathering operation. Distinguish memory allocated to live tensors from memory reserved by the caching allocator. Keeping a loss tensor in a Python list can accidentally retain its entire graph; store detached scalar values for logging. Choose the intervention that targets the dominant term: reducing batch size does little for optimizer states but can greatly reduce saved activations."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the sources: account for persistent and temporary tensors",
+        "paragraphs": [
+          "Use PyTorch Profiler's memory reporting to test a tensor inventory rather than expecting one universal bytes-per-parameter constant. Pair the inventory with Adam's two moment accumulators. Model states, saved activations, temporary workspaces, and allocator reservations have different lifetimes and scaling rules.",
+          "For an all-FP32 parameter with an allocated gradient and two FP32 moments, the persistent tensor budget is sixteen bytes. This does not include a second master copy because the parameter is already FP32. A mixed-precision implementation may organize these states differently, so copying the same constant without inspecting dtypes can double-count or omit storage.",
+          "Measure at several batch sizes and sequence lengths. A roughly fixed component suggests parameter or optimizer states; a changing component suggests activations or workspaces, although allocation behavior can complicate the curve. Compare allocated tensor memory with reserved memory, and inspect the peak rather than only the footprint after an update completes."
+        ]
       }
     ],
     "exercise": {
@@ -137,6 +164,12 @@
         "url": "https://docs.pytorch.org/docs/2.14/profiler.html",
         "kind": "guide",
         "note": "Inspect CPU, CUDA, shapes, and memory in an execution trace."
+      },
+      {
+        "title": "Adam: A Method for Stochastic Optimization",
+        "url": "https://arxiv.org/abs/1412.6980",
+        "kind": "paper",
+        "note": "Use the two moment buffers in the update algorithm to account for persistent optimizer-state memory; tensor dtypes and implementation determine the byte count."
       }
     ]
   },
@@ -169,6 +202,15 @@
         "paragraphs": [
           "Calling eval changes behaviors such as dropout; it does not by itself disable gradient recording. Use the appropriate no-grad or inference context as well. Measure prefill and decode separately because their temporary allocations differ. Report input and output lengths rather than a single vague context length. A model may load successfully but exhaust memory as generation grows, particularly under concurrent serving. Weight quantization can reduce one term without solving a cache-dominated workload."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the sources: identify the cached head dimension",
+        "paragraphs": [
+          "In GQA, trace how several query heads share a key and value head. The number retained in the cache is Hkv, not necessarily the query-head count. This directly connects the architectural choice to the cache formula and its bandwidth cost.",
+          "At fixed layer count, batch, sequence length, head width, and dtype, reducing Hkv from 32 to eight reduces raw key/value tensor bytes by a factor of four. It does not reduce every weight tensor or activation by that factor. An implementation that expands and materializes shared heads can also forfeit some expected savings.",
+          "Check actual cache shapes and storage rather than inferring them from the displayed attention-head count. Separately consult Autograd Mechanics before using eval() as a memory intervention: evaluation behavior does not disable graph recording. Cache compression, parameter freezing, and disabling gradient recording address different memory terms and should be measured independently."
+        ]
       }
     ],
     "exercise": {
@@ -181,10 +223,16 @@
     ],
     "references": [
       {
-        "title": "H₂O: Heavy-Hitter Oracle",
-        "url": "https://arxiv.org/abs/2306.14048",
+        "title": "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
+        "url": "https://arxiv.org/abs/2305.13245",
         "kind": "paper",
-        "note": "Examine retention of recent tokens and accumulated attention."
+        "note": "Trace how sharing key/value heads across query groups changes the retained cache dimension and the bandwidth–quality trade-off."
+      },
+      {
+        "title": "PyTorch Autograd Mechanics",
+        "url": "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+        "kind": "guide",
+        "note": "Distinguish requires_grad, no-grad mode, inference mode, and evaluation mode; freezing parameters and disabling graph recording solve different problems."
       }
     ]
   },
@@ -216,11 +264,20 @@
         "paragraphs": [
           "INT4 weights need roughly half the raw weight bits of INT8 weights, but scales, zero points, packing, and unquantized layers consume additional space. Speed depends on hardware and kernels; dequantization overhead can erase a theoretical saving. Use representative calibration data and evaluate sensitive slices such as rare inputs or long contexts. Never assume that changing a checkpoint format changes every operation to integer arithmetic. Compare output quality and actual latency at the same batch size and sequence lengths."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: choose a quantization unit",
+        "paragraphs": [
+          "Compare the affine quantization construction in Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference with LLM.int8()'s treatment of outliers. The important design choices include which values share a scale and which computations retain higher precision.",
+          "Imagine a group with values around 0.01 and one value near 100. A single scale that preserves the outlier may map many small values to the same integer. Splitting the group or treating the outlier separately can preserve distinctions, but requires extra scales, routing, or higher-precision work.",
+          "Evaluate the full representation including metadata and kernels. A low-bit file can expand before computation, while an integer path can accumulate in a wider type. In a reproduction, record calibration data, clipping policy, scale granularity, rounding convention, and sensitive evaluation slices. Nominal bit width alone cannot identify either the approximation error or the execution cost."
+        ]
       }
     ],
     "exercise": {
       "prompt": "Using s=0.25 and z=0, quantize x=0.6 without clipping and reconstruct it.",
-      "answer": "Rounding 0.6/0.25=2.4 gives q=2, so x̂=0.5 and the signed reconstruction error is −0.1. Different rounding rules only matter at ties in this example's scheme."
+      "answer": "Using round-to-nearest, 0.6/0.25=2.4 gives q=2, so x̂=0.5 and the signed reconstruction error is −0.1. Among round-to-nearest conventions, tie-breaking matters only at exact ties; other rules such as ceiling or stochastic rounding are different quantizers."
     },
     "takeaways": [
       "Bit width alone does not specify a quantization method.",
@@ -232,6 +289,12 @@
         "url": "https://arxiv.org/abs/2208.07339",
         "kind": "paper",
         "note": "Examine why activation outliers complicate low-bit inference."
+      },
+      {
+        "title": "Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference",
+        "url": "https://arxiv.org/abs/1712.05877",
+        "kind": "paper",
+        "note": "Inspect affine scale/zero-point quantization and simulated quantization during training; compare that setting with LLM.int8() outlier handling."
       }
     ]
   },
@@ -263,6 +326,15 @@
         "paragraphs": [
           "A teacher's mistakes and dataset biases can be transferred as efficiently as its strengths. Freeze teacher parameters unless joint training is intentional, and avoid retaining its autograd graph unnecessarily. Feature scales and coordinate systems may differ, so a large raw mean-squared error need not imply semantic disagreement. Evaluate the student independently on held-out tasks and measure its cost. Matching the teacher on training examples is evidence of imitation, not proof of generalization or improvement over ordinary supervised training."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: three supervision interfaces",
+        "paragraphs": [
+          "Read Hinton's distillation paper, FitNets, and Sequence-Level Knowledge Distillation as three different contracts between teacher and student. They expose class distributions, intermediate representations, and generated sequences respectively. The available interface determines which training signal is possible.",
+          "Suppose a teacher API returns only its final answer. You cannot reconstruct its full next-token distribution from that answer, nor recover a hidden feature tensor. Treating the answer as a supervised sequence is legitimate, but naming the resulting loss a full-distribution KL would misdescribe the information actually used.",
+          "For feature hints, trace any projection that reconciles shapes and ask whether coordinatewise matching is meaningful. For generated responses, record the teacher's decoding method because it changes the training targets. For logits, specify temperature and vocabulary alignment. Evaluate a common student baseline so that benefits of extra data are separated from benefits of the particular distillation signal."
+        ]
       }
     ],
     "exercise": {
@@ -279,6 +351,18 @@
         "url": "https://arxiv.org/abs/1503.02531",
         "kind": "paper",
         "note": "Read the soft-target objective and temperature discussion."
+      },
+      {
+        "title": "FitNets: Hints for Thin Deep Nets",
+        "url": "https://arxiv.org/abs/1412.6550",
+        "kind": "paper",
+        "note": "Trace the intermediate-feature hint objective and the regressor that reconciles teacher and student feature shapes."
+      },
+      {
+        "title": "Sequence-Level Knowledge Distillation",
+        "url": "https://arxiv.org/abs/1606.07947",
+        "kind": "paper",
+        "note": "Compare sequence-level teacher targets with token-distribution matching and inspect the role of teacher decoding."
       }
     ]
   },
@@ -301,14 +385,23 @@
         "id": "mechanism",
         "title": "Use a consistent distillation loss",
         "paragraphs": [
-          "Define pT(i)=exp(zi/T)/Σj exp(zj/T). A common distillation objective combines ordinary label loss with T² KL(pteacher,T || pstudent,T). The T² factor compensates for the gradient scaling introduced by temperature under the standard formulation. Both teacher and student distributions must use the same temperature for this comparison. For logits [2,0], the first-class probability is about 0.881 at T=1 and 0.731 at T=2, illustrating how relative alternatives become less suppressed."
+          "Define pT(i)=exp(zi/T)/Σj exp(zj/T). A common distillation objective combines ordinary label loss with T² KL(pteacher,T || pstudent,T). The T² factor compensates for the leading high-temperature gradient scaling under the standard formulation; it does not make gradients exactly invariant at every temperature. Both teacher and student distributions must use the same temperature for this comparison. For logits [2,0], the first-class probability is about 0.881 at T=1 and 0.731 at T=2, illustrating how relative alternatives become less suppressed."
         ]
       },
       {
         "id": "practice",
         "title": "Keep calibration and generation separate",
         "paragraphs": [
-          "Post-hoc temperature calibration fits a temperature on held-out validation data to adjust confidence. Distillation temperature shapes training targets. Generation temperature changes which tokens are sampled. They use related mathematics but optimize different goals. Tune temperature without looking at test outcomes, and report the mixture weight between hard-label and distillation losses. Extremely high temperature can make targets nearly uniform and weaken useful distinctions. A soft distribution is informative only when its relative probabilities carry relevant structure."
+          "Post-hoc temperature calibration fits a temperature on held-out validation data to adjust confidence. Distillation temperature shapes training targets. Generation temperature changes which tokens are sampled. They use related mathematics but optimize different goals. Tune temperature without looking at test outcomes, and report the mixture weight between hard-label and distillation losses. At high temperature, probability differences shrink, but T²-scaled distillation retains a centered-logit matching signal in the limit. Nearly uniform targets therefore do not imply vanishing information in that scaled objective; which distinctions help still depends on the task and teacher."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: the high-temperature limit",
+        "paragraphs": [
+          "In Distilling the Knowledge in a Neural Network, inspect the gradient argument behind multiplying the soft-target loss by T². The key object is the derivative with respect to student logits, not the visual flatness of a probability plot.",
+          "With K classes and centered logits, high-temperature softmax probabilities are approximately 1/K plus the centered logit divided by KT. Differentiating the T²-scaled cross-entropy or KL with fixed teacher targets yields a student-logit gradient approaching the centered student–teacher logit difference divided by K. Probability gaps shrink while the scaling preserves a finite matching signal.",
+          "Use this approximation to diagnose a temperature experiment: removing T² changes both target softness and effective loss scale. Keep the hard-label mixture explicit, and compare gradients as well as losses. Centering matters because adding a constant to every logit leaves the distribution unchanged; distillation cannot identify that unobservable common offset."
         ]
       }
     ],
@@ -356,6 +449,15 @@
         "title": "Test the executable model",
         "paragraphs": [
           "A pruning mask may add an extra multiplication without reducing dense matrix multiplication work. To claim speedup, export or rebuild the relevant structure, or use a kernel that supports the chosen sparsity pattern. Check residual connections, normalization dimensions, and tied weights when removing channels. Compare accuracy after a declared recovery budget, not after giving one method much more retraining. Report both nonzero counts and physical storage; sparse indices themselves consume memory and can dominate at modest sparsity."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the documentation: a mask is not a smaller layer",
+        "paragraphs": [
+          "In the PyTorch pruning tutorial, inspect the relationship among the original parameter, its mask, and the effective weight. Removing the pruning reparameterization does not by itself rebuild a narrower dense network. The distinction is essential when a file full of zeros is advertised as faster inference.",
+          "Take a dense linear layer with 128 inputs and 64 outputs. Zeroing sixteen output rows still leaves the original matrix dimensions unless the model is structurally rewritten. Deleting those rows requires changing its bias and every downstream operation that expects the old output width.",
+          "Measure the deployed representation and kernel. Unstructured sparsity needs an implementation capable of exploiting its pattern; structured removal changes tensor shapes but can affect residual branches and normalization. Evaluate the complete modified network after fine-tuning, and compare latency under the same hardware and batch conditions rather than assuming parameter sparsity equals runtime reduction."
         ]
       }
     ],
@@ -405,6 +507,15 @@
         "paragraphs": [
           "Scoring, sorting, clustering, and gathering tokens are not free. If selection happens late, earlier layers retain the original cost. Similarity can confuse repeated but semantically distinct objects, and aggressive merging can blur small text or spatial relations. Preserve positions or provenance when later outputs require grounding. Compare against simple uniform selection at the same budget, and measure downstream quality together with actual latency. Visualizations should show which evidence vanished rather than only attractive retained patches."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: merging preserves a weighted summary",
+        "paragraphs": [
+          "In Token Merging: Your ViT But Faster, inspect which tokens are combined and how their sizes influence the resulting representation. Merging is an approximation to the sequence state, not merely deleting array entries. Later attention must interpret tokens that can represent unequal amounts of the original image.",
+          "Consider token features zero and ten, representing nine patches and one patch respectively. Their unweighted average is five, whereas the patch-count-weighted average is one. Losing size information changes the meaning of the summary and can disproportionately amplify a small region.",
+          "Use a task requiring a tiny object or localized detail to test that trade-off. Compare where merging occurs, how many tokens survive each layer, and whether matching overhead offsets later savings. A reduced pairwise attention count is a useful prediction of possible savings, but neither accuracy retention nor measured throughput follows solely from the surviving token count."
+        ]
       }
     ],
     "exercise": {
@@ -452,6 +563,15 @@
         "title": "Evaluate the missing evidence",
         "paragraphs": [
           "Global scene recognition may tolerate heavy pooling while OCR and counting fail quickly. A question-aware selector can prioritize useful patches, but its access to the question must match the evaluation setup. Do not claim vision-encoder savings when compression occurs only afterward. Keep image resolution, language-model settings, and output length fixed in comparisons. Inspect examples where small objects or spatial relations disappear. Report visual token count alongside end-to-end latency, cache size, and task quality so the location of the benefit is clear."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: compression before the language model",
+        "paragraphs": [
+          "Read BLIP-2's learned query bottleneck beside Token Merging's sequence reduction. Both can decrease later token processing, but one learns a querying interface while the other combines existing representations. Their information losses and computational placement differ.",
+          "Suppose a visual encoder processes 576 patches and a resampler emits 64 features. The language model now sees fewer visual positions, but the encoder has already processed all 576. Any speed claim should split encoder time, resampler time, and language prefill instead of assigning the downstream reduction to the entire pipeline.",
+          "Test both broad semantic questions and fine-grained extraction, since they demand different retained information. If compression depends on the question, count the cost of recomputing it for another question about the same image. Compare quality at a fixed end-to-end budget; equal output token counts can conceal very different learned processing and reuse opportunities."
         ]
       }
     ],
@@ -507,6 +627,15 @@
         "paragraphs": [
           "Evaluate long-range retrieval, changing topics, and queries about early rare details rather than only average perplexity. Include bookkeeping overhead and the cost of moving or compacting cache tensors. Compare eviction policies at the same byte budget, since dtype and head layout affect storage. Do not renumber retained positions casually; changing position semantics changes the model computation. Report whether a method needs full-history statistics or only online state, and whether it can operate under a strict streaming memory limit."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: eviction and quantization lose different things",
+        "paragraphs": [
+          "Compare H2O's token retention with KIVI's lower-precision cache representation. Eviction removes positions from future attention; quantization retains positions but approximates their vectors. These interventions can be combined, yet they create distinct failure modes and bookkeeping requirements.",
+          "Imagine an early sentence containing a password mentioned only once. Recent-token retention may discard it, while a low-bit cache might preserve its position but perturb retrieval. A benchmark of ordinary next-token prediction can conceal this difference, so include long-distance retrieval probes with controlled evidence locations.",
+          "Inspect KIVI's different quantization axes for keys and values and its residual buffer; nominal two-bit storage does not describe every retained element or metadata cost. For eviction, preserve the intended positional interpretation of surviving tokens. Measure error, peak memory, and decode latency at matching context lengths instead of assuming that fewer stored bytes guarantee proportionate speedups."
+        ]
       }
     ],
     "exercise": {
@@ -523,6 +652,12 @@
         "url": "https://arxiv.org/abs/2306.14048",
         "kind": "paper",
         "note": "Examine retention of recent tokens and accumulated attention."
+      },
+      {
+        "title": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache",
+        "url": "https://arxiv.org/abs/2402.02750",
+        "kind": "paper",
+        "note": "Inspect why keys and values use different quantization axes, and why a residual buffer complicates nominal bit-width savings."
       }
     ]
   },
@@ -553,7 +688,16 @@
         "id": "practice",
         "title": "Separate complexity from implementation",
         "paragraphs": [
-          "FlashAttention does not make unrestricted dense attention linear in sequence length; its pairwise arithmetic still scales quadratically. It reduces memory traffic and intermediate storage through a hardware-aware schedule. Benefits depend on shapes, device support, masking, dtype, and the selected kernel. Test numerical closeness within appropriate tolerances rather than demanding bitwise identity. Also distinguish prefill from single-token decoding, whose bottlenecks differ. A faster attention kernel cannot accelerate input preprocessing or FFNs beyond the fraction of time they leave available."
+          "FlashAttention does not make unrestricted dense attention linear in sequence length; its pairwise arithmetic still scales quadratically. It reduces memory traffic and intermediate storage through a hardware-aware schedule. Benefits depend on shapes, device support, masking, dtype, and the selected kernel. Test numerical closeness within appropriate tolerances rather than demanding bitwise identity. Also distinguish prefill from single-token decoding, whose bottlenecks differ. A faster attention kernel does not speed up preprocessing or FFNs; end-to-end speedup is bounded by the fraction of runtime spent in attention."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: combine blocks without losing normalization",
+        "paragraphs": [
+          "In FlashAttention, follow the online softmax accumulators across score blocks. The central numerical problem is combining quantities normalized around different maxima while avoiding a full score matrix in slower memory. Exactness refers to the mathematical attention operation, not identical floating-point evaluation order.",
+          "Suppose an earlier block's maximum is two and a new block raises it to five. Its old exponential sum and weighted value accumulator must both be rescaled by exp(−3) before combining with quantities expressed relative to five. Rescaling only the denominator changes the attention output even if the final probabilities appear normalized.",
+          "Test a tiny implementation against ordinary softmax using blocks with deliberately different maxima. Then profile representative long sequences to study memory traffic. A correct tiled algorithm still computes dense pairwise interactions; its advantage comes from scheduling and storage, and its end-to-end benefit is limited by time spent elsewhere in the model."
         ]
       }
     ],
@@ -603,11 +747,20 @@
         "paragraphs": [
           "Zero gradients before the accumulation window, not after every microbatch. Schedule learning rates and gradient clipping around optimizer updates consistently. For checkpointing, ensure recomputation follows compatible control flow and random-state behavior; otherwise backward may differentiate a different computation. Measure throughput as well as peak memory because recomputation consumes time. In distributed training, avoid unnecessary gradient synchronization on intermediate microbatches when the framework supports it, while ensuring the final synchronization still occurs correctly."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the documentation: reproduce the same computation",
+        "paragraphs": [
+          "In PyTorch's checkpointing documentation, read recomputation and random-state handling before selecting a checkpoint boundary. The backward pass assumes it can reconstruct the necessary forward intermediates. Stateful side effects or inconsistent branches can undermine that assumption even when tensor shapes remain valid.",
+          "Consider a dropout-containing block. Recomputing with an unrelated mask can make backward correspond to a different stochastic computation from the original forward pass. Check the checkpointing mode and random-state settings rather than assuming that rerunning the same Python function reproduces its values.",
+          "For gradient accumulation, separately test a deterministic toy model against one combined batch. If microbatches contain ten and thirty valid target tokens, their token-mean losses need weights one quarter and three quarters, not equal weights. This experiment isolates normalization from checkpointing. Add dropout or batch-dependent layers only afterward, when exact large-batch equivalence is no longer the appropriate expectation."
+        ]
       }
     ],
     "exercise": {
       "prompt": "You accumulate four equal microbatches with mean loss and forget to divide each loss by four. What changes?",
-      "answer": "The accumulated gradient is four times the intended combined-batch mean gradient. This changes the effective update and interacts with clipping, optimizer state, and regularization; it is not merely a logging difference."
+      "answer": "The accumulated gradient is four times the intended combined-batch mean gradient. Under plain SGD this gives a four-times-larger step at the same learning rate. For Adam, a constant positive rescaling of the entire gradient history largely cancels between first and second moments, apart from ε; changing scale midway or introducing clipping and coupled regularization can break that cancellation. Normalize explicitly instead of assuming every optimizer responds identically."
     },
     "takeaways": [
       "Normalize accumulated losses to the intended objective.",
@@ -619,6 +772,12 @@
         "url": "https://docs.pytorch.org/docs/2.14/checkpoint.html",
         "kind": "guide",
         "note": "Read recomputation behavior and the handling of random state."
+      },
+      {
+        "title": "Adam: A Method for Stochastic Optimization",
+        "url": "https://arxiv.org/abs/1412.6980",
+        "kind": "paper",
+        "note": "Inspect the first- and second-moment update equations and the assumptions behind gradient-rescaling invariance."
       }
     ]
   },
@@ -650,6 +809,15 @@
         "title": "Choose based on the bottleneck",
         "paragraphs": [
           "DDP is often useful when the model already fits and more data throughput is needed. Sharding targets state memory, while tensor parallelism can make oversized operations feasible. Network bandwidth, latency, topology, and overlap determine whether communication dominates. Keep effective global batch size and optimizer-step counts comparable when evaluating scaling. Deadlocks can arise when workers execute mismatched collective operations. Record world size, precision, partitioning strategy, and communication time rather than reporting only the number of GPUs."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the documentation: identify what each collective moves",
+        "paragraphs": [
+          "Read the DDP, FSDP, and tensor-parallel documentation with a tensor ownership diagram. Ask which device holds each parameter, gradient, optimizer state, and intermediate activation before and after an operation. A label such as distributed training does not specify that ownership.",
+          "For Y=XW, column-sharding W partitions output features. Row-sharding W partitions the summed input dimension, so local partial results must be combined to recover Y. These are different communication patterns even when the devices store similar numbers of weight elements.",
+          "Trace one forward and backward step, including temporary all-gathers and gradient synchronization. FSDP's sharded resting state does not imply that its full working parameters are never materialized. DDP gradient buckets can overlap communication with backward work, so adding isolated timings may overestimate total latency. Confirm compatible collective order across ranks and profile the actual critical path before selecting a strategy."
         ]
       }
     ],
@@ -710,6 +878,15 @@
         "paragraphs": [
           "Change one bottleneck hypothesis at a time and rerun the same workload outside the profiler. For a suspected data bottleneck, compare a preloaded synthetic input path without claiming its timing as real application performance. For memory issues, inspect tensor lifetimes rather than only the final allocation. Warm up caches and compiled kernels before measurement, and report enough repetitions to reveal variability. A prettier trace is not the objective; improved end-to-end latency or throughput with preserved correctness is."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the documentation: use a trace to test a hypothesis",
+        "paragraphs": [
+          "Use the PyTorch Profiler timeline to answer a concrete question, such as whether the accelerator waits for input or for synchronization. A table sorted by total operator time can hide overlap and repeated small launches. Inspect the dependency chain that determines when an iteration actually finishes.",
+          "Suppose host preprocessing takes forty milliseconds and GPU work takes fifty. If they execute serially, the pair takes ninety milliseconds; with perfect steady-state overlap, it can approach fifty. Accelerating preprocessing has different value in those two schedules even though each isolated timing is unchanged.",
+          "Profile representative warmed-up iterations and compare with a lightweight timing run because instrumentation can perturb execution. Enable shape, memory, or stack recording only when those details answer the question at hand. After an optimization, check that output quality and workload settings remain comparable, then look for the newly dominant stage rather than assuming the original bottleneck persists."
+        ]
       }
     ],
     "exercise": {
@@ -758,10 +935,19 @@
         "paragraphs": [
           "Use the same hardware, task, data split, batch size, precision, and input/output lengths when interpreting a frontier. Include measurement uncertainty; a 0.1 ms difference within timing noise is weak evidence of dominance. Distinguish quality constraints from arbitrary weighted scores, and do not hide preprocessing costs for only one method. Report unsuccessful or dominated configurations when they clarify the search, since the cost of finding the final point can matter as much as its inference cost."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the sources: a frontier depends on the comparison set",
+        "paragraphs": [
+          "Use Boyd and Vandenberghe's vector-optimization discussion to formalize nondominance, then connect it to the reporting principles in the NeurIPS checklist. A Pareto frontier describes the measured candidates and objectives; it is not a certificate that no better model exists.",
+          "Imagine one model with slightly better accuracy but substantially higher memory. Neither dominates the other if both objectives matter. If deployment imposes a hard memory ceiling, first remove infeasible candidates, then compare the remainder. That constrained decision differs from assigning an arbitrary weighted sum to every metric.",
+          "Repeat noisy measurements before treating tiny differences as meaningful. A latency frontier can change with hardware, batch size, or context length, while an accuracy frontier can change with the task mixture. Publish these conditions alongside the points and state the decision rule. The result should let another reader choose an operating point suited to their own constraints."
+        ]
       }
     ],
     "exercise": {
-      "prompt": "D has 92% accuracy, 18 ms latency, and the same memory as A and B above. Which points remain nondominated?",
+      "prompt": "D has 92% accuracy and 18 ms latency. All four configurations A, B, C, and D use the same peak memory. Which points remain nondominated?",
       "answer": "D dominates both A and B on accuracy and latency, and also dominates C. Under these three measurements and equal memory, D is the only nondominated point among the four."
     },
     "takeaways": [
@@ -780,6 +966,12 @@
         "url": "https://neurips.cc/public/guides/PaperChecklist",
         "kind": "guide",
         "note": "Review reporting of uncertainty, compute, data, and limitations."
+      },
+      {
+        "title": "Convex Optimization: Convex Optimization Problems",
+        "url": "https://web.stanford.edu/class/ee364a/lectures/problems.pdf",
+        "kind": "guide",
+        "note": "Read the vector-optimization and Pareto-optimality discussion; apply its nondominance definition before considering scalarized objectives."
       }
     ]
   }

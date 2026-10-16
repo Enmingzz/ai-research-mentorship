@@ -54,6 +54,8 @@ for(const lesson of course.lessons){
   assert(Array.isArray(lesson.prerequisites),`${label}: prerequisites`);
   for(const id of lesson.prerequisites)assert(topicIds.has(id)&&id!==label,`${label}: valid prerequisite ${id}`);
   assert(lesson.sections.length>=3,`${label}: substantive explanation sections`);
+  const sourceReading=lesson.sections.find(section=>section.id==='source-reading');
+  assert(sourceReading?.paragraphs?.length>=2,`${label}: original-source reading explanation`);
   assert.equal(new Set(lesson.sections.map(s=>s.id)).size,lesson.sections.length,`${label}: unique section anchors`);
   for(const section of lesson.sections){assert(/^[a-z0-9-]+$/.test(section.id),`${label}: safe section anchor`);assert(section.title?.trim());assert(section.paragraphs?.length&&section.paragraphs.every(p=>typeof p==='string'&&p.trim()),`${label}: section prose`);}
   assert(lesson.exercise?.prompt?.trim()&&lesson.exercise?.answer?.trim(),`${label}: exercise and worked answer`);

@@ -1,0 +1,69 @@
+{
+  "reviewer": "OpenAI Codex",
+  "reviewSource": "review/claude-expanded-01-04-findings.json",
+  "findings": [
+    {
+      "range": "01-04",
+      "findingIndex": 0,
+      "topicId": "01-02",
+      "disposition": "accepted",
+      "reason": "Changed both the practice explanation and enriched numeric example to explicitly use predictions minus labels/targets. The stored numeric example was independently executed and is correct for this operation.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/notes/broadcasting.html"
+      ]
+    },
+    {
+      "range": "01-04",
+      "findingIndex": 1,
+      "topicId": "01-04",
+      "disposition": "accepted",
+      "reason": "Added the official Deep Feedforward Networks chapter for computational graphs, chain rule, path summation and backpropagation. Primary-site chapter excerpts directly verify those subjects; Numerical Computation remains for derivative notation and numerical concerns.",
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/mlp.html",
+        "https://www.deeplearningbook.org/contents/numerical.html"
+      ]
+    },
+    {
+      "range": "01-04",
+      "findingIndex": 2,
+      "topicId": "04-17",
+      "disposition": "accepted",
+      "reason": "Corrected both passages to identify the full batched multi-head attention-weight tensor: 16 matrices use 32 MiB in total, while each 1024 by 1024 FP16 matrix uses 2 MiB. The original total arithmetic was correct.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1706.03762",
+        "https://arxiv.org/abs/2205.14135"
+      ]
+    },
+    {
+      "range": "01-04",
+      "findingIndex": 3,
+      "topicId": "04-13",
+      "disposition": "rejected",
+      "reason": "This is a nonsequential reference library, so a valid prerequisite may have a later ID. The source-reading paragraph already explains that the cache stores keys and values reused by future queries, not old queries; the visible prerequisite links to the dedicated explanation. Stable IDs are preserved.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1911.02150",
+        "https://arxiv.org/abs/2305.13245"
+      ]
+    }
+  ],
+  "additionalChangesAfterExpandedSnapshot": [
+    {
+      "topicId": "03-11",
+      "change": "Added the official PyTorch word-language-model example as a third reference; clarified the book note and reading paragraph to separate recurrent concepts from the concrete chunking/repackage_hidden implementation.",
+      "verification": "Inspected get_batch, repackage_hidden and recurrent training in the official source; the earlier CPU detach check confirms unchanged numeric values and disconnected autograd history.",
+      "sourceUrls": [
+        "https://github.com/pytorch/examples/blob/main/word_language_model/main.py",
+        "https://www.deeplearningbook.org/contents/rnn"
+      ]
+    },
+    {
+      "topicId": "01-10",
+      "change": "Added Reddi, Kale and Kumar, On the Convergence of Adam and Beyond, and a source-reading paragraph on the flawed original convergence proof and convex counterexamples.",
+      "verification": "Verified authors, ICLR 2018 attribution, abstract and introduction from the primary arXiv paper. OpenReview required a browser verification challenge, so the accessible arXiv source is the link.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1904.09237"
+      ]
+    }
+  ],
+  "scopeNote": "The parent resolves shared paper findings at indices 4–6. This file addresses only the four assigned article findings and the two documented article deltas."
+}

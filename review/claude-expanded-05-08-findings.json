@@ -1,0 +1,333 @@
+{
+  "reviewer": "Claude (claude-opus-5-5), independent reasoning-only proofreading pass with no browsing, paper access or code execution",
+  "reviewedTopicIds": [
+    "05-01",
+    "05-02",
+    "05-03",
+    "05-04",
+    "05-05",
+    "05-06",
+    "05-07",
+    "05-08",
+    "05-09",
+    "05-10",
+    "05-11",
+    "05-12",
+    "05-13",
+    "05-14",
+    "06-01",
+    "06-02",
+    "06-03",
+    "06-04",
+    "06-05",
+    "06-06",
+    "06-07",
+    "06-08",
+    "06-09",
+    "06-10",
+    "06-11",
+    "06-12",
+    "07-01",
+    "07-02",
+    "07-03",
+    "07-04",
+    "07-05",
+    "07-06",
+    "07-07",
+    "07-08",
+    "07-09",
+    "07-10",
+    "07-11",
+    "08-01",
+    "08-02",
+    "08-03",
+    "08-04",
+    "08-05",
+    "08-06",
+    "08-07",
+    "08-08",
+    "08-09",
+    "08-10",
+    "08-11",
+    "08-12",
+    "08-13",
+    "08-14"
+  ],
+  "findings": [
+    {
+      "topicId": "05-02",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "source-reading, paragraph 1",
+      "originalText": "On paper, represent a sentence with explicit spaces and punctuation, apply two chosen merge rules, and list the vocabulary entries needed to reverse the segmentation.",
+      "problem": "This exercise mixes the two preprocessing conventions that the same paragraph asks readers to keep separate. In Sennrich et al., text is first split into words. BPE merges are then learned and applied inside words, using an end-of-word marker, and never cross whitespace. Their segmentation is reversed using boundary markers (for example the '@@ ' continuation convention), not from vocabulary entries alone. SentencePiece instead encodes whitespace as an ordinary meta-symbol (▁), which is what lets it detokenize losslessly from raw text. As written, a student may apply cross-space merges and attribute that behavior to Sennrich-style BPE.",
+      "suggestedCorrection": "Do the exercise twice. (a) Sennrich-style: split the sentence into words, mark word ends, apply two merges within words, and note which boundary markers are needed to rejoin the subwords. (b) SentencePiece-style: replace spaces with ▁, apply two merges over the raw symbol sequence, and note that the whitespace symbol alone allows reversal. Compare what information each convention must carry.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/1508.07909",
+        "https://arxiv.org/abs/1808.06226"
+      ]
+    },
+    {
+      "topicId": "05-12",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "mechanism, paragraph 1",
+      "originalText": "A rough estimate for dense Transformer training is C ≈ 6ND, with N parameters and D training tokens, ignoring important architecture- and sequence-dependent overheads.",
+      "problem": "The text leaves out the parameter-count convention. Kaplan et al. define N as non-embedding parameters, and their 6N-per-token estimate also drops the context-length-dependent attention term. The compute-optimal follow-up does not necessarily count parameters the same way. The article tells readers to compare the two papers' fitted recommendations, so an unstated difference in what N means can distort the comparison, especially for small models where embeddings are a large share of parameters.",
+      "suggestedCorrection": "Add: 'In Kaplan et al., N counts non-embedding parameters and the 6N estimate omits the context-dependent attention FLOPs. Check which parameter convention each scaling study uses before comparing their allocation rules.'",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2001.08361",
+        "https://arxiv.org/abs/2203.15556"
+      ]
+    },
+    {
+      "topicId": "05-14",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "exercise answer",
+      "originalText": "It is only one additional correct answer.",
+      "problem": "The 80-versus-81 gap is a net difference of one question, not necessarily one disagreement. For example, B could be right on 10 questions A misses while A is right on 9 that B misses. The article's own paired-analysis advice depends on this distinction. With n = 100, each accuracy also has a binomial standard error of about 4 percentage points.",
+      "suggestedCorrection": "'It is a net difference of one question. The models may disagree on many more items, so inspect the discordant pairs (for example with a paired test such as McNemar's). Note that each accuracy alone has a standard error of roughly 4 points at n = 100.'",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "06-03",
+      "severity": "low",
+      "confidence": "high",
+      "location": "practice, paragraph 1",
+      "originalText": "Take d_in = 8, d_out = 6, and r = 2. Full matrix adaptation has 48 trainable values; the two adapter matrices have 16 + 12 = 28. A high rank is not necessarily parameter-efficient for tiny layers.",
+      "problem": "The warning follows an example that is parameter-efficient: 28 < 48. A reader may conclude that r = 2 is inefficient here. The general statement is true, but the example does not show it. LoRA saves parameters only when r < d_in·d_out/(d_in + d_out) = 48/14 ≈ 3.43 for this layer, so r = 2 saves parameters and r = 4 (56 values) does not.",
+      "suggestedCorrection": "'...the two adapter matrices have 16 + 12 = 28, a saving. The break-even rank is d_in·d_out/(d_in + d_out) ≈ 3.43, so r = 4 would already need 56 values, more than the full matrix. Tiny layers leave little room for parameter-efficient ranks.'",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "06-10",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "mechanism and source-reading",
+      "originalText": "For a conceptual DoRA weight vector, write w′ = m(v + Δv)/‖v + Δv‖.",
+      "problem": "This is not an error; it is a missing implementation assumption. As I recall, the DoRA paper does two things beyond this forward formula. It initializes the magnitude m from the column norms of the pretrained weight, so that W′ = W₀ at the start when BA = 0. It also treats the norm ‖V + ΔV‖_c as a constant during backpropagation to reduce memory, which changes the gradients compared with differentiating the exact formula. An implementation that matches only the forward equation may not reproduce the studied training dynamics.",
+      "suggestedCorrection": "Add a sentence: 'Check the paper's magnitude initialization and whether the norm term is detached from the gradient computation. Both affect training behavior even when the forward output is identical.'",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2402.09353"
+      ]
+    },
+    {
+      "topicId": "06-12",
+      "severity": "low",
+      "confidence": "high",
+      "location": "mechanism, paragraph 1",
+      "originalText": "Run a single batch first, inspect the loss, and verify that adapter gradients are finite and nonzero after an appropriate initialization step.",
+      "problem": "Under the default LoRA initialization (B = 0, A random), the gradient with respect to A on the first backward pass is exactly zero, because it is proportional to Bᵀ. Only B gets a nonzero gradient. A student who checks that all adapter gradients are nonzero on step one will wrongly flag a correct setup. The phrase 'after an appropriate initialization step' does not make this explicit. Topic 06-06 derives exactly this fact, so the two articles should agree visibly.",
+      "suggestedCorrection": "'On the first backward pass with the default B = 0 initialization, expect finite nonzero gradients for the B (lora_B) matrices and exactly zero gradients for A (lora_A). After one optimizer step, A's gradients should also become nonzero. Non-default initialization options change this expectation (see 06-06).'",
+      "verificationNeeded": false,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2106.09685"
+      ]
+    }
+  ],
+  "numericalChecks": [
+    {
+      "topicId": "05-01",
+      "calculation": "0.5 × 0.25 × 0.8; −ln of each factor summed",
+      "result": "0.5×0.25 = 0.125, then ×0.8 = 0.1. −ln0.5 = 0.6931, −ln0.25 = 1.3863, −ln0.8 = 0.2231; sum = 2.3026 = −ln(0.1). The stated 2.303 nats is consistent."
+    },
+    {
+      "topicId": "05-03",
+      "calculation": "Targets for [BOS,A,B,EOS], and for 5 real tokens plus 3 padding",
+      "result": "Inputs [BOS,A,B] map to targets [A,B,EOS]: T − 1 = 3 positions. Five real tokens give 4 real-to-real pairs (1→2, 2→3, 3→4, 4→5); the pair 5→pad is excluded. Answer 4 is correct."
+    },
+    {
+      "topicId": "05-03",
+      "calculation": "Counting check for the source-reading claim about overlapping windows",
+      "result": "Window of 8 labels with the first 4 set to ignore and the last 4 valid: unshifted valid count = 4. After an internal shift the labels are positions 1–7, still 4 valid, because the dropped position 0 was already ignored. Subtracting one would give 3, which is wrong. The article's caution is arithmetically sound."
+    },
+    {
+      "topicId": "05-04",
+      "calculation": "Combined PPL of 4 and 16 with equal valid-target counts",
+      "result": "(ln4 + ln16)/2 = (1.3863 + 2.7726)/2 = 2.0794 = ln8, so PPL = 8 (the geometric mean, √64). The arithmetic mean 10 is correctly rejected. Uniform predictor: exp(−ln(1/V)) = V, correct."
+    },
+    {
+      "topicId": "05-09",
+      "calculation": "Top-p with p = 0.75 on [0.50, 0.30, 0.15, 0.05]",
+      "result": "Cumulative mass: 0.50 < 0.75, then 0.80 ≥ 0.75, so the nucleus is the first two tokens. Renormalized: 0.50/0.80 = 0.625 and 0.30/0.80 = 0.375. Correct, with no threshold tie."
+    },
+    {
+      "topicId": "05-12",
+      "calculation": "Fixed C ≈ 6ND with N doubled",
+      "result": "6(2N)D′ = 6ND gives D′ = D/2. Example: N = 1e9, D = 2e10 gives C = 1.2e20; with N = 2e9, D′ = 1e10. Correct under the approximation."
+    },
+    {
+      "topicId": "05-14",
+      "calculation": "Sampling uncertainty for 80% vs 81% on n = 100",
+      "result": "SE ≈ √(0.8×0.2/100) = 0.04, about 4 points per model. A 1-point gap is well inside that scale. Supports the article's conclusion; see the wording finding."
+    },
+    {
+      "topicId": "06-01",
+      "calculation": "Trainable fraction 2M/(100M + 2M); 1M vs 100M",
+      "result": "2/102 = 0.01961, about 1.96%: correct. 1M/100M = 1% relative to the backbone: correct as worded."
+    },
+    {
+      "topicId": "06-02",
+      "calculation": "Rank of the 2×2 identity and of a 3-nonzero diagonal",
+      "result": "I₂ has rank 2 > 1, so no outer product uv^T equals it, while e1e1^T + e2e2^T = I₂. A diagonal with three nonzero entries has rank 3 > 2, so rank 2 is insufficient. Both statements are correct."
+    },
+    {
+      "topicId": "06-03",
+      "calculation": "Adapter parameter counts for (8,6,2), (5,3,2), (1024,1024,8); shape check",
+      "result": "(8,6,2): A 2×8 = 16, B 6×2 = 12, total 28 vs 48 full. (5,3,2): 10 + 6 = 16 vs 15 full, so not efficient (correct). (1024,1024,8): 8192 + 8192 = 16,384 vs 1,048,576 = 1/64 (correct). Row form: X[b,d_in]·Aᵀ[d_in,r]·Bᵀ[r,d_out] gives [b,d_out], matching X·Wᵀ."
+    },
+    {
+      "topicId": "06-04",
+      "calculation": "s = α/r for (r=8, α=16), (r=32, α=16); doubling both",
+      "result": "16/8 = 2 and 16/32 = 0.5: correct. 2α/2r = α/r, unchanged: correct. Inverted dropout: E[m·x/(1−p)] = (1−p)x/(1−p) = x: correct."
+    },
+    {
+      "topicId": "06-05",
+      "calculation": "Budget equality and single-target counts",
+      "result": "512×512 with r=4: 4×1024 = 4096 per matrix; ×4 = 16,384. r=8 on Q and V: 8×1024×2 = 16,384. Equal, as stated. 256×1024 with r=4: 4×1280 = 5,120. 1024×1024 with r=4: 4×2048 = 8,192. Correct."
+    },
+    {
+      "topicId": "06-06",
+      "calculation": "Gradients of y = s·B(Ax) at B = 0",
+      "result": "∂L/∂B = s·g(Ax)ᵀ, nonzero if A ≠ 0 and x ≠ 0. ∂L/∂A = s·Bᵀg·xᵀ = 0 when B = 0. If both are zero, both gradients vanish. Matches the article."
+    },
+    {
+      "topicId": "06-07",
+      "calculation": "Soft prompt count for d = 768, m = 20; illustrative adapter 2db",
+      "result": "20×768 = 15,360: correct. For comparison, a b = 64 bottleneck adapter at d = 768 has 2×768×64 = 98,304 matrix values. A direct KV prefix with L = 12 and m = 20 would be about 2×12×20×768 = 368,640 values."
+    },
+    {
+      "topicId": "06-08",
+      "calculation": "1e9 weights at 4 bits vs 16 bits (decimal GB)",
+      "result": "1e9 × 0.5 byte = 0.5 GB; 1e9 × 2 bytes = 2 GB. Correct, excluding metadata."
+    },
+    {
+      "topicId": "06-09",
+      "calculation": "Bits per weight for (64-weight block, FP32 scale) and (32-weight block, FP16 scale); double quantization",
+      "result": "4 + 32/64 = 4.5 and 4 + 16/32 = 4.5: both correct. For context, QLoRA-style double quantization with 8-bit constants and one FP32 second-level constant per 256 blocks gives 8/64 + 32/(64×256) ≈ 0.127 bits of overhead, versus 0.5."
+    },
+    {
+      "topicId": "06-10",
+      "calculation": "rsLoRA α/√r vs α/r for α = 16",
+      "result": "r=64: 16/8 = 2 vs 16/64 = 0.25: correct. r 16→64: √r goes 4→8, so the rsLoRA multiplier halves (4→2); standard goes 1→0.25, one quarter. Correct."
+    },
+    {
+      "topicId": "06-11",
+      "calculation": "80 ± 2 vs 81 ± 2",
+      "result": "The gap of 1 is half of one reported spread, and under independence the SD of the difference is ≈ √(2²+2²) ≈ 2.8. The 'not enough' conclusion is correct."
+    },
+    {
+      "topicId": "07-01",
+      "calculation": "8 experts × 10M with top-2; 6 experts with top-2",
+      "result": "Stored 80M, active 20M (25%). Six experts with 2 active: 2/6 = 1/3. Correct."
+    },
+    {
+      "topicId": "07-02",
+      "calculation": "2dh for (16,32) and (64,128)",
+      "result": "2×16×32 = 1,024 per expert, ×4 = 4,096. 2×64×128 = 16,384, ×4 = 65,536. Correct."
+    },
+    {
+      "topicId": "07-03",
+      "calculation": "Top-2 renormalization for [0.55,0.25,0.15,0.05] and [0.2,0.5,0.3]",
+      "result": "0.55 + 0.25 = 0.8, giving 0.6875 and 0.3125 (unnormalized total 0.8). For [0.2,0.5,0.3], indices 1 and 2: 0.5/0.8 = 0.625 and 0.3/0.8 = 0.375. Correct."
+    },
+    {
+      "topicId": "07-04",
+      "calculation": "Assignments for T=120, k=2, E=6",
+      "result": "kT = 240 and 240/6 = 40 per expert. Correct."
+    },
+    {
+      "topicId": "07-05",
+      "calculation": "Weighted sums",
+      "result": "0.75[2,0] + 0.25[0,4] = [1.5, 1.0]. 0.4[1,3] + 0.6[5,1] = [0.4+3.0, 1.2+0.6] = [3.4, 1.8]. Correct."
+    },
+    {
+      "topicId": "07-06",
+      "calculation": "N·Σ f·P for uniform, concentrated, and the exercise case",
+      "result": "Uniform with 4 experts: 4×4×(0.25×0.25) = 1. All on one expert: 4×(1×1) = 4. Exercise: 2×(0.75×0.6 + 0.25×0.4) = 2×(0.45 + 0.10) = 1.1. Correct."
+    },
+    {
+      "topicId": "07-07",
+      "calculation": "Capacity for T=64, E=4, k=1, c=1.25; overflow fractions",
+      "result": "64/4 = 16, ×1.25 = 20, ceil = 20. 25 − 20 = 5 overflow. Exercise: 23 − 18 = 5, and 5/23 = 0.2174 = 21.7%. Correct."
+    },
+    {
+      "topicId": "07-08",
+      "calculation": "Code share vs base rate",
+      "result": "70% expert traffic vs 80% base rate gives a lift of 0.875 < 1, so this is relatively under-representation, consistent with the answer."
+    },
+    {
+      "topicId": "07-09",
+      "calculation": "Total and active counts",
+      "result": "20 + 8×10 = 100M total and 20 + 2×10 = 40M active. 30 + 12×5 = 90M total and 30 + 3×5 = 45M active. Correct."
+    },
+    {
+      "topicId": "07-10",
+      "calculation": "kTdb for k=2, T=1024, d=2048, b=2",
+      "result": "2×1024×2048×2 = 8,388,608 bytes, which is 8.39 MB (decimal) or exactly 8 MiB. Doubling k doubles the estimate. Correct."
+    },
+    {
+      "topicId": "08-01",
+      "calculation": "Raw values and patches",
+      "result": "32×32×3 = 3,072. (32/8)² = 16 patches of 8×8×3 = 192 values; 16×192 = 3,072 (consistent). 224/16 = 14, and 14² = 196. Correct."
+    },
+    {
+      "topicId": "08-02",
+      "calculation": "Conv output sizes and parameters",
+      "result": "(32 + 2 − 2 − 1)/1 + 1 = 32. 16×3×3×3 = 432. Stride 2: floor(31/2 + 1) = floor(16.5) = 16. Correct."
+    },
+    {
+      "topicId": "08-03",
+      "calculation": "ViT sequence lengths",
+      "result": "224/16 = 14, 14² = 196, +CLS = 197. 3×16×16 = 768 raw values per patch. 256/16 = 16, 16² = 256, +1 = 257. Correct."
+    },
+    {
+      "topicId": "08-04",
+      "calculation": "Attention entries for 196 → 784 tokens",
+      "result": "784/196 = 4, and 4² = 16 (38,416 → 614,656 entries). Correct."
+    },
+    {
+      "topicId": "08-05",
+      "calculation": "Horizontal flip of [10,30] with W = 100",
+      "result": "[100 − 30, 100 − 10] = [70, 90]. Width stays 20. Correct."
+    },
+    {
+      "topicId": "08-07",
+      "calculation": "InfoNCE examples",
+      "result": "e²/(e² + 1) = 7.389/8.389 = 0.8808, and −ln = 0.1269. Eight equal scores: −ln(1/8) = ln8 = 2.0794. Correct."
+    },
+    {
+      "topicId": "08-08",
+      "calculation": "Similarity matrix",
+      "result": "[32,512]·[512,32] = [32,32], 1,024 scores. Correct."
+    },
+    {
+      "topicId": "08-09",
+      "calculation": "Softmax at two temperatures for cosines 0.3 and 0.2",
+      "result": "τ=0.1 gives logits 3 and 2, p = 1/(1 + e⁻¹) = 0.731. τ=0.01 gives 30 and 20, p = 1/(1 + e⁻¹⁰) = 0.99995. Same ranking, very different confidence, as stated."
+    },
+    {
+      "topicId": "08-10",
+      "calculation": "softplus(−yz) at z = 2; pair counts at B = 4",
+      "result": "Positive: ln(1 + e⁻²) = ln(1.1353) = 0.1269. Negative: ln(1 + e²) = ln(8.389) = 2.1269. Pairs: 16 total, 4 diagonal, 4×3 = 12 off-diagonal. Correct."
+    },
+    {
+      "topicId": "08-12",
+      "calculation": "Global average pooling over a 14×14 grid",
+      "result": "196 positions averaged into one 768-vector. Summation is permutation-invariant, so reordered identical vectors give the same mean. Correct."
+    },
+    {
+      "topicId": "08-13",
+      "calculation": "Mask IoU",
+      "result": "Union = 100 + 100 − 60 = 140, and 60/140 = 0.4286. Correct."
+    }
+  ],
+  "overallAssessment": "All 51 articles were read in full. I found no high- or medium-severity errors. Every numerical example and exercise I recomputed is correct, including tensor shapes, LoRA and MoE parameter counts, quantization bit accounting, capacity and overflow arithmetic, the loss values, and the convolution output formula. The source-reading sections are generally well attributed, and in several places (top-p versus temperature, top-1 renormalization, SigLIP's 1/B reduction, the CLIP versus DINO embedding spaces, BERT's NSP objective, Packed-BERT's objective) they carefully avoid over-transferring a paper's claims. Conventions I checked against my knowledge of the primary sources are consistent with them: the LoRA α/r scale and B = 0 initialization, rsLoRA α/√r, the Switch balancing loss and capacity factor, Mixtral top-2, Shazeer-style top-k softmax, the GShard AllToAll, CLIP normalization and learned scale, SigLIP labels and bias, and the MAE masked-only loss. The six findings are low severity: one wording ambiguity in an exercise answer, one confusing juxtaposition of an example, two missing assumptions or conventions (the scaling-law parameter definition and DoRA's implementation details), one conflation of BPE preprocessing conventions, and one debugging instruction that could flag a correct LoRA setup as broken. I did not see regressions in the expanded sections. This review does not establish that the content is error-free.",
+  "limitations": "No web browsing, paper access, or code execution was used, so every source-attribution judgment rests on my recollection of the primary papers and may be wrong in detail. The findings on Kaplan's N convention and DoRA's norm detachment and initialization are marked for verification. Versioned documentation URLs could not be confirmed to exist or to contain the cited material: PEFT v0.21.0 LoRA reference (06-05, 06-06, 06-08, 06-12) and PyTorch docs path '2.11' for Conv2d (08-02). The Hugging Face chat-template, perplexity and PEFT quicktour pages are cited as stable guides, but their current text was not checked. In particular I could not check whether the current perplexity guide's token-count code subtracts a fixed one per window, which the 05-03 source-reading implicitly cautions against. The arXiv ID 2107.02027 for the sequence-packing paper is recalled with medium confidence. Prerequisite topics (01-xx through 04-xx) were not supplied, so cross-references to them were not checked. Style and pedagogy were reviewed only where they affect correctness."
+}

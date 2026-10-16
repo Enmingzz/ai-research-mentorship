@@ -32,7 +32,9 @@ export function lessonDocument(lesson,library) {
   const index=makeTopicIndex(library),allIds=Object.keys(index),position=allIds.indexOf(lesson.topicId);
   const previous=index[allIds[position-1]],next=index[allIds[position+1]];
   const url=`${SITE_URL}/learn/${lesson.topicId}/`;
-  const sectionLinks=[...lesson.sections.map(s=>({id:`section-${s.id}`,title:s.title})),{id:'worked-example',title:'Worked example'},{id:'takeaways',title:'Key points'},{id:'references',title:'References & further reading'}];
+  const primaryPapers=lesson.references.filter(reference=>reference.kind==='paper');
+  const leadSources=primaryPapers.length?primaryPapers:lesson.references;
+  const sectionLinks=[{id:'original-sources',title:primaryPapers.length?'Original papers':'Original sources'},...lesson.sections.map(s=>({id:`section-${s.id}`,title:s.title})),{id:'worked-example',title:'Worked example'},{id:'takeaways',title:'Key points'},{id:'references',title:'References & further reading'}];
   const toc=sectionLinks.map(s=>`<a href="#${e(s.id)}">${e(s.title)}</a>`).join('');
   const linkedTopic=(id)=>`<a href="../${e(id)}/">${e(index[id]?.title || id)} <span aria-hidden="true">↗</span></a>`;
   const adjacent=(entry,label)=>entry?`<a class="article-adjacent" href="../${e(entry.topicId)}/"><span class="eyebrow">${label}</span><strong>${e(entry.title)}</strong><span class="small">Subject ${e(entry.moduleId)} · ${entry.minutes} min read</span></a>`:'';
@@ -59,7 +61,8 @@ export function lessonDocument(lesson,library) {
 <header class="topbar"><div class="breadcrumb"><a href="../../library.html#subjects">Subjects</a><span>/</span><a href="../../library.html#subject/${subject.id}">Subject ${subject.id}</a><span>/</span><b>Article ${lesson.topicId}</b></div><div class="top-actions"><button class="button secondary" id="copy-article">Copy link ↗</button></div></header>
 <main id="article-content" tabindex="-1">
 <div class="article-topline"><a class="back-link" href="../../library.html#subject/${subject.id}">← ${e(subject.shortTitle)}</a><span class="outline-tag">REFERENCE ARTICLE</span></div>
-<header class="article-header"><div class="eyebrow">ARTICLE ${lesson.topicId.replace('-','.')} / ${e(subject.shortTitle.toUpperCase())}</div><h1>${e(lesson.title)}</h1><p class="article-dek">${e(lesson.summary)}</p><div class="article-meta"><span>enming group</span><span>${readingMinutes(lesson)} min read</span><span>${lesson.references.length} primary ${lesson.references.length===1?'source':'sources'}</span></div></header>
+<header class="article-header"><div class="eyebrow">ARTICLE ${lesson.topicId.replace('-','.')} / ${e(subject.shortTitle.toUpperCase())}</div><h1>${e(lesson.title)}</h1><p class="article-dek">${e(lesson.summary)}</p><div class="article-meta"><span>enming group</span><span>${readingMinutes(lesson)} min read</span><span>${lesson.references.length} ${lesson.references.length===1?'source':'sources'}</span></div></header>
+<section class="article-primary-sources" id="original-sources" aria-labelledby="original-sources-title"><div class="eyebrow">${primaryPapers.length?'READ THE RESEARCH':'GO TO THE SOURCE'}</div><h2 id="original-sources-title">${primaryPapers.length?'Papers behind this idea':'Original sources for this topic'}</h2><p>${primaryPapers.length?'Read the original work alongside the explanation. The source-reading section below connects its ideas, assumptions, and examples.':'The authoritative text or documentation provides the definitions and details used in this explanation.'}</p><ol>${leadSources.map(reference=>`<li><span class="reference-kind">${e(reference.kind.toUpperCase())}</span><h3>${external(reference)}</h3><p>${e(reference.note)}</p></li>`).join('')}</ol></section>
 <div class="article-layout"><article class="article-body">
 ${lesson.prerequisites.length?`<aside class="related-concepts"><span class="eyebrow">RELATED CONCEPTS</span><p>Background on the ideas used in this article.</p><div>${lesson.prerequisites.map(linkedTopic).join('')}</div></aside>`:''}
 <details class="mobile-toc"><summary>On this page</summary><nav aria-label="Article sections on mobile">${toc}</nav></details>

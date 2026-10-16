@@ -1,0 +1,3429 @@
+{
+  "reviewer": "OpenAI Codex: full-content factual review, primary-source verification, original enrichment, and executed arithmetic. Independent Claude baseline findings were separately adjudicated.",
+  "date": "2026-10-16",
+  "scope": {
+    "files": [
+      "data/lessons/09.json",
+      "data/lessons/10.json",
+      "data/lessons/11.json",
+      "data/lessons/12.json"
+    ],
+    "articleCount": 68,
+    "reviewedFields": [
+      "title",
+      "summary",
+      "prerequisites",
+      "every section paragraph",
+      "formulas",
+      "exercise prompt and answer",
+      "takeaways",
+      "reference title, URL, kind, and reading note"
+    ],
+    "codeSnippetsPresent": 0,
+    "method": "Read every article in full before editing. Rechecked niche claims in primary papers and official technical documentation. Authored one original, topic-specific three-paragraph source-reading section per article. Executed arithmetic and small algebraic/finite-difference checks in V8; validated on-disk JSON, topic coverage, prerequisite IDs, section uniqueness, reference schemas, and source-reading lengths."
+  },
+  "reviewedTopicIds": [
+    "09-01",
+    "09-02",
+    "09-03",
+    "09-04",
+    "09-05",
+    "09-06",
+    "09-07",
+    "09-08",
+    "09-09",
+    "09-10",
+    "09-11",
+    "09-12",
+    "09-13",
+    "09-14",
+    "09-15",
+    "09-16",
+    "09-17",
+    "09-18",
+    "09-19",
+    "09-20",
+    "10-01",
+    "10-02",
+    "10-03",
+    "10-04",
+    "10-05",
+    "10-06",
+    "10-07",
+    "10-08",
+    "10-09",
+    "10-10",
+    "10-11",
+    "10-12",
+    "10-13",
+    "10-14",
+    "11-01",
+    "11-02",
+    "11-03",
+    "11-04",
+    "11-05",
+    "11-06",
+    "11-07",
+    "11-08",
+    "11-09",
+    "11-10",
+    "11-11",
+    "11-12",
+    "11-13",
+    "11-14",
+    "11-15",
+    "11-16",
+    "12-01",
+    "12-02",
+    "12-03",
+    "12-04",
+    "12-05",
+    "12-06",
+    "12-07",
+    "12-08",
+    "12-09",
+    "12-10",
+    "12-11",
+    "12-12",
+    "12-13",
+    "12-14",
+    "12-15",
+    "12-16",
+    "12-17",
+    "12-18"
+  ],
+  "enrichedTopicIds": [
+    "09-01",
+    "09-02",
+    "09-03",
+    "09-04",
+    "09-05",
+    "09-06",
+    "09-07",
+    "09-08",
+    "09-09",
+    "09-10",
+    "09-11",
+    "09-12",
+    "09-13",
+    "09-14",
+    "09-15",
+    "09-16",
+    "09-17",
+    "09-18",
+    "09-19",
+    "09-20",
+    "10-01",
+    "10-02",
+    "10-03",
+    "10-04",
+    "10-05",
+    "10-06",
+    "10-07",
+    "10-08",
+    "10-09",
+    "10-10",
+    "10-11",
+    "10-12",
+    "10-13",
+    "10-14",
+    "11-01",
+    "11-02",
+    "11-03",
+    "11-04",
+    "11-05",
+    "11-06",
+    "11-07",
+    "11-08",
+    "11-09",
+    "11-10",
+    "11-11",
+    "11-12",
+    "11-13",
+    "11-14",
+    "11-15",
+    "11-16",
+    "12-01",
+    "12-02",
+    "12-03",
+    "12-04",
+    "12-05",
+    "12-06",
+    "12-07",
+    "12-08",
+    "12-09",
+    "12-10",
+    "12-11",
+    "12-12",
+    "12-13",
+    "12-14",
+    "12-15",
+    "12-16",
+    "12-17",
+    "12-18"
+  ],
+  "enrichment": {
+    "sectionId": "source-reading",
+    "sectionCount": 68,
+    "totalAddedReadingWords": 9600,
+    "wordCountConvention": "Whitespace-delimited words in added section paragraphs; titles excluded.",
+    "sections": [
+      {
+        "topicId": "09-01",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "09-02",
+        "paragraphs": 3,
+        "wordCount": 134
+      },
+      {
+        "topicId": "09-03",
+        "paragraphs": 3,
+        "wordCount": 141
+      },
+      {
+        "topicId": "09-04",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "09-05",
+        "paragraphs": 3,
+        "wordCount": 131
+      },
+      {
+        "topicId": "09-06",
+        "paragraphs": 3,
+        "wordCount": 141
+      },
+      {
+        "topicId": "09-07",
+        "paragraphs": 3,
+        "wordCount": 144
+      },
+      {
+        "topicId": "09-08",
+        "paragraphs": 3,
+        "wordCount": 136
+      },
+      {
+        "topicId": "09-09",
+        "paragraphs": 3,
+        "wordCount": 142
+      },
+      {
+        "topicId": "09-10",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "09-11",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "09-12",
+        "paragraphs": 3,
+        "wordCount": 140
+      },
+      {
+        "topicId": "09-13",
+        "paragraphs": 3,
+        "wordCount": 131
+      },
+      {
+        "topicId": "09-14",
+        "paragraphs": 3,
+        "wordCount": 138
+      },
+      {
+        "topicId": "09-15",
+        "paragraphs": 3,
+        "wordCount": 138
+      },
+      {
+        "topicId": "09-16",
+        "paragraphs": 3,
+        "wordCount": 142
+      },
+      {
+        "topicId": "09-17",
+        "paragraphs": 3,
+        "wordCount": 134
+      },
+      {
+        "topicId": "09-18",
+        "paragraphs": 3,
+        "wordCount": 150
+      },
+      {
+        "topicId": "09-19",
+        "paragraphs": 3,
+        "wordCount": 141
+      },
+      {
+        "topicId": "09-20",
+        "paragraphs": 3,
+        "wordCount": 140
+      },
+      {
+        "topicId": "10-01",
+        "paragraphs": 3,
+        "wordCount": 143
+      },
+      {
+        "topicId": "10-02",
+        "paragraphs": 3,
+        "wordCount": 144
+      },
+      {
+        "topicId": "10-03",
+        "paragraphs": 3,
+        "wordCount": 143
+      },
+      {
+        "topicId": "10-04",
+        "paragraphs": 3,
+        "wordCount": 142
+      },
+      {
+        "topicId": "10-05",
+        "paragraphs": 3,
+        "wordCount": 134
+      },
+      {
+        "topicId": "10-06",
+        "paragraphs": 3,
+        "wordCount": 144
+      },
+      {
+        "topicId": "10-07",
+        "paragraphs": 3,
+        "wordCount": 137
+      },
+      {
+        "topicId": "10-08",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "10-09",
+        "paragraphs": 3,
+        "wordCount": 142
+      },
+      {
+        "topicId": "10-10",
+        "paragraphs": 3,
+        "wordCount": 142
+      },
+      {
+        "topicId": "10-11",
+        "paragraphs": 3,
+        "wordCount": 140
+      },
+      {
+        "topicId": "10-12",
+        "paragraphs": 3,
+        "wordCount": 145
+      },
+      {
+        "topicId": "10-13",
+        "paragraphs": 3,
+        "wordCount": 144
+      },
+      {
+        "topicId": "10-14",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "11-01",
+        "paragraphs": 3,
+        "wordCount": 138
+      },
+      {
+        "topicId": "11-02",
+        "paragraphs": 3,
+        "wordCount": 145
+      },
+      {
+        "topicId": "11-03",
+        "paragraphs": 3,
+        "wordCount": 145
+      },
+      {
+        "topicId": "11-04",
+        "paragraphs": 3,
+        "wordCount": 143
+      },
+      {
+        "topicId": "11-05",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "11-06",
+        "paragraphs": 3,
+        "wordCount": 141
+      },
+      {
+        "topicId": "11-07",
+        "paragraphs": 3,
+        "wordCount": 141
+      },
+      {
+        "topicId": "11-08",
+        "paragraphs": 3,
+        "wordCount": 143
+      },
+      {
+        "topicId": "11-09",
+        "paragraphs": 3,
+        "wordCount": 144
+      },
+      {
+        "topicId": "11-10",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "11-11",
+        "paragraphs": 3,
+        "wordCount": 137
+      },
+      {
+        "topicId": "11-12",
+        "paragraphs": 3,
+        "wordCount": 145
+      },
+      {
+        "topicId": "11-13",
+        "paragraphs": 3,
+        "wordCount": 141
+      },
+      {
+        "topicId": "11-14",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "11-15",
+        "paragraphs": 3,
+        "wordCount": 147
+      },
+      {
+        "topicId": "11-16",
+        "paragraphs": 3,
+        "wordCount": 143
+      },
+      {
+        "topicId": "12-01",
+        "paragraphs": 3,
+        "wordCount": 141
+      },
+      {
+        "topicId": "12-02",
+        "paragraphs": 3,
+        "wordCount": 144
+      },
+      {
+        "topicId": "12-03",
+        "paragraphs": 3,
+        "wordCount": 143
+      },
+      {
+        "topicId": "12-04",
+        "paragraphs": 3,
+        "wordCount": 141
+      },
+      {
+        "topicId": "12-05",
+        "paragraphs": 3,
+        "wordCount": 148
+      },
+      {
+        "topicId": "12-06",
+        "paragraphs": 3,
+        "wordCount": 142
+      },
+      {
+        "topicId": "12-07",
+        "paragraphs": 3,
+        "wordCount": 145
+      },
+      {
+        "topicId": "12-08",
+        "paragraphs": 3,
+        "wordCount": 144
+      },
+      {
+        "topicId": "12-09",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "12-10",
+        "paragraphs": 3,
+        "wordCount": 145
+      },
+      {
+        "topicId": "12-11",
+        "paragraphs": 3,
+        "wordCount": 144
+      },
+      {
+        "topicId": "12-12",
+        "paragraphs": 3,
+        "wordCount": 136
+      },
+      {
+        "topicId": "12-13",
+        "paragraphs": 3,
+        "wordCount": 144
+      },
+      {
+        "topicId": "12-14",
+        "paragraphs": 3,
+        "wordCount": 143
+      },
+      {
+        "topicId": "12-15",
+        "paragraphs": 3,
+        "wordCount": 139
+      },
+      {
+        "topicId": "12-16",
+        "paragraphs": 3,
+        "wordCount": 144
+      },
+      {
+        "topicId": "12-17",
+        "paragraphs": 3,
+        "wordCount": 145
+      },
+      {
+        "topicId": "12-18",
+        "paragraphs": 3,
+        "wordCount": 146
+      }
+    ],
+    "approach": "Source-specific reading questions, original toy calculations, counterexamples, diagnostics, and explicit assumptions/trade-offs. No invented paper section numbers or reproduced extended passages."
+  },
+  "issues": [
+    {
+      "topicId": "09-01",
+      "severity": "minor",
+      "field": "references.0.url",
+      "before": "https://www.deeplearningbook.org/",
+      "after": "https://www.deeplearningbook.org/contents/autoencoders.html",
+      "reason": "Point the textbook source directly to the relevant chapter.",
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/autoencoders.html",
+        "https://arxiv.org/abs/2111.06377"
+      ]
+    },
+    {
+      "topicId": "09-12",
+      "severity": "moderate",
+      "field": "sections.0.paragraphs.0",
+      "before": "The same numerical timestep can represent very different noise levels under different schedules. In a variance-preserving process, ᾱ_t controls the remaining signal variance and 1 − ᾱ_t the noise variance. Their ratio is a useful measure of prediction difficulty. Early high-signal states preserve image detail, while late low-signal states require stronger reliance on the learned data distribution and conditioning. The schedule decides how training and sampling traverse these regimes.",
+      "after": "The same numerical timestep can represent very different noise levels under different schedules. In a variance-preserving process, ᾱ_t and 1 − ᾱ_t are the squared signal and noise coefficients. For unit-variance data and independent standard Gaussian noise, they also give the two variance contributions. Their ratio is the conventional signal-to-noise ratio. Early high-signal states preserve image detail, while late low-signal states require stronger reliance on the learned data distribution and conditioning. The schedule decides how training and sampling traverse these regimes.",
+      "reason": "State unit-data-variance assumption and distinguish coefficient SNR from actual signal variance.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2102.09672",
+        "https://arxiv.org/abs/2006.11239"
+      ]
+    },
+    {
+      "topicId": "09-12",
+      "severity": "moderate",
+      "field": "sections.1.formula",
+      "before": "SNR(t) = ᾱ_t / (1 − ᾱ_t)",
+      "after": "Conventional SNR(t) = ᾱ_t / (1 − ᾱ_t); actual variance ratio = ᾱ_t Var(x₀) / (1 − ᾱ_t) for independent unit-variance noise",
+      "reason": "State unit-data-variance assumption and distinguish coefficient SNR from actual signal variance.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2102.09672",
+        "https://arxiv.org/abs/2006.11239"
+      ]
+    },
+    {
+      "topicId": "09-12",
+      "severity": "moderate",
+      "field": "exercise.prompt",
+      "before": "At what ᾱ value is the variance-based signal-to-noise ratio equal to one?",
+      "after": "At what ᾱ value is the conventional signal-to-noise ratio equal to one?",
+      "reason": "State unit-data-variance assumption and distinguish coefficient SNR from actual signal variance.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2102.09672",
+        "https://arxiv.org/abs/2006.11239"
+      ]
+    },
+    {
+      "topicId": "09-12",
+      "severity": "moderate",
+      "field": "exercise.answer",
+      "before": "ᾱ/(1 − ᾱ) = 1 implies ᾱ = 0.5. Signal and noise each contribute half the variance under this convention.",
+      "after": "ᾱ/(1 − ᾱ) = 1 implies ᾱ = 0.5. With unit-variance data and independent standard Gaussian noise, signal and noise each contribute half the variance.",
+      "reason": "State unit-data-variance assumption and distinguish coefficient SNR from actual signal variance.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2102.09672",
+        "https://arxiv.org/abs/2006.11239"
+      ]
+    },
+    {
+      "topicId": "11-07",
+      "severity": "moderate",
+      "field": "sections.1.paragraphs.0",
+      "before": "Define pT(i)=exp(zi/T)/Σj exp(zj/T). A common distillation objective combines ordinary label loss with T² KL(pteacher,T || pstudent,T). The T² factor compensates for the gradient scaling introduced by temperature under the standard formulation. Both teacher and student distributions must use the same temperature for this comparison. For logits [2,0], the first-class probability is about 0.881 at T=1 and 0.731 at T=2, illustrating how relative alternatives become less suppressed.",
+      "after": "Define pT(i)=exp(zi/T)/Σj exp(zj/T). A common distillation objective combines ordinary label loss with T² KL(pteacher,T || pstudent,T). The T² factor compensates for the leading high-temperature gradient scaling under the standard formulation; it does not make gradients exactly invariant at every temperature. Both teacher and student distributions must use the same temperature for this comparison. For logits [2,0], the first-class probability is about 0.881 at T=1 and 0.731 at T=2, illustrating how relative alternatives become less suppressed.",
+      "reason": "T² temperature compensation is asymptotic; centered-logit matching remains informative at high temperature.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1503.02531"
+      ]
+    },
+    {
+      "topicId": "11-07",
+      "severity": "moderate",
+      "field": "sections.2.paragraphs.0",
+      "before": "Post-hoc temperature calibration fits a temperature on held-out validation data to adjust confidence. Distillation temperature shapes training targets. Generation temperature changes which tokens are sampled. They use related mathematics but optimize different goals. Tune temperature without looking at test outcomes, and report the mixture weight between hard-label and distillation losses. Extremely high temperature can make targets nearly uniform and weaken useful distinctions. A soft distribution is informative only when its relative probabilities carry relevant structure.",
+      "after": "Post-hoc temperature calibration fits a temperature on held-out validation data to adjust confidence. Distillation temperature shapes training targets. Generation temperature changes which tokens are sampled. They use related mathematics but optimize different goals. Tune temperature without looking at test outcomes, and report the mixture weight between hard-label and distillation losses. At high temperature, probability differences shrink, but T²-scaled distillation retains a centered-logit matching signal in the limit. Nearly uniform targets therefore do not imply vanishing information in that scaled objective; which distinctions help still depends on the task and teacher.",
+      "reason": "T² temperature compensation is asymptotic; centered-logit matching remains informative at high temperature.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1503.02531"
+      ]
+    },
+    {
+      "topicId": "12-06",
+      "severity": "minor",
+      "field": "summary",
+      "before": "A symmetric comparison can balance two distributions, but estimating it still requires access to their probabilities.",
+      "after": "Jensen–Shannon divergence compares distributions symmetrically; exact evaluation and estimation from samples require different information and assumptions.",
+      "reason": "Distinguish exact evaluation from sample estimation; fix corrupted Jensen–Shannon punctuation.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1406.2661"
+      ]
+    },
+    {
+      "topicId": "12-06",
+      "severity": "minor",
+      "field": "references.0.note",
+      "before": "Read the distribution-matching analysis and its Jensen?Shannon connection.",
+      "after": "Read the optimal-discriminator analysis and its Jensen–Shannon connection; distinguish that ideal analysis from finite-model training.",
+      "reason": "Distinguish exact evaluation from sample estimation; fix corrupted Jensen–Shannon punctuation.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1406.2661"
+      ]
+    },
+    {
+      "topicId": "10-06",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models",
+          "url": "https://arxiv.org/abs/2301.12597",
+          "kind": "paper",
+          "note": "Inspect the use of frozen image and language encoders."
+        },
+        {
+          "title": "Visual Instruction Tuning",
+          "url": "https://arxiv.org/abs/2304.08485",
+          "kind": "paper",
+          "note": "Compare which components are updated across training stages."
+        }
+      ],
+      "after": [
+        {
+          "title": "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models",
+          "url": "https://arxiv.org/abs/2301.12597",
+          "kind": "paper",
+          "note": "Inspect the use of frozen image and language encoders."
+        },
+        {
+          "title": "Visual Instruction Tuning",
+          "url": "https://arxiv.org/abs/2304.08485",
+          "kind": "paper",
+          "note": "Compare which components are updated across training stages."
+        },
+        {
+          "title": "PyTorch Autograd Mechanics",
+          "url": "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+          "kind": "guide",
+          "note": "Distinguish requires_grad, no-grad mode, inference mode, and evaluation mode; freezing parameters and disabling graph recording solve different problems."
+        }
+      ],
+      "reason": "The PyTorch API claims need their official documentation, beyond architecture papers.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/2.14/notes/autograd.html"
+      ]
+    },
+    {
+      "topicId": "11-04",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "H₂O: Heavy-Hitter Oracle",
+          "url": "https://arxiv.org/abs/2306.14048",
+          "kind": "paper",
+          "note": "Examine retention of recent tokens and accumulated attention."
+        }
+      ],
+      "after": [
+        {
+          "title": "H₂O: Heavy-Hitter Oracle",
+          "url": "https://arxiv.org/abs/2306.14048",
+          "kind": "paper",
+          "note": "Examine retention of recent tokens and accumulated attention."
+        },
+        {
+          "title": "PyTorch Autograd Mechanics",
+          "url": "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+          "kind": "guide",
+          "note": "Distinguish requires_grad, no-grad mode, inference mode, and evaluation mode; freezing parameters and disabling graph recording solve different problems."
+        }
+      ],
+      "reason": "Support the distinction between eval() and disabling autograd with the official API documentation.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/2.14/notes/autograd.html"
+      ]
+    },
+    {
+      "topicId": "11-05",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "LLM.int8()",
+          "url": "https://arxiv.org/abs/2208.07339",
+          "kind": "paper",
+          "note": "Examine why activation outliers complicate low-bit inference."
+        }
+      ],
+      "after": [
+        {
+          "title": "LLM.int8()",
+          "url": "https://arxiv.org/abs/2208.07339",
+          "kind": "paper",
+          "note": "Examine why activation outliers complicate low-bit inference."
+        },
+        {
+          "title": "Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference",
+          "url": "https://arxiv.org/abs/1712.05877",
+          "kind": "paper",
+          "note": "Inspect affine scale/zero-point quantization and simulated quantization during training; compare that setting with LLM.int8() outlier handling."
+        }
+      ],
+      "reason": "LLM.int8() alone does not support the broader affine-quantization and QAT explanation.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1712.05877"
+      ]
+    },
+    {
+      "topicId": "11-06",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "Distilling the Knowledge in a Neural Network",
+          "url": "https://arxiv.org/abs/1503.02531",
+          "kind": "paper",
+          "note": "Read the soft-target objective and temperature discussion."
+        }
+      ],
+      "after": [
+        {
+          "title": "Distilling the Knowledge in a Neural Network",
+          "url": "https://arxiv.org/abs/1503.02531",
+          "kind": "paper",
+          "note": "Read the soft-target objective and temperature discussion."
+        },
+        {
+          "title": "FitNets: Hints for Thin Deep Nets",
+          "url": "https://arxiv.org/abs/1412.6550",
+          "kind": "paper",
+          "note": "Trace the intermediate-feature hint objective and the regressor that reconciles teacher and student feature shapes."
+        }
+      ],
+      "reason": "Add the primary source for intermediate-feature distillation.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1412.6550"
+      ]
+    },
+    {
+      "topicId": "11-06",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "Distilling the Knowledge in a Neural Network",
+          "url": "https://arxiv.org/abs/1503.02531",
+          "kind": "paper",
+          "note": "Read the soft-target objective and temperature discussion."
+        },
+        {
+          "title": "FitNets: Hints for Thin Deep Nets",
+          "url": "https://arxiv.org/abs/1412.6550",
+          "kind": "paper",
+          "note": "Trace the intermediate-feature hint objective and the regressor that reconciles teacher and student feature shapes."
+        }
+      ],
+      "after": [
+        {
+          "title": "Distilling the Knowledge in a Neural Network",
+          "url": "https://arxiv.org/abs/1503.02531",
+          "kind": "paper",
+          "note": "Read the soft-target objective and temperature discussion."
+        },
+        {
+          "title": "FitNets: Hints for Thin Deep Nets",
+          "url": "https://arxiv.org/abs/1412.6550",
+          "kind": "paper",
+          "note": "Trace the intermediate-feature hint objective and the regressor that reconciles teacher and student feature shapes."
+        },
+        {
+          "title": "Sequence-Level Knowledge Distillation",
+          "url": "https://arxiv.org/abs/1606.07947",
+          "kind": "paper",
+          "note": "Compare sequence-level teacher targets with token-distribution matching and inspect the role of teacher decoding."
+        }
+      ],
+      "reason": "Add the primary source for response or sequence-level distillation.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1606.07947"
+      ]
+    },
+    {
+      "topicId": "11-11",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "H₂O: Heavy-Hitter Oracle",
+          "url": "https://arxiv.org/abs/2306.14048",
+          "kind": "paper",
+          "note": "Examine retention of recent tokens and accumulated attention."
+        }
+      ],
+      "after": [
+        {
+          "title": "H₂O: Heavy-Hitter Oracle",
+          "url": "https://arxiv.org/abs/2306.14048",
+          "kind": "paper",
+          "note": "Examine retention of recent tokens and accumulated attention."
+        },
+        {
+          "title": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache",
+          "url": "https://arxiv.org/abs/2402.02750",
+          "kind": "paper",
+          "note": "Inspect why keys and values use different quantization axes, and why a residual buffer complicates nominal bit-width savings."
+        }
+      ],
+      "reason": "H2O supports eviction, while KIVI directly supports cache quantization.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2402.02750"
+      ]
+    },
+    {
+      "topicId": "11-16",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "Deep Learning: Practical Methodology",
+          "url": "https://www.deeplearningbook.org/contents/guidelines.html",
+          "kind": "book",
+          "note": "Read the sections on baselines, diagnostics, and experimental design."
+        },
+        {
+          "title": "NeurIPS Paper Checklist",
+          "url": "https://neurips.cc/public/guides/PaperChecklist",
+          "kind": "guide",
+          "note": "Review reporting of uncertainty, compute, data, and limitations."
+        }
+      ],
+      "after": [
+        {
+          "title": "Deep Learning: Practical Methodology",
+          "url": "https://www.deeplearningbook.org/contents/guidelines.html",
+          "kind": "book",
+          "note": "Read the sections on baselines, diagnostics, and experimental design."
+        },
+        {
+          "title": "NeurIPS Paper Checklist",
+          "url": "https://neurips.cc/public/guides/PaperChecklist",
+          "kind": "guide",
+          "note": "Review reporting of uncertainty, compute, data, and limitations."
+        },
+        {
+          "title": "Convex Optimization: Convex Optimization Problems",
+          "url": "https://web.stanford.edu/class/ee364a/lectures/problems.pdf",
+          "kind": "guide",
+          "note": "Read the vector-optimization and Pareto-optimality discussion; apply its nondominance definition before considering scalarized objectives."
+        }
+      ],
+      "reason": "Add an authoritative mathematical source for Pareto optimality.",
+      "sourceUrls": [
+        "https://web.stanford.edu/class/ee364a/lectures/problems.pdf"
+      ]
+    },
+    {
+      "topicId": "12-06",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "Generative Adversarial Nets",
+          "url": "https://arxiv.org/abs/1406.2661",
+          "kind": "paper",
+          "note": "Read the optimal-discriminator analysis and its Jensen–Shannon connection; distinguish that ideal analysis from finite-model training."
+        }
+      ],
+      "after": [
+        {
+          "title": "Generative Adversarial Nets",
+          "url": "https://arxiv.org/abs/1406.2661",
+          "kind": "paper",
+          "note": "Read the optimal-discriminator analysis and its Jensen–Shannon connection; distinguish that ideal analysis from finite-model training."
+        },
+        {
+          "title": "A New Metric for Probability Distributions",
+          "url": "https://research-repository.st-andrews.ac.uk/bitstream/10023/1591/1/Endres2003-IEEETransInfTheory49-NewMetric.pdf",
+          "kind": "paper",
+          "note": "Inspect the metric construction and its relation to the square root of Jensen–Shannon divergence; distinguish the divergence from the metric."
+        }
+      ],
+      "reason": "GAN analysis does not establish the square-root metric property.",
+      "sourceUrls": [
+        "https://research-repository.st-andrews.ac.uk/bitstream/10023/1591/1/Endres2003-IEEETransInfTheory49-NewMetric.pdf"
+      ]
+    },
+    {
+      "topicId": "12-14",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "Training language models to follow instructions with human feedback",
+          "url": "https://arxiv.org/abs/2203.02155",
+          "kind": "paper",
+          "note": "Separate demonstration learning, preference modeling, and policy optimization."
+        },
+        {
+          "title": "DeepSeekMath",
+          "url": "https://arxiv.org/abs/2402.03300",
+          "kind": "paper",
+          "note": "Read the group-relative policy optimization formulation."
+        }
+      ],
+      "after": [
+        {
+          "title": "Training language models to follow instructions with human feedback",
+          "url": "https://arxiv.org/abs/2203.02155",
+          "kind": "paper",
+          "note": "Separate demonstration learning, preference modeling, and policy optimization."
+        },
+        {
+          "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+          "url": "https://arxiv.org/abs/2501.12948",
+          "kind": "paper",
+          "note": "Read the accuracy and format reward definitions, including mathematical-answer checks and code tests; separate reward design from the policy optimizer."
+        }
+      ],
+      "reason": "Use a primary source that explicitly documents rule-based verifiable rewards.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2501.12948"
+      ]
+    },
+    {
+      "topicId": "12-16",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "Training language models to follow instructions with human feedback",
+          "url": "https://arxiv.org/abs/2203.02155",
+          "kind": "paper",
+          "note": "Separate demonstration learning, preference modeling, and policy optimization."
+        },
+        {
+          "title": "DeepSeekMath",
+          "url": "https://arxiv.org/abs/2402.03300",
+          "kind": "paper",
+          "note": "Read the group-relative policy optimization formulation."
+        }
+      ],
+      "after": [
+        {
+          "title": "Training language models to follow instructions with human feedback",
+          "url": "https://arxiv.org/abs/2203.02155",
+          "kind": "paper",
+          "note": "Separate demonstration learning, preference modeling, and policy optimization."
+        },
+        {
+          "title": "Scaling Laws for Reward Model Overoptimization",
+          "url": "https://arxiv.org/abs/2210.10760",
+          "kind": "paper",
+          "note": "Inspect proxy-versus-gold reward curves under stronger optimization; the experimental gold standard is a stronger reward model, not literal human ground truth."
+        }
+      ],
+      "reason": "Replace a generic RL reference with a direct study of reward-model overoptimization.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2210.10760"
+      ]
+    },
+    {
+      "topicId": "12-17",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "Spinning Up: Intro to Policy Optimization",
+          "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html",
+          "kind": "guide",
+          "note": "Derive the log-probability gradient and action-independent baseline."
+        },
+        {
+          "title": "Proximal Policy Optimization Algorithms",
+          "url": "https://arxiv.org/abs/1707.06347",
+          "kind": "paper",
+          "note": "Analyze the clipped surrogate and its dependence on advantage sign."
+        }
+      ],
+      "after": [
+        {
+          "title": "Spinning Up: Kinds of RL Algorithms",
+          "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro2.html",
+          "kind": "guide",
+          "note": "Compare policy-optimization and Q-learning approaches and their use of on-policy versus off-policy experience."
+        },
+        {
+          "title": "Proximal Policy Optimization Algorithms",
+          "url": "https://arxiv.org/abs/1707.06347",
+          "kind": "paper",
+          "note": "Analyze the clipped surrogate and its dependence on advantage sign."
+        }
+      ],
+      "reason": "The algorithm taxonomy is a more direct source for the on/off-policy distinction.",
+      "sourceUrls": [
+        "https://spinningup.openai.com/en/latest/spinningup/rl_intro2.html"
+      ]
+    },
+    {
+      "topicId": "11-16",
+      "severity": "moderate",
+      "field": "exercise.prompt",
+      "before": "D has 92% accuracy, 18 ms latency, and the same memory as A and B above. Which points remain nondominated?",
+      "after": "D has 92% accuracy and 18 ms latency. All four configurations A, B, C, and D use the same peak memory. Which points remain nondominated?",
+      "reason": "The previous prompt omitted C's memory, so it did not justify three-objective dominance.",
+      "sourceUrls": [
+        "https://web.stanford.edu/class/ee364a/lectures/problems.pdf"
+      ],
+      "origin": "Claude baseline suggestion independently validated by OpenAI"
+    },
+    {
+      "topicId": "11-13",
+      "severity": "minor",
+      "field": "exercise.answer",
+      "before": "The accumulated gradient is four times the intended combined-batch mean gradient. This changes the effective update and interacts with clipping, optimizer state, and regularization; it is not merely a logging difference.",
+      "after": "The accumulated gradient is four times the intended combined-batch mean gradient. Under plain SGD this gives a four-times-larger step at the same learning rate. For Adam, a constant positive rescaling of the entire gradient history largely cancels between first and second moments, apart from ε; changing scale midway or introducing clipping and coupled regularization can break that cancellation. Normalize explicitly instead of assuming every optimizer responds identically.",
+      "reason": "Gradient magnitude and optimizer step magnitude are distinct; Adam's scaling cancellation has historical consistency assumptions.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1412.6980"
+      ],
+      "origin": "Claude baseline suggestion independently validated by OpenAI"
+    },
+    {
+      "topicId": "12-17",
+      "severity": "minor",
+      "field": "sections.1.paragraphs.0",
+      "before": "For a single action, an expectation under π can sometimes be estimated from actions sampled under μ using importance weight π(a|s)/μ(a|s), provided μ covers π's support. Full trajectories can require products of ratios and additional treatment of state-distribution differences, making variance severe. Some off-policy algorithms instead use value-learning objectives with their own assumptions. A one-step ratio does not magically turn every stale trajectory into an unbiased estimate of every desired quantity.",
+      "after": "For a single action at a fixed state, an expectation under π can sometimes be estimated from actions sampled under μ using importance weight π(a|s)/μ(a|s), provided μ covers π's support. A full-trajectory likelihood ratio is the product of per-step action ratios when the initial-state and environment dynamics are shared; it already accounts for the induced state-distribution change, but its variance can be severe. Methods that avoid that product need their own corrections or assumptions. A one-step ratio does not turn every stale trajectory into an unbiased estimate of every desired quantity.",
+      "reason": "A full trajectory ratio already corrects the induced state distribution because shared environment factors cancel.",
+      "sourceUrls": [
+        "https://github.com/openai/spinningup/blob/master/docs/spinningup/rl_intro3.rst"
+      ],
+      "origin": "Claude baseline suggestion independently validated by OpenAI"
+    },
+    {
+      "topicId": "12-17",
+      "severity": "minor",
+      "field": "exercise.prompt",
+      "before": "The target policy assigns positive probability to an action that the behavior policy never sampled and assigns probability zero. Can ordinary importance weighting recover it?",
+      "after": "The target policy assigns positive probability to an action to which the behavior policy assigns probability zero. Can ordinary importance weighting recover that action's contribution from behavior-policy data?",
+      "reason": "Make the policy with zero probability unambiguous and distinguish missing support from a finite-sample omission.",
+      "sourceUrls": [
+        "https://github.com/openai/spinningup/blob/master/docs/spinningup/rl_intro3.rst"
+      ],
+      "origin": "Claude baseline suggestion independently validated by OpenAI"
+    },
+    {
+      "topicId": "11-12",
+      "severity": "minor",
+      "field": "sections.2.paragraphs.0",
+      "before": "FlashAttention does not make unrestricted dense attention linear in sequence length; its pairwise arithmetic still scales quadratically. It reduces memory traffic and intermediate storage through a hardware-aware schedule. Benefits depend on shapes, device support, masking, dtype, and the selected kernel. Test numerical closeness within appropriate tolerances rather than demanding bitwise identity. Also distinguish prefill from single-token decoding, whose bottlenecks differ. A faster attention kernel cannot accelerate input preprocessing or FFNs beyond the fraction of time they leave available.",
+      "after": "FlashAttention does not make unrestricted dense attention linear in sequence length; its pairwise arithmetic still scales quadratically. It reduces memory traffic and intermediate storage through a hardware-aware schedule. Benefits depend on shapes, device support, masking, dtype, and the selected kernel. Test numerical closeness within appropriate tolerances rather than demanding bitwise identity. Also distinguish prefill from single-token decoding, whose bottlenecks differ. A faster attention kernel does not speed up preprocessing or FFNs; end-to-end speedup is bounded by the fraction of runtime spent in attention.",
+      "reason": "Correct the garbled description of the unaffected runtime fraction.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2205.14135"
+      ],
+      "origin": "Claude baseline suggestion independently validated by OpenAI"
+    },
+    {
+      "topicId": "11-05",
+      "severity": "minor",
+      "field": "exercise.answer",
+      "before": "Rounding 0.6/0.25=2.4 gives q=2, so x̂=0.5 and the signed reconstruction error is −0.1. Different rounding rules only matter at ties in this example's scheme.",
+      "after": "Using round-to-nearest, 0.6/0.25=2.4 gives q=2, so x̂=0.5 and the signed reconstruction error is −0.1. Among round-to-nearest conventions, tie-breaking matters only at exact ties; other rules such as ceiling or stochastic rounding are different quantizers.",
+      "reason": "The original wording incorrectly generalized tie-breaking behavior to all rounding rules.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1712.05877"
+      ],
+      "origin": "Claude baseline suggestion independently validated by OpenAI"
+    },
+    {
+      "topicId": "09-01",
+      "severity": "minor",
+      "field": "sections.1.formula",
+      "before": "z = encoder(x); x̂ = decoder(z); L = mean ‖x − x̂‖²",
+      "after": "z = encoder(x); x̂ = decoder(z); per-pixel MSE = (1/(N D)) Σₙ₌₁ᴺ Σⱼ₌₁ᴰ (xₙⱼ − x̂ₙⱼ)², with N examples and D pixels",
+      "reason": "Disambiguate the batch and pixel reduction to match the stated mean squared error.",
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/autoencoders.html"
+      ],
+      "origin": "Claude baseline suggestion independently validated by OpenAI"
+    },
+    {
+      "topicId": "09-04",
+      "severity": "minor",
+      "field": "sections.0.paragraphs.0",
+      "before": "A VAE's reconstruction term is a negative log-likelihood under p(x|z). Mean squared error corresponds to a Gaussian observation model under particular variance assumptions; binary cross-entropy corresponds to Bernoulli observations. These choices express different assumptions about the data. Replacing one with another or changing its reduction changes the optimization problem. The decoder's output activation and the numerical loss function must agree, such as using logits with a stable logits-based binary loss.",
+      "after": "A VAE's reconstruction term is a negative log-likelihood under p(x|z). Mean squared error corresponds to a Gaussian observation model under particular variance assumptions; binary cross-entropy is a Bernoulli negative log-likelihood for binary observations. Applying the same expression to continuous intensities in [0,1] does not by itself define a normalized continuous likelihood; a continuous Bernoulli, for example, needs an additional parameter-dependent normalizer. These choices express different assumptions about the data. Replacing one with another or changing its reduction changes the optimization problem. The decoder's output activation and the numerical loss function must agree, such as using logits with a stable logits-based binary loss.",
+      "reason": "The Bernoulli likelihood interpretation requires binary data; continuous intensities need a proper observation distribution.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1907.06845"
+      ],
+      "origin": "Claude baseline suggestion independently validated by OpenAI"
+    },
+    {
+      "topicId": "09-04",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "Auto-Encoding Variational Bayes",
+          "url": "https://arxiv.org/abs/1312.6114",
+          "kind": "paper",
+          "note": "Inspect the Gaussian KL expression and reconstruction likelihood."
+        }
+      ],
+      "after": [
+        {
+          "title": "Auto-Encoding Variational Bayes",
+          "url": "https://arxiv.org/abs/1312.6114",
+          "kind": "paper",
+          "note": "Inspect the Gaussian KL expression and reconstruction likelihood."
+        },
+        {
+          "title": "The Continuous Bernoulli: Fixing a Pervasive Error in Variational Autoencoders",
+          "url": "https://arxiv.org/abs/1907.06845",
+          "kind": "paper",
+          "note": "Inspect why the Bernoulli expression is not a normalized continuous density and how the missing normalizer changes the reconstruction objective."
+        }
+      ],
+      "reason": "Source the caveat for continuous observations.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1907.06845"
+      ]
+    },
+    {
+      "topicId": "11-04",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "H₂O: Heavy-Hitter Oracle",
+          "url": "https://arxiv.org/abs/2306.14048",
+          "kind": "paper",
+          "note": "Examine retention of recent tokens and accumulated attention."
+        },
+        {
+          "title": "PyTorch Autograd Mechanics",
+          "url": "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+          "kind": "guide",
+          "note": "Distinguish requires_grad, no-grad mode, inference mode, and evaluation mode; freezing parameters and disabling graph recording solve different problems."
+        }
+      ],
+      "after": [
+        {
+          "title": "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
+          "url": "https://arxiv.org/abs/2305.13245",
+          "kind": "paper",
+          "note": "Trace how sharing key/value heads across query groups changes the retained cache dimension and the bandwidth–quality trade-off."
+        },
+        {
+          "title": "PyTorch Autograd Mechanics",
+          "url": "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+          "kind": "guide",
+          "note": "Distinguish requires_grad, no-grad mode, inference mode, and evaluation mode; freezing parameters and disabling graph recording solve different problems."
+        }
+      ],
+      "reason": "Replace the tangential eviction source with direct support for the cache's key/value-head count.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2305.13245"
+      ]
+    },
+    {
+      "topicId": "11-13",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "PyTorch activation checkpointing",
+          "url": "https://docs.pytorch.org/docs/2.14/checkpoint.html",
+          "kind": "guide",
+          "note": "Read recomputation behavior and the handling of random state."
+        }
+      ],
+      "after": [
+        {
+          "title": "PyTorch activation checkpointing",
+          "url": "https://docs.pytorch.org/docs/2.14/checkpoint.html",
+          "kind": "guide",
+          "note": "Read recomputation behavior and the handling of random state."
+        },
+        {
+          "title": "Adam: A Method for Stochastic Optimization",
+          "url": "https://arxiv.org/abs/1412.6980",
+          "kind": "paper",
+          "note": "Inspect the first- and second-moment update equations and the assumptions behind gradient-rescaling invariance."
+        }
+      ],
+      "reason": "Source the optimizer-dependent consequence of gradient normalization.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1412.6980"
+      ]
+    },
+    {
+      "topicId": "09-19",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "Flow Matching for Generative Modeling",
+          "url": "https://arxiv.org/abs/2210.02747",
+          "kind": "paper",
+          "note": "Inspect ODE sampling from a learned velocity field."
+        },
+        {
+          "title": "Score-Based Generative Modeling through Stochastic Differential Equations",
+          "url": "https://arxiv.org/abs/2011.13456",
+          "kind": "paper",
+          "note": "Compare numerical integration roles in continuous-time generative models."
+        }
+      ],
+      "after": [
+        {
+          "title": "Flow Matching for Generative Modeling",
+          "url": "https://arxiv.org/abs/2210.02747",
+          "kind": "paper",
+          "note": "Inspect ODE sampling from a learned velocity field."
+        },
+        {
+          "title": "Score-Based Generative Modeling through Stochastic Differential Equations",
+          "url": "https://arxiv.org/abs/2011.13456",
+          "kind": "paper",
+          "note": "Compare numerical integration roles in continuous-time generative models."
+        },
+        {
+          "title": "Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow",
+          "url": "https://arxiv.org/abs/2209.03003",
+          "kind": "paper",
+          "note": "Connect trajectory geometry to Euler discretization while separating learned-field error from numerical integration error."
+        }
+      ],
+      "reason": "Provide the explicit source discussed in the new reading section.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2209.03003"
+      ]
+    },
+    {
+      "topicId": "09-14",
+      "severity": "minor",
+      "field": "sections.3.paragraphs.1",
+      "before": "Suppose the conditional prediction is c and the unconditional prediction is u. The form u+w(c−u) equals c+s(c−u) when w=1+s. Thus a displayed value of three in one convention can correspond to two in another; comparing raw labels would describe different algorithms as identical.",
+      "after": "Ho and Salimans use (1+w_p)c − w_p u, where c and u are conditional and unconditional predictions. This article uses u+w_a(c−u), so w_p=w_a−1. The paper's w_p=0 corresponds to w_a=1 here, both yielding c. Likewise, this article's scale three matches the paper's scale two.",
+      "reason": "Make the cited paper's scale convention explicit rather than warning only about unspecified alternatives.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2207.12598"
+      ],
+      "origin": "Expanded Claude review suggestion independently checked by OpenAI"
+    },
+    {
+      "topicId": "09-07",
+      "severity": "minor",
+      "field": "sections.3.paragraphs.0",
+      "before": "Read Understanding Disentangling in β-VAE beside Neural Discrete Representation Learning. One reading concerns pressure on a continuous information channel; the other introduces a discrete codebook and a way to train through its selection. Their representation changes should be compared separately from decoder capacity.",
+      "after": "Start with Higgins et al.'s 2017 β-VAE paper for the β-weighted objective. Burgess et al.'s Understanding Disentangling in β-VAE is a follow-up analysis of information capacity. Compare both with Neural Discrete Representation Learning, which changes the latent representation to a discrete codebook rather than simply reweighting a continuous prior KL.",
+      "reason": "Distinguish the originating objective from the later information-capacity interpretation.",
+      "sourceUrls": [
+        "https://openreview.net/forum?id=Sy2fzU9gl",
+        "https://arxiv.org/abs/1804.03599"
+      ],
+      "origin": "Expanded Claude review suggestion independently checked by OpenAI"
+    },
+    {
+      "topicId": "09-07",
+      "severity": "minor",
+      "field": "references.0.note",
+      "before": "Read the information-capacity interpretation of β-VAE.",
+      "after": "Read Burgess et al.'s follow-up information-capacity analysis, distinguishing its capacity-controlled variant from Higgins et al.'s original β-weighted objective.",
+      "reason": "Clarify the respective contributions of the original and follow-up papers.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1804.03599"
+      ],
+      "origin": "Expanded Claude review suggestion independently checked by OpenAI"
+    },
+    {
+      "topicId": "09-07",
+      "severity": "minor",
+      "field": "references",
+      "before": [
+        {
+          "title": "Understanding disentangling in β-VAE",
+          "url": "https://arxiv.org/abs/1804.03599",
+          "kind": "paper",
+          "note": "Read Burgess et al.'s follow-up information-capacity analysis, distinguishing its capacity-controlled variant from Higgins et al.'s original β-weighted objective."
+        },
+        {
+          "title": "Neural Discrete Representation Learning",
+          "url": "https://arxiv.org/abs/1711.00937",
+          "kind": "paper",
+          "note": "Inspect nearest-code assignment and codebook training."
+        }
+      ],
+      "after": [
+        {
+          "title": "β-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework",
+          "url": "https://openreview.net/forum?id=Sy2fzU9gl",
+          "kind": "paper",
+          "note": "Read Higgins et al.'s original β-weighted variational objective and its constrained-latent motivation; compare it with the later information-capacity analysis."
+        },
+        {
+          "title": "Understanding disentangling in β-VAE",
+          "url": "https://arxiv.org/abs/1804.03599",
+          "kind": "paper",
+          "note": "Read Burgess et al.'s follow-up information-capacity analysis, distinguishing its capacity-controlled variant from Higgins et al.'s original β-weighted objective."
+        },
+        {
+          "title": "Neural Discrete Representation Learning",
+          "url": "https://arxiv.org/abs/1711.00937",
+          "kind": "paper",
+          "note": "Inspect nearest-code assignment and codebook training."
+        }
+      ],
+      "reason": "Add the originating Higgins et al. ICLR 2017 paper, with attribution confirmed by the authors' 2018 follow-up. The direct OpenReview page presents browser verification to the research tool.",
+      "sourceUrls": [
+        "https://openreview.net/forum?id=Sy2fzU9gl",
+        "https://arxiv.org/abs/1804.03599"
+      ],
+      "origin": "Expanded Claude review"
+    },
+    {
+      "topicId": "09-09",
+      "severity": "minor",
+      "field": "sections.3.paragraphs.0",
+      "before": "In Generative Adversarial Nets, separate the optimal-discriminator distribution analysis from the alternating optimization procedure. The theoretical comparison assumes distributions and a discriminator optimum that a finite training run does not automatically provide. A falling generator loss is not itself evidence that those assumptions hold.",
+      "after": "In Generative Adversarial Networks, separate the optimal-discriminator distribution analysis from the alternating optimization procedure. The theoretical comparison assumes distributions and a discriminator optimum that a finite training run does not automatically provide. A falling generator loss is not itself evidence that those assumptions hold.",
+      "reason": "Use the arXiv listing's title consistently for the same paper in both lessons.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1406.2661"
+      ],
+      "origin": "Expanded Claude review suggestion independently checked by OpenAI"
+    },
+    {
+      "topicId": "12-06",
+      "severity": "minor",
+      "field": "sections.3.paragraphs.0",
+      "before": "In Generative Adversarial Nets, inspect the distribution comparison obtained after optimizing the discriminator. Then read Endres and Schindelin for the separate metric property of the square-root construction. These are different results; neither makes a finite discriminator's training loss an exact measured divergence.",
+      "after": "In Generative Adversarial Networks, inspect the distribution comparison obtained after optimizing the discriminator. Then read Endres and Schindelin for the separate metric property of the square-root construction. These are different results; neither makes a finite discriminator's training loss an exact measured divergence.",
+      "reason": "Use the arXiv listing's title consistently for the same paper in both lessons.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1406.2661"
+      ],
+      "origin": "Expanded Claude review suggestion independently checked by OpenAI"
+    },
+    {
+      "topicId": "12-06",
+      "severity": "minor",
+      "field": "references.0.title",
+      "before": "Generative Adversarial Nets",
+      "after": "Generative Adversarial Networks",
+      "reason": "Harmonize the citation title with the linked arXiv record and lesson 09-09.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1406.2661"
+      ],
+      "origin": "Expanded Claude review suggestion independently checked by OpenAI"
+    },
+    {
+      "topicId": "10-13",
+      "severity": "minor",
+      "field": "sections.3.paragraphs.1",
+      "before": "Suppose a model answers no to every question. On a dataset dominated by absent objects, raw accuracy can look strong despite detecting nothing. Inspect the class balance and positive-class precision and recall; a balanced evaluation still needs these components to explain whether a change merely shifts the response bias.",
+      "after": "An always-no model can appear accurate on an unbalanced probe dominated by absent objects, despite detecting nothing. POPE itself uses equal numbers of present and absent queries, so always-no accuracy is 50% on its balanced labels. Still inspect positive-class precision, recall, and the yes-response rate: balanced labels alone do not explain a model's response bias.",
+      "reason": "Prevent the hypothetical unbalanced example from being mistaken for POPE's actual 1:1 sampling design.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2305.10355"
+      ],
+      "origin": "Expanded Claude review suggestion independently checked by OpenAI"
+    }
+  ],
+  "checkedSources": [
+    {
+      "title": "Deep Learning",
+      "url": "https://www.deeplearningbook.org/contents/autoencoders.html",
+      "accessedUrl": "https://www.deeplearningbook.org/contents/autoencoders.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-01"
+      ],
+      "focus": [
+        "Read chapter 14 on autoencoders and representation constraints."
+      ]
+    },
+    {
+      "title": "Masked Autoencoders Are Scalable Vision Learners",
+      "url": "https://arxiv.org/abs/2111.06377",
+      "accessedUrl": "https://arxiv.org/html/2111.06377",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-01"
+      ],
+      "focus": [
+        "Compare ordinary reconstruction with a masked-image prediction objective."
+      ]
+    },
+    {
+      "title": "Auto-Encoding Variational Bayes",
+      "url": "https://arxiv.org/abs/1312.6114",
+      "accessedUrl": "https://arxiv.org/html/1312.6114",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-02",
+        "09-03",
+        "09-04",
+        "09-05",
+        "09-06",
+        "09-09"
+      ],
+      "focus": [
+        "Read the distinction between the generative model and the recognition model.",
+        "Follow the variational lower-bound derivation and posterior approximation.",
+        "Inspect the Gaussian KL expression and reconstruction likelihood.",
+        "Read the reparameterized stochastic gradient estimator.",
+        "Revisit the competing reconstruction and prior-matching terms.",
+        "Compare the inference model and evidence lower bound."
+      ]
+    },
+    {
+      "title": "The Continuous Bernoulli: Fixing a Pervasive Error in Variational Autoencoders",
+      "url": "https://arxiv.org/abs/1907.06845",
+      "accessedUrl": "https://arxiv.org/html/1907.06845",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-04"
+      ],
+      "focus": [
+        "Inspect why the Bernoulli expression is not a normalized continuous density and how the missing normalizer changes the reconstruction objective."
+      ]
+    },
+    {
+      "title": "Generating Sentences from a Continuous Space",
+      "url": "https://arxiv.org/abs/1511.06349",
+      "accessedUrl": "https://arxiv.org/html/1511.06349",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-06"
+      ],
+      "focus": [
+        "Read the discussion of latent-variable underuse with powerful sequence decoders."
+      ]
+    },
+    {
+      "title": "Understanding disentangling in β-VAE",
+      "url": "https://arxiv.org/abs/1804.03599",
+      "accessedUrl": "https://arxiv.org/html/1804.03599",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-07"
+      ],
+      "focus": [
+        "Burgess et al.'s follow-up information-capacity analysis, original Higgins et al. attribution, and the distinction between fixed β weighting and capacity-controlled training."
+      ]
+    },
+    {
+      "title": "Neural Discrete Representation Learning",
+      "url": "https://arxiv.org/abs/1711.00937",
+      "accessedUrl": "https://arxiv.org/html/1711.00937",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-07",
+        "09-08"
+      ],
+      "focus": [
+        "Inspect nearest-code assignment and codebook training.",
+        "Connect discrete code indices to a finite latent representation."
+      ]
+    },
+    {
+      "title": "End-to-end Optimized Image Compression",
+      "url": "https://arxiv.org/abs/1611.01704",
+      "accessedUrl": "https://arxiv.org/html/1611.01704",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-08"
+      ],
+      "focus": [
+        "Read the rate–distortion objective and entropy-model role."
+      ]
+    },
+    {
+      "title": "Generative Adversarial Networks",
+      "url": "https://arxiv.org/abs/1406.2661",
+      "accessedUrl": "https://arxiv.org/html/1406.2661",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-09",
+        "12-06"
+      ],
+      "focus": [
+        "Read the generator–discriminator minimax formulation.",
+        "Read the optimal-discriminator analysis and its Jensen–Shannon connection; distinguish that ideal analysis from finite-model training."
+      ]
+    },
+    {
+      "title": "Denoising Diffusion Probabilistic Models",
+      "url": "https://arxiv.org/abs/2006.11239",
+      "accessedUrl": "https://arxiv.org/html/2006.11239",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-10",
+        "09-11",
+        "09-12"
+      ],
+      "focus": [
+        "Read the forward Gaussian process and noise-prediction training objective.",
+        "Compare the original stochastic reverse process.",
+        "Review α_t and accumulated ᾱ_t definitions."
+      ]
+    },
+    {
+      "title": "Denoising Diffusion Implicit Models",
+      "url": "https://arxiv.org/abs/2010.02502",
+      "accessedUrl": "https://arxiv.org/html/2010.02502",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-11"
+      ],
+      "focus": [
+        "Read the non-Markovian construction and deterministic sampling case."
+      ]
+    },
+    {
+      "title": "Improved Denoising Diffusion Probabilistic Models",
+      "url": "https://arxiv.org/abs/2102.09672",
+      "accessedUrl": "https://arxiv.org/html/2102.09672",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-12"
+      ],
+      "focus": [
+        "Read the motivation and construction of alternative noise schedules."
+      ]
+    },
+    {
+      "title": "Progressive Distillation for Fast Sampling of Diffusion Models",
+      "url": "https://arxiv.org/abs/2202.00512",
+      "accessedUrl": "https://arxiv.org/html/2202.00512",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-13"
+      ],
+      "focus": [
+        "Read the alternative prediction parameterizations used for diffusion sampling."
+      ]
+    },
+    {
+      "title": "Classifier-Free Diffusion Guidance",
+      "url": "https://arxiv.org/abs/2207.12598",
+      "accessedUrl": "https://arxiv.org/html/2207.12598",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-14"
+      ],
+      "focus": [
+        "Read conditional dropout and the combination of conditional and unconditional predictions."
+      ]
+    },
+    {
+      "title": "High-Resolution Image Synthesis with Latent Diffusion Models",
+      "url": "https://arxiv.org/abs/2112.10752",
+      "accessedUrl": "https://arxiv.org/html/2112.10752",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-15"
+      ],
+      "focus": [
+        "Read the separation between perceptual compression and latent-space diffusion."
+      ]
+    },
+    {
+      "title": "Generative Modeling by Estimating Gradients of the Data Distribution",
+      "url": "https://arxiv.org/abs/1907.05600",
+      "accessedUrl": "https://arxiv.org/html/1907.05600",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-16"
+      ],
+      "focus": [
+        "Read noise-conditional score estimation and sampling."
+      ]
+    },
+    {
+      "title": "Score-Based Generative Modeling through Stochastic Differential Equations",
+      "url": "https://arxiv.org/abs/2011.13456",
+      "accessedUrl": "https://arxiv.org/html/2011.13456",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-16",
+        "09-17",
+        "09-19",
+        "09-20"
+      ],
+      "focus": [
+        "Connect learned scores with continuous-time generative dynamics.",
+        "Read the relationship between stochastic dynamics and probability-flow ODEs.",
+        "Compare numerical integration roles in continuous-time generative models.",
+        "Inspect probability-flow ODE sampling for score-based models."
+      ]
+    },
+    {
+      "title": "Flow Matching for Generative Modeling",
+      "url": "https://arxiv.org/abs/2210.02747",
+      "accessedUrl": "https://arxiv.org/html/2210.02747",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-18",
+        "09-19",
+        "09-20"
+      ],
+      "focus": [
+        "Read conditional flow matching and the velocity regression objective.",
+        "Inspect ODE sampling from a learned velocity field.",
+        "Read the family of probability paths supported by flow matching."
+      ]
+    },
+    {
+      "title": "Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow",
+      "url": "https://arxiv.org/abs/2209.03003",
+      "accessedUrl": "https://arxiv.org/html/2209.03003",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "09-18",
+        "09-19",
+        "09-20"
+      ],
+      "focus": [
+        "Compare straight interpolation and rectification procedures.",
+        "Connect trajectory geometry to Euler discretization while separating learned-field error from numerical integration error.",
+        "Compare straight-path transport with other path constructions."
+      ]
+    },
+    {
+      "title": "Learning Transferable Visual Models From Natural Language Supervision",
+      "url": "https://arxiv.org/abs/2103.00020",
+      "accessedUrl": "https://arxiv.org/html/2103.00020",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "10-01"
+      ],
+      "focus": [
+        "Review dual-encoder compatibility scoring."
+      ]
+    },
+    {
+      "title": "Visual Instruction Tuning",
+      "url": "https://arxiv.org/abs/2304.08485",
+      "accessedUrl": "https://arxiv.org/html/2304.08485",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "10-01",
+        "10-02",
+        "10-03",
+        "10-04",
+        "10-05",
+        "10-06",
+        "10-07",
+        "10-13"
+      ],
+      "focus": [
+        "Compare visual conditioning with autoregressive answer generation.",
+        "Inspect the vision encoder, projection, and language-model connection.",
+        "Read how projected visual features condition language-model generation.",
+        "Compare a direct projection interface.",
+        "Read the alignment and visual instruction-tuning stages.",
+        "Compare which components are updated across training stages.",
+        "Inspect the original LLaVA interface and training stages.",
+        "Compare visual instruction-following behavior with the need for grounded evaluation."
+      ]
+    },
+    {
+      "title": "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models",
+      "url": "https://arxiv.org/abs/2301.12597",
+      "accessedUrl": "https://arxiv.org/html/2301.12597",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "10-02",
+        "10-04",
+        "10-05",
+        "10-06",
+        "10-07",
+        "11-10"
+      ],
+      "focus": [
+        "Compare a query-based interface with direct feature projection.",
+        "Read the learned-query interface and Q-Former architecture.",
+        "Compare staged training across frozen visual and language components.",
+        "Inspect the use of frozen image and language encoders.",
+        "Read the Q-Former bridge and frozen components.",
+        "Study learned queries as a compact interface between vision features and a language model."
+      ]
+    },
+    {
+      "title": "Flamingo: a Visual Language Model for Few-Shot Learning",
+      "url": "https://arxiv.org/abs/2204.14198",
+      "accessedUrl": "https://arxiv.org/html/2204.14198",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "10-03",
+        "10-10",
+        "10-12"
+      ],
+      "focus": [
+        "Compare cross-attention conditioning with inserted visual embeddings.",
+        "Read the use of interleaved visual and textual sequences.",
+        "Inspect visual conditioning that supports image and video inputs."
+      ]
+    },
+    {
+      "title": "PyTorch Autograd Mechanics",
+      "url": "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+      "accessedUrl": "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "10-06",
+        "11-04"
+      ],
+      "focus": [
+        "Distinguish requires_grad, no-grad mode, inference mode, and evaluation mode; freezing parameters and disabling graph recording solve different problems."
+      ]
+    },
+    {
+      "title": "Qwen2.5-VL Technical Report",
+      "url": "https://arxiv.org/abs/2502.13923",
+      "accessedUrl": "https://arxiv.org/html/2502.13923",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "10-07",
+        "10-08",
+        "10-09",
+        "10-10",
+        "10-11",
+        "10-12"
+      ],
+      "focus": [
+        "Read model architecture, dynamic resolution, and the vision–language merger.",
+        "Inspect dynamic visual processing and token-sequence compression.",
+        "Read native dynamic resolution and the grouping-based vision–language merger.",
+        "Inspect multimodal rotary positions and absolute-time alignment.",
+        "Inspect document, OCR, and grounding evaluations as distinct capabilities.",
+        "Read dynamic frame-rate processing and temporal position handling."
+      ]
+    },
+    {
+      "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+      "url": "https://arxiv.org/abs/2010.11929",
+      "accessedUrl": "https://arxiv.org/html/2010.11929",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "10-08"
+      ],
+      "focus": [
+        "Review patch count as a function of image size."
+      ]
+    },
+    {
+      "title": "VQA: Visual Question Answering",
+      "url": "https://arxiv.org/abs/1505.00468",
+      "accessedUrl": "https://arxiv.org/html/1505.00468",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "10-11"
+      ],
+      "focus": [
+        "Read the visual-question-answering task and answer evaluation setup."
+      ]
+    },
+    {
+      "title": "Evaluating Object Hallucination in Large Vision-Language Models",
+      "url": "https://arxiv.org/abs/2305.10355",
+      "accessedUrl": "https://arxiv.org/html/2305.10355",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "10-13",
+        "10-14"
+      ],
+      "focus": [
+        "Read object-presence probing and the evaluation of hallucinated objects.",
+        "Compare targeted hallucination probes with broad benchmark scores."
+      ]
+    },
+    {
+      "title": "MMMU: A Massive Multi-discipline Multimodal Understanding and Reasoning Benchmark for Expert AGI",
+      "url": "https://arxiv.org/abs/2311.16502",
+      "accessedUrl": "https://arxiv.org/html/2311.16502",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "10-14"
+      ],
+      "focus": [
+        "Inspect task diversity and category-level multimodal evaluation."
+      ]
+    },
+    {
+      "title": "PyTorch Profiler",
+      "url": "https://docs.pytorch.org/docs/2.14/profiler.html",
+      "accessedUrl": "https://docs.pytorch.org/docs/2.14/profiler.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-01",
+        "11-03",
+        "11-15"
+      ],
+      "focus": [
+        "Inspect CPU, CUDA, shapes, and memory in an execution trace."
+      ]
+    },
+    {
+      "title": "Mixtral of Experts",
+      "url": "https://arxiv.org/abs/2401.04088",
+      "accessedUrl": "https://arxiv.org/html/2401.04088",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-02"
+      ],
+      "focus": [
+        "Distinguish total expert capacity from parameters used by each token."
+      ]
+    },
+    {
+      "title": "Adam: A Method for Stochastic Optimization",
+      "url": "https://arxiv.org/abs/1412.6980",
+      "accessedUrl": "https://arxiv.org/pdf/1412.6980",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-03",
+        "11-13"
+      ],
+      "focus": [
+        "Use the two moment buffers in the update algorithm to account for persistent optimizer-state memory; tensor dtypes and implementation determine the byte count.",
+        "Inspect the first- and second-moment update equations and the assumptions behind gradient-rescaling invariance."
+      ]
+    },
+    {
+      "title": "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
+      "url": "https://arxiv.org/abs/2305.13245",
+      "accessedUrl": "https://arxiv.org/html/2305.13245",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-04"
+      ],
+      "focus": [
+        "Trace how sharing key/value heads across query groups changes the retained cache dimension and the bandwidth–quality trade-off."
+      ]
+    },
+    {
+      "title": "LLM.int8()",
+      "url": "https://arxiv.org/abs/2208.07339",
+      "accessedUrl": "https://arxiv.org/html/2208.07339",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-05"
+      ],
+      "focus": [
+        "Examine why activation outliers complicate low-bit inference."
+      ]
+    },
+    {
+      "title": "Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference",
+      "url": "https://arxiv.org/abs/1712.05877",
+      "accessedUrl": "https://arxiv.org/html/1712.05877",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-05"
+      ],
+      "focus": [
+        "Inspect affine scale/zero-point quantization and simulated quantization during training; compare that setting with LLM.int8() outlier handling."
+      ]
+    },
+    {
+      "title": "Distilling the Knowledge in a Neural Network",
+      "url": "https://arxiv.org/abs/1503.02531",
+      "accessedUrl": "https://arxiv.org/html/1503.02531",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-06",
+        "11-07",
+        "12-03"
+      ],
+      "focus": [
+        "Read the soft-target objective and temperature discussion."
+      ]
+    },
+    {
+      "title": "FitNets: Hints for Thin Deep Nets",
+      "url": "https://arxiv.org/abs/1412.6550",
+      "accessedUrl": "https://arxiv.org/html/1412.6550",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-06"
+      ],
+      "focus": [
+        "Trace the intermediate-feature hint objective and the regressor that reconciles teacher and student feature shapes."
+      ]
+    },
+    {
+      "title": "Sequence-Level Knowledge Distillation",
+      "url": "https://arxiv.org/abs/1606.07947",
+      "accessedUrl": "https://arxiv.org/html/1606.07947",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-06"
+      ],
+      "focus": [
+        "Compare sequence-level teacher targets with token-distribution matching and inspect the role of teacher decoding."
+      ]
+    },
+    {
+      "title": "PyTorch pruning tutorial",
+      "url": "https://docs.pytorch.org/tutorials/intermediate/pruning_tutorial.html",
+      "accessedUrl": "https://docs.pytorch.org/tutorials/intermediate/pruning_tutorial.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-08"
+      ],
+      "focus": [
+        "Distinguish a pruning mask from a physically smaller layer."
+      ]
+    },
+    {
+      "title": "Token Merging: Your ViT But Faster",
+      "url": "https://arxiv.org/abs/2210.09461",
+      "accessedUrl": "https://arxiv.org/html/2210.09461",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-09",
+        "11-10"
+      ],
+      "focus": [
+        "Study similarity-based merging and its computation costs."
+      ]
+    },
+    {
+      "title": "H₂O: Heavy-Hitter Oracle",
+      "url": "https://arxiv.org/abs/2306.14048",
+      "accessedUrl": "https://arxiv.org/pdf/2306.14048",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-11"
+      ],
+      "focus": [
+        "Examine retention of recent tokens and accumulated attention."
+      ]
+    },
+    {
+      "title": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache",
+      "url": "https://arxiv.org/abs/2402.02750",
+      "accessedUrl": "https://arxiv.org/html/2402.02750",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-11"
+      ],
+      "focus": [
+        "Inspect why keys and values use different quantization axes, and why a residual buffer complicates nominal bit-width savings."
+      ]
+    },
+    {
+      "title": "FlashAttention",
+      "url": "https://arxiv.org/abs/2205.14135",
+      "accessedUrl": "https://arxiv.org/html/2205.14135",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-12"
+      ],
+      "focus": [
+        "Study the distinction between arithmetic work and memory traffic."
+      ]
+    },
+    {
+      "title": "PyTorch activation checkpointing",
+      "url": "https://docs.pytorch.org/docs/2.14/checkpoint.html",
+      "accessedUrl": "https://docs.pytorch.org/docs/2.14/checkpoint.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-13"
+      ],
+      "focus": [
+        "Read recomputation behavior and the handling of random state."
+      ]
+    },
+    {
+      "title": "PyTorch DistributedDataParallel design",
+      "url": "https://docs.pytorch.org/docs/2.14/notes/ddp.html",
+      "accessedUrl": "https://docs.pytorch.org/docs/2.14/notes/ddp.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-14"
+      ],
+      "focus": [
+        "Trace gradient synchronization and overlap with backward computation."
+      ]
+    },
+    {
+      "title": "PyTorch FullyShardedDataParallel",
+      "url": "https://docs.pytorch.org/docs/2.14/fsdp.html",
+      "accessedUrl": "https://docs.pytorch.org/docs/2.14/fsdp.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-14"
+      ],
+      "focus": [
+        "Compare sharding strategies and transient memory requirements."
+      ]
+    },
+    {
+      "title": "PyTorch tensor parallelism",
+      "url": "https://docs.pytorch.org/docs/2.14/distributed.tensor.parallel.html",
+      "accessedUrl": "https://docs.pytorch.org/docs/2.14/distributed.tensor.parallel.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-14"
+      ],
+      "focus": [
+        "Trace the placement of shards and collective communication."
+      ]
+    },
+    {
+      "title": "Deep Learning: Practical Methodology",
+      "url": "https://www.deeplearningbook.org/contents/guidelines.html",
+      "accessedUrl": "https://www.deeplearningbook.org/contents/guidelines.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-16"
+      ],
+      "focus": [
+        "Read the sections on baselines, diagnostics, and experimental design."
+      ]
+    },
+    {
+      "title": "NeurIPS Paper Checklist",
+      "url": "https://neurips.cc/public/guides/PaperChecklist",
+      "accessedUrl": "https://neurips.cc/public/guides/PaperChecklist",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-16"
+      ],
+      "focus": [
+        "Review reporting of uncertainty, compute, data, and limitations."
+      ]
+    },
+    {
+      "title": "Convex Optimization: Convex Optimization Problems",
+      "url": "https://web.stanford.edu/class/ee364a/lectures/problems.pdf",
+      "accessedUrl": "https://web.stanford.edu/class/ee364a/lectures/problems.pdf",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "11-16"
+      ],
+      "focus": [
+        "Read the vector-optimization and Pareto-optimality discussion; apply its nondominance definition before considering scalarized objectives."
+      ]
+    },
+    {
+      "title": "Training language models to follow instructions with human feedback",
+      "url": "https://arxiv.org/abs/2203.02155",
+      "accessedUrl": "https://arxiv.org/html/2203.02155",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-01",
+        "12-07",
+        "12-14",
+        "12-16"
+      ],
+      "focus": [
+        "Separate demonstration learning, preference modeling, and policy optimization."
+      ]
+    },
+    {
+      "title": "On-Policy Distillation of Language Models: Learning from Self-Generated Mistakes",
+      "url": "https://arxiv.org/abs/2306.13649",
+      "accessedUrl": "https://arxiv.org/html/2306.13649",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-02",
+        "12-04",
+        "12-05"
+      ],
+      "focus": [
+        "Compare student-generated contexts with fixed teacher demonstrations.",
+        "Compare divergence choices for matching a teacher on student-generated contexts."
+      ]
+    },
+    {
+      "title": "Deep Learning: Probability and Information Theory",
+      "url": "https://www.deeplearningbook.org/contents/prob.html",
+      "accessedUrl": "https://www.deeplearningbook.org/contents/prob.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-05",
+        "12-15"
+      ],
+      "focus": [
+        "Review entropy, cross-entropy, and the ordered definition of KL divergence."
+      ]
+    },
+    {
+      "title": "A New Metric for Probability Distributions",
+      "url": "https://research-repository.st-andrews.ac.uk/bitstream/10023/1591/1/Endres2003-IEEETransInfTheory49-NewMetric.pdf",
+      "accessedUrl": "https://research-repository.st-andrews.ac.uk/bitstream/10023/1591/1/Endres2003-IEEETransInfTheory49-NewMetric.pdf",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-06"
+      ],
+      "focus": [
+        "Inspect the metric construction and its relation to the square root of Jensen–Shannon divergence; distinguish the divergence from the metric."
+      ]
+    },
+    {
+      "title": "Spinning Up: Key Concepts in RL",
+      "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro.html",
+      "accessedUrl": "https://spinningup.openai.com/en/latest/spinningup/rl_intro.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-08",
+        "12-18"
+      ],
+      "focus": [
+        "Review trajectories, policies, returns, and value functions."
+      ]
+    },
+    {
+      "title": "Spinning Up: Intro to Policy Optimization",
+      "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html",
+      "accessedUrl": "https://github.com/openai/spinningup/blob/master/docs/spinningup/rl_intro3.rst",
+      "status": "verified",
+      "verification": "Rendered documentation repeatedly returned an error (last response: 429). Opened the official repository source and inspected the trajectory factorization, score-function identity, baselines, and reward-to-go derivation instead.",
+      "topicIds": [
+        "12-09",
+        "12-10",
+        "12-15",
+        "12-18"
+      ],
+      "focus": [
+        "Derive the log-probability gradient and action-independent baseline."
+      ]
+    },
+    {
+      "title": "Proximal Policy Optimization Algorithms",
+      "url": "https://arxiv.org/abs/1707.06347",
+      "accessedUrl": "https://arxiv.org/pdf/1707.06347",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-10",
+        "12-11",
+        "12-17"
+      ],
+      "focus": [
+        "Analyze the clipped surrogate and its dependence on advantage sign."
+      ]
+    },
+    {
+      "title": "DeepSeekMath",
+      "url": "https://arxiv.org/abs/2402.03300",
+      "accessedUrl": "https://arxiv.org/html/2402.03300",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-12"
+      ],
+      "focus": [
+        "Read the group-relative policy optimization formulation."
+      ]
+    },
+    {
+      "title": "Back to Basics: Revisiting REINFORCE Style Optimization",
+      "url": "https://arxiv.org/abs/2402.14740",
+      "accessedUrl": "https://arxiv.org/html/2402.14740",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-12"
+      ],
+      "focus": [
+        "Read the leave-one-out baseline and sequence-level reward estimator."
+      ]
+    },
+    {
+      "title": "Direct Preference Optimization",
+      "url": "https://arxiv.org/abs/2305.18290",
+      "accessedUrl": "https://arxiv.org/html/2305.18290",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-13"
+      ],
+      "focus": [
+        "Trace the reference-relative preference objective."
+      ]
+    },
+    {
+      "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+      "url": "https://arxiv.org/abs/2501.12948",
+      "accessedUrl": "https://arxiv.org/html/2501.12948",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-14"
+      ],
+      "focus": [
+        "Read the accuracy and format reward definitions, including mathematical-answer checks and code tests; separate reward design from the policy optimizer."
+      ]
+    },
+    {
+      "title": "Scaling Laws for Reward Model Overoptimization",
+      "url": "https://arxiv.org/abs/2210.10760",
+      "accessedUrl": "https://arxiv.org/html/2210.10760",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-16"
+      ],
+      "focus": [
+        "Inspect proxy-versus-gold reward curves under stronger optimization; the experimental gold standard is a stronger reward model, not literal human ground truth."
+      ]
+    },
+    {
+      "title": "Spinning Up: Kinds of RL Algorithms",
+      "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro2.html",
+      "accessedUrl": "https://spinningup.openai.com/en/latest/spinningup/rl_intro2.html",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-17"
+      ],
+      "focus": [
+        "Compare policy-optimization and Q-learning approaches and their use of on-policy versus off-policy experience."
+      ]
+    },
+    {
+      "title": "Spinning Up: Intro to Policy Optimization (official source)",
+      "url": "https://github.com/openai/spinningup/blob/master/docs/spinningup/rl_intro3.rst",
+      "accessedUrl": "https://github.com/openai/spinningup/blob/master/docs/spinningup/rl_intro3.rst",
+      "status": "verified",
+      "verification": "Opened primary source and inspected the topic-relevant discussion, equations, or official API descriptions.",
+      "topicIds": [
+        "12-17"
+      ],
+      "focus": [
+        "Use the trajectory-probability factorization to derive the target/behavior likelihood ratio and the cancellation of shared environment transitions."
+      ]
+    },
+    {
+      "title": "β-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework",
+      "url": "https://openreview.net/forum?id=Sy2fzU9gl",
+      "accessedUrl": "https://arxiv.org/html/1804.03599",
+      "status": "attribution-verified-via-authors-primary-followup",
+      "verification": "Canonical OpenReview forum and PDF returned a browser verification page. Confirmed original authorship, ICLR 2017 attribution, and the weighted objective in the authors' 2018 follow-up, which explicitly cites the original as reference 15. The original full text was not successfully fetched.",
+      "topicIds": [
+        "09-07"
+      ],
+      "focus": [
+        "Origin of the β-weighted variational objective, distinguished from later information-capacity control."
+      ]
+    }
+  ],
+  "numericalChecks": [
+    {
+      "topicId": "09-01",
+      "description": "Coordinate-count ratio",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 49,
+      "expected": 49,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-03",
+      "description": "ELBO gap",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 3,
+      "expected": 3,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-04",
+      "description": "Gaussian KL mean mismatch",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 0.5,
+      "expected": 0.5,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-04",
+      "description": "Gaussian KL variance mismatch",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 0.8068528194400546,
+      "expected": 0.807,
+      "tolerance": 0.0005,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-05",
+      "description": "Fixed-noise sample and gradients",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.5,
+        1,
+        -0.5
+      ],
+      "expected": [
+        0.5,
+        1,
+        -0.5
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-05",
+      "description": "Exercise gradients",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        6,
+        6
+      ],
+      "expected": [
+        6,
+        6
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-07",
+      "description": "Bits per256 code index",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 8,
+      "expected": 8,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-08",
+      "description": "Fixed-length code bytes",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 4096,
+      "expected": 4096,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-08",
+      "description": "Ideal symbol bits",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 3,
+      "expected": 3,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-10",
+      "description": "Noising coefficients",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.8,
+        0.6,
+        0.5,
+        0.8660254037844386
+      ],
+      "expected": [
+        0.8,
+        0.6,
+        0.5,
+        0.8660254037844386
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-12",
+      "description": "Nominal SNR",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        9,
+        0.11111111111111112,
+        1
+      ],
+      "expected": [
+        9,
+        0.1111111111111111,
+        1
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-13",
+      "description": "v prediction example",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        1,
+        -2,
+        2,
+        -1
+      ],
+      "expected": [
+        1,
+        -2,
+        2,
+        -1
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-13",
+      "description": "v inverse exercise",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.19999999999999996,
+        1.1
+      ],
+      "expected": [
+        0.2,
+        1.1
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-14",
+      "description": "CFG extrapolation",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": -1,
+      "expected": -1,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-15",
+      "description": "Latent-grid sizes",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        64,
+        96,
+        64,
+        6144
+      ],
+      "expected": [
+        64,
+        96,
+        64,
+        6144
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-16",
+      "description": "Gaussian score",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": -1,
+      "expected": -1,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-17",
+      "description": "Brownian standard deviations",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.2,
+        0.1
+      ],
+      "expected": [
+        0.2,
+        0.1
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-18",
+      "description": "Flow interpolation and velocity",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        2,
+        1,
+        4,
+        -2
+      ],
+      "expected": [
+        2,
+        1,
+        4,
+        -2
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-19",
+      "description": "Euler and Heun",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        1.5,
+        1.625,
+        1.6487212707001282,
+        1.2,
+        1.2214027581601699
+      ],
+      "expected": [
+        1.5,
+        1.625,
+        1.6487212707001282,
+        1.2,
+        1.2214027581601699
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-02",
+      "description": "Combined prefix positions",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 228,
+      "expected": 228,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-03",
+      "description": "Visual and text positions",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 84,
+      "expected": 84,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-08",
+      "description": "Patch counts and quadratic ratio",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        196,
+        784,
+        16
+      ],
+      "expected": [
+        196,
+        784,
+        16
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-09",
+      "description": "Merged grid examples",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        96,
+        150
+      ],
+      "expected": [
+        96,
+        150
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-11",
+      "description": "CER",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 0.4,
+      "expected": 0.4,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-12",
+      "description": "Video visual positions",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 1568,
+      "expected": 1568,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-01",
+      "description": "MACs and throughput",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        262144,
+        200
+      ],
+      "expected": [
+        262144,
+        200
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-02",
+      "description": "Expert parameter counts",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        500,
+        200,
+        150,
+        50
+      ],
+      "expected": [
+        500,
+        200,
+        150,
+        50
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-03",
+      "description": "FP32 Adam memory bytes and GiB",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        1600000000,
+        1.4901161193847656
+      ],
+      "expected": [
+        1600000000,
+        1.4901161193847656
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-04",
+      "description": "KV cache bytes",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 25600,
+      "expected": 25600,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-05",
+      "description": "Quantization examples",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.30000000000000004,
+        2,
+        0.5,
+        -0.09999999999999998
+      ],
+      "expected": [
+        0.3,
+        2,
+        0.5,
+        -0.1
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-07",
+      "description": "Softmax temperatures",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.8807970779778823,
+        0.7310585786300049
+      ],
+      "expected": [
+        0.8807970779778823,
+        0.7310585786300049
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-08",
+      "description": "Structured pruning dimensions",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 48,
+      "expected": 48,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-09",
+      "description": "Attention ratio",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 0.25,
+      "expected": 0.25,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-15",
+      "description": "Profiling and Amdahl",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        75,
+        1.25
+      ],
+      "expected": [
+        75,
+        1.25
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-05",
+      "description": "Ordered discrete KL",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.5108256237659907,
+        0.3680642071684971
+      ],
+      "expected": [
+        0.5108256237659907,
+        0.3680642071684971
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-06",
+      "description": "Disjoint JS bits",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 1,
+      "expected": 1,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-07",
+      "description": "Bradley-Terry probability",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 0.8807970779778823,
+      "expected": 0.8807970779778823,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-08",
+      "description": "Discounted return",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 0.81,
+      "expected": 0.81,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-09",
+      "description": "Sampled and expected bandit gradient",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.5,
+        0.25
+      ],
+      "expected": [
+        0.5,
+        0.25
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-10",
+      "description": "Return-minus-value",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 2,
+      "expected": 2,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-11",
+      "description": "PPO positive and negative advantages",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        2.4,
+        -1.6
+      ],
+      "expected": [
+        2.4,
+        -1.6
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-12",
+      "description": "RLOO baselines and advantages",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        4,
+        -3,
+        0.6666666666666667
+      ],
+      "expected": [
+        4,
+        -3,
+        0.6666666666666666
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-13",
+      "description": "DPO initialization",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 0.6931471805599453,
+      "expected": 0.6931471805599453,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-04",
+      "description": "New reading example: pixel sum versus mean",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        5,
+        2.5
+      ],
+      "expected": [
+        5,
+        2.5
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-05",
+      "description": "New reading example: log-variance path derivative via central finite difference",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 1.0000000000065512,
+      "expected": 1,
+      "tolerance": 1e-8,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-08",
+      "description": "New reading example: four equal codes",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 2,
+      "expected": 2,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-10",
+      "description": "New reading example: accumulated alpha and clean coefficient",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.6400000000000001,
+        0.8
+      ],
+      "expected": [
+        0.64,
+        0.8
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-12",
+      "description": "Corrected actual variance ratio with Var(x0)=4",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        2,
+        0.5,
+        4,
+        1
+      ],
+      "expected": [
+        2,
+        0.5,
+        4,
+        1
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-14",
+      "description": "New reading example: equivalence of CFG conventions",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        -1,
+        -1
+      ],
+      "expected": [
+        -1,
+        -1
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-02",
+      "description": "New reading example: tokenwise projection weight entries",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 1572864,
+      "expected": 1572864,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-04",
+      "description": "Query compression ratio",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 18,
+      "expected": 18,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-08",
+      "description": "Resolution scaling: token and attention ratios",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        4,
+        16
+      ],
+      "expected": [
+        4,
+        16
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-09",
+      "description": "New reading example: local grouping",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 150,
+      "expected": 150,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-10",
+      "description": "New reading example: same displacement over one versus ten seconds",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 10,
+      "expected": 10,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-11",
+      "description": "New reading example: insertion-heavy CER can exceed one",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 1.2,
+      "expected": 1.2,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-04",
+      "description": "New reading example: raw cache reduction",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 4,
+      "expected": 4,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-09",
+      "description": "New reading example: size-aware token merging",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        5,
+        1
+      ],
+      "expected": [
+        5,
+        1
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-07",
+      "description": "New reading derivation: T-scaled probability difference approaches centered-logit difference / K",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        -0.49999999988115107,
+        0.4999999998867022
+      ],
+      "expected": [
+        -0.5,
+        0.5
+      ],
+      "tolerance": 1e-8,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-13",
+      "description": "Accumulation: sum of four microbatch means versus combined mean",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 4,
+      "expected": 4,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-13",
+      "description": "New reading example: unequal token weighting",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.25,
+        0.75
+      ],
+      "expected": [
+        0.25,
+        0.75
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-13",
+      "description": "Adam rescaling cancellation when epsilon=0",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        0.6666666666666666,
+        0.6666666666666666
+      ],
+      "expected": [
+        0.6666666666666666,
+        0.6666666666666666
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-15",
+      "description": "New reading example: serial versus ideal overlap",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        90,
+        50
+      ],
+      "expected": [
+        90,
+        50
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-16",
+      "description": "Corrected four-objective-input exercise: nondominated index",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        3
+      ],
+      "expected": [
+        3
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "11-12",
+      "description": "New reading example: online softmax rescales numerator and denominator",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        6.8577223804673,
+        6.8577223804673
+      ],
+      "expected": [
+        6.8577223804673,
+        6.8577223804673
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-07",
+      "description": "New reading example: preference offsets cancel",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 2,
+      "expected": 2,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-09",
+      "description": "REINFORCE sample expectation",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 0.25,
+      "expected": 0.25,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-12",
+      "description": "RLOO identity for three responses",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        -3,
+        -3
+      ],
+      "expected": [
+        -3,
+        -3
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-12",
+      "description": "RLOO identity for group size two",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": -2,
+      "expected": -2,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-13",
+      "description": "New reading example: both relative likelihoods doubled",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 0,
+      "expected": 0,
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-17",
+      "description": "New reading example: full trajectory importance ratio and common transition cancellation",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        6,
+        6
+      ],
+      "expected": [
+        6,
+        6
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "12-18",
+      "description": "New reading example: undiscounted rewards-to-go",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        7,
+        5,
+        5
+      ],
+      "expected": [
+        7,
+        5,
+        5
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "09-14",
+      "description": "Final CFG notation: paper scale two = article three, paper zero = article one",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": [
+        -1,
+        -1,
+        1,
+        1
+      ],
+      "expected": [
+        -1,
+        -1,
+        1,
+        1
+      ],
+      "tolerance": 1e-10,
+      "result": "pass"
+    },
+    {
+      "topicId": "10-13",
+      "description": "Always-no accuracy with equal present and absent labels",
+      "method": "Executed JavaScript arithmetic in V8",
+      "actual": 50,
+      "expected": 50,
+      "tolerance": 1e-10,
+      "result": "pass"
+    }
+  ],
+  "validation": {
+    "onDiskJSON": "pass",
+    "articleCoverage": "68/68; IDs and ordering preserved",
+    "prerequisiteIDs": "All exist in the 174-topic curriculum; none is a self-reference",
+    "sourceReading": "Exactly one per article, three paragraphs each, 131–150 words",
+    "references": "HTTPS, titled, relevant reading notes, one to three per article",
+    "encoding": "No Han characters or Unicode replacement characters in owned article JSON",
+    "numericalChecks": "73 executed checks passed",
+    "trainingOrGPUExecution": "Not performed",
+    "siteBuildOrPublication": "Not performed by this subagent"
+  },
+  "claudeBaselineAdjudication": {
+    "inputFile": "review/claude-baseline-09-12-findings.json",
+    "sourceReviewer": "Claude baseline review as supplied by the parent; baseline used no browsing or code execution.",
+    "findings": [
+      {
+        "findingIndex": 0,
+        "topicId": "11-16",
+        "status": "accepted",
+        "reason": "Accepted; fixed all-four-memory assumption."
+      },
+      {
+        "findingIndex": 1,
+        "topicId": "11-13",
+        "status": "accepted",
+        "reason": "Accepted with stronger qualification: Adam cancellation assumes consistent scaling of the gradient history and can fail under clipping, ε, coupled penalties, or a scale change midway."
+      },
+      {
+        "findingIndex": 2,
+        "topicId": "12-17",
+        "status": "accepted",
+        "reason": "Accepted; derived full-trajectory ratio cancellation from the official policy-gradient trajectory factorization."
+      },
+      {
+        "findingIndex": 3,
+        "topicId": "11-12",
+        "status": "accepted",
+        "reason": "Accepted; corrected the Amdahl interpretation."
+      },
+      {
+        "findingIndex": 4,
+        "topicId": "11-05",
+        "status": "accepted",
+        "reason": "Accepted; restricted the tie statement to round-to-nearest variants."
+      },
+      {
+        "findingIndex": 5,
+        "topicId": "09-01",
+        "status": "accepted",
+        "reason": "Accepted; made N-example and D-pixel reductions explicit."
+      },
+      {
+        "findingIndex": 6,
+        "topicId": "09-04",
+        "status": "accepted",
+        "reason": "Accepted after opening the continuous Bernoulli primary paper."
+      },
+      {
+        "findingIndex": 7,
+        "topicId": "11-04",
+        "status": "accepted",
+        "reason": "Accepted; GQA replaces H2O here, and official autograd documentation was already added by the independent audit."
+      },
+      {
+        "findingIndex": 8,
+        "topicId": "12-14",
+        "status": "accepted",
+        "reason": "Accepted; independently found and already replaced with verified DeepSeek-R1 rule-based reward source."
+      },
+      {
+        "findingIndex": 9,
+        "topicId": "12-16",
+        "status": "accepted",
+        "reason": "Accepted; independently found and already replaced with verified Reward Model Overoptimization paper."
+      },
+      {
+        "findingIndex": 10,
+        "topicId": "12-06",
+        "status": "accepted",
+        "reason": "Accepted; corrupted dash was independently corrected. Kept the valid arXiv/proceedings title variants because both identify the same paper."
+      }
+    ],
+    "note": "All 11 findings accepted, sometimes with additional qualifications. Several reference and encoding issues had already been independently identified. Mathematical examples suggested by Claude were not described as executed unless separately evaluated in numericalChecks."
+  },
+  "unresolved": [],
+  "limitations": [
+    "This is a technical content audit, not proof that every scientific claim is error-free or that cited results generalize beyond their assumptions.",
+    "Primary sources were inspected for the relevant claims, not reproduced experimentally. No model was trained; no GPU kernels, PyTorch API examples, distributed jobs, or benchmark suites were executed.",
+    "The 73 executed numerical checks are small JavaScript calculations, not neural-network validation. Their descriptions identify what was actually tested; broader reasoning and formula derivations were reviewed statically.",
+    "PyTorch 2.14 documentation URLs were successfully opened during this review. The content makes no claim that this pinned version is the newest release.",
+    "The rendered Spinning Up policy-optimization page could not be fetched reliably and last returned HTTP 429; its official repository source was successfully read. Existing rendered-page references remain valid canonical citations but their immediate availability was not established.",
+    "The direct Boyd textbook PDF and a Sutton/Barto book fetch failed during research; neither failed resource is required by the final additions. The official Boyd lecture PDF and official Spinning Up documentation/source were used instead.",
+    "Paper-reading examples are original instructional analyses. Their hypothetical scenarios are not claimed to be experiments or numerical results reported by the cited papers.",
+    "Cross-module prerequisite IDs were validated, but this subagent did not audit the full prose of modules 01–08. Other agents own those articles.",
+    "The expanded Claude pass reviewed the full enriched snapshot using reasoning only. OpenAI checked its five findings against sources, applied four scoped clarifications, and rejected the conditional PyTorch-link concern after reopening all six URLs.",
+    "The newly added original Higgins et al. β-VAE OpenReview reference displayed browser verification. Attribution and objective support were confirmed in the authors' primary follow-up; full text of the originating paper was not fetched."
+  ],
+  "claudeExpandedAdjudication": {
+    "inputFile": "review/claude-expanded-09-12-findings.json",
+    "resolutionsFile": "review/expanded-resolutions-09-12.json",
+    "accepted": 4,
+    "rejected": 1,
+    "findings": [
+      {
+        "range": "09-12",
+        "findingIndex": 0,
+        "topicId": "09-14",
+        "disposition": "accepted",
+        "reason": "Verified the original CFG paper's displayed combination (1+w_p)c−w_p u. Added the explicit mapping w_p=w_a−1, including paper scale zero = article scale one, and paper two = article three.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/2207.12598",
+          "https://arxiv.org/html/2207.12598"
+        ]
+      },
+      {
+        "range": "09-12",
+        "findingIndex": 1,
+        "topicId": "09-07",
+        "disposition": "accepted",
+        "reason": "Added Higgins et al.'s originating ICLR 2017 β-VAE reference and identified Burgess et al. as a follow-up capacity analysis. The authors' 2018 primary paper explicitly attributes β-VAE to Higgins et al. (reference 15) and presents the original weighted objective separately from its capacity extension. The canonical OpenReview forum/PDF returned browser verification; this retrieval limitation is recorded rather than claiming full-text access to that original paper.",
+        "sourceUrls": [
+          "https://openreview.net/forum?id=Sy2fzU9gl",
+          "https://arxiv.org/html/1804.03599"
+        ]
+      },
+      {
+        "range": "09-12",
+        "findingIndex": 2,
+        "topicId": "09-09",
+        "disposition": "accepted",
+        "reason": "Used Generative Adversarial Networks, the linked arXiv listing's title, consistently in the prose and references of 09-09 and 12-06. Both earlier title variants were valid; this is consistency rather than a corrected scientific claim.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/1406.2661"
+        ]
+      },
+      {
+        "range": "09-12",
+        "findingIndex": 3,
+        "topicId": "10-13",
+        "disposition": "accepted",
+        "reason": "Verified POPE's stated 1:1 ratio of ground-truth to nonexistent objects. Rewrote the hypothetical shortcut example to state POPE's balanced design and the always-no baseline of 50%, while retaining precision/recall/yes-rate diagnostics.",
+        "sourceUrls": [
+          "https://arxiv.org/abs/2305.10355",
+          "https://arxiv.org/html/2305.10355"
+        ]
+      },
+      {
+        "range": "09-12",
+        "findingIndex": 4,
+        "topicId": "10-06",
+        "disposition": "rejected",
+        "reason": "The concern was conditional on unverified availability. All six version-pinned URLs were reopened successfully and returned titled PyTorch 2.14 documentation. The autograd page explicitly distinguishes eval() from gradient-disabling modes. Kept the pinned references; no assertion that 2.14 is the latest version was added.",
+        "sourceUrls": [
+          "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+          "https://docs.pytorch.org/docs/2.14/profiler.html",
+          "https://docs.pytorch.org/docs/2.14/checkpoint.html",
+          "https://docs.pytorch.org/docs/2.14/notes/ddp.html",
+          "https://docs.pytorch.org/docs/2.14/fsdp.html",
+          "https://docs.pytorch.org/docs/2.14/distributed.tensor.parallel.html"
+        ]
+      }
+    ],
+    "postSnapshotChangeCount": 8
+  },
+  "finalSourceHashes": {
+    "algorithm": "SHA-256",
+    "files": {
+      "data/lessons/09.json": "de76ed67376d9afe9f1aa438afe296916e765a7664d6f76da911f7d7d22495dc",
+      "data/lessons/10.json": "06adca53de3285d9ed5fd1ff5b75e29d45caa1e6480c1b0b8588f35fb50b45a1",
+      "data/lessons/11.json": "a25ea9aaf80f1af2ed1f426e8e615b03ff2fe1e62bf5e8d46a3322cf6a98eebe",
+      "data/lessons/12.json": "4b00c050b71511fc11b322beb16fcb8b19bffb32f0d1111a9b79e7cddfa492fe"
+    }
+  }
+}

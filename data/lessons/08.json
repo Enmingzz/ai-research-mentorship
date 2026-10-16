@@ -12,7 +12,7 @@
         "id": "intuition",
         "title": "Pixels are measurements, not meanings",
         "paragraphs": [
-          "An RGB image can be represented as a grid of three-channel intensity measurements. Flattening that grid produces a vector, but nearby coordinates no longer visibly express the original spatial arrangement. A learned encoder transforms pixels into features that may respond to edges, textures, objects, or context. An embedding is simply a representation in a vector space; the word does not guarantee that distances in that space correspond to human judgments of similarity."
+          "An RGB image can be represented as a grid of three-channel intensity measurements. Flattening preserves all pixel values when the original shape and ordering are known. What changes is the representation: a generic dense layer does not automatically exploit the image's two-dimensional neighborhood structure. A learned encoder transforms pixels into features that may respond to edges, textures, objects, or context. An embedding is simply a representation in a vector space; the word does not guarantee that distances in that space correspond to human judgments of similarity."
         ]
       },
       {
@@ -28,6 +28,14 @@
         "title": "Choose the representation for the question",
         "paragraphs": [
           "A global vector is convenient for retrieving similar images, while a spatial feature grid is better suited to locating objects. Consider two pictures containing the same objects in different arrangements. A global representation may deliberately suppress location, making it useful for recognition but weak for spatial reasoning. Test this by comparing retrieval similarity and a location-sensitive probe. Avoid using a visualization of two embedding dimensions as proof of semantic quality: projection methods can create appealing clusters even when downstream performance is poor."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read the input representation in ViT beside the spatial stages of a residual CNN. For each transition, label whether it is a reshape, a learned projection, a nonlinear transformation, or a pooling operation. These operations do not discard information in the same way. Flattening a known grid is reversible, whereas mapping many input coordinates into a smaller feature vector generally cannot preserve every distinction.",
+          "Choose one image and sketch the coordinates before and after patch extraction. Identify which neighboring pixels remain in the same patch and which cross a patch boundary. Then ask what the learned encoder must infer beyond that layout. When the papers report representation quality, inspect the downstream task and feature extraction point rather than assuming that any internal vector is a universal embedding. A useful probe compares global retrieval with a location-sensitive task; the same representation can support one well while making the other difficult."
         ]
       }
     ],
@@ -67,7 +75,7 @@
         "id": "intuition",
         "title": "A filter is reused across locations",
         "paragraphs": [
-          "A convolutional layer applies learned local filters at many spatial positions. Weight sharing lets the same pattern detector respond to an edge or texture wherever it appears, subject to effects from boundaries and sampling. Each output channel combines information from all input channels within the kernel footprint. Locality and sharing are useful inductive biases for images, but they do not make a network automatically invariant to every translation, scale, or rotation."
+          "A convolutional layer applies learned local filters at many spatial positions. Weight sharing lets the same pattern detector respond to an edge or texture wherever it appears, subject to effects from boundaries and sampling. In a standard ungrouped convolution, each output channel combines all input channels within the kernel footprint. Grouped and depthwise convolutions restrict those channel connections. Locality and sharing are useful inductive biases for images, but they do not make a network automatically invariant to every translation, scale, or rotation."
         ]
       },
       {
@@ -83,6 +91,14 @@
         "title": "Understand what the skip path helps",
         "paragraphs": [
           "Write a block as y = x + F(x). Its input gradient includes a direct path from the identity term as well as a path through F. This can make optimization of deep stacks easier, but it does not eliminate all vanishing, exploding, or poorly conditioned gradients. In a toy network, compare gradient norms across plain and residual stacks with matched widths. Check tensor shapes at every addition: broadcasting an incorrectly shaped shortcut can produce a legal tensor operation that implements the wrong architecture."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read the residual mapping in the ResNet paper as a statement about the function a block learns, then inspect how its shortcut handles a shape change. An identity connection and a projection shortcut have different parameter counts and different direct gradient paths. A block diagram that omits the spatial stride or channel width can hide this distinction even if it visually resembles the published architecture.",
+          "Use the Conv2d documentation to turn one block into explicit tensor shapes. Specify groups as well as kernel, stride, padding, and dilation: the all-channel parameter count in this article assumes an ungrouped layer. Now compare a plain two-layer transformation with a residual one at matching widths. Ask whether an observed optimization improvement could also involve initialization or normalization differences. The paper motivates residual learning, but the identity term is not a universal proof against exploding gradients or a substitute for checking the complete block computation."
         ]
       }
     ],
@@ -100,6 +116,12 @@
         "url": "https://arxiv.org/abs/1512.03385",
         "kind": "paper",
         "note": "Read the residual mapping formulation and projection shortcuts."
+      },
+      {
+        "title": "PyTorch Conv2d Documentation",
+        "url": "https://docs.pytorch.org/docs/2.11/generated/torch.nn.Conv2d.html",
+        "kind": "guide",
+        "note": "Check grouped/depthwise channel connectivity, kernel parameter shapes, and the output-size formula."
       }
     ]
   },
@@ -123,7 +145,7 @@
         "id": "mechanism",
         "title": "Follow a complete shape example",
         "paragraphs": [
-          "Take B images of shape [B, 3, 224, 224], patch size 16, and width 768. There are 14 × 14 = 196 patches. Each patch contains 3 × 16 × 16 = 768 raw values and is projected to a 768-dimensional embedding. Appending CLS gives [B, 197, 768]. Attention operates across these 197 positions, not across individual pixels. The equality of raw patch width and hidden width in this example is coincidental; the projection can change dimensionality."
+          "Take B images of shape [B, 3, 224, 224], patch size 16, and width 768. There are 14 × 14 = 196 patches. Each patch contains 3 × 16 × 16 = 768 raw values and is projected to a 768-dimensional embedding. Prepending CLS, as in the original ViT, gives [B, 197, 768]. Attention operates across these 197 positions, not across individual pixels. The equality of raw patch width and hidden width in this example is coincidental; the projection can change dimensionality."
         ],
         "formula": "Patch count N = HW/P²; sequence length with CLS = N + 1"
       },
@@ -131,7 +153,15 @@
         "id": "practice",
         "title": "Position and resolution are connected",
         "paragraphs": [
-          "Without spatial position information, a standard self-attention stack cannot distinguish arbitrary permutations of otherwise identical patch embeddings in the intended image layout. At a new resolution, a learned positional grid may need interpolation, and the number of tokens changes. A smaller patch size preserves finer spatial detail but increases sequence length and attention cost. Do not assume CLS is literally an average of patches: it is a learned token whose representation evolves through attention. Inspect how the selected checkpoint pools features before attaching a downstream head."
+          "Without positional information, standard self-attention is permutation-equivariant: reordering patch tokens reorders their token-level outputs. A mean-pooled or fixed-CLS image representation is invariant to that reordering, so patch content alone does not specify the spatial layout. At a new resolution, a learned positional grid may need interpolation, and the number of tokens changes. A smaller patch size preserves finer spatial detail but increases sequence length and attention cost. Do not assume CLS is literally an average of patches: it is a learned token whose representation evolves through attention. Inspect how the selected checkpoint pools features before attaching a downstream head."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "In the ViT paper, follow an image from patch extraction to the classification representation before studying the attention blocks. Write separate dimensions for the flattened patch and the hidden embedding; their equality in the 224-by-224 example here is accidental. For a patch with 192 raw values projected to width 384, the learned projection changes dimensionality even though the number of patches stays fixed.",
+          "Next, inspect the role of the classification token and positional embeddings. Permute the patch tokens while holding the classification token fixed, first without positional information and then with positions attached to image locations. The two experiments test different functions. This is why patch-order equivariance alone cannot recover an image layout. When reading higher-resolution results, distinguish interpolation of a learned positional grid from learning new image content. The input token count and attention cost also change, so improved resolution carries a computational consequence beyond simply resizing a table of positional values."
         ]
       }
     ],
@@ -181,6 +211,14 @@
         "title": "Avoid architecture-only explanations",
         "paragraphs": [
           "A comparison can change not only architecture but also pretraining data, augmentation, parameter count, optimizer, and resolution. Large differences in any of those can dominate the result. For a small experiment, train matched-size models with the same dataset and document tuning budgets, then evaluate both clean accuracy and a chosen shift such as blur or translation. A common overstatement is that one architecture always needs more data or is always more robust. Those tendencies depend on the training recipe, model scale, and evaluation distribution; report the conditions instead of turning a trend into a rule."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "The ViT and ResNet papers offer concrete architectures for comparing inductive biases, but their published headline systems are not automatically a controlled pair. Identify the image resolution, parameter scale, data source, augmentation, and optimization choices before attributing an accuracy difference to attention versus convolution. A claim about data requirements needs those conditions, especially when pretraining and downstream evaluation use different datasets.",
+          "Derive the spatial scaling independently. Doubling both image dimensions multiplies patch count by four at fixed patch size, while the dense pairwise interaction count grows by sixteen. A convolution with unchanged kernel and channels usually follows the output area instead. Neither estimate captures every layer or hardware effect. Use these calculations to predict which operation might dominate, then compare with measured runtime. The useful lesson from reading both sources is how architectural structure creates hypotheses about learning and cost, followed by experiments that can separate those hypotheses from the rest of the training recipe."
         ]
       }
     ],
@@ -237,6 +275,14 @@
         "paragraphs": [
           "In contrastive visual learning, augmentations create different views of the same image that are treated as related. If the views preserve too little shared content, the positive-pair assumption becomes noisy. If they are almost identical, the task may be too easy. Inspect augmented examples before training, including labels and masks, and compare a small set of transformations through ablations. Applying random training augmentation at evaluation time without an explicit test-time protocol is a common mistake that can make reported metrics unstable or incomparable."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "In SimCLR, the construction of two related views is part of the learning problem, not an incidental preprocessing step. Inspect which transformations can change appearance while preserving enough common content for the intended positive relation. Then contrast that setup with detection, where the target includes geometry and the image transformation must be applied consistently to boxes or masks.",
+          "Take one example with a small foreground object and a large background. Draw two possible crops and ask whether both still justify the same positive-pair or class-label assumption. A transformation that helps recognition of broad categories can be inappropriate for counting objects, reading text, or measuring color. Use the DETR reading to keep object locations and matching targets explicit rather than treating an image label as the only supervision. An informative augmentation ablation reports the task and target convention alongside its gain; stronger visual variation is not automatically better supervision."
+        ]
       }
     ],
     "exercise": {
@@ -291,6 +337,14 @@
         "title": "Evaluate representations through controlled probes",
         "paragraphs": [
           "Freeze an encoder and train a simple linear classifier on its features to test what is linearly accessible. Compare this with full fine-tuning, which also measures adaptability. Use the same labels, train/test split, preprocessing, and feature-pooling convention across encoders. A strong downstream result does not prove that the representation is unbiased or universally reusable. A common confusion is to call image–caption pretraining completely label-free: captions supply a form of supervision even when they were collected naturally rather than manually assigned as class labels."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read MAE and DINO through the source of their targets. For a masked-reconstruction example, the missing content comes from the original image. For a teacher-student example, the target is a representation produced by another view and a particular teacher construction. These targets ask the encoder to preserve different properties, so the shared term self-supervised does not imply identical learned features.",
+          "Sketch what information is available to the encoder and to the loss in each case. A decoder that reconstructs patches during pretraining need not be the component used for a later classification probe. Similarly, a training projection head need not be the best feature interface for every downstream task. When examining reported representation quality, locate the feature extraction point, pooling rule, and probe protocol. This separates success at the training objective from the question of what information remains accessible to a lightweight downstream model."
         ]
       }
     ],
@@ -347,6 +401,14 @@
         "paragraphs": [
           "A larger candidate set can make discrimination harder, but some negatives may actually share the same semantic content. Treating two pictures of the same object category as unrelated can conflict with the desired downstream representation. Representation collapse, false negatives, augmentation choices, and batch construction should be inspected together. Do not interpret a low training contrastive loss as calibrated real-world similarity or guaranteed semantic understanding. Evaluate retrieval and downstream probes using examples outside the training pair construction, and inspect both successful and failed nearest neighbors."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "The contrastive predictive coding paper supplies an original setting for InfoNCE, while SimCLR shows a visual pair construction. Compare what serves as an anchor, what counts as a positive, and how alternatives are sampled. The same algebra can train different notions of similarity because its labels come from different data relationships. If an information-theoretic interpretation is discussed, identify the sampling assumptions rather than treating every contrastive loss as a direct universal measure of semantic information.",
+          "Build a candidate table with one designated positive and several negatives. Compute the positive probability before and after adding a hard negative with a similar score. The loss changes even if the positive embedding itself is unchanged, because the classification problem changed. Then mark a negative that is semantically related to the anchor: the training label and your downstream notion of similarity can disagree. This makes batch construction, temperature, and false negatives concrete experimental choices instead of unexplained hyperparameters beside the loss formula."
+        ]
       }
     ],
     "exercise": {
@@ -402,6 +464,14 @@
         "paragraphs": [
           "For a query image, encode candidate text descriptions and rank them by similarity. For a text query, rank stored image embeddings instead. Text vectors can often be cached when the candidate labels are fixed. Consider an image of a red car behind a blue truck: broad object descriptions may rank well even if descriptions requiring exact spatial relations do not. This illustrates why alignment is not equivalent to a complete scene representation. A common mistake is expecting a CLIP encoder alone to answer open-ended questions with generated text; generation requires an additional decoder or other mechanism."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Use CLIP's model diagram and similarity-matrix pseudocode to identify the boundary between each modality's encoder and the shared comparison space. The image and text encoders need not have matching internal widths. What must match is the dimension after projection, and what makes the comparison cosine-like is normalization. Trace these steps for one image and three candidate descriptions before considering a large batch.",
+          "Now reverse the retrieval direction using the same scores: an image can rank captions, and a caption can rank images. This symmetry does not supply a mechanism for emitting new words. Ask what additional component would be needed for generation, and which training data would teach it to use the image representation. When inspecting CLIP's downstream examples, distinguish alignment useful for retrieval from exact understanding of object counts, attributes, or spatial relations. A shared embedding can be valuable while still compressing away distinctions that a different task requires."
+        ]
       }
     ],
     "exercise": {
@@ -450,6 +520,14 @@
         "title": "Build and test the text classifier",
         "paragraphs": [
           "Encode prompts such as 'a photo of a bicycle' for each candidate class, normalize them, and compare with the image vector. Prompt wording and the candidate set can change the result. If the true class is absent, softmax still chooses among available labels. Evaluate several reasonable prompts using validation data rather than selecting on the test set. For a controlled experiment, compare bare class names with descriptive prompts and inspect confusion pairs, especially classes that differ by small attributes or spatial relations."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "In the CLIP reading, separate the training classification problem over paired batch examples from the inference classification problem over named classes. Both use image-text similarities, but their candidate sets and meanings differ. Trace one row and one column of a training similarity matrix, then construct a new matrix whose text vectors represent candidate classes rather than the captions from that training batch.",
+          "For a zero-shot example, change a bare class name into a descriptive prompt without changing the image. That alters a text vector and can change the ranking; changing only a positive logit scale cannot. This distinction provides a useful way to diagnose an apparent gain from prompt design versus a change in displayed confidence. Also add an irrelevant candidate class and observe how normalized probabilities can change even if the best similarity stays the same. Read evaluation results with the label set, prompt construction, and validation-selection procedure visible, rather than interpreting the output softmax as an unconditional correctness probability."
         ]
       }
     ],
@@ -500,6 +578,14 @@
         "paragraphs": [
           "A batch of B matched examples yields B diagonal positives and potentially B(B − 1) mismatches. Pair subsampling, weighting, and distributed computation determine how those terms enter training. Removing a global softmax denominator does not make batch composition irrelevant. It also does not make the raw sigmoid output a universally calibrated match probability on arbitrary deployment data. Evaluate retrieval or zero-shot classification with a consistent preprocessing and prompt protocol. When comparing with CLIP, hold encoder size, data, and training budget fixed if the goal is to isolate the loss change."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read the sigmoid objective in SigLIP next to CLIP's row-and-column softmax objective. The crucial difference is how pair losses are formed and normalized, not whether mismatched examples disappear. For a batch of four pairs, explicitly label the sixteen image-text combinations and calculate one positive and one negative logistic term using the same score.",
+          "Inspect the reduction over those terms as carefully as the pair formula. The paper normalizes the summed pair losses by B; a mean over all B² pairs differs by a batch-size-dependent scale; that difference matters when comparing gradients or changing batch size. The learned bias also participates in the positive-negative imbalance, so copying only a similarity scale is not a complete transcription of the studied objective. An independent comparison should hold encoder, data, and evaluation protocol fixed while recording the negative-pair policy. This keeps the reading focused on the loss design rather than attributing every system-level gain to the word sigmoid."
+        ]
       }
     ],
     "exercise": {
@@ -547,6 +633,14 @@
         "title": "Probe global and local information",
         "paragraphs": [
           "Take a frozen encoder and extract both its global image representation and its patch tokens. A linear classifier on global vectors tests accessible category information, while patch correspondences or segmentation probes test spatial features. Use consistent layer selection and normalization: early and late representations may support different tasks. For a practical exercise, compare two crops of the same object and inspect nearest patch neighbors. A visually appealing attention map is not a segmentation ground truth, and a strong frozen probe does not establish that every downstream task will benefit without adaptation."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read DINO's teacher update separately from its target-distribution construction. A moving-average network changes how the reference evolves, while centering, sharpening, and the view recipe affect what agreement means. Agreement alone is insufficient because identical outputs for every image could also agree. This is why the stabilization ingredients belong to the learning method rather than being optional decorative details around an ordinary loss.",
+          "Then inspect what DINOv2 adds at the level of image and patch objectives. Its masked patch learning provides a concrete reason to evaluate spatial features as well as a global vector. For an independent probe, freeze one encoder and compare a class-token representation with patch features on tasks that require different information. Keep normalization and layer selection fixed across the comparison. Neither a compelling attention visualization nor a successful global classifier proves that all patch locations are accurate segmentation labels; the paper's feature evaluations should guide which claim your own measurement can support."
         ]
       }
     ],
@@ -603,6 +697,14 @@
         "paragraphs": [
           "Construct two synthetic images with the same colored objects in swapped positions. Compare their global embedding similarity and the ability of a dense head to identify left versus right. If global vectors remain similar, that may be desirable for object recognition but problematic for spatial instructions. A common mistake is resizing a low-resolution feature map and interpreting it as recovered high-resolution evidence. Upsampling changes the output grid; it cannot guarantee restoration of details absent from the original representation. Evaluate localization at the resolution and coordinate convention used by the task."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Use ViT and DINOv2 to locate the feature interface before choosing a downstream task. Identify the class token, patch tokens, and any pooling operation used to produce a single image vector. A dense output can contain global contextual information while retaining spatial indices; it should not be mistaken for a collection of completely independent local pixel descriptors.",
+          "Construct two feature grids with the same vectors in different positions. Their arithmetic means are identical, but a location-aware head can distinguish the grids. This is a mathematical illustration of pooling loss, not a claim that two real swapped-object images must produce exactly permuted deep features. Positional encodings and contextual processing can change the values themselves. Read dense-feature evaluations with that distinction in mind, and record image resizing and feature-grid resolution. Upsampling can create a finer output grid, but evidence for better boundaries must come from localization metrics rather than the number of displayed pixels."
+        ]
       }
     ],
     "exercise": {
@@ -657,6 +759,14 @@
         "paragraphs": [
           "A neat visualization can hide duplicate detections, missed small objects, or systematically shifted boundaries. Report the task-appropriate metric and inspect size, class, and occlusion subgroups. Confidence thresholds trade false positives against misses, so compare methods across an agreed evaluation protocol rather than cherry-picking a display threshold. Keep coordinate normalization and resizing consistent when moving boxes between model and image space. A common error is computing overlap after applying different crop or resize transforms to predictions and targets, which produces a geometry mismatch even when the underlying prediction is reasonable."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read DETR's prediction and matching formulation before comparing detector scores. A model emits a set of candidate objects, while training needs a correspondence between predictions and annotated targets. This differs from treating every pixel as a class prediction. Draw a case with two objects and three candidate detections to see why duplicates, unmatched predictions, and assignment policy are central rather than exceptional details.",
+          "Place the SAM reading beside that diagram to separate the interface of a prompted mask from the interface of class-labeled detection. A high-quality region boundary need not include an object category, and a good rectangular box need not describe a precise boundary. For one irregular object, compare box overlap with mask overlap and identify which errors each metric hides. The source papers become easier to interpret when the output structure, matching procedure, and evaluation target are written down before any aggregate score is considered."
+        ]
       }
     ],
     "exercise": {
@@ -685,7 +795,7 @@
   {
     "topicId": "08-14",
     "title": "SAM and SAM 2 as promptable segmentation systems",
-    "summary": "Promptable segmentation uses user-specified spatial cues to identify a region, and video segmentation additionally requires memory across frames.",
+    "summary": "Promptable segmentation uses spatial cues to identify a region; SAM 2 uses temporal memory to maintain the selected object across video frames.",
     "prerequisites": [
       "08-13",
       "08-12"
@@ -710,6 +820,14 @@
         "title": "Measure prompt quality and temporal failure",
         "paragraphs": [
           "For an image experiment, compare one positive point, a box, and additional corrective points on the same objects. For video, inspect occlusion, reappearance, camera motion, and similar-looking instances. Report whether prompts are supplied once or repeatedly: frequent human correction changes the difficulty of the task. A common mistake is treating a confident mask as guaranteed object recognition or assuming a tracked mask proves understanding of the object's action. Evaluate spatial overlap and temporal identity separately, and include failures where the prompt itself is underspecified."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read SAM's image encoder, prompt encoder, and mask decoder as a reusable-query interface: the same image features can support multiple prompts. Mark which tensors depend on the image and which depend on a particular point, box, or mask prompt. This helps explain why an interactive segmentation system is not simply an image classifier with a more detailed output.",
+          "In SAM 2, inspect how information from earlier frames and interactions conditions a later mask. Attribute this streaming-memory mechanism to that architecture rather than assuming that every video segmentation method must use the same design. Draw a short sequence where an object disappears behind another and returns, then identify what information could preserve its identity. A useful evaluation varies the timing and number of corrective prompts, because repeated intervention changes the task difficulty. Keep boundary accuracy and target identity separate: a plausible mask on the wrong instance can look successful in a single frame while failing the intended tracking query."
         ]
       }
     ],

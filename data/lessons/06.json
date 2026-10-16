@@ -28,6 +28,14 @@
         "paragraphs": [
           "Imagine a 100-million-parameter backbone and a one-million-parameter adapter. The adapter stores only 1% as many trainable parameters, but that does not imply a 100-fold reduction in total GPU memory or runtime. Compare methods with the same examples, evaluation prompts, and validation procedure. Tune learning rates separately: restricting the trainable space changes optimization. If full tuning wins, investigate whether capacity, target layers, or training budget explains the difference before attributing it to the method alone."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read the LoRA and bottleneck-adapter papers through the question of what is allowed to change. Draw the frozen backbone in one color and the trainable components in another. An inserted nonlinear adapter and a factorized update to an existing projection occupy different places in that graph, even when their trainable parameter counts are similar. Their small checkpoint sizes therefore do not establish equivalent models.",
+          "For each trainable component, trace its influence on the loss backward through the graph. If an early adapter affects a later frozen layer's input, that layer can still participate in differentiation. This explains why freezing weights and eliminating all backward computation are different operations. Build a resource table with separate rows for stored weights, gradients, optimizer state, and activations. When a paper reports efficiency, identify which rows were measured and under what batch and sequence lengths before translating a parameter-count reduction into a hardware requirement."
+        ]
       }
     ],
     "exercise": {
@@ -83,6 +91,14 @@
         "paragraphs": [
           "Suppose the desired change independently boosts two unrelated feature directions. One rank-one update may not represent that change exactly; rank two could. In a deep network, however, several low-rank updates interact with nonlinearities, so local rank is not the rank of the complete model's behavioral change. A practical diagnostic is to sweep rank while holding data fixed, track validation performance, and inspect update singular values. A flat curve might indicate adequate rank, weak training signal, or poor target-layer selection."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "The central object to inspect in LoRA is the weight change, not a compressed replacement for the original matrix. Rewrite the paper's factorization using a small square example and identify the input directions selected by A and the output directions supplied by B. This turns a storage formula into a statement about which linear corrections can be represented.",
+          "Now construct a diagonal target update with three nonzero diagonal entries and ask whether rank two can reproduce it exactly. It cannot, but that matrix example alone does not predict the quality of a deep model adapted with many rank-two updates. Read empirical rank investigations with that distinction in mind: an observed low-rank solution on selected tasks is evidence about those adaptations, not a universal theorem. Useful follow-up measurements include singular values of learned updates and validation performance across ranks, while keeping scale, target locations, and optimization choices visible."
+        ]
       }
     ],
     "exercise": {
@@ -131,7 +147,15 @@
         "id": "practice",
         "title": "Count and test a small layer",
         "paragraphs": [
-          "Take d_in = 8, d_out = 6, and r = 2. Full matrix adaptation has 48 trainable values; the two adapter matrices have 16 + 12 = 28. A high rank is not necessarily parameter-efficient for tiny layers. Test the implementation by comparing the two-path output with the output of an explicitly merged matrix using fixed weights and dropout disabled. The outputs should agree within numerical tolerance, and frozen W should receive no parameter gradient."
+          "Take d_in = 8, d_out = 6, and r = 2. Full matrix adaptation has 48 trainable values; the two adapter matrices have 16 + 12 = 28, a saving. The break-even rank is d_in d_out/(d_in + d_out) = 48/14 ≈ 3.43. Rank 4 would require 56 adapter values, exceeding the full matrix's 48. Tiny layers leave little room for parameter-efficient ranks. Test the implementation by comparing the two-path output with the output of an explicitly merged matrix using fixed weights and dropout disabled. The outputs should agree within numerical tolerance, and frozen W should receive no parameter gradient."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "When reading LoRA's forward equation, translate every symbol into the tensor convention used by your code. A paper may multiply column vectors on the right of a matrix, while a framework stores a batch as rows. Write the same operation both ways and mark the two transposes explicitly. The low-rank branch must end with exactly the same output shape as the frozen branch.",
+          "Use a non-square layer for an independent check, because equal input and output widths can hide an incorrect transpose. Choose d_in = 5, d_out = 3, and r = 2, then compare the two-path computation with an explicitly formed effective matrix. Also verify the parameter count: the adapter contains 10 + 6 values rather than the full matrix's 15, so this tiny example is not parameter-efficient. The paper's motivation concerns suitable ranks relative to large dimensions; the algebra alone does not guarantee savings for every layer."
         ]
       }
     ],
@@ -181,6 +205,14 @@
         "title": "Design a readable sweep",
         "paragraphs": [
           "Start with a small rank grid and record rank, α, dropout, learning rate, target modules, and validation score. Also log the norm of the effective update relative to the base weight. If a larger rank performs worse, check learning rate and scaling before concluding that capacity is harmful. Excessive dropout may make a small dataset harder to fit, while too little regularization may encourage memorization. Always compare in evaluation mode; stochastic adapter dropout can otherwise disguise reproducibility problems."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Place the original LoRA scaling convention beside the rsLoRA paper's alternative. The useful reading question is what changes when rank changes while the user-facing α stays fixed. Compute both multipliers for a sequence of ranks before looking at an empirical curve. Otherwise a curve labeled only by rank may combine a capacity change with a substantially different update scale.",
+          "To investigate the distinction, keep a record of initialization, learning rate, dropout, and the norm of the effective update. Equal explicit multipliers do not guarantee equal learned norms, because the optimization trajectories also change. Dropout introduces another source of randomness on the adapter path, so compare evaluation outputs with that randomness disabled. A careful paper reading separates the mathematical parameterization from claims about training stability and from measured downstream quality. Treat the proposed scaling as a hypothesis to test under a documented configuration, rather than as evidence that rank can be increased without any resource or optimization consequences."
         ]
       }
     ],
@@ -238,6 +270,14 @@
         "paragraphs": [
           "Consider a layer with four 512-by-512 attention projections. Rank 4 on all four uses 16,384 parameters; rank 8 on just Q and V uses the same number. The two choices offer different adaptation paths even though their budget matches. Run an ablation using identical training examples and evaluate several task types. A common implementation error is targeting a name that does not exist in the selected architecture. Inspect named modules and the final trainable parameter list before launching a long run."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "The target-matrix experiments in LoRA are useful because they ask where a limited adaptation budget should be spent. Inspect which projections are changed in each condition and recalculate the number of adapter values. Two configurations with the same nominal rank can have different budgets if they cover different matrices; two configurations with matching budgets can intervene in very different computations.",
+          "Connect those experiments to a single attention head. A change to Q or K can alter its attention distribution, while a change to V can alter what information is aggregated under an unchanged distribution. In a full network these roles interact, so the distinction is a way to design an ablation rather than a promise of isolated behavior. Consult the PEFT target-module reference only after checking the actual checkpoint's module names and shapes. A published architectural label does not establish that a string such as q_proj exists in every implementation."
+        ]
       }
     ],
     "exercise": {
@@ -293,6 +333,14 @@
         "paragraphs": [
           "On a small FP32 layer, save base weights, compute an unmerged evaluation output, merge once, and compare outputs. Then restore the saved base weights and compare again. Do not merge twice: that would add two copies of the update. Quantized backbones need additional care because dequantization, addition, and requantization can introduce error or may be unsupported in a particular library path. Finally, an adapter checkpoint alone usually depends on the exact base model revision; record that revision with the artifact."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read LoRA's initialization and merging discussion together. A zero initial correction must preserve the base function while still permitting a learning signal to enter one factor. Write the gradients of B(Ax) for a scalar loss and substitute B = 0. This reveals why one factor can begin learning before the other, and why setting both factors to zero is a different situation.",
+          "Then separate mathematical merging from a library operation. The identity W_merged = W + sBA assumes the same adapter weights, the same scale, and a deterministic linear path. A checkpoint may also contain trained biases or other modules, which must not disappear from the deployment artifact. In the PEFT reference, inspect whether an operation retains adapter state or returns a model without it. Test a saved base-plus-adapter pair independently of any merged copy. Numerical agreement should be measured with a stated tolerance, particularly when the deployment path changes precision."
+        ]
       }
     ],
     "exercise": {
@@ -347,6 +395,14 @@
         "title": "Choose based on the task interface",
         "paragraphs": [
           "Suppose a frozen model must support many small task-specific packages. A soft prompt is compact and easy to select, but it spends context positions and may be sensitive to initialization and model scale. An adapter can intervene deeper but requires modifying the network. A prefix can condition multiple layers without updating the backbone. Evaluate task quality, storage, context budget, and serving complexity together. Calling every method a prompt obscures these practical differences and can lead to loading a checkpoint into the wrong architecture."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Compare the adapter, prefix-tuning, and prompt-tuning sources by drawing the location of their learned values. For each, ask whether those values modify a hidden transformation, provide attention keys and values, or enter as input embeddings. This makes the papers' shared goal of compact adaptation easier to understand without collapsing their distinct mechanisms into a single category.",
+          "Use a fixed hidden width and a small parameter budget to work out feasible bottleneck sizes or prompt lengths. Then identify costs that the count misses: extra sublayer operations, added context positions, and cached prefix tensors. The direct key/value-prefix estimate in this article is only a shape model; implementations may learn a reparameterization and use attention-head layouts that change the stored tensors. When reading reported transfer results, note model scale and task interface. A compact package that works well for generation need not provide the same intervention for a token-labeling head or a spatial vision task."
         ]
       }
     ],
@@ -409,6 +465,14 @@
         "paragraphs": [
           "A hypothetical one-billion-parameter backbone needs 0.5 GB for four-bit codes alone, compared with 2 GB for two-byte weights, using decimal units. Real memory exceeds those figures because quantization scales, adapters, activations, temporary buffers, and optimizer states also occupy space. Quantization can change model outputs, so compare the frozen quantized baseline before attributing any quality loss to LoRA training. Check supported kernels, compute dtype, gradient checkpointing, and the exact preparation procedure for the chosen library version. A memory-saving setup is not automatically faster on every device."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "QLoRA combines a frozen quantized backbone with trainable adaptation; read its memory discussion by separating storage representation from the arithmetic used in a layer. On a diagram, label the quantized codes, reconstruction metadata, adapter tensors, and activations. Only then identify which quantities the optimizer can update. Calling all of these objects four-bit values would obscure the method's actual resource trade-off.",
+          "For an independent experiment, compare three states: the original frozen model, its quantized frozen counterpart, and that counterpart after adapter training. This isolates a quantization effect from the effect of adaptation. Measure peak memory during a full step, not just immediately after loading weights, because backward activations and temporary buffers can dominate the missing difference. In the PEFT documentation, check the supported preparation and compute-dtype choices for the installed versions. A paper's successful configuration establishes a concrete result, while a particular device and kernel combination still needs its own measurement."
+        ]
       }
     ],
     "exercise": {
@@ -464,6 +528,14 @@
         "paragraphs": [
           "Take a tiny block containing several small weights and one unusually large weight. A shared scale chosen to cover the outlier can reduce precision for the small values. Smaller blocks may localize that effect but require more scales. Compare mean squared reconstruction error, maximum error, and downstream output error, since a numerically small error in a sensitive direction can matter. Do not assume lower average weight error always means better task accuracy. Evaluate the quantized model with the same tokenizer, prompts, and decoding settings as the unquantized reference."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "The NF4 and double-quantization discussion in QLoRA is easiest to read as two separate encoding problems. First, approximate weight values with a small codebook and a block scale. Second, reduce the storage occupied by those scales. Sketch a byte-level record for one toy block so that the weight codes and their metadata cannot be accidentally counted as the same thing.",
+          "Now vary the block size while keeping the number of weights fixed. Larger blocks require fewer scales, but one outlier can influence more reconstructed values. The resulting trade-off concerns both error and metadata overhead; four-bit code storage alone is an incomplete memory estimate. Examine the paper's normal-distribution motivation as a design assumption, not a claim that every layer exactly follows that distribution. A useful extension is to compare errors before and after a linear projection, because two quantizers with similar weight reconstruction error can perturb task-relevant output directions differently."
+        ]
       }
     ],
     "exercise": {
@@ -503,7 +575,7 @@
         "id": "mechanism",
         "title": "Write each parameterization explicitly",
         "paragraphs": [
-          "For rsLoRA, the adapter multiplier is α/√r. With α = 16 and r = 64, that multiplier is 2; standard α/r would be 0.25. For a conceptual DoRA weight vector, write w′ = m(v + Δv)/‖v + Δv‖. The normalization isolates a direction, while m controls length. Actual matrix implementations must specify which axis defines a weight vector and how norms are computed. A zero or tiny norm needs numerically careful handling."
+          "For rsLoRA, the adapter multiplier is α/√r. With α = 16 and r = 64, that multiplier is 2; standard α/r would be 0.25. For a conceptual DoRA weight vector, write w′ = m(v + Δv)/‖v + Δv‖. The normalization isolates a direction, while m controls length. Actual matrix implementations must specify which axis defines a weight vector and how norms are computed. A zero or tiny norm needs numerically careful handling. In the paper's matrix convention, V starts at W₀ and m at W₀'s column norms, so zero BA preserves the initial weight for nonzero columns. Its memory-saving variant detaches the norm denominator from backpropagation while recomputing its value in each forward pass. The forward expression is unchanged, but the gradients differ."
         ],
         "formula": "rsLoRA: ΔW = (α/√r)BA; vector-form DoRA: w′ = m(v + Δv)/‖v + Δv‖"
       },
@@ -512,6 +584,14 @@
         "title": "Compare without hiding the changed budget",
         "paragraphs": [
           "DoRA introduces magnitude parameters and normalization work; rsLoRA changes the explicit scaling convention. Keep a record of these changes when comparing against a LoRA baseline. Reusing one learning rate across all variants is a convenience, not proof of a fair optimum. Measure validation quality, update norms, peak memory, and deployment behavior. Neither method establishes that full fine-tuning is always unnecessary. Their usefulness depends on model, target layers, data, rank, and optimization settings, which should remain visible in the experiment report."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read rsLoRA and DoRA as answers to different questions. The first revisits how an adapter's contribution scales with rank. The second separates magnitude from direction in the adapted weight. Translate both into one explicit shape convention before combining them in an implementation; otherwise a changed scaling factor can be mistaken for the entire magnitude-direction method.",
+          "For DoRA, choose one weight vector and compute its norm, normalized direction, and reconstructed value. Perturb its direction without changing its assigned magnitude, then change only the magnitude. These are distinct degrees of freedom that ordinary matrix addition does not expose separately. The paper uses a matrix-axis convention, so check whether a framework's transposed storage makes the corresponding norm run over rows or columns. For rsLoRA, compare effective update norms at several ranks rather than merely checking α/√r numerically. Neither exercise reproduces the papers' training results, but both can catch an incorrectly implemented parameterization."
         ]
       }
     ],
@@ -534,7 +614,7 @@
         "title": "DoRA: Weight-Decomposed Low-Rank Adaptation",
         "url": "https://arxiv.org/abs/2402.09353",
         "kind": "paper",
-        "note": "Inspect the magnitude–direction decomposition and its implementation."
+        "note": "Inspect the magnitude–direction decomposition, pretrained column-norm initialization, and the variant that detaches the denominator during backpropagation."
       }
     ]
   },
@@ -567,6 +647,14 @@
         "title": "Read a result with competing constraints",
         "paragraphs": [
           "Suppose full tuning scores 82 and LoRA scores 81 on the same held-out metric, while their peak memory is 24 GB and 10 GB. That one-point difference may or may not justify the larger resource requirement. Repeat runs to estimate variability, inspect important subgroups, and check whether LoRA rank or targets were tuned adequately. Save the validation choices separately from the test result. A common mistake is comparing a well-tuned full model with a single default adapter configuration and interpreting the gap as a fundamental capacity limit."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Use LoRA and QLoRA to practice reading an efficiency claim with its denominator attached. Identify the backbone, adaptation configuration, precision, training data, and measured resource. A comparison of checkpoint sizes answers a different question from a comparison of peak training memory, and both differ from time to reach a target validation score. Put these outcomes in separate columns instead of combining them into a single claim of being cheaper.",
+          "Then reconstruct a matched comparison of your own. Give each method a documented hyperparameter search allowance, record the examples or tokens consumed, and evaluate with the same prompts and scoring rules. If one method cannot fit the chosen device, report that feasibility constraint directly rather than inventing a quality comparison for an unrun baseline. Interpret a small score gap alongside repeated-run variation and the size of the resource saving. The papers motivate this investigation; they do not remove the need to define the comparison you intend to make."
         ]
       }
     ],
@@ -613,7 +701,7 @@
         "id": "mechanism",
         "title": "Train with a visible loss path",
         "paragraphs": [
-          "Prepare tokenized examples with appropriate labels and padding masks. For causal language modeling, decide whether loss covers all text or only the desired response tokens; the choice affects the learning objective. Run a single batch first, inspect the loss, and verify that adapter gradients are finite and nonzero after an appropriate initialization step. Check that the optimizer contains only intended parameters. Quantized workflows also require the supported preparation steps for the installed PEFT and Transformers versions."
+          "Prepare tokenized examples with appropriate labels and padding masks. For causal language modeling, decide whether loss covers all text or only the desired response tokens; the choice affects the learning objective. Run a single batch first and inspect the loss. With standard random-A, zero-B initialization, the task-loss gradient for A is zero on the first backward pass; B can receive a nonzero gradient. After B changes, gradients can reach A. Check finite gradients and the expected pattern for the actual initialization, data, and objective, rather than requiring every tensor to be nonzero. Check that the optimizer contains only intended parameters. Quantized workflows also require the supported preparation steps for the installed PEFT and Transformers versions."
         ]
       },
       {
@@ -621,6 +709,14 @@
         "title": "Reload before trusting the artifact",
         "paragraphs": [
           "Save the adapter configuration and weights along with the exact base model identity, tokenizer configuration, and training settings. In a fresh process, reload the base and attach the saved adapter. In evaluation mode with fixed inputs, compare logits or deterministic outputs with the original trained instance. An adapter checkpoint generally does not contain the full backbone. If deployment needs merged weights, create that artifact separately and test it as well. A successful save call alone does not demonstrate that another machine can reproduce the model."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper and implementation guide",
+        "paragraphs": [
+          "The PEFT quicktour is an executable interface guide, while the LoRA paper explains why the added factors define a restricted weight update. Read them side by side and connect configuration fields to mathematical objects: rank sets the factor width, α contributes to scaling, and target modules identify where the correction enters. Treat example target names as architecture-dependent choices rather than universal strings.",
+          "A useful audit artifact is a compact manifest of trainable parameter names and shapes before the first optimizer step. Compare it with the intended targets, then save and reload an adapter on the same base revision in a fresh process. Check logits on fixed inputs before evaluating generated text, since sampling can hide small discrepancies or create differences without a checkpoint error. The documentation's successful save call establishes that files were written; your reload check establishes whether the intended computation was recovered. Quantized and merged deployment paths require separate checks because they can change numerical behavior."
         ]
       }
     ],

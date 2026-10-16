@@ -28,6 +28,14 @@
         "paragraphs": [
           "Dense matrix multiplication is easy to batch efficiently. Conditional routing adds selection, dispatch, variable batch sizes, and recombination. If only a few tokens reach an expert, its matrix operations may poorly utilize the hardware. Communication can dominate when experts live on different devices. Compare latency and throughput at realistic batch sizes, rather than inferring speed from active parameters alone. Also distinguish token-level sparsity from pruning: routing chooses a computation path dynamically, whereas pruning usually removes or masks components according to a different rule."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read the sparsely gated MoE paper and Mixtral with two ledgers open: one for parameters stored and another for expert computations executed by a token. Mark which parts of the model are shared before counting the routed branches. This prevents the phrase sparse model from being confused with a matrix whose elements are mostly zero or with a model that stores only its active experts.",
+          "Take the eight-expert example here and imagine a batch whose tokens collectively visit every expert. Per-token execution remains sparse while the batch touches the complete expert collection. Ask what that means for weight residency, batching, and device placement before translating an active-parameter count into a speed prediction. When reading experimental comparisons, identify whether the baseline is matched by total parameters, active computation, training budget, or measured latency. Each condition isolates a different question, and none can silently substitute for the others."
+        ]
       }
     ],
     "exercise": {
@@ -81,7 +89,15 @@
         "id": "practice",
         "title": "Build the smallest useful prototype",
         "paragraphs": [
-          "Use four experts with d = 16 and h = 32. Each two-matrix expert has 1,024 weight parameters, so the collection has 4,096. Route a batch of token vectors, run only selected experts, and restore the original token order before the residual addition. A useful debugging test sends every token to one chosen expert and checks that the layer matches that standalone MLP. A frequent error is returning tokens in dispatch order, which silently mixes representations between sequence positions while leaving tensor shapes apparently valid."
+          "Use four experts with d = 16 and h = 32. Each two-matrix expert has 1,024 weight parameters, so the collection has 4,096. Route a batch of token vectors, run only selected experts, and restore the original token order before the residual addition. A useful debugging test sends every token to one chosen expert and checks that the MoE contribution, before residual addition, equals the standalone MLP output multiplied by its gate weight. Exact equality to the unweighted MLP requires a gate of one. A frequent error is returning tokens in dispatch order, which silently mixes representations between sequence positions while leaving tensor shapes apparently valid."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Inspect the expert sublayer in Switch or Mixtral before thinking about model-scale parameter counts. Identify its input width, internal expansion, nonlinearity or gate, and output width. The defining interface is that a selected expert returns a token representation compatible with the surrounding residual stream. An expert is not automatically a complete independent language model merely because it has its own weights.",
+          "Translate one diagram into a tiny tensor program on paper: four input tokens, two experts, and a recorded destination for each token. Group the rows by destination, apply the appropriate feed-forward computation, and restore their original positions. This exercise separates the expert's local function from the router and dispatcher. For a gated expert, count each distinct projection instead of using the two-matrix estimate unchanged. The architectural reading should end with a shape and parameter-count description precise enough that another implementation could reproduce the same sublayer interface."
         ]
       }
     ],
@@ -136,13 +152,21 @@
         "id": "practice",
         "title": "Inspect a concrete routing distribution",
         "paragraphs": [
-          "Suppose a router produces probabilities [0.55, 0.25, 0.15, 0.05]. A top-two rule chooses experts zero and one. If selected weights are renormalized, their weights become 0.6875 and 0.3125. If they are not, their total contribution remains scaled by 0.8. Those are different layer definitions. During debugging, log logits, selected indices, gate weights, and per-expert token counts. Extreme logits early in training can make assignments overly concentrated, while perfectly balanced counts alone do not prove that routing improves task quality."
+          "Suppose a router produces probabilities [0.55, 0.25, 0.15, 0.05]. Using zero-based indexing, a top-two rule chooses experts at indices 0 and 1. If selected weights are renormalized, their weights become 0.6875 and 0.3125. If they are not, their total contribution remains scaled by 0.8. Those are different layer definitions. During debugging, log logits, selected indices, gate weights, and per-expert token counts. Extreme logits early in training can make assignments overly concentrated, while perfectly balanced counts alone do not prove that routing improves task quality."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Compare the gate construction in the original sparse MoE paper with the selected-expert formulation in Switch. Write down three objects separately: all-expert logits, the selected indices, and the numerical weights that multiply expert outputs. A softmax over selected logits and a softmax over all logits followed by selection do not have the same output scale unless an appropriate renormalization is applied.",
+          "Use a four-expert example to inspect the gradient path. Once an index set is fixed, the selected numerical weights can still depend differentiably on router logits; changing the winning indices is a separate discrete event. If top-one weights are renormalized to one, that particular mixture-magnitude gradient disappears. Ask how the studied system trains its router under the actual convention rather than assuming every top-k operator behaves identically. This reading approach connects the paper's equation to the optimization behavior that a seemingly small implementation change can alter."
         ]
       }
     ],
     "exercise": {
       "prompt": "For probabilities [0.2, 0.5, 0.3], which experts does top-two select, and what are their renormalized weights?",
-      "answer": "Experts one and two. Their selected mass is 0.8, so the weights are 0.625 and 0.375."
+      "answer": "The experts at zero-based indices 1 and 2, namely the second and third experts with probabilities 0.5 and 0.3. Their selected mass is 0.8, so the weights are 0.625 and 0.375."
     },
     "takeaways": [
       "Routing scores, selected indices, and mixture weights are distinct objects.",
@@ -191,6 +215,14 @@
         "title": "Understand the top-one normalization trap",
         "paragraphs": [
           "With top-one selection, renormalizing the sole selected probability to one removes its magnitude from the output. Retaining the original probability preserves a gate multiplier and its associated gradient path. Both definitions can be implemented, but they are not identical. For a toy experiment with four experts, compare top-one and top-two while recording task loss, routing counts, and time. Do not only report the number of experts: a model with many experts and k = 1 has a very different per-token workload from one with the same expert count and k = 4."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Switch and Mixtral are useful contrasting sources because their sparse layers choose different numbers of experts per token. Read their routing definitions alongside their expert dimensions. A count of one versus two says how many branches are selected, but it does not fully specify the amount of arithmetic, the amount of shared computation, or the dispatch buffer sizes.",
+          "Build a comparison with 100 tokens and first count assignments for each k before estimating expert work. Then change expert width so that two narrow branches approximately match one wide branch's matrix cost. The resulting architectures still differ in routing flexibility and communication, even under that arithmetic constraint. When interpreting a paper's speed result, look for batch size, hardware, capacity policy, and expert utilization. A useful ablation isolates k while making these costs visible; simply copying a published top-k setting into a differently sized model does not reproduce the original comparison."
         ]
       }
     ],
@@ -247,6 +279,14 @@
         "paragraphs": [
           "A batched implementation often groups assignments by expert for efficient matrix multiplication. Maintain the original token index and gate weight beside every dispatched row. Multiply each returned row by its weight and scatter-add it into an output buffer indexed by the original token. Scatter-add matters because one token may receive several contributions. A simple assignment operation can overwrite earlier expert outputs. Validate the optimized implementation against a slow loop over tokens and selected experts, including repeated indices, empty experts, and noncontiguous inputs."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "The gated-sum equations in sparse MoE papers specify a function, while a dispatcher implements that function through reordered batches. Keep those two levels separate while reading. First compute a token's mixture directly from expert outputs and scalar gate weights. Only then reorganize the calculation into expert-specific batches, carrying the token index and mixture weight with every dispatched row.",
+          "Consider two tokens that each select the same two experts. The return operation must combine two contributions for each original token without combining contributions between tokens. Write down the four dispatch rows and their destination indices; an ordinary overwrite would lose a valid term even though all tensor dimensions match. Use this toy construction to interpret any optimized implementation associated with the paper. Agreement with the direct gated sum is the relevant correctness condition, while faster grouping or communication is a separate systems improvement that should preserve that condition."
+        ]
       }
     ],
     "exercise": {
@@ -292,15 +332,23 @@
         "id": "mechanism",
         "title": "Connect assignments and probabilities",
         "paragraphs": [
-          "A common top-one balancing term uses f_e, the fraction of tokens assigned to expert e, and P_e, the mean routing probability for e across the batch. The product sum penalizes concentration when assignment frequency and probability mass align. A coefficient sets the strength of this auxiliary loss relative to the task loss. Assignment counts are discrete, while the probability averages provide a differentiable path. This specific form is only one design; other routers use different balancing mechanisms."
+          "A common top-one balancing term uses f_e, the fraction of tokens assigned to expert e, and P_e, the mean routing probability for e across the batch. The product sum penalizes concentration when assignment frequency and probability mass align. Let N_E denote the number of experts. A coefficient λ sets the strength of this auxiliary loss relative to the task loss. Assignment counts are discrete, while the probability averages provide a differentiable path. This specific form is only one design; other routers use different balancing mechanisms."
         ],
-        "formula": "L_balance = E Σₑ fₑ Pₑ"
+        "formula": "L_balance = N_E Σₑ fₑ Pₑ; L_total = L_task + λ L_balance"
       },
       {
         "id": "practice",
         "title": "Interpret the scale with a toy case",
         "paragraphs": [
           "For four experts under uniform routing, f_e = P_e = 0.25, giving L_balance = 1. If all tokens and probability mass go to one expert, the value is 4. The coefficient therefore matters: a large coefficient can prioritize equal traffic at the expense of useful specialization. Track both the auxiliary term and the main task metric, along with per-expert counts and dropped assignments. Do not diagnose health from the mean probability alone; an apparently smooth mean can hide very uneven hard selections or imbalances across devices."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "In the Switch paper, inspect the definitions of hard assignment frequency and average router probability before using the auxiliary objective. They are not two names for the same statistic. One records which expert wins a selection rule, while the other preserves the distribution of soft scores across the batch. That distinction explains why a smooth average probability can coexist with uneven hard routing.",
+          "Recalculate the uniform example and a concentrated example from this article, including the external coefficient when combining with task loss. The value one is the stated uniform reference, not a probability of correctness or a reason to optimize the auxiliary term in isolation. Examine per-expert counts, token overflow, and task performance together when assessing the paper's balancing strategy. A useful independent experiment holds the router probabilities nearly tied and changes a small logit bias: hard assignments can shift sharply even when the mean scores barely move, exposing why both measurements matter."
         ]
       }
     ],
@@ -351,6 +399,14 @@
         "paragraphs": [
           "Overflow assignments may be dropped, rerouted, or handled with a dropless implementation. Dropping an expert contribution does not necessarily delete the token from the model: a shared residual path may still carry its representation. Nevertheless, the intended expert computation is missing. Log the overflow rate and investigate which examples are affected. A training setup that drops tokens heavily can create differences from a deployment setup with larger capacity. Increasing capacity reduces overflow but can reserve more memory and may increase padding or scheduling costs."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Use Switch's expert-capacity discussion to locate the boundary between a mathematical router and a system with finite buffers. For a chosen routing group, list the input-token count, number of assignments per token, number of experts, and capacity convention. The same numerical capacity factor can imply different buffer sizes if an implementation uses a different group or counts top-k assignments differently.",
+          "Draw a dispatch table where one expert is overloaded and another has spare slots. Uniform total capacity does not automatically move work between them; that requires an explicit overflow policy. Mark which expert contributions are missing after dropping and trace what still reaches the next layer through a residual path. When reading quality or speed comparisons, check whether capacity changes between training and evaluation. Dropless processing is an alternative systems design, not something implied by the capacity-factor formula, and it can exchange dropped work for different batching, memory, or scheduling costs."
+        ]
       }
     ],
     "exercise": {
@@ -399,6 +455,14 @@
         "title": "Use interventions carefully",
         "paragraphs": [
           "A stronger test masks, replaces, or reroutes an expert and measures which tasks degrade. Compare against random expert removal at a matched compute change, since disabling any useful capacity can hurt performance. For a small model, train on two synthetic distributions and inspect whether specialized routing predicts which expert interventions matter. Also check stability: an apparent specialization that changes completely across seeds may reflect interchangeable solutions. Avoid assuming that equal load and sharp semantic specialization can always be achieved simultaneously; their objectives may sometimes compete."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read the routing analysis in Mixtral and the specialization experiments in DeepSeekMoE as evidence with different strengths. A traffic visualization reveals association; removing or changing experts can reveal functional sensitivity, but also changes available capacity and input distributions. Neither observation alone gives an expert a fixed human-readable job description. Begin by identifying exactly what was measured and what alternative explanation remains.",
+          "Create a two-way table of expert assignments and token categories. From that one table, calculate both category-given-expert and expert-given-category distributions, keeping category base rates visible. Then design a matched intervention: remove a candidate expert and compare the task effect with removing another expert under similar compute conditions. A selective degradation is more informative than an attractive category label. Repeat the analysis across layers or data mixtures, because a specialization claim should specify where and under which distribution it holds rather than implying a permanent property of an expert index."
         ]
       }
     ],
@@ -455,6 +519,14 @@
         "paragraphs": [
           "One token may activate two experts, while a batch collectively touches every expert. Consequently, batching can improve utilization without reducing the need to store the full collection. Active parameters also do not uniquely determine latency: sequence length changes attention work, and communication changes device time. When comparing a dense and sparse model, report total storage, active parameter convention, measured FLOPs if available, batch size, and latency or throughput. A claim that an MoE model is equivalent to a dense model of its active size is too strong; their capacity and computation structure differ."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Use Mixtral's distinction between total and active parameters as a prompt to reconstruct the counts, not just repeat the headline values. Separate shared attention and other common components from the routed expert collection. Then identify the reporting convention for embeddings and output projections. Parameter storage, parameter use by one token, and floating-point operations are related but different accounting quantities.",
+          "Apply the formula to a complete hypothetical stack rather than one isolated layer. Count how many layers actually contain experts and whether their widths or routing counts vary. A batch that visits all experts can still have a small active count per token, so the active number does not bound the batch's resident model storage. When comparing with a dense model, ask what claim the matching count supports. Equal active parameters is not a proof of equal latency, equal learned capacity, or equal quality; each of those needs an additional measurement or assumption."
+        ]
       }
     ],
     "exercise": {
@@ -494,7 +566,7 @@
         "id": "mechanism",
         "title": "Estimate payload before timing it",
         "paragraphs": [
-          "For T dispatched tokens, k assignments, hidden width d, and b bytes per activation value, a simple payload estimate is kTdb bytes for dispatch and a similar amount for returning outputs. With T = 1024, k = 2, d = 2048, and b = 2, one direction contains about 8.39 MB of activation values. This is not a complete network-traffic prediction: local assignments, metadata, padding, topology, and collective algorithms change what actually crosses links."
+          "For T input tokens, k selected experts per token, hidden width d, and b bytes per activation value, a simple payload estimate is kTdb bytes for dispatch and a similar amount for returning outputs. With T = 1024, k = 2, d = 2048, and b = 2, one direction contains about 8.39 MB of activation values. This is not a complete network-traffic prediction: local assignments, metadata, padding, topology, and collective algorithms change what actually crosses links."
         ],
         "formula": "Approximate dispatch payload = kTdb bytes"
       },
@@ -503,6 +575,14 @@
         "title": "Small expert batches can waste hardware",
         "paragraphs": [
           "Communication is only one bottleneck. Uneven routing makes some devices finish late, and tiny per-expert batches reduce matrix-multiplication efficiency. Increasing global batch size may help utilization but can change latency and optimization. Profile dispatch, expert computation, combine, and synchronization separately. Compare balanced synthetic routing with real routing to reveal load-related stalls. A common mistake is benchmarking experts in isolation and reporting that speed as end-to-end MoE speed; it omits exactly the routing and transfer costs that determine whether distribution is worthwhile."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read GShard's expert dispatch and resharding discussion alongside the original sparse MoE paper. Trace a token representation from its original device to its selected expert and back. In GShard, inspect the change from a token-partitioned layout to an expert-partitioned layout and identify the AllToAll operation that connects them. Count activation values moved, not only weights held by each device. This connects conditional computation to a concrete distributed execution plan.",
+          "Use the payload estimate in this article with a clearly defined T: input tokens before top-k replication. Separate logical dispatched bytes from bytes that cross a physical link, since local assignments need no remote transfer and collective implementations can introduce their own costs. Then consider an uneven routing batch: the total payload can stay similar while one device becomes a bottleneck. Reading efficiency results with this distinction helps explain why isolated expert throughput cannot stand in for end-to-end performance, and why topology, overlap, padding, and token distribution belong in the experiment description."
         ]
       }
     ],
@@ -526,6 +606,12 @@
         "url": "https://arxiv.org/abs/2401.06066",
         "kind": "paper",
         "note": "Inspect the expert design alongside efficiency considerations."
+      },
+      {
+        "title": "GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding",
+        "url": "https://arxiv.org/abs/2006.16668",
+        "kind": "paper",
+        "note": "Trace expert dispatch as resharding between token and expert dimensions, then inspect the AllToAll communication and runtime breakdown."
       }
     ]
   },
@@ -558,6 +644,14 @@
         "title": "Turn the designs into an ablation",
         "paragraphs": [
           "Build a small controlled model and first compare top-one versus top-two at matched active compute. Next, compare coarse and fine expert partitions, then add shared expert capacity while adjusting the routed budget. Record validation loss, load balance, overflow, throughput, and specialization diagnostics. Change one design choice at a time where possible. Avoid claiming that one named architecture universally dominates: the value of routing simplicity, flexible combinations, or shared computation depends on the task distribution and the hardware that executes it."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original paper",
+        "paragraphs": [
+          "Read Switch, Mixtral, and DeepSeekMoE through a common worksheet rather than a sequence of benchmark rankings. Record selected experts per token, expert hidden width, routed expert count, shared computation, and balancing or capacity policy. The named systems bundle several choices together. A difference in their final score cannot identify which individual choice caused it when data and training conditions also change.",
+          "For a controlled design exercise, split one wide feed-forward expert into smaller candidate experts and adjust the number selected so the approximate active matrix work stays fixed. Then allocate part of that work to an always-available shared expert. Ask which routing combinations become possible and which costs remain shared. The DeepSeekMoE reading motivates those axes, while Switch and Mixtral illustrate different routing simplifications. Such a worksheet turns the papers into a space of testable designs, with storage, arithmetic, and communication constraints stated explicitly instead of treating one architecture name as a universally optimal answer."
         ]
       }
     ],

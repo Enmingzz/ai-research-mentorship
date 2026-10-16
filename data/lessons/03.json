@@ -29,6 +29,14 @@
         "paragraphs": [
           "An MLP can represent complicated functions, but representation capacity does not ensure successful optimization or good generalization. Too little width may underfit; excessive capacity can memorize limited data. Scale input features, inspect hidden activations, and first fit a tiny synthetic task with a known boundary. The XOR problem is useful because a single linear boundary fails, while a small nonlinear hidden representation can separate its four points."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Use the feedforward-network chapter's XOR discussion to distinguish a representational obstacle from an optimization failure. Four points can be easy to enumerate yet impossible to separate with one straight boundary. A hidden representation changes the coordinates supplied to the output classifier. Draw the input points and a proposed hidden feature before increasing depth; this connects the model's algebra to the decision geometry it is meant to express.",
+          "Then remove the activation from the two-layer example and multiply the affine maps explicitly. The effective weight becomes W₁W₂ and the effective bias becomes b₁W₂ + b₂. The 67 stored parameters no longer imply a nonlinear function merely because they are arranged in two layers. This is also a useful way to read architecture comparisons: count parameters, identify the nonlinear operations, and distinguish an expanded parameterization from an expanded family of input-output functions."
+        ]
       }
     ],
     "exercise": {
@@ -78,6 +86,14 @@
         "paragraphs": [
           "A parameter used twice must receive both contributions. Similarly, changing a loss from a sum to a mean changes all gradients by the reduction factor. Use a tiny float64 network and compare a few analytical entries against finite differences. Avoid checking exactly at a ReLU kink, where the classical derivative is undefined. If gradients disagree, inspect axis sums and transposes before blaming numerical precision or the framework."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the textbook's backpropagation discussion by following the upstream gradient, not just the forward arrows. In the example here, G already contains the effects of the loss definition and reduction. The product HᵀG accumulates contributions over the batch, while GW₂ᵀ transports sensitivity back into hidden coordinates. Annotating the shapes of these three matrices is a reliable way to determine where a transpose belongs.",
+          "To investigate shared computation, temporarily replace a reused parameter with two independent copies. Differentiate the expanded graph, then add the two gradients when identifying the copies as one shared parameter again. This reconstructs the accumulation rule rather than treating it as framework magic. Finite-difference comparisons should use the same scalar objective and avoid activation kinks. A discrepancy caused by sum-versus-mean reduction is a mathematical mismatch in the tested objective, not a small floating-point tolerance problem."
+        ]
       }
     ],
     "exercise": {
@@ -126,6 +142,14 @@
         "title": "Inspect distributions, not just names",
         "paragraphs": [
           "A ReLU unit receiving only negative preactivations can stop receiving useful gradient through that gate. Changing an activation can also alter activation variance, so initialization and learning rate should be reconsidered when making an architectural comparison. Plot outputs and derivatives over a small interval, then inspect layerwise activation histograms during training. Treat a better final score as an empirical result under a specified setup, rather than proof that smoothness always improves learning."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "The GELU paper defines a specific smooth weighting, so separate that function from implementations that use an approximation. The exact xΦ(x) expression in this article and a faster approximation are related choices, but they need not produce identical outputs or gradients. When reproducing an architecture, inspect the activation configuration rather than relying only on the name written in a diagram.",
+          "An informative comparison uses moderately negative inputs as well as large positive ones. ReLU outputs zero throughout the negative half-line, whereas GELU and SiLU can transmit a negative value. Their derivatives therefore shape optimization differently even when their positive tails look similar. A smooth curve alone does not demonstrate superior generalization: the paper's empirical results belong to particular tasks and training settings. Preserve initialization, normalization, model width, and training budget when asking whether the activation itself explains a change in your own experiment."
         ]
       }
     ],
@@ -183,6 +207,14 @@
         "paragraphs": [
           "A summed loss grows with batch size or sequence length, while a mean depends on what positions enter its denominator. Padding and ignored labels must be excluded consistently. Applying softmax before a loss that expects logits changes its input semantics and can weaken learning. For regression with heavy-tailed noise, squared error may be dominated by a few outliers; consider whether that sensitivity matches the application before treating it as an optimizer problem."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the textbook's output-unit and likelihood discussion alongside the actual loss interface. A categorical probability vector, logits that parameterize that vector, and a hard class prediction are three different representations. The derivative in this article concerns unweighted softmax cross-entropy with respect to logits. Class weights, additional regularizers, or a different reduction change the complete gradient supplied to the optimizer.",
+          "For the three-class example, the gradient entries sum to zero. This provides an independent consistency check: adding the same constant to every logit does not change softmax probabilities. It also explains why inspecting one logit in isolation can mislead; probabilities depend on relative scores. When reading a reported loss, identify whether it is averaged over examples, valid tokens, or all tensor elements. Two implementations can use the same named loss while applying different weighting to short and long sequences."
+        ]
       }
     ],
     "exercise": {
@@ -222,7 +254,7 @@
         "id": "mechanism",
         "title": "Count incoming contributions",
         "paragraphs": [
-          "A preactivation sums fan_in weighted inputs. Under simplifying independence and zero-mean assumptions, its variance scales roughly with fan_in times weight variance times input variance. Xavier initialization balances incoming and outgoing widths, often using variance 2/(fan_in + fan_out). Kaiming initialization accounts for rectification and commonly uses variance 2/fan_in for ReLU forward signal preservation. The chosen mode and activation gain matter; these are not interchangeable names for arbitrary small random weights."
+          "A preactivation sums fan_in weighted inputs. Under simplifying independence assumptions and zero-mean weights, preactivation variance scales roughly as fan_in · Var(w) · E[x²]. This becomes fan_in · Var(w) · Var(x) when inputs are also zero-mean. ReLU outputs generally are not: for a symmetric zero-mean preactivation z, E[ReLU(z)²] = Var(z)/2. Xavier initialization balances incoming and outgoing widths, often using variance 2/(fan_in + fan_out). Kaiming initialization accounts for rectification and commonly uses variance 2/fan_in for ReLU forward signal preservation. The chosen mode and activation gain matter; these are not interchangeable names for arbitrary small random weights."
         ],
         "formula": "Var(W_Xavier) ≈ 2/(fan_in + fan_out);  Var(W_Kaiming) ≈ 2/fan_in"
       },
@@ -231,6 +263,14 @@
         "title": "Symmetry and orientation can break the setup",
         "paragraphs": [
           "Initializing every hidden unit identically can keep their updates identical, preventing useful specialization. Randomness breaks that symmetry. Matrix orientation matters too: a library may store a linear weight as [out, in] even when the mathematical expression uses [in, out]. Check which axis a custom initializer treats as fan_in. Inspect activation and gradient scales across several layers on a fixed batch; gross trends can reveal a mismatch before expensive training."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read Glorot and Bengio together with the rectifier-initialization paper, focusing on the assumptions behind each variance calculation. The useful question is which signal is intended to remain comparable across layers: forward activations, backward sensitivities, or a compromise between them. The ReLU rule in this article is tied to rectification and a specified fan convention; it is not a universal variance for every nonlinear block.",
+          "Connect the calculation to the storage orientation of a real layer. A custom xW implementation can store W as [in, out], while a library initializer may interpret a linear weight as [out, in]. Passing the wrong orientation can therefore select the wrong fan even though initialization completes successfully. After initialization, inspect several layers on the same small input batch. The theoretical calculation uses simplified statistical assumptions; observed activation and gradient scales test whether the implemented architecture starts in the intended regime."
         ]
       }
     ],
@@ -286,6 +326,14 @@
         "title": "Mode changes and batch size matter",
         "paragraphs": [
           "BatchNorm typically updates running statistics during training and uses them during evaluation. Tiny or unrepresentative batches can make those estimates unreliable. LayerNorm and RMSNorm generally use current per-example statistics in both modes, although other layers may still change behavior. Check normalized_shape carefully: normalizing tokens and features together is different from normalizing each token independently. Do not describe normalization as a guaranteed cure for instability; residual scale and optimizer settings still matter."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Compare the three normalization papers by writing down the set of values used to compute one output's statistics. For [B, T, D] token representations, feature-only normalization uses D values for each token, while mixing T into that reduction changes the function. The RMSNorm comparison isolates another choice: whether centering occurs before scaling. Learned affine parameters should be considered separately from this raw normalization step.",
+          "The [2, 4] example makes that distinction concrete. Without affine parameters and ignoring epsilon, centered normalization yields [−1, 1], while RMS normalization divides both positive entries by √10. A shared offset is therefore treated differently. When inspecting BatchNorm evaluation, check whether running statistics are actually enabled; the usual train/eval description assumes that configuration. A paper's normalization label is insufficient to reconstruct an implementation without its axes, epsilon convention, affine parameters, and running-statistics policy."
         ]
       }
     ],
@@ -348,6 +396,14 @@
         "paragraphs": [
           "Repeatedly adding large branches can still cause activations to grow, especially in very deep networks. Normalization placement, initialization, and residual scaling remain important. Also distinguish addition from concatenation: concatenating a skip feature changes width and lets a later layer combine features, while addition mixes them immediately in shared coordinates. When a skip addition fails, inspect both shape and meaning rather than inserting a projection solely to silence the error."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the residual-learning paper's mapping and shortcut construction before interpreting the depth comparisons. The expression x + F(x) isolates an additive connection; a complete architecture may add normalization or an activation around that addition. Those surrounding operations matter when asking whether setting the branch to zero makes the entire block an identity map. The simplified Jacobian here describes the additive operation itself.",
+          "The projection example offers a second distinction: matching shapes is necessary, but a projected shortcut is not an unchanged copy of the input. A stride-two 1×1 convolution changes channels and samples a lower-resolution grid. It may make addition possible while discarding spatial detail. When reproducing a residual architecture, trace both paths through the dimension-changing blocks and inspect where nonlinearities occur. The identity contribution helps explain gradient flow, but it does not guarantee that the full Jacobian cannot cancel or amplify particular directions."
+        ]
       }
     ],
     "exercise": {
@@ -397,6 +453,14 @@
         "paragraphs": [
           "Forgetting to call eval() leaves dropout active and makes ordinary evaluation stochastic. Conversely, training in evaluation mode removes the intended regularization. Large dropout can underfit or damage information flow, especially when few features carry the signal. Decay policies often treat biases and normalization parameters differently, but the policy should be recorded rather than assumed. Compare training and validation curves together to distinguish useful regularization from merely making optimization harder."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Use the dropout paper to distinguish the random training computation from the deterministic inference convention. This article uses inverted dropout, where training rescales retained activations and evaluation leaves them unchanged. Another presentation can place the compensating scale at inference instead. Match the convention before comparing equations or implementation outputs; equal drop probabilities do not remove a scaling mismatch.",
+          "The scalar expectation calculation does not imply that an entire nonlinear network's prediction equals the average prediction of all its masked versions. Later nonlinear operations generally do not commute with taking expectations. This limits the interpretation of the simple mean-preservation argument. For weight decay, return separately to the AdamW paper and locate where shrinkage enters the update. Random activation removal and parameter shrinkage act through different mechanisms, so a training setup should report both settings instead of treating either as a generic amount of regularization."
+        ]
       }
     ],
     "exercise": {
@@ -412,7 +476,7 @@
         "title": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting",
         "url": "https://jmlr.org/papers/v15/srivastava14a.html",
         "kind": "paper",
-        "note": "Read random unit removal and prediction-time scaling."
+        "note": "Read random unit removal and the original paper’s test-time weight scaling. Compare that convention with this article’s inverted dropout, which rescales retained activations during training."
       },
       {
         "title": "Decoupled Weight Decay Regularization",
@@ -452,6 +516,14 @@
         "paragraphs": [
           "Embedding similarity reflects the training objective and data, not an intrinsic definition of meaning. Two tokens used in similar contexts may become close even if they are opposites in a particular task. Padding rows need a deliberate treatment, and unknown-token behavior depends on the tokenizer. An embedding table also has substantial memory cost: a vocabulary of 50,000 and width 768 contains 38.4 million parameters before any attention layer is added."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the word-representation paper for the relationship between a predictive objective and learned geometry, then use the Embedding documentation for lookup mechanics. The vocabulary table is a parameterization: training determines which distinctions its coordinates make useful. A nearby pair of vectors can reflect similar context distributions without implying synonymy, and arbitrary token IDs do not themselves provide a meaningful distance.",
+          "The repeated-ID example assumes ordinary lookup gradients. PyTorch also exposes options such as padding_idx and scale_grad_by_freq, so those settings belong in any exact reproduction of the gradient calculation. More subtly, zero contribution from a lookup path does not guarantee an unchanged parameter row: a tied output projection, optimizer momentum, or weight decay can introduce other effects. Distinguish the derivative generated by this operation from the complete optimizer update before using sparse row access to reason about training behavior."
+        ]
       }
     ],
     "exercise": {
@@ -468,6 +540,12 @@
         "url": "https://arxiv.org/abs/1301.3781",
         "kind": "paper",
         "note": "Read how predictive objectives learn useful vector representations of words."
+      },
+      {
+        "title": "PyTorch — Embedding",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Embedding.html",
+        "kind": "guide",
+        "note": "Inspect input/output shapes, padding_idx, and the optional scale_grad_by_freq setting; the worked example uses ordinary summed lookup gradients."
       }
     ]
   },
@@ -500,6 +578,14 @@
         "title": "Downsampling trades detail for efficiency",
         "paragraphs": [
           "Pooling summarizes neighborhoods, while strided convolution learns how to combine and downsample them. Both can lose small structures or introduce sensitivity to alignment. Weight sharing gives convolution a form of translation equivariance under suitable boundary conditions; it does not make an entire network perfectly translation-invariant. Check padding, stride, and pooling when diagnosing shifted-image failures. Use a tiny image with one marked pixel to trace which output locations respond."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Use the convolution chapter to separate local connectivity, shared weights, and downsampling. They are related architectural choices, but none is a synonym for the others. Trace the same 3×3 filter at two interior locations: the weights are reused while the input neighborhood changes. The parameter count therefore stays fixed when image dimensions change, even though the number of filter applications and stored activations grows.",
+          "Translation equivariance should be read with its assumptions visible. Boundary padding and stride can alter the relation between an input shift and an output shift. A one-pixel movement followed by stride-two sampling need not simply move the resulting feature map by one location. Pooling may add tolerance to some local changes while discarding information needed by another task. When reading a vision result, inspect the complete resizing and downsampling pipeline rather than assigning every robustness property to the convolution operator alone."
         ]
       }
     ],
@@ -550,6 +636,14 @@
         "paragraphs": [
           "Reset hidden state between unrelated examples unless the task intentionally treats them as one stream. When training long streams with truncated backpropagation, detach state at planned boundaries to limit graph length while retaining its numerical value. Padding and sequence lengths must prevent artificial tokens from corrupting the meaningful final state. Compare recurrent models and attention models under matched data and latency constraints rather than treating one historical architecture as universally obsolete."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the sequence-modeling chapter for state and gating, and the recurrent-optimization paper for gradient propagation over time. Keep the forward recurrence separate from the backward computation graph. Carrying a numerical hidden state across chunks preserves information for subsequent predictions, while detaching that state prevents a later loss from changing parameters through earlier chunks. These two decisions can be made independently. The official PyTorch word-language-model example makes this concrete in get_batch and repackage_hidden: sequence chunks share state values, but each recurrent training iteration detaches their previous history.",
+          "A useful mental experiment changes only the training boundary. The stream and recurrent update can remain the same while the maximum gradient path becomes shorter. This reduces retained computation but also removes credit assignment across that boundary, so truncated backpropagation changes more than memory consumption. For padded batches, check which state is called final: a state after artificial padding can differ from the last meaningful observation. Architecture comparisons need to specify truncation length, state-reset policy, and valid sequence lengths as well as hidden width."
+        ]
       }
     ],
     "exercise": {
@@ -565,13 +659,19 @@
         "title": "Deep Learning — Sequence Modeling",
         "url": "https://www.deeplearningbook.org/contents/rnn.html",
         "kind": "book",
-        "note": "Read recurrent state, gated networks, and truncated backpropagation through time."
+        "note": "Read recurrent state, time-unrolled computation, long-range gradients, and gated networks."
       },
       {
         "title": "On the difficulty of training Recurrent Neural Networks",
         "url": "https://arxiv.org/abs/1211.5063",
         "kind": "paper",
         "note": "Study vanishing and exploding gradients in recurrent computation."
+      },
+      {
+        "title": "PyTorch Examples — Word Language Model",
+        "url": "https://github.com/pytorch/examples/blob/main/word_language_model/main.py",
+        "kind": "guide",
+        "note": "Trace get_batch, repackage_hidden, and the recurrent training loop to see chunked sequences and hidden-state detachment."
       }
     ]
   },
@@ -588,7 +688,7 @@
         "id": "intuition",
         "title": "An effective step size changes over training",
         "paragraphs": [
-          "Early training, representation formation, and late refinement may benefit from different update magnitudes. A learning-rate schedule specifies how the optimizer's base step size changes with progress. Warmup gradually increases that rate at the beginning. Gradient clipping instead reacts to the current gradient, preventing an unusually large norm from producing an excessive update. These mechanisms address different situations and should be recorded separately."
+          "Early training, representation formation, and late refinement may benefit from different update magnitudes. A learning-rate schedule specifies how the optimizer's base step size changes with progress. Warmup gradually increases that rate at the beginning. Gradient clipping instead reacts to the current gradient and caps its norm. For plain SGD without momentum or decay this bounds the step norm by learning rate times the threshold; adaptive scaling, momentum, or weight decay mean the same bound does not generally apply to the complete parameter update. These mechanisms address different situations and should be recorded separately."
         ]
       },
       {
@@ -604,6 +704,14 @@
         "title": "Count the unit your schedule uses",
         "paragraphs": [
           "A schedule defined over optimizer steps should not advance on every microbatch during gradient accumulation. Resuming a checkpoint must restore the schedule position, and changing total steps changes the meaning of a cosine schedule. Log both learning rate and gradient norm so that a loss spike can be linked to a concrete event. Constant severe clipping may hide instability rather than solve it; inspect loss scaling, data outliers, and the optimizer configuration."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Compare the clipping procedure in the recurrent-network paper with the learning-rate schedule in Attention Is All You Need. They control different quantities, and the original Transformer decay is inverse-square-root rather than cosine. The SGDR paper supplies the cosine-annealing source; its restart policy is a separate choice from using one decay phase. A reproduction should identify the actual schedule equation, its time unit, and how warmup connects to the remaining training budget.",
+          "The [3, 4] example makes global clipping a direction-preserving rescaling, but the optimizer can subsequently transform that gradient. For plain SGD, learning rate times the clipped vector is the update; with Adam or momentum, state and normalization intervene. Logging the gradient norm alone therefore does not establish a bound on the realized parameter change. During accumulation, clip after the intended gradient has been assembled and unscaled, and advance a step-based schedule with optimizer updates rather than individual microbatch forwards."
         ]
       }
     ],
@@ -627,6 +735,12 @@
         "url": "https://arxiv.org/abs/1706.03762",
         "kind": "paper",
         "note": "Inspect the original Transformer's warmup and learning-rate schedule."
+      },
+      {
+        "title": "SGDR: Stochastic Gradient Descent with Warm Restarts",
+        "url": "https://arxiv.org/abs/1608.03983",
+        "kind": "paper",
+        "note": "Read cosine annealing within a run and the separate restart policy; contrast these with the original Transformer’s inverse-square-root decay after warmup."
       }
     ]
   }

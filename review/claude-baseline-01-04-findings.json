@@ -1,0 +1,490 @@
+{
+  "reviewer": "Claude (claude-opus-5-5), independent reasoning-only proofreading pass; no tools, browsing, paper access, or code execution used",
+  "reviewedTopicIds": [
+    "01-01",
+    "01-02",
+    "01-03",
+    "01-04",
+    "01-05",
+    "01-06",
+    "01-07",
+    "01-08",
+    "01-09",
+    "01-10",
+    "01-11",
+    "02-01",
+    "02-02",
+    "02-03",
+    "02-04",
+    "02-05",
+    "02-06",
+    "02-07",
+    "02-08",
+    "02-09",
+    "02-10",
+    "02-11",
+    "02-12",
+    "02-13",
+    "02-14",
+    "03-01",
+    "03-02",
+    "03-03",
+    "03-04",
+    "03-05",
+    "03-06",
+    "03-07",
+    "03-08",
+    "03-09",
+    "03-10",
+    "03-11",
+    "03-12",
+    "04-01",
+    "04-02",
+    "04-03",
+    "04-04",
+    "04-05",
+    "04-06",
+    "04-07",
+    "04-08",
+    "04-09",
+    "04-10",
+    "04-11",
+    "04-12",
+    "04-13",
+    "04-14",
+    "04-15",
+    "04-16",
+    "04-17",
+    "04-18"
+  ],
+  "findings": [
+    {
+      "topicId": "01-02",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "references[1] (Deep Learning — Numerical Computation)",
+      "originalText": "Connect shape mistakes to reliable numerical implementations.",
+      "problem": "As far as I recall, the Numerical Computation chapter covers overflow/underflow, poor conditioning, and gradient-based and constrained optimization. It does not discuss tensor shapes, axis semantics, or broadcasting. The citation therefore does not plausibly support the article's main practical claims about right-aligned broadcasting and the [B,1] − [B] → [B,B] pitfall.",
+      "suggestedCorrection": "Cite the PyTorch Broadcasting Semantics note, which the library already uses in 02-05, or the NumPy broadcasting guide for the broadcasting rules. Keep the Numerical Computation chapter only if the note is reworded, for example to 'related numerical-stability concerns'.",
+      "verificationNeeded": "Confirm the chapter's contents. Deep Learning §2.1 does briefly mention broadcasting, so the first reference partially covers it.",
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/numerical.html",
+        "https://docs.pytorch.org/docs/stable/notes/broadcasting.html",
+        "https://numpy.org/doc/stable/user/basics.broadcasting.html"
+      ]
+    },
+    {
+      "topicId": "01-03",
+      "severity": "low",
+      "confidence": "high",
+      "location": "sections[mechanism], first sentence",
+      "originalText": "An eigenvector of a square matrix retains its direction under the map, changing only by an eigenvalue.",
+      "problem": "This is imprecise in two ways. With a negative real eigenvalue, the vector's direction reverses; only the line it spans is preserved. A real nonsymmetric matrix may also have complex eigenvalues and no real eigenvector at all, such as a 90° rotation. Students reasoning about 'preserved directions' can be misled, which matters because the same section later warns about nonsymmetric matrices.",
+      "suggestedCorrection": "Replace with: 'A (real) eigenvector of a square matrix is mapped to a scalar multiple of itself, Av = λv, so the line it spans is preserved; a negative λ reverses its direction, and some real matrices (e.g., rotations) have no real eigenvectors.'",
+      "verificationNeeded": "None; standard linear algebra.",
+      "sourceUrls": [
+        "https://www.deeplearningbook.org/contents/linear_algebra.html"
+      ]
+    },
+    {
+      "topicId": "01-03",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "sections[mechanism], SVD roles",
+      "originalText": "The right singular vectors specify input directions, singular values specify their nonnegative gains, and left singular vectors specify corresponding output directions.",
+      "problem": "These roles are correct only for the column-vector convention y = Ax. Topics 01-01 and 01-02, which are prerequisites, use the row-vector convention y = xW. Under that convention, with W = UΣVᵀ, the input directions are the left singular vectors (columns of U), mapped to σᵢ times the columns of V. A student applying this sentence to xW would swap the roles.",
+      "suggestedCorrection": "State the convention explicitly: 'For column vectors, y = Ax with A = UΣVᵀ maps right singular vector vᵢ to σᵢuᵢ. For the row-vector convention y = xW used in 01-01, the roles of U and V swap.'",
+      "verificationNeeded": "None.",
+      "sourceUrls": []
+    },
+    {
+      "topicId": "01-05",
+      "severity": "low",
+      "confidence": "high",
+      "location": "sections[mechanism]",
+      "originalText": "Choosing Δ = −η∇L gives an expected first-order change of −η‖∇L‖².",
+      "problem": "'Expected' suggests a probabilistic expectation. This is the deterministic first-order Taylor prediction for full-batch gradient descent. The article distinguishes deterministic and minibatch gradients only later, and for a stochastic gradient the expectation statement would need an unbiasedness assumption (E[ĝ] = ∇L).",
+      "suggestedCorrection": "Use 'predicted first-order change' or 'first-order approximation of the change'. Optionally add that with an unbiased stochastic gradient, the expected first-order change is still −η‖∇L‖².",
+      "verificationNeeded": "None.",
+      "sourceUrls": []
+    },
+    {
+      "topicId": "01-10",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "sections[mechanism]",
+      "originalText": "The normalized update divides the corrected first moment by the square root of the corrected second moment plus a stabilizing epsilon.",
+      "problem": "The sentence can be parsed as m̂/√(v̂ + ε) or m̂/(√v̂ + ε). Algorithm 1 in Kingma & Ba uses m̂/(√v̂ + ε), and common framework implementations do the same. The two forms differ numerically, especially for small v̂, and the default ε (1e-8) means very different things in each placement. No update formula is given to resolve the ambiguity.",
+      "suggestedCorrection": "Add the explicit update: θₜ = θₜ₋₁ − α·m̂ₜ/(√v̂ₜ + ε), with m̂ₜ = mₜ/(1 − β₁ᵗ) and v̂ₜ = vₜ/(1 − β₂ᵗ).",
+      "verificationNeeded": "Confirm epsilon placement against Algorithm 1 of the Adam paper.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1412.6980"
+      ]
+    },
+    {
+      "topicId": "02-01",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "sections[practice].code (RunningMean.value)",
+      "originalText": "return self.total / self.count if self.count else 0.0",
+      "problem": "When there are no updates, the class returns 0.0. For a metric such as validation loss, an empty or mis-wired evaluation loop would then silently report a perfect loss of 0.0. This conflicts with the article's own goal of keeping experiments understandable and surfacing errors. An undefined mean is not zero.",
+      "suggestedCorrection": "Return float('nan') or raise a ValueError when count == 0. Alternatively, document that 0.0 is a sentinel and must not be logged as a metric.",
+      "verificationNeeded": "None.",
+      "sourceUrls": []
+    },
+    {
+      "topicId": "02-03",
+      "severity": "low",
+      "confidence": "high",
+      "location": "exercise.answer",
+      "originalText": "The staged snapshot enters the commit, while later edits remain in the working tree.",
+      "problem": "This holds for a plain 'git commit'. However, 'git commit -a', or 'git commit train.py' with a pathspec, records the current working-tree version of tracked files instead of the earlier staged snapshot. These forms are common enough that students may get a different result than the answer predicts.",
+      "suggestedCorrection": "Add: 'This assumes a plain git commit; git commit -a or git commit <path> stages and records the current working-tree contents of those tracked files. Use git diff --staged to see what a plain commit will record.'",
+      "verificationNeeded": "None; documented git-commit behavior.",
+      "sourceUrls": [
+        "https://git-scm.com/docs/git-commit",
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "topicId": "02-04",
+      "severity": "low",
+      "confidence": "high",
+      "location": "sections[mechanism], last sentence",
+      "originalText": "Repeated labels identify contracted dimensions unless they are included in the output labels.",
+      "problem": "This is incomplete for explicit-mode einsum, which is the form shown ('btd,dh->bth'). Any input label omitted from the output is summed, whether or not it is repeated: 'ij->i' sums over j, which appears only once. Students may expect a non-repeated label dropped from the output to cause an error or be preserved.",
+      "suggestedCorrection": "Use: 'In explicit mode (with ->), every label that does not appear in the output is summed over. A label shared between operands and omitted from the output therefore becomes a contraction.'",
+      "verificationNeeded": "None; torch.einsum documentation.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/stable/generated/torch.einsum.html"
+      ]
+    },
+    {
+      "topicId": "03-05",
+      "severity": "low",
+      "confidence": "high",
+      "location": "sections[mechanism]",
+      "originalText": "Under simplifying independence and zero-mean assumptions, its variance scales roughly with fan_in times weight variance times input variance.",
+      "problem": "For zero-mean weights independent of the inputs, Var(Σ wᵢxᵢ) = fan_in·Var(w)·E[x²], which uses the input's second moment. It equals the input variance only if the inputs are also zero-mean. Post-ReLU inputs are not zero-mean, and the gap between E[x²] and Var(x) is exactly where Kaiming's factor of 2 comes from: E[ReLU(z)²] = Var(z)/2 for symmetric zero-mean z. Phrased this way, the next sentence's '2/fan_in' cannot be derived from the stated rule.",
+      "suggestedCorrection": "Write: 'With zero-mean weights independent of inputs, Var(preactivation) = fan_in·Var(w)·E[x²]. For ReLU inputs, E[x²] is half the variance of the previous preactivation, which motivates Var(w) = 2/fan_in.'",
+      "verificationNeeded": "Optionally compare with the derivation in He et al. (2015), §2.2.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1502.01852",
+        "https://proceedings.mlr.press/v9/glorot10a.html"
+      ]
+    },
+    {
+      "topicId": "03-08",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "references[0] note vs sections[mechanism]",
+      "originalText": "Read random unit removal and prediction-time scaling.",
+      "problem": "The article teaches inverted dropout, which rescales by 1/(1 − p) during training and leaves evaluation unmodified. To my recollection, Srivastava et al. present the variant that leaves training unscaled and multiplies the outgoing weights by the retention probability at test time. Students who follow the reference may think the article contradicts it.",
+      "suggestedCorrection": "Add one sentence: 'The original paper scales weights by the retention probability at test time. Inverted dropout moves that factor into training, and the two are equivalent in expectation.'",
+      "verificationNeeded": "Confirm the paper's test-time weight-scaling description.",
+      "sourceUrls": [
+        "https://jmlr.org/papers/v15/srivastava14a.html"
+      ]
+    },
+    {
+      "topicId": "03-12",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "sections[mechanism] and references[1]",
+      "originalText": "A linear warmup reaches the target learning rate after a chosen number of steps. A cosine decay then lowers it smoothly ... | Inspect the original Transformer's warmup and learning-rate schedule.",
+      "problem": "The cited Transformer paper uses linear warmup followed by inverse-square-root decay: lrate = d_model^−0.5·min(step^−0.5, step·warmup^−1.5). It does not use cosine decay. A reader may infer that the reference supports the warmup-plus-cosine schedule described in the text. Cosine annealing is usually attributed to SGDR (Loshchilov & Hutter).",
+      "suggestedCorrection": "Note that the original Transformer used warmup with inverse-square-root decay, and cite SGDR as the source for cosine annealing.",
+      "verificationNeeded": "Confirm the schedule formula in §5.3 of the Transformer paper and the SGDR reference.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1706.03762",
+        "https://arxiv.org/abs/1608.03983"
+      ]
+    },
+    {
+      "topicId": "04-03",
+      "severity": "low",
+      "confidence": "high",
+      "location": "sections[example]",
+      "originalText": "Its output is 0.6698·[2, 0] + 0.3302·[0, 4] = [1.3396, 1.3208]. The second query swaps the weights, producing approximately [0.6604, 2.6792].",
+      "problem": "The outputs were computed from weights already rounded to four decimals, so the last reported digits are off. The unrounded weights are 0.669762 and 0.330238, giving [1.339524, 1.320952] ≈ [1.3395, 1.3210] and [0.660476, 2.679048] ≈ [0.6605, 2.6790]. A student who checks with a library implementation will see a mismatch in the third and fourth decimals and may suspect an implementation bug.",
+      "suggestedCorrection": "Report [1.3395, 1.3210] and [0.6605, 2.6790]. Alternatively, say that the outputs were computed from the rounded weights shown.",
+      "verificationNeeded": "None.",
+      "sourceUrls": []
+    },
+    {
+      "topicId": "04-13",
+      "severity": "low",
+      "confidence": "high",
+      "location": "prerequisites",
+      "originalText": "\"prerequisites\":[\"04-05\",\"04-14\"]",
+      "problem": "Topic 04-13 lists the later topic 04-14 (KV cache) as a prerequisite. In the numbered sequence, readers reach MQA/GQA, whose motivation and cache-size formula depend on KV caching, before the KV cache has been introduced. It is a curriculum-ordering inconsistency rather than a content error.",
+      "suggestedCorrection": "Swap the order of 04-13 and 04-14, or renumber so the KV-cache topic precedes MHA/MQA/GQA.",
+      "verificationNeeded": "None.",
+      "sourceUrls": []
+    },
+    {
+      "topicId": "04-15",
+      "severity": "low",
+      "confidence": "low",
+      "location": "references",
+      "originalText": "FlashAttention ... Relate large attention workloads to GPU memory traffic and tiling.",
+      "problem": "Neither cited paper is mainly about the prefill/decode split, time-to-first-token, or inter-token latency measurement, which is the article's central claim. The MQA paper does support the decode memory-bandwidth argument. The precise framing of prefill versus decode regimes appears to lack a directly supporting source.",
+      "suggestedCorrection": "Consider adding a serving-oriented primary source that analyzes prefill and decode separately. One candidate is Pope et al., 'Efficiently Scaling Transformer Inference'.",
+      "verificationNeeded": "Unverified in this pass: confirm that arXiv 2211.05102 is Pope et al. and that it discusses prefill and decode regimes.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1911.02150",
+        "https://arxiv.org/abs/2205.14135",
+        "https://arxiv.org/abs/2211.05102"
+      ]
+    }
+  ],
+  "numericalChecks": [
+    {
+      "topicId": "01-01",
+      "calculation": "x=[2,−1], W=[[1,3],[4,2]]; (xW)₁ = 2·1 + (−1)·4; (xW)₂ = 2·3 + (−1)·2",
+      "result": "[−2, 4], matching the article."
+    },
+    {
+      "topicId": "01-01",
+      "calculation": "W=diag(3,4): ‖W‖_F = √(3²+4²) = √25; spectral norm = max singular value = max(3,4); W·[0,1]ᵀ = [0,4]",
+      "result": "Frobenius 5, spectral 4, maximizer ±[0,1]. Matches."
+    },
+    {
+      "topicId": "01-02",
+      "calculation": "[2,5,12]@[12,8] → contract 12 → [2,5,8]; Q[2,5,8]@Kᵀ[2,8,5] → [2,5,5]; broadcasting [16,1] with [16] → [16,1] vs [1,16] → [16,16]",
+      "result": "All shapes match the article."
+    },
+    {
+      "topicId": "01-03",
+      "calculation": "Gain ratio for diag(2, 0.001): 2/0.001",
+      "result": "2000, matching 'two thousand times'."
+    },
+    {
+      "topicId": "01-03",
+      "calculation": "Singular values [5,2,0]: rank = number of nonzero values = 2; Eckart–Young rank-1 error = √(2²+0²) = 2; squared error = 4",
+      "result": "Matches."
+    },
+    {
+      "topicId": "01-04",
+      "calculation": "f(w)=(3w−1)²; f'(w)=2(3w−1)·3=6(3w−1); at w=1: 6·2",
+      "result": "12. Matches."
+    },
+    {
+      "topicId": "01-04",
+      "calculation": "y=ab+a²; ∂y/∂a=b+2a=3+4; ∂y/∂b=a",
+      "result": "7 and 2. Matches."
+    },
+    {
+      "topicId": "01-05",
+      "calculation": "L=aw²/2 ⇒ w←(1−ηa)w; contraction iff |1−ηa|<1 ⇔ 0<ηa<2",
+      "result": "Matches the stated interval."
+    },
+    {
+      "topicId": "01-05",
+      "calculation": "L=5w² (a=10), w=1: η=0.1 → w=1−0.1·10=0, L=0; η=0.3 → w=1−3=−2, L=5·4=20; stability 0<η<2/10",
+      "result": "0 and 20, interval 0<η<0.2. Matches."
+    },
+    {
+      "topicId": "01-06",
+      "calculation": "Of 100 documents, 10 technical → 0.8·10 = 8 with keyword; 90 other → 0.2·90 = 18; P(tech|kw) = 8/(8+18)",
+      "result": "8/26 ≈ 0.3077. Matches 0.308."
+    },
+    {
+      "topicId": "01-06",
+      "calculation": "X~Bern(0.25): E[X]=E[X²]=0.25; Var=0.25−0.25²=0.25−0.0625; Y=4X: E=4·0.25, Var=16·0.1875",
+      "result": "Var(X)=0.1875, E[Y]=1, Var(Y)=3. Matches."
+    },
+    {
+      "topicId": "01-08",
+      "calculation": "MLE p̂=7/10; NLL of failure = −ln(1−0.7) = −ln 0.3 = ln(10/3) ≈ 2.302585−1.098612",
+      "result": "≈1.20397 nats. Matches 1.204."
+    },
+    {
+      "topicId": "01-09",
+      "calculation": "p=[0.5,0.5], q=[0.9,0.1]: H(p,q) = −0.5 ln0.9 − 0.5 ln0.1 = 0.5(0.10536+2.30259); H(p) = ln2 = 0.69315; KL = 1.20397−0.69315",
+      "result": "H(p,q) ≈ 1.204 > ln 2, KL ≈ 0.511. This confirms the qualitative claim."
+    },
+    {
+      "topicId": "01-09",
+      "calculation": "p=q=[0.5,0.5]: H=H(p,q)=ln2; KL=Σp ln(p/q)=0",
+      "result": "0.693 nats, KL = 0. Matches."
+    },
+    {
+      "topicId": "02-04",
+      "calculation": "x=arange(24).reshape(2,3,4); y=x.permute(0,2,1) has shape [2,4,3]; y[0,0]=x[0,:,0]=[0,4,8]",
+      "result": "Consistent with the comment 'feature 0 across three positions'."
+    },
+    {
+      "topicId": "02-04",
+      "calculation": "[2,5,24] → reshape [2,5,3,8] (3·8=24) → permute(0,2,1,3) → [2,3,5,8]",
+      "result": "Matches."
+    },
+    {
+      "topicId": "02-05",
+      "calculation": "Q[4,2,7,8] @ Kᵀ[4,2,8,9] → [4,2,7,9]; scale [2] vs trailing dim 8 → incompatible; X[3,5,4]@W[1,4,6] → batch broadcast 1→3 → [3,5,6]",
+      "result": "Matches. Per-example scalar [3,1,1] broadcasts correctly."
+    },
+    {
+      "topicId": "02-06",
+      "calculation": "y=x²+3x, dy/dx=2x+3 at x=2",
+      "result": "7. Matches. Accumulated grad 3+5 = 8 also matches."
+    },
+    {
+      "topicId": "02-08",
+      "calculation": "Lengths [2,4,3] padded to 4: 3·4=12 positions; real 2+4+3=9; padding 12−9=3; shifted next-token targets would be 1+3+2=6",
+      "result": "12, 9, 3 match. The caveat about shifted targets is consistent."
+    },
+    {
+      "topicId": "02-09",
+      "calculation": "Mean over 4 equal microbatches: ∇(¼Σℓᵢ) = ¼Σ∇ℓᵢ; without the ¼, the accumulated gradient is 4× larger",
+      "result": "Matches."
+    },
+    {
+      "topicId": "02-12",
+      "calculation": "True norm n; scaled norm 1024n; clipping to 1 when 1024n>1, then unscaling gives norm 1/1024; effective threshold on the true gradient is min(n, 1/1024)",
+      "result": "Consistent with the article's 1/1024 claim."
+    },
+    {
+      "topicId": "02-14",
+      "calculation": "1000 steps × 32 = 32,000; 1000 × 128 = 128,000 examples",
+      "result": "Matches."
+    },
+    {
+      "topicId": "03-01",
+      "calculation": "4·8 + 8 + 8·3 + 3 = 32+8+24+3",
+      "result": "67. Matches."
+    },
+    {
+      "topicId": "03-02",
+      "calculation": "y=wx+wz ⇒ ∂y/∂w = x+z ⇒ ∂L/∂w = g(x+z)",
+      "result": "Matches."
+    },
+    {
+      "topicId": "03-03",
+      "calculation": "ReLU([−2,0,3]) = [max(0,−2), max(0,0), max(0,3)]",
+      "result": "[0,0,3]. Matches."
+    },
+    {
+      "topicId": "03-04",
+      "calculation": "softmax − onehot = [0.1,0.7,0.2] − [0,0,1]",
+      "result": "[0.1, 0.7, −0.8]. The components sum to 0, as expected. Matches."
+    },
+    {
+      "topicId": "03-05",
+      "calculation": "Kaiming: Var=2/100=0.02; std=√0.02=0.141421",
+      "result": "Matches 0.1414."
+    },
+    {
+      "topicId": "03-06",
+      "calculation": "x=[2,4]: mean 3, centered [−1,1], var 1 → LN≈[−1,1]; RMS=√((4+16)/2)=√10≈3.1623 → [0.632,1.265]",
+      "result": "Centering and sign-preservation claims are confirmed."
+    },
+    {
+      "topicId": "03-07",
+      "calculation": "1×1 conv, stride 2, pad 0 on 32: floor((32−1)/2+1)=floor(16.5)",
+      "result": "16, so the shortcut yields [8,128,16,16]. Matches."
+    },
+    {
+      "topicId": "03-08",
+      "calculation": "p=0.25: retained 6/0.75=8; E=0.75·8+0.25·0=6; Var=0.75·64−36",
+      "result": "8 and 6 match. The variance is 12, consistent with the claim that variance increases."
+    },
+    {
+      "topicId": "03-09",
+      "calculation": "50,000·768",
+      "result": "38,400,000 = 38.4M. Matches. IDs [4,4,9]: 2 distinct rows, output [3,32]."
+    },
+    {
+      "topicId": "03-10",
+      "calculation": "n=32, k=3, p=1, d=1, s=2: floor((32+2−2−1)/2+1)=floor(16.5); params 16·3·3·3 + 16 = 432+16",
+      "result": "Output size 16 and 448 parameters. Matches."
+    },
+    {
+      "topicId": "03-12",
+      "calculation": "‖[3,4]‖=5; scale min(1,2/5)=0.4 → [1.2,1.6] (norm 2); elementwise clip → [2,2] (direction 45° vs ≈53.13°)",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-02",
+      "calculation": "Scores [6,8]@[8,10] → [6,10]; output [6,10]@[10,12] → [6,12]",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-03",
+      "calculation": "Scores [1,0]/√2=[0.707107,0]; e^0.707107≈2.028115; weights 2.028115/3.028115=0.669762, 0.330238; output [2·0.669762, 4·0.330238]",
+      "result": "[1.339524, 1.320952] ≈ [1.3395, 1.3210]. The article's [1.3396, 1.3208] reflects rounded weights; see finding. Second query ≈ [0.6605, 2.6790]."
+    },
+    {
+      "topicId": "04-03",
+      "calculation": "Causal row 0: only key 0 allowed → weights [1,0] → output V₀ = [2,0]; identical values [3,−1] → any convex mix = [3,−1]",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-04",
+      "calculation": "Q[8,d]@Kᵀ[d,120] → [8,120]; output rows = number of queries = 8",
+      "result": "Matches. The 5×196 example likewise gives [5,196]."
+    },
+    {
+      "topicId": "04-05",
+      "calculation": "96/4=24; 128/4=32; 128/8=16; concat H·(D/H)=D",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-06",
+      "calculation": "Query 2 causal keys {0,1,2}; minus padded key 1 → {0,2}",
+      "result": "Matches."
+    },
+    {
+      "topicId": "04-09",
+      "calculation": "R(90°)[1,0]=[1·0−0·1, 1·1+0·0]=[0,1]; [1,0]·[0,1]=0; [0,1]·[0,1]=1",
+      "result": "Matches. Rᵀ_m R_n = R_{n−m} confirms the identity."
+    },
+    {
+      "topicId": "04-11",
+      "calculation": "2·256·1024=524,288; 64·256+256+256·64+64=16384+256+16384+64",
+      "result": "524,288 and 33,088. Matches."
+    },
+    {
+      "topicId": "04-12",
+      "calculation": "2D·1536 = 3D·F ⇒ F = 3072/3",
+      "result": "F = 1024, with 3,072D weights. Matches."
+    },
+    {
+      "topicId": "04-13",
+      "calculation": "Cache ∝ H_kv: 8/32",
+      "result": "0.25. Matches."
+    },
+    {
+      "topicId": "04-14",
+      "calculation": "2·L·B·T·H_kv·d = 2·2·1·100·4·8 = 12,800 elements × 2 bytes",
+      "result": "25,600 bytes. Matches."
+    },
+    {
+      "topicId": "04-15",
+      "calculation": "Time to n further tokens: A = 0.2 + n/20, B = 1 + n/50; equal when 0.05n − 0.02n = 0.8 ⇒ n ≈ 26.7",
+      "result": "A is faster below about 27 additional tokens and B above, under this convention. The article's qualitative answer is consistent."
+    },
+    {
+      "topicId": "04-16",
+      "calculation": "Pairs ∝ T²: (2T)²/T²",
+      "result": "4×. Matches."
+    },
+    {
+      "topicId": "04-17",
+      "calculation": "B·H·T² = 2·8·1024² = 16,777,216 elements × 2 bytes = 33,554,432 B / 2²⁰",
+      "result": "32 MiB. Matches."
+    },
+    {
+      "topicId": "04-17",
+      "calculation": "T: 512→2048 is a 4× increase; T² term 4² = 16×; TD² term 4×; KV ∝ T: 4×",
+      "result": "16×, 4×, 4×. Matches."
+    },
+    {
+      "topicId": "04-18",
+      "calculation": "Mask triu(diagonal=1) forbids j>i; the diagonal is always allowed, so no row is fully −∞; scale 1/√width matches single-head d_k = width; zeroing the out projection and the final FFN linear (weights and biases) gives output = x",
+      "result": "The code's behavior is consistent with the described causal pre-norm block and its identity test."
+    }
+  ],
+  "overallAssessment": "I read all 55 articles in full. The library is technically strong. Every recomputed numerical example and exercise answer (about 50 checks) is correct, except for a last-digit rounding inconsistency in the 04-03 attention example. Formula signs and dimensions are correct throughout, including backprop transposes, softmax-CE gradients, the Kaiming and Xavier variances, the conv output-size formula, the RoPE relative-rotation identity, and the KV-cache formulas. The code snippets behave as described, as do the PyTorch API claims (mask boolean conventions, tensor.to vs module.to semantics, GradScaler unscaling before clipping, ModuleList registration). The text generally hedges guarantees appropriately. I found no high- or medium-severity errors. The 14 findings are low severity: imprecise mathematical phrasing (eigenvector 'direction', the second moment vs variance in the Kaiming derivation, Adam epsilon placement, 'expected' first-order change), a singular-vector role convention that conflicts with the row-vector convention of earlier articles, incomplete einsum and git-commit semantics, a misleading 0.0 default in the RunningMean example, reference-support mismatches (Transformer schedule vs cosine decay, original dropout's test-time scaling, a Numerical Computation chapter cited for shape errors, missing prefill/decode sources), and one prerequisite that points to a later topic (04-13 → 04-14). Separately, 02-14 contains a non-scientific typo ('Keep the raw enough information'). These findings do not certify the remaining content as error-free.",
+  "limitations": "This was a reasoning-only pass with tools disabled. I did not open any cited paper, documentation page, or URL, did not execute code, and did not check that links resolve. Judgments about what a reference contains rely on recalled knowledge, and those judgments are marked as needing verification. The SGDR, NumPy broadcasting, torch.einsum, and git-commit URLs are standard sources I believe to be correct. The arXiv identifier 2211.05102 for Pope et al. is unverified. Library-behavior claims (PyTorch mask conventions, default ReLU subgradient, caching-allocator behavior) are stated from memory of current documentation and could differ across versions. Numerical checks were done by hand, with occasional rounding at the fourth to sixth significant digit. I did not exhaustively check pedagogical sequencing beyond the declared prerequisites, and I did not evaluate prose style."
+}

@@ -1,0 +1,148 @@
+{
+  "reviewer": "OpenAI Codex adjudication of the independent expanded Claude review",
+  "date": "2026-10-16",
+  "inputFile": "review/claude-expanded-09-12-findings.json",
+  "findingIndexConvention": "Zero-based index into the input findings array",
+  "findings": [
+    {
+      "range": "09-12",
+      "findingIndex": 0,
+      "topicId": "09-14",
+      "disposition": "accepted",
+      "reason": "Verified the original CFG paper's displayed combination (1+w_p)c−w_p u. Added the explicit mapping w_p=w_a−1, including paper scale zero = article scale one, and paper two = article three.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2207.12598",
+        "https://arxiv.org/html/2207.12598"
+      ]
+    },
+    {
+      "range": "09-12",
+      "findingIndex": 1,
+      "topicId": "09-07",
+      "disposition": "accepted",
+      "reason": "Added Higgins et al.'s originating ICLR 2017 β-VAE reference and identified Burgess et al. as a follow-up capacity analysis. The authors' 2018 primary paper explicitly attributes β-VAE to Higgins et al. (reference 15) and presents the original weighted objective separately from its capacity extension. The canonical OpenReview forum/PDF returned browser verification; this retrieval limitation is recorded rather than claiming full-text access to that original paper.",
+      "sourceUrls": [
+        "https://openreview.net/forum?id=Sy2fzU9gl",
+        "https://arxiv.org/html/1804.03599"
+      ]
+    },
+    {
+      "range": "09-12",
+      "findingIndex": 2,
+      "topicId": "09-09",
+      "disposition": "accepted",
+      "reason": "Used Generative Adversarial Networks, the linked arXiv listing's title, consistently in the prose and references of 09-09 and 12-06. Both earlier title variants were valid; this is consistency rather than a corrected scientific claim.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1406.2661"
+      ]
+    },
+    {
+      "range": "09-12",
+      "findingIndex": 3,
+      "topicId": "10-13",
+      "disposition": "accepted",
+      "reason": "Verified POPE's stated 1:1 ratio of ground-truth to nonexistent objects. Rewrote the hypothetical shortcut example to state POPE's balanced design and the always-no baseline of 50%, while retaining precision/recall/yes-rate diagnostics.",
+      "sourceUrls": [
+        "https://arxiv.org/abs/2305.10355",
+        "https://arxiv.org/html/2305.10355"
+      ]
+    },
+    {
+      "range": "09-12",
+      "findingIndex": 4,
+      "topicId": "10-06",
+      "disposition": "rejected",
+      "reason": "The concern was conditional on unverified availability. All six version-pinned URLs were reopened successfully and returned titled PyTorch 2.14 documentation. The autograd page explicitly distinguishes eval() from gradient-disabling modes. Kept the pinned references; no assertion that 2.14 is the latest version was added.",
+      "sourceUrls": [
+        "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+        "https://docs.pytorch.org/docs/2.14/profiler.html",
+        "https://docs.pytorch.org/docs/2.14/checkpoint.html",
+        "https://docs.pytorch.org/docs/2.14/notes/ddp.html",
+        "https://docs.pytorch.org/docs/2.14/fsdp.html",
+        "https://docs.pytorch.org/docs/2.14/distributed.tensor.parallel.html"
+      ]
+    }
+  ],
+  "postSnapshotChanges": [
+    {
+      "topicId": "09-14",
+      "field": "sections.3.paragraphs.1",
+      "before": "Suppose the conditional prediction is c and the unconditional prediction is u. The form u+w(c−u) equals c+s(c−u) when w=1+s. Thus a displayed value of three in one convention can correspond to two in another; comparing raw labels would describe different algorithms as identical.",
+      "after": "Ho and Salimans use (1+w_p)c − w_p u, where c and u are conditional and unconditional predictions. This article uses u+w_a(c−u), so w_p=w_a−1. The paper's w_p=0 corresponds to w_a=1 here, both yielding c. Likewise, this article's scale three matches the paper's scale two."
+    },
+    {
+      "topicId": "09-07",
+      "field": "sections.3.paragraphs.0",
+      "before": "Read Understanding Disentangling in β-VAE beside Neural Discrete Representation Learning. One reading concerns pressure on a continuous information channel; the other introduces a discrete codebook and a way to train through its selection. Their representation changes should be compared separately from decoder capacity.",
+      "after": "Start with Higgins et al.'s 2017 β-VAE paper for the β-weighted objective. Burgess et al.'s Understanding Disentangling in β-VAE is a follow-up analysis of information capacity. Compare both with Neural Discrete Representation Learning, which changes the latent representation to a discrete codebook rather than simply reweighting a continuous prior KL."
+    },
+    {
+      "topicId": "09-07",
+      "field": "references.0.note",
+      "before": "Read the information-capacity interpretation of β-VAE.",
+      "after": "Read Burgess et al.'s follow-up information-capacity analysis, distinguishing its capacity-controlled variant from Higgins et al.'s original β-weighted objective."
+    },
+    {
+      "topicId": "09-07",
+      "field": "references",
+      "before": [
+        {
+          "title": "Understanding disentangling in β-VAE",
+          "url": "https://arxiv.org/abs/1804.03599",
+          "kind": "paper",
+          "note": "Read Burgess et al.'s follow-up information-capacity analysis, distinguishing its capacity-controlled variant from Higgins et al.'s original β-weighted objective."
+        },
+        {
+          "title": "Neural Discrete Representation Learning",
+          "url": "https://arxiv.org/abs/1711.00937",
+          "kind": "paper",
+          "note": "Inspect nearest-code assignment and codebook training."
+        }
+      ],
+      "after": [
+        {
+          "title": "β-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework",
+          "url": "https://openreview.net/forum?id=Sy2fzU9gl",
+          "kind": "paper",
+          "note": "Read Higgins et al.'s original β-weighted variational objective and its constrained-latent motivation; compare it with the later information-capacity analysis."
+        },
+        {
+          "title": "Understanding disentangling in β-VAE",
+          "url": "https://arxiv.org/abs/1804.03599",
+          "kind": "paper",
+          "note": "Read Burgess et al.'s follow-up information-capacity analysis, distinguishing its capacity-controlled variant from Higgins et al.'s original β-weighted objective."
+        },
+        {
+          "title": "Neural Discrete Representation Learning",
+          "url": "https://arxiv.org/abs/1711.00937",
+          "kind": "paper",
+          "note": "Inspect nearest-code assignment and codebook training."
+        }
+      ]
+    },
+    {
+      "topicId": "09-09",
+      "field": "sections.3.paragraphs.0",
+      "before": "In Generative Adversarial Nets, separate the optimal-discriminator distribution analysis from the alternating optimization procedure. The theoretical comparison assumes distributions and a discriminator optimum that a finite training run does not automatically provide. A falling generator loss is not itself evidence that those assumptions hold.",
+      "after": "In Generative Adversarial Networks, separate the optimal-discriminator distribution analysis from the alternating optimization procedure. The theoretical comparison assumes distributions and a discriminator optimum that a finite training run does not automatically provide. A falling generator loss is not itself evidence that those assumptions hold."
+    },
+    {
+      "topicId": "12-06",
+      "field": "sections.3.paragraphs.0",
+      "before": "In Generative Adversarial Nets, inspect the distribution comparison obtained after optimizing the discriminator. Then read Endres and Schindelin for the separate metric property of the square-root construction. These are different results; neither makes a finite discriminator's training loss an exact measured divergence.",
+      "after": "In Generative Adversarial Networks, inspect the distribution comparison obtained after optimizing the discriminator. Then read Endres and Schindelin for the separate metric property of the square-root construction. These are different results; neither makes a finite discriminator's training loss an exact measured divergence."
+    },
+    {
+      "topicId": "12-06",
+      "field": "references.0.title",
+      "before": "Generative Adversarial Nets",
+      "after": "Generative Adversarial Networks"
+    },
+    {
+      "topicId": "10-13",
+      "field": "sections.3.paragraphs.1",
+      "before": "Suppose a model answers no to every question. On a dataset dominated by absent objects, raw accuracy can look strong despite detecting nothing. Inspect the class balance and positive-class precision and recall; a balanced evaluation still needs these components to explain whether a change merely shifts the response bias.",
+      "after": "An always-no model can appear accurate on an unbalanced probe dominated by absent objects, despite detecting nothing. POPE itself uses equal numbers of present and absent queries, so always-no accuracy is 50% on its balanced labels. Still inspect positive-class precision, recall, and the yes-response rate: balanced labels alone do not explain a model's response bias."
+    }
+  ]
+}

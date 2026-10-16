@@ -21,13 +21,22 @@
         "paragraphs": [
           "A flattened 28-by-28 grayscale image has 784 values. An encoder might map it to 32 latent values, and a decoder expand those values back to 784 outputs. For normalized continuous pixels, mean squared error is one possible loss; other observation models lead to other losses. The latent coordinate count is smaller, but storing 32 unrestricted floating-point numbers is not yet a complete compression codec. Quantization, metadata, and a coding scheme determine actual storage."
         ],
-        "formula": "z = encoder(x); x̂ = decoder(z); L = mean ‖x − x̂‖²"
+        "formula": "z = encoder(x); x̂ = decoder(z); per-pixel MSE = (1/(N D)) Σₙ₌₁ᴺ Σⱼ₌₁ᴰ (xₙⱼ − x̂ₙⱼ)², with N examples and D pixels"
       },
       {
         "id": "practice",
         "title": "Reconstruction and generation are different tests",
         "paragraphs": [
           "A good reconstruction shows that the decoder can interpret latents produced by its encoder. It does not show that random Gaussian latents correspond to meaningful images. The encoder may occupy a complicated region of latent space with unused gaps. Test interpolations and random samples separately from reconstructions, and inspect what happens to details such as stroke thickness or small objects. A common mistake is choosing the checkpoint only by training reconstruction loss; a model can memorize training examples while generalizing poorly to held-out images or useful downstream features."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the sources: what reconstruction rewards",
+        "paragraphs": [
+          "The autoencoders chapter of Deep Learning separates representation constraints from mere reconstruction accuracy. Read it alongside Masked Autoencoders with a specific question: what information can the decoder obtain without learning a useful representation? The corruption pattern and decoder capacity belong in that answer.",
+          "Consider a dataset of black backgrounds containing a small digit. Predicting the background accurately can dominate average pixel error while missing the digit. A low reconstruction loss therefore does not establish semantic usefulness. Compare errors inside and outside the foreground, then test whether a simple classifier can use the frozen representation.",
+          "For a masked image, identify which patches the encoder actually sees and which patches contribute to the loss. Changing either changes the task. A reconstruction objective encourages features useful for its particular observation and prediction problem; transfer to classification or retrieval remains an empirical question."
         ]
       }
     ],
@@ -42,7 +51,7 @@
     "references": [
       {
         "title": "Deep Learning",
-        "url": "https://www.deeplearningbook.org/",
+        "url": "https://www.deeplearningbook.org/contents/autoencoders.html",
         "kind": "book",
         "note": "Read chapter 14 on autoencoders and representation constraints."
       },
@@ -83,6 +92,15 @@
         "title": "A two-dimensional example",
         "paragraphs": [
           "Suppose an input produces mean [1, −1] and standard deviation [0.2, 0.5]. Repeated latent samples form an ellipse around that mean; the decoder sees related but nonidentical codes. A small variance makes inference nearly deterministic, but the training objective also accounts for how that distribution differs from the prior. Do not interpret every latent axis as an independently meaningful concept merely because the prior factorizes. Evaluate reconstruction, prior samples, and latent sensitivity separately; each reveals a different property of the learned model."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: two distributions over the latent",
+        "paragraphs": [
+          "In Auto-Encoding Variational Bayes, follow the distinction between the generative model pθ(x,z) and the recognition distribution qφ(z|x). The latter is a tractable inference mechanism, not the prior used to generate a new observation. Keep their conditioning variables visible in every equation.",
+          "Imagine encoding ten handwritten sevens. Their posterior means may cluster, while each posterior also has its own uncertainty. Sampling those posteriors explores reconstructions around observed sevens; sampling the prior explores the model's overall latent space. These experiments answer different questions even when they use the same decoder.",
+          "A useful diagnostic is to compare posterior reconstructions with prior samples at a fixed decoder setting. Good reconstructions accompanied by poor prior samples can expose a mismatch between regions reached by inference and regions emphasized by the prior. Neither experiment alone measures the entire probabilistic model."
         ]
       }
     ],
@@ -133,6 +151,15 @@
         "paragraphs": [
           "Suppose two models have ELBO estimates of −100 and −95 nats per example under the same likelihood convention. The second has a higher lower bound, but this alone does not guarantee better perceptual samples. Also, a lower bound can improve because the generative model improves, the inference approximation improves, or both. Compare consistent units and reductions: summing over pixels in one implementation and averaging in another changes the apparent scale. A common mistake is reversing the KL arguments or treating the posterior-matching gap as the same term as the prior regularizer."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: identifying the variational gap",
+        "paragraphs": [
+          "Read Auto-Encoding Variational Bayes by labeling which expectation uses qφ(z|x), which density is the prior, and which density is the true posterior. The two KL divergences in the ELBO identities have different roles; their arguments should never be shortened to an unlabeled KL.",
+          "Suppose the evidence for a fixed observation is unchanged while a better inference distribution raises its ELBO from −25 to −22. The posterior approximation gap has decreased by three nats. This thought experiment improves inference without changing the generative model, showing why an ELBO increase need not represent better evidence when both components are being optimized.",
+          "Conversely, a restricted inference family can favor generative parameters whose posteriors are easier to approximate. When comparing models, record the variational family and the evidence estimator as well as the reported bound. A bound is informative only when its looseness is interpreted."
+        ]
       }
     ],
     "exercise": {
@@ -165,7 +192,7 @@
         "id": "intuition",
         "title": "Reconstruction is a likelihood choice",
         "paragraphs": [
-          "A VAE's reconstruction term is a negative log-likelihood under p(x|z). Mean squared error corresponds to a Gaussian observation model under particular variance assumptions; binary cross-entropy corresponds to Bernoulli observations. These choices express different assumptions about the data. Replacing one with another or changing its reduction changes the optimization problem. The decoder's output activation and the numerical loss function must agree, such as using logits with a stable logits-based binary loss."
+          "A VAE's reconstruction term is a negative log-likelihood under p(x|z). Mean squared error corresponds to a Gaussian observation model under particular variance assumptions; binary cross-entropy is a Bernoulli negative log-likelihood for binary observations. Applying the same expression to continuous intensities in [0,1] does not by itself define a normalized continuous likelihood; a continuous Bernoulli, for example, needs an additional parameter-dependent normalizer. These choices express different assumptions about the data. Replacing one with another or changing its reduction changes the optimization problem. The decoder's output activation and the numerical loss function must agree, such as using logits with a stable logits-based binary loss."
         ]
       },
       {
@@ -181,6 +208,15 @@
         "title": "Watch the scale of each term",
         "paragraphs": [
           "If reconstruction error is summed over 784 pixels while KL is summed over 16 latent dimensions, their numerical magnitudes can differ substantially. Averaging the reconstruction term over pixels without adjusting other coefficients changes the balance. Log both terms separately and use a consistent per-example convention. A model with near-zero KL may be ignoring the latent, while a model with excellent reconstruction and very large KL may sample poorly from the prior. Neither diagnosis follows from total loss alone; inspect reconstructions and unconditional samples alongside the numbers."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: likelihood units and KL units",
+        "paragraphs": [
+          "In Auto-Encoding Variational Bayes, inspect the observation model before translating reconstruction into a convenient loss function. A Bernoulli likelihood and a Gaussian likelihood imply different data assumptions. Even within the Gaussian choice, changing the assumed observation variance changes the relative penalty for a fixed residual.",
+          "Take two independent pixels with residuals one and two. Their squared residual sum is five. Averaging that sum produces 2.5, whereas summing it produces five; combining either with an unchanged latent KL silently changes the optimization balance. This is a reduction convention, not a discovery about latent representations.",
+          "Write the batch, pixel, and latent reductions explicitly when reproducing the objective. Then vary the number of pixels in a small controlled example and check whether the relative terms change as intended. Comparable loss curves require comparable likelihood definitions and normalizations, not just similar variable names."
         ]
       }
     ],
@@ -198,6 +234,12 @@
         "url": "https://arxiv.org/abs/1312.6114",
         "kind": "paper",
         "note": "Inspect the Gaussian KL expression and reconstruction likelihood."
+      },
+      {
+        "title": "The Continuous Bernoulli: Fixing a Pervasive Error in Variational Autoencoders",
+        "url": "https://arxiv.org/abs/1907.06845",
+        "kind": "paper",
+        "note": "Inspect why the Bernoulli expression is not a normalized continuous density and how the missing normalizer changes the reconstruction objective."
       }
     ]
   },
@@ -230,6 +272,15 @@
         "title": "Check the implementation with fixed noise",
         "paragraphs": [
           "Take μ = 2, σ = 3, and ε = −0.5. The sampled z is 0.5. If the loss is z², the derivative with respect to μ is 2z = 1 and with respect to σ is 2zε = −0.5. Fixing ε makes a finite-difference check meaningful; resampling noise at every perturbation would add variance to the comparison. A common mistake is detaching z or converting it through a non-differentiable external operation before decoding, which breaks the encoder's gradient path despite using the correct sampling formula."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: where randomness enters the graph",
+        "paragraphs": [
+          "The reparameterization construction in Auto-Encoding Variational Bayes places random sampling in a parameter-independent noise variable. Trace the computation from that variable to the latent and onward to the decoder. This makes clear which operations ordinary differentiation can traverse and which expectations Monte Carlo approximates.",
+          "For z=μ+exp(ℓ/2)ε with fixed ε, differentiating with respect to log variance ℓ gives ∂z/∂ℓ=ε exp(ℓ/2)/2. At ℓ=0 and ε=2, this derivative is one. Using exp(ℓ) instead would both change the sampling variance and give the wrong derivative for the intended parameterization.",
+          "Check an implementation with a fixed noise draw and finite differences before averaging many draws. A single realization's derivative need not resemble the final expected gradient. The useful guarantee concerns an estimator under suitable differentiability and integrability assumptions, not a deterministic gradient for every sampled latent."
         ]
       }
     ],
@@ -278,6 +329,15 @@
         "title": "Interventions change the optimization problem",
         "paragraphs": [
           "Possible remedies include adjusting decoder capacity, gradually increasing the KL weight, or using objectives that encourage a useful information budget. These are hypotheses to test, not guaranteed fixes. For a toy sequence task, compare a weak decoder and a strong autoregressive decoder, track KL by dimension, and measure the effect of swapping latents. A common mistake is removing the KL penalty entirely and declaring collapse solved: the model may then encode information well but lose the prior compatibility required for reliable unconditional generation."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: testing whether the decoder uses z",
+        "paragraphs": [
+          "In Generating Sentences from a Continuous Space, read the latent-variable objective together with the decoder's autoregressive conditioning. A powerful decoder can explain much of a sentence from preceding tokens, reducing its incentive to use the global latent. The architecture and training dynamics therefore interact.",
+          "Design a diagnostic using the same sentence prefixes and three latent inputs: its inferred latent, another sentence's latent, and a prior draw. If predictions barely change, the decoder is insensitive along the tested directions. This is stronger evidence than merely observing that a plotted average KL is small.",
+          "Also inspect per-dimension KL and variation across examples. A small total can hide a few useful coordinates, while a large total can encode details irrelevant to the intended task. KL annealing changes the optimization path; it does not prove that the resulting representation captures meaning or avoids collapse universally."
         ]
       }
     ],
@@ -334,6 +394,15 @@
         "paragraphs": [
           "Increasing β can produce smoother prior compatibility while losing reconstruction detail. A VQ model can instead use only a small fraction of its codebook, wasting available codes. Track reconstruction quality and latent statistics appropriate to each method: KL and active dimensions for a continuous model, code usage and assignment distributions for a discrete one. A common mistake is claiming that a factorized prior alone identifies the true generative factors. Interpretability also depends on data, assumptions, supervision, and the ambiguities of representation learning."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: bottleneck pressure versus a codebook",
+        "paragraphs": [
+          "Start with Higgins et al.'s 2017 β-VAE paper for the β-weighted objective. Burgess et al.'s Understanding Disentangling in β-VAE is a follow-up analysis of information capacity. Compare both with Neural Discrete Representation Learning, which changes the latent representation to a discrete codebook rather than simply reweighting a continuous prior KL.",
+          "Consider a continuous model whose KL remains near zero even after changing β. Its effective channel is already barely used, so the hyperparameter alone says little about learned factors. In a discrete model, a 256-entry dictionary also says little if nearly every input selects the same entry.",
+          "Measure continuous rate or discrete code usage alongside reconstruction and downstream behavior. In the capacity-controlled β-VAE discussion, distinguish a target information capacity from a fixed multiplier on KL. In VQ-VAE, separate codebook updates from commitment pressure. Neither a nominal latent dimension nor a dictionary size establishes disentanglement."
+        ]
       }
     ],
     "exercise": {
@@ -346,10 +415,16 @@
     ],
     "references": [
       {
+        "title": "β-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework",
+        "url": "https://openreview.net/forum?id=Sy2fzU9gl",
+        "kind": "paper",
+        "note": "Read Higgins et al.'s original β-weighted variational objective and its constrained-latent motivation; compare it with the later information-capacity analysis."
+      },
+      {
         "title": "Understanding disentangling in β-VAE",
         "url": "https://arxiv.org/abs/1804.03599",
         "kind": "paper",
-        "note": "Read the information-capacity interpretation of β-VAE."
+        "note": "Read Burgess et al.'s follow-up information-capacity analysis, distinguishing its capacity-controlled variant from Higgins et al.'s original β-weighted objective."
       },
       {
         "title": "Neural Discrete Representation Learning",
@@ -388,6 +463,15 @@
         "title": "Compute a simple storage example",
         "paragraphs": [
           "A 64-by-64 latent grid with 256 possible codes per location uses 4,096 × 8 = 32,768 bits, or 4,096 bytes, under fixed-length indexing. Entropy coding may reduce this if codes are predictable. Compare the result with the original image's actual encoding, not just its raw tensor size. A common mistake is optimizing a perceptual score and claiming lossless compression: a visually plausible reconstruction can invent or remove details. Evaluate rate, distortion, and task-specific consequences separately, especially when exact text, measurements, or object identity must be preserved."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: from tensor size to a bitstream",
+        "paragraphs": [
+          "In End-to-end Optimized Image Compression, focus on the relationship between quantization, an entropy model, and rate–distortion optimization. A latent tensor becomes a codec only after the representation can be discretized, encoded, transmitted, and decoded under an agreed format.",
+          "Suppose four codes are equally likely. A fixed two-bit code is already ideal for that distribution. If one code occurs almost always, the same two-bit storage wastes an opportunity; an accurate entropy model can exploit that imbalance. Conversely, an overconfident model can assign expensive lengths to unexpected symbols.",
+          "Reconstruct from the decoded bitstream, not the encoder's original floating-point tensor, and include side information when measuring rate. Inspect how the paper approximates quantization during training and how evaluation changes it. A differentiable training surrogate is useful only insofar as its deployed discrete counterpart preserves the intended rate and distortion."
         ]
       }
     ],
@@ -444,6 +528,15 @@
         "paragraphs": [
           "Imagine a dataset with equally many circles and squares. A generator producing only convincing circles may fool some checks while missing half the distribution. This is a mode-coverage failure. A VAE can face a different trade-off, such as blurry conditional means under a chosen likelihood, but neither family is categorically immune to poor coverage or artifacts. Evaluate sample diversity, fidelity, held-out behavior, and task-relevant properties. A common mistake is comparing a few selected GAN samples with average VAE reconstructions; that compares different outputs under an uncontrolled selection procedure."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: the discriminator's idealization",
+        "paragraphs": [
+          "In Generative Adversarial Networks, separate the optimal-discriminator distribution analysis from the alternating optimization procedure. The theoretical comparison assumes distributions and a discriminator optimum that a finite training run does not automatically provide. A falling generator loss is not itself evidence that those assumptions hold.",
+          "Imagine two real modes with equal frequency and a generator that produces only one very sharply. A few attractive samples reveal quality within that mode but cannot reveal the missing half of the distribution. Evaluate coverage with a deliberately balanced reference set rather than selecting a pleasing image grid.",
+          "Compare a GAN and VAE using the same intended task and explicitly chosen metrics. Reconstruction quality is unavailable for a GAN without an added inference procedure, while a VAE's likelihood bound does not directly measure perceived sharpness. Different training signals make unmatched loss values particularly uninformative as a ranking."
+        ]
       }
     ],
     "exercise": {
@@ -499,6 +592,15 @@
         "paragraphs": [
           "Training commonly samples one timestep per example and computes a regression loss there. Generation usually performs many sequential model evaluations. These are different workloads. For ᾱ_t = 0.64, the clean-signal coefficient is 0.8 and the noise coefficient is 0.6. As ᾱ_t approaches zero, little information about the specific original example remains. A common error is confusing α_t with ᾱ_t in the noising equation; the former describes a single step, while the latter describes accumulated corruption. Check endpoints and tensor broadcasting when implementing schedules."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: check the forward marginal first",
+        "paragraphs": [
+          "In Denoising Diffusion Probabilistic Models, connect the product of per-step signal factors to the closed-form noisy marginal. This is what permits training at a randomly chosen noise level without explicitly executing every earlier corruption step. The reverse model is then conditioned on that level.",
+          "Test the algebra with two steps whose α values are both 0.8. The accumulated signal variance coefficient is 0.64, so the clean-sample coefficient is 0.8 rather than 0.64. Confusing a variance coefficient with its square root creates a different training distribution even though the code still runs.",
+          "Use simulated scalar data to check the marginal mean and variance before trying images. Keep posterior variance choices, the predicted quantity, and the training weighting separate when reading the reverse process. Matching one displayed mean equation does not ensure that an entire sampler reproduces the paper's stochastic transition."
+        ]
       }
     ],
     "exercise": {
@@ -547,6 +649,15 @@
         "paragraphs": [
           "Take one checkpoint and evaluate several samplers or step counts with the same prompts and initial seeds. Record the number of model evaluations, runtime, and a quality or task metric. Large steps can increase discretization error even when the trajectory is deterministic. A common mistake is interpreting reproducibility under a fixed seed as evidence of good coverage, or interpreting DDIM as simply a smaller DDPM. Inspect the exact update equation, noise parameter, timestep spacing, and any clipping of the predicted clean sample before attributing differences to the sampler name."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: which quantities a sampler can change",
+        "paragraphs": [
+          "Read DDIM alongside DDPM with attention to what remains fixed when the sampling trajectory changes. Shared training marginals allow a trained denoiser to support different reverse constructions. This does not mean that arbitrary update equations or timestep subsets preserve the same numerical behavior.",
+          "Start two deterministic DDIM runs from exactly the same noise and conditioning. They should agree under deterministic execution. Now change only the starting noise: the outputs can differ substantially despite there being no fresh noise inside the updates. Deterministic transport and random initialization are entirely compatible.",
+          "To compare a short DDIM trajectory with a long ancestral trajectory, record denoiser evaluations, prediction conversion, and the selected noise levels. Holding only a displayed step count fixed can conceal different computational budgets. Inspect quality across multiple seeds because a single favorable trajectory cannot establish the accuracy of a sampler."
+        ]
       }
     ],
     "exercise": {
@@ -584,7 +695,7 @@
         "id": "intuition",
         "title": "Time is an index into corruption strength",
         "paragraphs": [
-          "The same numerical timestep can represent very different noise levels under different schedules. In a variance-preserving process, ᾱ_t controls the remaining signal variance and 1 − ᾱ_t the noise variance. Their ratio is a useful measure of prediction difficulty. Early high-signal states preserve image detail, while late low-signal states require stronger reliance on the learned data distribution and conditioning. The schedule decides how training and sampling traverse these regimes."
+          "The same numerical timestep can represent very different noise levels under different schedules. In a variance-preserving process, ᾱ_t and 1 − ᾱ_t are the squared signal and noise coefficients. For unit-variance data and independent standard Gaussian noise, they also give the two variance contributions. Their ratio is the conventional signal-to-noise ratio. Early high-signal states preserve image detail, while late low-signal states require stronger reliance on the learned data distribution and conditioning. The schedule decides how training and sampling traverse these regimes."
         ]
       },
       {
@@ -593,7 +704,7 @@
         "paragraphs": [
           "A sequence of β_t values defines per-step noise increments, but the product ᾱ_t = ∏(1 − β_s) determines accumulated corruption. Linear β spacing does not imply linear loss of signal. For ᾱ_t = 0.9, SNR is 9; for ᾱ_t = 0.1, it is 1/9. Plot ᾱ_t or log SNR to compare schedules meaningfully. The endpoint should be checked as well: starting generation from nearly pure noise assumes the terminal training distribution is compatible with that initialization."
         ],
-        "formula": "SNR(t) = ᾱ_t / (1 − ᾱ_t)"
+        "formula": "Conventional SNR(t) = ᾱ_t / (1 − ᾱ_t); actual variance ratio = ᾱ_t Var(x₀) / (1 − ᾱ_t) for independent unit-variance noise"
       },
       {
         "id": "practice",
@@ -601,11 +712,20 @@
         "paragraphs": [
           "Even with a fixed training schedule, a sampler can spend more evaluations in some regions than others. Timestep sampling during training and loss weighting also affect which noise levels receive emphasis. Keep these choices distinct in experiments. A common error is switching the inference schedule without checking whether the model's timestep input and prediction parameterization expect the same noise convention. Test a schedule on a small known distribution first and visualize noisy samples at several signal levels, rather than trusting a plot of β alone."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: schedules depend on data scale",
+        "paragraphs": [
+          "In Improved Denoising Diffusion Probabilistic Models, inspect the accumulated signal curve when comparing schedule choices. A schedule is a distribution of prediction difficulties over training time, not merely a list of noise increments. Its usefulness also depends on preprocessing and loss weighting.",
+          "At ᾱ=0.5, unit-variance data produces equal signal and noise variance. If the clean data instead has variance four, the same coefficients give signal variance two and noise variance 0.5, an actual ratio of four. The conventional coefficient SNR remains one, so reporting its definition prevents a misleading interpretation.",
+          "Plot noisy examples after the real normalization pipeline, and evaluate the terminal distribution against the sampler's starting prior. When trying another schedule, preserve or deliberately change the meaning of the timestep embedding. An improvement can otherwise reflect a changed data scale or training emphasis rather than the schedule shape alone."
+        ]
       }
     ],
     "exercise": {
-      "prompt": "At what ᾱ value is the variance-based signal-to-noise ratio equal to one?",
-      "answer": "ᾱ/(1 − ᾱ) = 1 implies ᾱ = 0.5. Signal and noise each contribute half the variance under this convention."
+      "prompt": "At what ᾱ value is the conventional signal-to-noise ratio equal to one?",
+      "answer": "ᾱ/(1 − ᾱ) = 1 implies ᾱ = 0.5. With unit-variance data and independent standard Gaussian noise, signal and noise each contribute half the variance."
     },
     "takeaways": [
       "Inspect accumulated signal or log SNR, not only per-step β.",
@@ -656,6 +776,15 @@
         "paragraphs": [
           "An error in ε produces an x₀ error scaled by s/a when converted, which can become large at low signal. Different target choices and loss weightings therefore emphasize noise regimes differently. For a = 0.8, s = 0.6, x₀ = 2, and ε = −1, x_t = 1 and v = −2. The inverse formulas recover the originals exactly. A common mistake is calling all v targets velocity without defining their equation, or mixing standard deviations with variance coefficients when converting between targets."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: v is an angular derivative",
+        "paragraphs": [
+          "In Progressive Distillation for Fast Sampling of Diffusion Models, follow the parameterization that writes the signal and noise coefficients as cosine and sine. Its v target is naturally the derivative with respect to that angle. This explains why calling every v output a time velocity is unsafe.",
+          "For xφ=cos(φ)x₀+sin(φ)ε, differentiation gives vφ=−sin(φ)x₀+cos(φ)ε. If a separate clock t controls φ, then dx/dt=vφ dφ/dt. A clock that runs twice as fast doubles the time derivative without changing the angular target at the same noisy point.",
+          "Check the coefficient identity before applying the inverse formulas. The simple rotation inverse assumes a²+s²=1; other paths need their own transformation. In a reproduction, record the noisy-input scaling, target scaling, and solver's time variable together so that a correct network output is not inserted into an incompatible update."
+        ]
       }
     ],
     "exercise": {
@@ -704,6 +833,15 @@
         "title": "More guidance is not always better",
         "paragraphs": [
           "Stronger guidance may improve agreement with a prompt while reducing diversity or introducing artifacts. It also typically requires both conditional and unconditional predictions, although they may be batched or otherwise optimized. Evaluate quality, prompt adherence, diversity, and runtime together. A common mistake is increasing the guidance scale to compensate for weak visual evidence or an incorrect prompt template without checking the underlying model. Use a fixed seed grid across scales and inspect failure cases, including oversaturated images, repeated patterns, and missing secondary objects."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: identify the guidance convention",
+        "paragraphs": [
+          "Classifier-Free Diffusion Guidance combines conditional and unconditional predictions. Read its coefficients literally before copying a guidance number from another implementation: different conventions assign different numeric names to the same extrapolation. Also verify what conditioning is actually removed in the unconditional branch.",
+          "Ho and Salimans use (1+w_p)c − w_p u, where c and u are conditional and unconditional predictions. This article uses u+w_a(c−u), so w_p=w_a−1. The paper's w_p=0 corresponds to w_a=1 here, both yielding c. Likewise, this article's scale three matches the paper's scale two.",
+          "Use the same noisy input and timestep for both branches when testing the combination. Increasing extrapolation can amplify model error as well as conditioning information, so inspect diversity and artifacts instead of treating guidance as free accuracy. If clipping or rescaling follows the combination, report that extra operation because it changes the effective update."
         ]
       }
     ],
@@ -754,6 +892,15 @@
         "paragraphs": [
           "If the autoencoder loses small text or fine geometry, the diffusion stage cannot reliably reconstruct those exact details from absent information. Its decoder may produce plausible texture, but plausibility is not fidelity to an original image. Evaluate the autoencoder's reconstructions before diagnosing the generative model. A common implementation mistake is omitting the latent normalization or scaling expected by a checkpoint. The latent shape may still match while its variance is wrong, shifting every noise level experienced by the denoiser. Record encoder version, latent scale, and decoding precision with generated results."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: the autoencoder defines the working space",
+        "paragraphs": [
+          "In High-Resolution Image Synthesis with Latent Diffusion Models, follow the division between the representation model and the diffusion model. The decoder's limitations are present before any denoising experiment begins. Reconstruct held-out images through the autoencoder to establish that independent ceiling.",
+          "Imagine compressing a document until its smallest characters disappear. A powerful latent generator cannot recover the exact missing text from that lossy representation alone. More denoising steps address numerical approximation and modeling, not the information discarded by the encoder. This distinction matters when choosing compression for scientific diagrams or OCR-heavy images.",
+          "Check the latent scaling convention and spatial reduction separately. A smaller grid reduces many denoiser operations, but channel widths, attention layout, decoding cost, and memory traffic still affect runtime. Compare actual end-to-end measurements when deciding whether a representation change provides useful savings for the intended output size."
+        ]
       }
     ],
     "exercise": {
@@ -802,6 +949,15 @@
         "title": "Why multiple noise levels help",
         "paragraphs": [
           "Real images concentrate near complicated lower-dimensional structures, where estimating a useful score directly can be difficult. Adding noise smooths the distribution and creates prediction problems at several scales. Generation can then move from broad noisy structure toward finer detail. A common mistake is performing plain deterministic gradient ascent on an estimated score and assuming it samples the whole distribution; that can instead converge toward modes. Sampling procedures need the appropriate stochastic or probability-flow dynamics, and their discretization must match the trained noise convention."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: a score field is not a sample",
+        "paragraphs": [
+          "In Generative Modeling by Estimating Gradients of the Data Distribution, connect noise-conditioned score estimation with a sampling procedure. Estimating a local direction and generating a distribution are separate steps. The noise level identifies which smoothed density supplies the score.",
+          "For a unit Gaussian, the score is −x. Deterministic gradient ascent therefore moves every point toward zero, eventually destroying the distribution's variance. In contrast, a suitable stochastic dynamics balances this restoring tendency with injected noise. This toy case explains why repeatedly following a score does not automatically produce representative samples.",
+          "Plot the estimated field for a one-dimensional mixture at several noise scales. Heavy smoothing may merge modes that become separate near the data distribution. Inspect errors near low-density regions too: a sampler can pass through them even if ordinary held-out samples rarely do. Good average regression error need not imply robust sampling trajectories."
         ]
       }
     ],
@@ -858,6 +1014,15 @@
         "paragraphs": [
           "In generative modeling, the goal is usually to transport an initial distribution toward a data distribution. Different dynamics can share the same time-dependent marginal distributions while having different individual paths, provided their fields are chosen appropriately. This does not mean an arbitrary ODE is equivalent to any chosen SDE. A common error is copying a reverse-time formula without checking the sign and time direction. Define whether integration runs from noise to data or data to noise, then test the solver on a simple Gaussian example with a known behavior."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: direction and time parameterization",
+        "paragraphs": [
+          "In Score-Based Generative Modeling through Stochastic Differential Equations, read the forward SDE, reverse-time SDE, and probability-flow ODE as three different equations. Their related marginal distributions do not make their drifts interchangeable. Pay particular attention to which direction the time variable runs.",
+          "For the forward scalar process dx=σ dW, an interval h adds variance σ²h. A numerical update using σhε instead would add σ²h² and converge toward the wrong behavior as steps shrink. The square-root timestep factor is therefore a distributional requirement, not a tuning convention.",
+          "Test a solver on a process with known Gaussian marginals before using a learned score. If integrating backward, state whether the code uses negative increments or a new increasing reverse clock. Mixing those conventions can flip a drift sign while leaving tensor shapes and ordinary software checks entirely valid."
+        ]
       }
     ],
     "exercise": {
@@ -906,6 +1071,15 @@
         "title": "Test the direction convention",
         "paragraphs": [
           "With z = 0 and x = 4 in one dimension, the path at t = 0.25 is 1 and its target velocity is 4. If another implementation uses t = 0 for data and t = 1 for noise, both the interpolation and velocity sign change. A common mistake is mixing these conventions between training and sampling. Begin with a two-dimensional toy distribution, plot intermediate sample clouds, and inspect whether they move toward the data. Straight conditional paths do not guarantee that every learned marginal trajectory is straight or easy to integrate."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: conditional paths cross",
+        "paragraphs": [
+          "In Flow Matching for Generative Modeling and Flow Straight and Fast, distinguish a sampled endpoint pair's target velocity from the marginal field learned at a location. The training target is easy to construct because its endpoints are known; inference does not have access to those endpoints.",
+          "Consider two equally likely straight paths that pass through the same point at the same time, one moving right and one moving left at equal speed. Squared-error regression at that point favors zero velocity, their conditional average. It does not recover either hidden pair's label separately.",
+          "This example motivates examining the coupling between noise and data as well as the path equation. Pairing choices can change conditional velocity variability and the difficulty of regression. When comparing flow experiments, keep direction, time range, endpoint distributions, and target scaling explicit; a field trained from noise to data cannot be integrated with the opposite sign by accident."
         ]
       }
     ],
@@ -962,6 +1136,15 @@
         "paragraphs": [
           "A ten-step two-stage solver can call the model as often as a twenty-step one-stage solver. Adaptive solvers choose step sizes based on an error estimate, but their cost can vary across samples and tolerances. Near sharp changes or poorly conditioned regions, large steps may overshoot. A common mistake is comparing samplers by step count while ignoring function evaluations and wall-clock time. For a toy field with an analytic solution, plot error against evaluations; then repeat the experiment on the learned field using fixed initial noise samples."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: straight paths and integration error",
+        "paragraphs": [
+          "Flow Straight and Fast motivates studying transport paths together with numerical integration. Read geometric claims as statements about a particular learned or ideal field, not as a universal guarantee that one large Euler step is accurate. Field estimation error remains distinct from discretization error.",
+          "Use the test equation dx/dt=x from x(0)=1. Over a step of 0.5, Euler gives 1.5 and Heun gives 1.625, while the exact value is exp(0.5). Heun improves this example by evaluating the field again at a predicted endpoint, so its cost must include that extra evaluation.",
+          "Then replace the exact field by a biased one and repeat the step-size study. Smaller steps can reduce integration error while converging toward the wrong solution of that biased field. Plot quality against function evaluations and wall-clock time, and report the solver tolerance or step grid rather than its name alone."
+        ]
       }
     ],
     "exercise": {
@@ -984,6 +1167,12 @@
         "url": "https://arxiv.org/abs/2011.13456",
         "kind": "paper",
         "note": "Compare numerical integration roles in continuous-time generative models."
+      },
+      {
+        "title": "Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow",
+        "url": "https://arxiv.org/abs/2209.03003",
+        "kind": "paper",
+        "note": "Connect trajectory geometry to Euler discretization while separating learned-field error from numerical integration error."
       }
     ]
   },
@@ -1017,6 +1206,15 @@
         "title": "Design an informative toy experiment",
         "paragraphs": [
           "Train small models on the same two-dimensional data distribution with matched network sizes and update budgets. State the path, time sampling, target, loss weighting, and solver for each. Compare sample coverage, distributional error, model evaluations, and wall-clock time at several budgets. A common mistake is giving one method a tuned high-order solver and the other a default sampler, then attributing the whole difference to training. Another is assuming straight conditional interpolation guarantees accurate one-step generation; the learned marginal field can still require careful integration."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: compare equations before family names",
+        "paragraphs": [
+          "Read the diffusion, score-SDE, and flow-matching papers using a shared worksheet: input distribution at time t, supervised target, weighting, and generation equation. These labels reveal overlap that broad family names hide. A probability-flow ODE already provides a deterministic transport associated with a diffusion process.",
+          "For a Gaussian corruption path, noise, score, and clean-sample predictions can be converted algebraically when the coefficients are nonzero. Yet an unweighted squared error on each converted target generally gives different emphasis across time. Equivalent representations of an exact field do not imply identical finite-model training.",
+          "Build comparisons around one controlled change: keep architecture and data fixed while changing target weighting, or keep the learned field fixed while changing the solver. Report endpoint conventions and evaluation budgets. Otherwise a claimed advantage for an entire model family may actually come from resolution, conditioning, optimization, or numerical choices."
         ]
       }
     ],

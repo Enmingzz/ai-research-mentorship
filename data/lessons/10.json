@@ -29,6 +29,15 @@
         "paragraphs": [
           "For an image containing two differently colored cups, compare ranking candidate captions with generating an answer to 'Which cup is on the left?' Retrieval can succeed if the correct caption is supplied, while generation requires selecting and expressing the relevant relation. Conversely, a generative model can produce a plausible answer from language priors even when the image is ambiguous. A common mistake is assuming that adding an LLM automatically improves visual representation. Evaluate perception, relation reasoning, answer formatting, and hallucination separately to understand which component actually changes."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: matching versus generation",
+        "paragraphs": [
+          "Read CLIP and Visual Instruction Tuning by writing down their output spaces. CLIP compares image and text representations; a generative VLM assigns probabilities to successive answer tokens. This difference determines what a training example supplies and what a reported score can establish.",
+          "For a question about an object's color, a retrieval system can compare several complete candidate descriptions. A generative model can emit a new description, but may insert an unsupported adjective along the way. Correct candidate ranking and faithful open-ended generation are related abilities, not interchangeable evaluations.",
+          "Try a controlled set of captions that differ in only one visual attribute. Then ask the generative model the equivalent question with the image present, absent, and swapped. These interventions separate broad language compatibility from sensitivity to the visual evidence. Compare architectures through these observable behaviors before attributing grounding to model size or fluent responses."
+        ]
       }
     ],
     "exercise": {
@@ -85,6 +94,15 @@
         "paragraphs": [
           "If a small sign is unreadable in encoder features, a better text template cannot restore its exact pixels. If projected features have the wrong scale or semantics, the language model may fail to use otherwise useful visual information. If perception is correct but the response format is wrong, instruction tuning or decoding may be responsible. Debug with intermediate shapes, image-only probes, and simple prompts before attempting a complicated benchmark. A common mistake is loading a projector trained with a different vision checkpoint or feature layer merely because the dimensions happen to match."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: an interface has two jobs",
+        "paragraphs": [
+          "In Visual Instruction Tuning and BLIP-2, track both the feature width and the sequence length at each modality interface. A map can solve a dimensional mismatch without reducing token count, while a query-based bottleneck can change both. The diagram alone may hide this distinction.",
+          "Take 100 image features of width 768 and a language model width of 2048. A tokenwise linear projection needs a 768-by-2048 weight matrix under the row-vector convention, but still emits 100 positions. Compressing to 25 positions requires an additional selection, pooling, or learned aggregation mechanism.",
+          "Use this trace to identify where visual information could be lost and where computation is actually saved. Inspect gradient flow as well: an adapter can learn while both pretrained components remain fixed. Shape compatibility is necessary for execution, but successful training must also align feature meaning and numerical scale with the language model's expected interface."
+        ]
       }
     ],
     "exercise": {
@@ -139,6 +157,15 @@
         "title": "Test visibility and ordering",
         "paragraphs": [
           "Construct a tiny example with one image and a short question, then inspect the processor output: embeddings, position IDs, attention mask, and labels. Verify that the answer positions can attend to the intended image features. For multiple images, confirm that their feature blocks match their placeholders and descriptions. A common error is truncating the combined sequence after tokenization without accounting for expanded image tokens, which can remove instructions or response labels. Generation caches must also preserve the multimodal prefix consistently when subsequent text tokens are decoded."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: inspect how images become accessible",
+        "paragraphs": [
+          "Compare the token interface in Visual Instruction Tuning with Flamingo's inserted cross-attention mechanism. Both make image information available to a language model, but they need not place identical visual vectors into an ordinary text-token stream. The attention graph is part of the architecture.",
+          "In a prefix-token design, masking image positions out of the language loss means they are not prediction targets. It does not mean answer tokens should be prevented from attending to them. Confusing these masks can produce a model that optimizes a valid text loss while effectively ignoring the image.",
+          "Trace a single answer position backward through its allowed attention edges. Include image delimiters, padding, and any causal restrictions. Then swap the image while preserving text and observe whether logits change. This combines a structural check with a behavioral one; neither requires interpreting a visual embedding as a discrete vocabulary token."
         ]
       }
     ],
@@ -195,6 +222,15 @@
         "paragraphs": [
           "Imagine 576 visual tokens and 32 learned queries. The query interface can reduce the sequence passed onward, but important fine detail may be lost if those queries do not capture it. An MLP over each of the 576 tokens can be nonlinear without reducing sequence length. Evaluate both task accuracy and token cost, especially for OCR or localization. A common mistake is assuming that a two-layer projector automatically performs spatial pooling, or that a fixed query bottleneck preserves every detail required by an arbitrary future question."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: what learned queries actually compress",
+        "paragraphs": [
+          "In BLIP-2, follow the learned query vectors through their interactions with frozen image features. The query count sets an interface bottleneck; it does not automatically identify one query with one object or region. Read the attention masks alongside the objectives because different masks expose different information.",
+          "Imagine an image containing many tiny labels. A fixed number of output queries can aggregate them, but the representation must decide which distinctions survive. Increasing the language-model width cannot restore information that the querying stage discarded. Evaluate detailed extraction separately from a broad captioning task.",
+          "Compare a tokenwise projector and a query bottleneck at matched output width and task conditions. Report the query transformer's own cost as well as the smaller language-model input. An apparent downstream saving may be offset by expensive cross-attention, and improved quality could come from extra learned processing rather than compression itself."
+        ]
       }
     ],
     "exercise": {
@@ -250,6 +286,15 @@
         "paragraphs": [
           "Suppose the model improves at producing polite, structured answers after instruction tuning. That does not establish that it became better at reading tiny text or counting objects. Evaluate simple perception tasks and instruction adherence separately. Use examples where the image changes while the question remains fixed, so language-only shortcuts are exposed. A common mistake is training on generated captions that contain unsupported details and then treating their fluent wording as ground truth. Audit data quality, image–text pairing, duplication, and ambiguity before scaling the number of examples."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: stages isolate different learning problems",
+        "paragraphs": [
+          "In Visual Instruction Tuning, inspect which parameters change during feature alignment and which change during instruction tuning. Read BLIP-2 as a related but different staged design. Stage names are descriptions of a particular training recipe, not universally standardized objectives.",
+          "Suppose an adapter learns from short image captions and is then evaluated on counting questions. Caption alignment may teach useful correspondence while never forcing precise counting. Instruction examples change the demanded behavior, but noisy answers can simultaneously teach unsupported claims. Data content matters beyond the name of the training stage.",
+          "Create small evaluation sets for image recognition, instruction compliance, and evidence-grounded answers before comparing stages. Hold prompt formatting fixed and report trainable components at each checkpoint. If multiple factors change together, an improvement cannot be attributed uniquely to visual alignment, language-model adaptation, or richer supervision."
+        ]
       }
     ],
     "exercise": {
@@ -304,6 +349,15 @@
         "paragraphs": [
           "Start with a frozen-encoder baseline, then selectively unfreeze later blocks or the full encoder. Use separate learning-rate groups because pretrained vision weights and a newly initialized projector may need different update scales. Track visual-only probes as well as multimodal task metrics to detect loss of general features. A common mistake is assuming a frozen encoder is in evaluation mode automatically; dropout and normalization behavior are controlled separately. Record training mode, augmentation, feature layer, and optimizer groups so that the comparison measures freezing rather than several accidental changes at once."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the sources: freezing is a graph decision",
+        "paragraphs": [
+          "BLIP-2 motivates learning a bridge around frozen pretrained components. Pair that architectural choice with PyTorch's Autograd Mechanics documentation, which distinguishes parameter gradients, graph recording, and evaluation behavior. These controls are related operationally but are not synonyms.",
+          "Consider a trainable adapter before a frozen transformer. Although the transformer's weights need no gradients, differentiating its output with respect to the adapter's input may still be essential. Wrapping that transformer in no_grad would sever the required path. By contrast, a frozen image encoder before the first trainable adapter may safely produce detached features when no earlier input optimization is needed.",
+          "Draw the intended gradient path before deciding where to disable recording. Verify that adapter gradients are nonzero, frozen parameters stay unchanged, and dropout behavior matches the experiment. Memory savings from freezing depend on which intermediate derivatives remain necessary, not merely on the count of parameters marked nontrainable."
+        ]
       }
     ],
     "exercise": {
@@ -326,6 +380,12 @@
         "url": "https://arxiv.org/abs/2304.08485",
         "kind": "paper",
         "note": "Compare which components are updated across training stages."
+      },
+      {
+        "title": "PyTorch Autograd Mechanics",
+        "url": "https://docs.pytorch.org/docs/2.14/notes/autograd.html",
+        "kind": "guide",
+        "note": "Distinguish requires_grad, no-grad mode, inference mode, and evaluation mode; freezing parameters and disabling graph recording solve different problems."
       }
     ]
   },
@@ -357,6 +417,15 @@
         "title": "Build a versioned comparison sheet",
         "paragraphs": [
           "Choose exact checkpoints and record image resolution policy, visual token count, context limit, processor revision, and training or evaluation assumptions. Run the same small set of tasks: broad description, exact text reading, spatial relations, and an ambiguous image that should prompt uncertainty. Do not infer that a higher aggregate benchmark score comes from one architectural component alone; data quality and post-training may dominate. A common error is using a newer LLaVA variant's MLP projector to describe the original paper, or transferring one family's chat template to another merely because both expose a conversational API."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: build a versioned architecture comparison",
+        "paragraphs": [
+          "Compare Visual Instruction Tuning, BLIP-2, and the Qwen2.5-VL Technical Report using their actual component boundaries. Record the visual backbone, bridging operation, language interface, and trainable parameters. A shared label such as vision-language model does not specify these choices.",
+          "Imagine two models with identical language backbones but different image preprocessing. If one receives a high-resolution document and the other a small square crop, their OCR difference cannot be attributed solely to the projector. The effective visual observation is already different before the bridge runs.",
+          "Reconstruct a complete path for one input, including resizing, patch formation, merging, and text formatting. Attach the checkpoint version to that path: a later model family member can change a component while retaining the familiar family name. Use matched ablations for causal claims; architecture tables and benchmark scores alone establish associations, not isolated mechanisms."
         ]
       }
     ],
@@ -420,6 +489,15 @@
         "paragraphs": [
           "Evaluate several resolutions with fixed prompts and a held-out set containing both large objects and small details. Record task accuracy, visual token count, prefill time, and peak memory. Keep cropping and aspect ratio policies visible: increasing the nominal resolution while cropping away the relevant corner can make performance worse. A common mistake is reporting only the input image dimensions while hiding the processor's resizing or tiling. Inspect the actual processed shapes and generated visual sequence lengths rather than assuming the uploaded image reaches the model unchanged."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: resolution changes both evidence and work",
+        "paragraphs": [
+          "Read the Vision Transformer patch construction beside Qwen2.5-VL's resolution handling. Count patches using the image after preprocessing rather than the uploaded file's nominal dimensions. Crops, padding, spatial merging, and special positions can alter the number ultimately reaching each component.",
+          "Suppose a square image doubles in each dimension while patch size stays fixed. It contains four times as many patches. Full attention among those patches has sixteen times as many pairs, but a model using local windows or later merging need not exhibit that same end-to-end scaling.",
+          "Choose a task where resolution has an interpretable effect, such as reading a small serial number. Compare accuracy, encoder time, language prefill time, and peak memory across resolutions. A useful operating point preserves the task's evidence without spending computation on irrelevant background; the highest available resolution is not automatically the most efficient choice."
+        ]
       }
     ],
     "exercise": {
@@ -475,6 +553,15 @@
         "paragraphs": [
           "For a 24-by-16 patch grid, 2-by-2 merging produces 12-by-8 = 96 tokens from 384 patches. Odd grid dimensions require a defined resize, pad, or grouping policy. Preserve the mapping between merged tokens and image coordinates when evaluating localization. A common mistake is comparing models at equal post-merge token count while ignoring different encoder workloads: one may process many more raw patches before compression. Measure both stages, and test whether merging harms tasks that depend on a small isolated feature or precise character boundaries."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the report: locate the spatial merger",
+        "paragraphs": [
+          "In the Qwen2.5-VL Technical Report, trace the four-neighbor spatial merging operation relative to the visual encoder and language model. The location matters: reducing the language sequence does not retroactively erase visual encoding work. Also distinguish this merger from preprocessing that changes the patch grid itself.",
+          "With a 20-by-30 feature grid, grouping nonoverlapping two-by-two neighborhoods produces 10-by-15 groups, or 150 outputs. Concatenating a group's features temporarily increases its width before the learned projection. Token count and channel width therefore move in different directions during the same operation.",
+          "Test a document containing text across neighborhood boundaries. A fixed local merger must preserve useful fine detail through its learned representation, and excessive upstream downsampling can remove that detail earlier. When reproducing results, record image size bounds, patch-grid constraints, merging factor, and the final visual sequence length instead of describing the system only as dynamic resolution."
+        ]
       }
     ],
     "exercise": {
@@ -522,6 +609,15 @@
         "title": "Use a correspondence test",
         "paragraphs": [
           "Create two images with different colored objects and ask 'What is present only in the second image?' Swap the image order while keeping text references consistent and check whether the answer changes appropriately. For video, compare clips sampled at different rates but with the same timestamps. A common mistake is assigning every frame an identical spatial sequence without a temporal distinction, or using frame index as elapsed time when sampling rates vary. Inspect image boundaries, timestamps, position IDs, and attention masks as a single input contract rather than independent implementation details."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: ordering is part of the evidence",
+        "paragraphs": [
+          "Read Flamingo's image-conditioning layout alongside Qwen2.5-VL's temporal position design. The important question is which visual observation a text position can access and how time is represented. Sequence order, spatial coordinates, and elapsed seconds encode different relationships.",
+          "Consider two frames showing the same object at the same positions, once separated by one second and once by ten seconds. Their displacement is identical but their implied average speed differs tenfold. Frame indices alone cannot express that distinction unless the sampling interval is also supplied or otherwise encoded.",
+          "For interleaved images and text, create an example whose correct answer depends on image identity rather than the union of visible objects. Swap image order while preserving the question. Then check both the positional metadata and the response. A model that sees all relevant pixels can still fail when their correspondence or temporal spacing is represented incorrectly."
         ]
       }
     ],
@@ -578,6 +674,15 @@
         "paragraphs": [
           "Use one scene image for object and relation questions, one document for exact transcription, one referring expression for localization, and one ambiguous image for calibrated uncertainty. Inspect whether failure begins in perception, spatial reasoning, language generation, or output formatting. A common mistake is counting a correct object name as successful grounding when its predicted box points elsewhere. Another is accepting a detailed caption without verifying its details. Preserve original image coordinates and text normalization rules in the evaluation script, and document whether punctuation or case differences count as errors."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the sources: task metrics answer different questions",
+        "paragraphs": [
+          "In VQA, inspect the answer format and agreement-based evaluation; in the Qwen2.5-VL report, separate recognition, document, and localization tasks. A single multimodal average blends distinct failure modes. The evaluation target should explain why a particular metric is appropriate.",
+          "Suppose OCR predicts an extra word that is absent from the image. A character-error calculation counts insertions and can exceed one if inserted characters outnumber the reference length. Calling one minus that quantity an ordinary bounded accuracy would therefore be misleading. State normalization and text preprocessing explicitly.",
+          "For grounding, check coordinates in the original image frame rather than an undocumented resized frame. For captioning, examine whether a plausible sentence invents an object. For short-answer VQA, inspect accepted variants. These checks reveal errors that fluent output or an aggregate score can conceal, and they identify which stage of the visual pipeline needs investigation."
+        ]
       }
     ],
     "exercise": {
@@ -632,6 +737,15 @@
         "title": "Test motion and order explicitly",
         "paragraphs": [
           "Create paired clips with the same frames in reverse order and ask a question that depends on direction, such as whether an object was picked up or put down. Also test events of different durations and gaps. A model that answers both reversed clips identically may be relying on static appearance, though ambiguous prompts can also cause that outcome. A common mistake is claiming temporal reasoning from a benchmark dominated by questions answerable from one frame. Include temporal grounding and counterfactual order tests, and separate generation latency from the time spent decoding and preprocessing video."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: frame coverage precedes reasoning",
+        "paragraphs": [
+          "Read the video handling in Qwen2.5-VL and Flamingo by first reconstructing which frames reach the model. Temporal modeling cannot use an event that the sampling pipeline never exposes. Separate sampling coverage from the model's ability to order or relate observed evidence.",
+          "Imagine a half-second action in a long clip sampled once every five seconds. A wrong answer may reflect absent input rather than failed temporal reasoning. Increase sampling around the event while keeping the question fixed; if performance changes, the observation policy is a plausible limiting factor.",
+          "Then use pairs of clips with the same objects but reversed action order. Static recognition should remain similar while a temporal answer changes. Record timestamps, frame budget, and any per-frame compression. More frames increase cost and may also crowd the context, so evaluate evidence coverage and retention together rather than treating frame count as a universal quality setting."
         ]
       }
     ],
@@ -688,6 +802,15 @@
         "paragraphs": [
           "Suppose a model answers yes to every question asking whether an object is present. It may achieve high recall for present objects while producing many false positives. Conversely, a model that denies everything avoids some hallucinations but misses real evidence. Evaluate both errors, vary object popularity and wording, and inspect free-form descriptions as well as binary answers. A common mistake is treating a model's verbal confidence as a calibrated uncertainty measure. Encourage explicit uncertainty where appropriate, but verify that abstention improves reliability rather than merely hiding errors on difficult examples."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the paper: negatives determine what hallucination means",
+        "paragraphs": [
+          "In Evaluating Object Hallucination in Large Vision-Language Models, inspect how POPE constructs object-presence questions and negative examples. A hallucination score depends on which absent objects are queried. Easy random negatives and plausible co-occurring negatives challenge different shortcuts.",
+          "An always-no model can appear accurate on an unbalanced probe dominated by absent objects, despite detecting nothing. POPE itself uses equal numbers of present and absent queries, so always-no accuracy is 50% on its balanced labels. Still inspect positive-class precision, recall, and the yes-response rate: balanced labels alone do not explain a model's response bias.",
+          "Add controlled image swaps and paraphrased questions to examine evidence dependence. If an answer follows the common scene prior after the relevant object is removed, fluent reasoning has not established grounding. Keep object-presence evaluation distinct from attributes, counts, and relations: passing one hallucination probe does not establish correctness for every visual claim."
+        ]
       }
     ],
     "exercise": {
@@ -742,6 +865,15 @@
         "title": "Turn errors into an experiment plan",
         "paragraphs": [
           "Sample failures and label likely causes: missing visual detail, incorrect reading, wrong relation, reasoning error, hallucination, or formatting. Verify those labels with intermediate probes rather than treating them as certain. For example, crop and enlarge a failed text region; if transcription improves, resolution was a plausible bottleneck. Report subgroup counts and uncertainty, since a category with five examples cannot support the same confidence as one with five thousand. A common mistake is presenting a few compelling successes as representative performance or comparing scores produced by incompatible resolution and prompting protocols."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the papers: interpret a benchmark's scope",
+        "paragraphs": [
+          "Read MMMU's task construction beside POPE's targeted hallucination probe. A broad expert-question benchmark and a narrow object-presence test measure different capabilities. Their relationship is useful precisely because a model can improve on one while remaining weak on the other.",
+          "Suppose a benchmark contains many questions solvable from text alone. Removing the image provides a diagnostic baseline: high remaining performance reveals that the headline score is not purely visual. It does not invalidate every item, but it changes what an aggregate improvement can demonstrate.",
+          "Report results by task type, image necessity, and relevant difficulty groups where sample sizes permit. Preserve the evaluation prompt and scoring protocol when comparing systems, and inspect overlap with training or tuning data. A credible interpretation connects each score to its actual evidence and uncertainty rather than equating a larger benchmark average with general visual understanding."
         ]
       }
     ],

@@ -6,3 +6,9 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Local audit inputs and raw CLI envelopes; reviewed findings are retained.
+review/claude-*-input.json
+review/claude-*-response.json
+review/audit-*-before.json
+review/enrich-paper-notes.mjs

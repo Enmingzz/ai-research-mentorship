@@ -27,6 +27,14 @@
         "paragraphs": [
           "Dense attention compares many pairs of positions, creating quadratic pairwise work as sequence length grows. A recurrent state can be much more compact for streaming use. Attention also needs positional information or another mechanism to distinguish order; content comparisons alone do not encode a sequence's arrangement. Choose an architecture by the task's access pattern, memory budget, and latency requirements. The motivation for attention explains a useful trade-off rather than proving recurrent models are always inappropriate."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the alignment-and-translation paper for the problem it addresses, then compare the access pattern with the Transformer paper. The useful distinction is not simply old versus new architecture: it is whether a prediction must rely on one repeatedly compressed state or can retrieve from a collection of source representations. In the document-name example, identify where the name is stored and which computation makes it available to the answer.",
+          "Direct access still does not guarantee successful retrieval. The source representation must preserve the needed distinction, and the learned query-key comparison must give it useful weight. A system can have enough context capacity yet fail either requirement. When evaluating an attention-based design, vary the location of the relevant evidence and introduce plausible distractors. This separates the architectural possibility of accessing a token from the empirical claim that a trained model reliably uses that access."
+        ]
       }
     ],
     "exercise": {
@@ -82,6 +90,14 @@
         "paragraphs": [
           "In self-attention, Q, K, and V originate from the same sequence, but usually use different projections. Their rows therefore need not be identical. In cross-attention, queries may come from a text decoder while keys and values come from image features. Keys and values must remain aligned by source position; permuting one without the other changes which content a match retrieves. A large attention weight also does not establish a complete causal explanation of the model's answer."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Use the Transformer paper's attention definition to label the roles of each matrix before attaching a semantic story to a head. Queries determine the number of requested outputs; paired keys and values define the candidate memory. The six-query, ten-source example makes this clear because the score matrix cannot be square. A learned projection may change feature width, but it does not change which axis enumerates source positions.",
+          "A useful independent invariance check permutes keys and values together. The score columns and corresponding value rows change in matching order, leaving the final weighted mixture unchanged when masks and positional treatment are permuted consistently. Permuting keys alone usually changes the result because matching now retrieves the wrong content. This distinction is valuable when debugging a memory bank, image-patch sequence, or cached source representation: ordering is an association between keys and values, not an incidental tensor layout."
+        ]
       }
     ],
     "exercise": {
@@ -129,7 +145,7 @@
         "id": "example",
         "title": "Turn two scores into one retrieved vector",
         "paragraphs": [
-          "Choose Q = K = [[1, 0], [0, 1]] and V = [[2, 0], [0, 4]]. The first query has raw scores [1, 0]. Dividing by √2 gives [0.7071, 0]. Exponentiation gives approximately [2.0281, 1], and normalization produces [0.6698, 0.3302]. Its output is 0.6698·[2, 0] + 0.3302·[0, 4] = [1.3396, 1.3208]. The second query swaps the weights, producing approximately [0.6604, 2.6792]. Notice that the output mixes values, not keys."
+          "Choose Q = K = [[1, 0], [0, 1]] and V = [[2, 0], [0, 4]]. The first query has raw scores [1, 0]. Dividing by √2 gives [0.7071, 0]. Exponentiation gives approximately [2.0281, 1], and normalization produces approximately [0.66976155, 0.33023845]. Using unrounded weights, its output is approximately [1.33952310, 1.32095380]. The second query swaps the weights, producing approximately [0.66047690, 2.67904620]. Notice that the output mixes values, not keys."
         ]
       },
       {
@@ -144,6 +160,14 @@
         "title": "Mask and normalize the intended axis",
         "paragraphs": [
           "Subtracting the largest logit before exponentiation improves numerical stability without changing softmax. Apply an additive mask before softmax so forbidden positions receive zero probability. In this example, a causal mask removes the first query's access to the second source: its weights become [1, 0] and its output becomes [2, 0]. Check row sums and forbidden positions explicitly. An entirely masked row needs defined handling because naive softmax of all negative infinities is invalid."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Compare the scaled-attention equation in the Transformer paper with the official SDPA reference computation. Follow the normalization axis explicitly: each query needs a distribution over available keys. The numeric example here is small enough to inspect every intermediate, so it can serve as a reference when a batched or multi-head implementation is rearranged. Use unrounded intermediate values when comparing outputs; display rounding should happen only after the computation.",
+          "The library interface adds choices beyond the compact equation. A boolean participation mask differs from an additive bias, and dropout can change the row-sum and convex-mixture properties of the raw attention weights. SDPA applies the supplied dropout probability even if an enclosing module is in evaluation mode, so evaluation code must pass zero explicitly. An agreement test should therefore specify dtype, scale, mask, and dropout before interpreting a difference as evidence that the mathematical operation is wrong."
         ]
       }
     ],
@@ -201,6 +225,14 @@
         "paragraphs": [
           "Decoder self-attention usually needs causality to avoid reading future target tokens. Cross-attention over a fully observed source generally does not need a triangular target-style mask, but it still needs to exclude padded source positions. A source containing future observations in a forecasting task may require additional restrictions. Shared source data can also allow precomputing cross-attention keys and values during generation; do not recompute them merely because a new query arrives."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the Transformer architecture description by tracing separate data streams through each attention use. In cross-attention, a decoder query retrieves from a source whose length and original width can differ from the target's. Mark those dimensions on the projection matrices as well as on Q, K, and V. This prevents a common implementation shortcut from accidentally assuming identical source and target widths.",
+          "The masking policy follows what information is available, not the rectangular shape of the score matrix. A fully observed document can be visible to every summary position, while padded document slots remain invalid. For an online forecasting source, some observations might instead be unavailable at a particular prediction time. These are task-specific information constraints. Precomputing cross-attention keys and values is valid only while the encoded source and relevant model computation remain unchanged; a new source requires a new memory."
+        ]
       }
     ],
     "exercise": {
@@ -250,6 +282,14 @@
         "paragraphs": [
           "At fixed total width, adding heads makes each matching subspace narrower. It can also change kernel efficiency and attention-memory overhead. Some heads may become redundant, and good performance does not require every head to have a distinct interpretation. Check that D is divisible by H in a simple equal-width implementation, and transpose axes carefully when merging heads. Compare head counts under matched width and training budget to isolate the actual architectural change."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Use the multi-head construction in Attention Is All You Need to count matching spaces and projection dimensions separately. In the 96-wide example, four heads each receive 24 features, and the concatenated result returns to width 96. The output projection then combines those subspaces. This explains why increasing head count at fixed width does not automatically multiply the main projection-parameter budget.",
+          "Inspect intermediate storage as well as weights. An explicit implementation with more heads stores more separate attention maps, even though each map uses narrower query and value features. Head count can therefore alter memory and kernel behavior without changing the residual-stream width. A useful comparison holds width and training data fixed, records per-head width, and measures the actual implementation. Attractive visualizations of individual heads can suggest hypotheses, but they do not establish that every head has a stable, unique human-readable responsibility."
+        ]
       }
     ],
     "exercise": {
@@ -298,6 +338,14 @@
         "title": "Boolean values are API-specific",
         "paragraphs": [
           "PyTorch's functional scaled_dot_product_attention uses True to mean a position participates, while MultiheadAttention key_padding_mask uses True to mean ignore that position. Reusing one boolean mask unchanged can reverse the information policy. Test with a tiny sequence whose future token is deliberately altered: earlier causal outputs should remain unchanged. Also handle rows with no valid keys explicitly, because a naive softmax over entirely masked entries can produce undefined values."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the two PyTorch attention interfaces side by side before reusing a boolean tensor. In SDPA, True permits participation; in MultiheadAttention's key-padding mask, True excludes a position. A mask with the right shape can therefore implement precisely the opposite information policy after an API change. Verify a small example with clearly distinguishable values instead of inferring the convention from the argument name.",
+          "The non-square causal case deserves a separate test. SDPA's upper-left causal alignment for one query and several keys allows only the first key; it does not automatically interpret that query as the newest cached position. For incremental decoding, construct the intended position-aware permission rule or use an appropriate cache-aware interface. A query at the current final position may read the entire valid prefix. Keep that causal decision separate from excluding padded keys and ignoring padded targets in the loss."
         ]
       }
     ],
@@ -353,6 +401,14 @@
         "paragraphs": [
           "A prompt and its continuation can share one causal sequence, so decoder-only does not mean input-free. Conversely, an encoder's bidirectional representations cannot simply be used for next-token prediction without controlling target leakage. Architecture also affects reusable computation: an encoder-decoder can encode a fixed source once, while the decoder repeatedly retrieves from it. Compare systems with the same task framing, because different source-target formatting can change both cost and available information."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the encoder and decoder portions of the Transformer paper as a diagram of permitted information flow. A source token can be contextualized using the fully observed source, while a target prediction must respect the generated prefix. The extra cross-attention path lets a target state retrieve source information without treating the entire source as previously generated target tokens. Trace those permissions before comparing parameter counts.",
+          "The training objective must agree with the mask and target alignment. A lower-triangular self-attention mask allows a position to see its own input token, so next-token labels must be shifted appropriately to avoid asking the model to copy an already visible target. Teacher forcing permits parallel training because the inputs are known, not because future targets become legitimate conditioning information. When reading a decoder-only adaptation, inspect how prompt tokens, continuation tokens, and loss-masked positions are arranged within that same causal sequence."
+        ]
       }
     ],
     "exercise": {
@@ -400,6 +456,14 @@
         "title": "Representing a position is not mastering it",
         "paragraphs": [
           "A sinusoidal formula can be evaluated beyond the training length, but that does not guarantee accurate long-context behavior. Learned tables have an explicit range unless extended or interpolated. Position indices also need to remain consistent when padding, packing, or caching sequences. Test a model with the same content placed at different positions and lengths; a failure can reflect training distribution, positional treatment, or attention access rather than an insufficient vocabulary."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Inspect the positional-encoding formula in the Transformer paper together with the surrounding attention computation. The sine and cosine coordinates are added to token representations before learned projections, so their effects need not remain cleanly separated from content. At position zero, each sine coordinate is zero and each corresponding cosine coordinate is one; later positions change the combination at multiple frequencies.",
+          "An informative comparison separates representing an index from using it successfully. A sinusoidal formula produces coordinates for position 600 without a table lookup, but that only removes an indexing limitation. It does not establish that the trained model can retrieve evidence at unfamiliar distances. Likewise, extending a learned table changes what inputs can be represented without automatically supplying training experience for them. Evaluate content placed at several offsets and lengths while keeping the task itself fixed; this makes positional behavior more interpretable than a single maximum-context number."
         ]
       }
     ],
@@ -450,6 +514,14 @@
         "paragraphs": [
           "During incremental decoding, a newly computed query must use its actual position, not restart from zero. Cached keys need the corresponding rotations from their own positions. Mixing a rotated cache with an inconsistent indexing convention corrupts matching even when tensor shapes look correct. RoPE also does not eliminate long-context limits: changing the frequency schedule or extending context requires careful evaluation of retrieval and task accuracy across positions."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read RoFormer by following the two-dimensional rotation before expanding to many coordinate pairs. The relative-angle identity in this article can be checked using ordinary rotation matrices: a shared rotation cancels from the dot product, while different rotations leave their angle difference. That is the mechanism to identify when examining a library's paired-coordinate layout or a checkpoint's rotary convention.",
+          "The relative-position statement concerns the interaction of given query and key vectors. Those vectors can themselves already contain contextual information, so it does not imply that every attention score is solely a function of distance. For a cache test, compare one full-sequence evaluation with token-by-token evaluation using the same absolute indices and frequencies. Restarting the query position at zero changes the rotation even if all shapes remain valid. Context extensions that change frequencies should be evaluated as changed model behavior, not assumed to preserve the original retrieval geometry."
+        ]
       }
     ],
     "exercise": {
@@ -498,6 +570,14 @@
         "title": "Do not swap the order inside a checkpoint",
         "paragraphs": [
           "Weights trained under one placement generally cannot be moved into the other computation while preserving predictions. When reproducing a paper or loading weights, inspect the exact equations and final normalization. For a controlled comparison, initialize both systems consistently and track gradient norms by depth during the first updates. Pre-norm often improves optimization behavior in deep setups, but it does not imply that every pre-norm model can safely discard warmup or use an arbitrary learning rate."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the pre-LN/post-LN paper with the residual sum highlighted. Moving normalization from after the sum to inside the branch changes which operations lie on the direct path. The zero-branch example here makes that distinction observable without training: x + 0 preserves the representation, whereas LN(x + 0) generally does not. This is a property of the written computation, not a claim about a particular optimizer.",
+          "The paper's optimization observations should be interpreted together with the tested architecture and initialization. A result showing that one setup trains without warmup does not imply that any pre-norm checkpoint can tolerate arbitrary learning rates or residual scales. When comparing implementations, inspect both sublayers and the final normalization outside the block stack. A seemingly minor mismatch there can change predictions even when every tensor loads successfully and all parameter names and shapes appear compatible."
         ]
       }
     ],
@@ -548,6 +628,14 @@
         "paragraphs": [
           "The same FFN parameters are reused at every position, but different contextual inputs yield different activations. Increasing F adds representational capacity and substantial matrix-multiplication cost; attention is not automatically the dominant cost at short sequence lengths. When profiling, measure projections and FFNs separately from pairwise attention. Avoid accidentally flattening the token and feature axes into one dimension, which changes a shared positionwise network into a sequence-length-specific operation."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the positionwise feed-forward description in the Transformer paper while keeping the token axis visible. The same two matrices are applied at every position; the hidden width expands features, not sequence length. The parameter count 2DF therefore does not include a factor of T, although the amount of computation does. This is a useful distinction when estimating the cost of processing a longer prompt.",
+          "A contextual input can make an FFN's output depend indirectly on distant tokens even though the FFN itself never mixes positions. To isolate that fact, compare the same token representation before and after an attention layer has incorporated another token's information. The subsequent positionwise operation receives different inputs and can produce different features. When profiling a Transformer, keep the FFN and projection costs separate from pairwise attention; a long-context complexity argument does not establish which component dominates a short-sequence workload."
+        ]
       }
     ],
     "exercise": {
@@ -597,6 +685,14 @@
         "paragraphs": [
           "SiLU(x) = xσ(x) can be negative and can exceed one, so a SwiGLU gate is not simply a Bernoulli-style probability. Its multiplicative interaction changes activation and gradient scales. Check initialization, normalization, and kernel support when replacing an FFN. Also verify which projection is gated: interchanging weights in a trained checkpoint changes the function, even though the multiplication itself is commutative after both branches have been computed."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read GLU Variants Improve Transformer by identifying the two expanded feature streams and the final down projection. The SwiGLU expression in this article uses SiLU on one branch before elementwise multiplication. Swapping the raw projection weights changes which stream passes through the nonlinearity, so commutativity of multiplication does not justify exchanging those weights in a trained model.",
+          "The three-matrix parameter count provides a concrete way to interpret a reported comparison. At the same hidden width, a gated FFN has more weights than a conventional two-matrix FFN; reducing the width can match that budget. The 1536-to-1024 example follows from equating those counts, before biases and hardware rounding. It does not prove equal latency or identical representational capacity. Inspect the actual hidden widths, activation choice, and measured runtime before attributing an improvement exclusively to gating rather than to a changed parameter or compute budget."
+        ]
       }
     ],
     "exercise": {
@@ -645,6 +741,14 @@
         "title": "Cache savings do not guarantee proportional speedups",
         "paragraphs": [
           "Reducing key-value heads shrinks cache storage and associated bandwidth, but query projections, output projections, FFNs, and other work remain. Quality can also change because heads share part of the representation. A naive implementation that physically repeats keys and values may lose the intended memory benefit. Check whether the attention kernel supports grouped heads, and compare end-to-end decoding at matched batch size, context length, and precision."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Compare the multi-query decoding paper with GQA by counting query heads and key-value heads independently. The cache equation uses H_kv because future queries reuse stored keys and values, not old queries. In the sixteen-query-head, four-KV-head example, each group shares a source representation while retaining distinct query projections. This is a structural sharing choice rather than a reduction in the number of generated output positions.",
+          "The ideal cache ratio is only one component of an efficiency claim. Physically repeating KV tensors to imitate grouped heads can increase temporary memory or traffic, while specialized kernels may preserve the sharing more effectively. Query projections, output projections, and FFNs also remain. Read quality and runtime results as measurements under specified architecture and serving conditions. A fourfold reduction in cache elements does not establish a fourfold reduction in request latency, especially when weights or other operations dominate the workload."
         ]
       }
     ],
@@ -701,6 +805,14 @@
         "paragraphs": [
           "Position indices, masks, model weights, and preprocessing must match between full and cached evaluation. Changing an earlier token invalidates affected cached states. Training-time dropout or changing parameters also breaks straightforward reuse assumptions. Compare last-token logits from a full-prefix forward pass with incremental cached logits on a tiny example. Small numerical differences can arise from kernels, but a large mismatch usually indicates an indexing or masking error."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Use the incremental-decoding discussion in the multi-query paper to identify exactly what is reused. Each layer keeps historical keys and values because a new query needs to compare with that history and retrieve its content. Past queries are not the memory needed for later attention. The byte-count example here makes the two stored tensors explicit and keeps sequence length, layer count, KV-head count, and element size as separate factors.",
+          "A cache-validity test should compare the same prediction, not merely two sequences of plausible generated tokens. Feed an identical prefix to a full forward pass and an incremental computation, then compare the next-token logits under matching positions and masks. If an earlier token or model parameter changes, dependent cached states are stale. Deterministic evaluation removes dropout randomness but does not remove floating-point differences caused by different kernel shapes. Small tolerances can be appropriate; a large mismatch needs a causal explanation."
+        ]
       }
     ],
     "exercise": {
@@ -754,6 +866,14 @@
         "paragraphs": [
           "Measure time to first token, time between generated tokens, complete request latency, and throughput under a stated concurrency level. Include tokenization, queuing, and transfer overhead when they matter to the user experience. Warm up kernels and synchronize timing boundaries appropriately. A short-prompt benchmark with long outputs emphasizes decode; a long-document summarization request can be dominated by prefill. Benchmark both if the application serves both."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read Efficiently Scaling Transformer Inference alongside the multi-query decoding cost analysis, keeping the number of simultaneous queries in mind. A prompt offers many known positions to process together, while one sequence's next generated token depends on the previous choice. The distinction changes matrix shapes and opportunities to reuse loaded data. FlashAttention provides a complementary perspective on attention's memory traffic, but an attention-kernel improvement alone is not a complete serving-system latency result.",
+          "For the timing example, explicitly define whether the first emitted token is included in startup time. With that convention, an N-token answer takes approximately 0.2 + (N − 1)/20 seconds on A and 1 + (N − 1)/50 seconds on B. Their crossover is between 27 and 28 tokens. This calculation illustrates why both time to first token and subsequent token rate matter. Real comparisons must also state concurrency, queueing, prompt lengths, output lengths, and any batching policy."
+        ]
       }
     ],
     "exercise": {
@@ -776,6 +896,12 @@
         "url": "https://arxiv.org/abs/2205.14135",
         "kind": "paper",
         "note": "Relate large attention workloads to GPU memory traffic and tiling."
+      },
+      {
+        "title": "Efficiently Scaling Transformer Inference",
+        "url": "https://arxiv.org/abs/2211.05102",
+        "kind": "paper",
+        "note": "Compare the separate prefill and decode measurements and latency/throughput trade-offs under stated batch sizes and hardware configurations."
       }
     ]
   },
@@ -807,6 +933,14 @@
         "title": "Quadratic arithmetic still exists",
         "paragraphs": [
           "Dense FlashAttention still performs all relevant query-key interactions, so its pairwise arithmetic remains quadratic in sequence length. It reduces memory use and I/O, not the fundamental number of dense pairs. Floating-point operation order can produce small numerical differences from a reference implementation. Speed also depends on dimensions, dtype, masks, and supported hardware. Compare outputs and gradients on a small case, then measure peak memory and end-to-end runtime on the target workload."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the FlashAttention algorithm by tracking what crosses the boundary between fast on-chip storage and main GPU memory. The compact attention equation does not require a particular schedule of intermediate writes. Tiling changes that schedule, while online normalization preserves the required weighted sum. When a new tile raises a row's running maximum from m to m′, old exponential accumulations must be rescaled consistently by exp(m − m′).",
+          "That accounting is the key distinction from approximations that remove token interactions. A dense tiled implementation still considers the relevant query-key pairs, so doubling sequence length does not remove the quadratic arithmetic growth. Numerical equality should also be interpreted carefully: changed operation ordering can affect floating-point results even when the real-arithmetic expression is the same. Use a small output-and-gradient comparison to investigate semantics, then measure memory and runtime on the actual supported hardware. The first check cannot establish a GPU speedup."
         ]
       }
     ],
@@ -854,7 +988,7 @@
         "id": "mechanism",
         "title": "Write the dominant terms",
         "paragraphs": [
-          "For sequence length T and model width D, standard projections cost roughly O(TD²). With total head width D, score computation and value mixing cost O(T²D). Naively storing attention weights requires O(BHT²) elements, while a KV cache is linear in T. For B = 2, H = 8, T = 1024, one FP16 attention matrix alone occupies 32 MiB, excluding logits, gradients, and every other layer."
+          "For sequence length T and model width D, standard projections cost roughly O(TD²). With total head width D, score computation and value mixing cost O(T²D). Naively storing attention weights requires O(BHT²) elements, while a KV cache is linear in T. For B = 2, H = 8, T = 1024, the full FP16 attention-weight tensor for one layer contains 16 matrices of size 1024 × 1024 and occupies 32 MiB. Each individual matrix occupies 2 MiB; these counts exclude logits, gradients, and every other layer."
         ],
         "formula": "Pairwise work: O(T²D);  naive score storage: O(BHT²)"
       },
@@ -863,6 +997,14 @@
         "title": "Training and decoding need different accounting",
         "paragraphs": [
           "Training often retains activations for backpropagation. A cached decode step uses one new query, so its attention work grows roughly linearly with the current context length, but generating many tokens sums that cost over growing prefixes. Efficient kernels can avoid storing quadratic matrices without removing pairwise arithmetic. Report actual peak memory and latency together with theoretical counts; memory allocation, fusion, bandwidth, and batch scheduling all affect observed results."
+        ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the Transformer complexity comparison and the FlashAttention memory discussion as statements about different resources. The pairwise O(T²D) term counts interactions, whereas O(BHT²) describes one explicitly stored attention tensor. Eliminating that tensor from memory does not eliminate the interactions. Conversely, a KV cache has a different purpose and grows linearly with retained context for a fixed architecture.",
+          "Use the 32 MiB example as an accounting exercise rather than a prediction of total device memory. It includes the full batched, multi-head FP16 attention-weight tensor for one layer and excludes other layers, logits, saved activations, gradients, optimizer state, and allocator overhead. A training-memory estimate and a decoding-memory estimate should list different categories. For generation, also distinguish cost per step from cost over the whole continuation: one new query scans a growing context, and summing many such steps accumulates the work. Theoretical scaling becomes useful only after those boundaries are stated."
         ]
       }
     ],
@@ -921,6 +1063,14 @@
         "paragraphs": [
           "First verify that output shape equals input shape and gradients reach every intended parameter. Next, change only future input positions and confirm earlier outputs are unchanged. Set both residual branches to zero and check that the block becomes an identity map. Finally, compare the explicit attention calculation with a trusted implementation on a tiny fixed input. This educational block omits padding masks and caching, so batches must contain fully valid sequences of equal length."
         ]
+      },
+      {
+        "id": "source-reading",
+        "title": "Reading the original source",
+        "paragraphs": [
+          "Read the Transformer equations for attention and FFNs together with the separate pre-LN reference. The original Transformer used post-LN, whereas TinyBlock deliberately normalizes before each residual branch. That distinction should be explicit when comparing its outputs or loading weights; this example is a small educational construction, not a compatible reproduction of an arbitrary pretrained architecture.",
+          "The SDPA reference offers a second implementation of the core attention operation for comparison. Set dropout to zero, match the causal mask and scale, and compare the explicit attention result before checking the complete block. The strongest small tests isolate separate properties: shape preservation, finite gradients, no effect from changed future inputs on earlier outputs, and identity behavior when both residual updates are zero. Passing them supports the implemented block's stated invariants. It does not validate omitted components such as padding handling, positional encoding, caching, tokenization, or a language-model training objective."
+        ]
       }
     ],
     "exercise": {
@@ -943,6 +1093,12 @@
         "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
         "kind": "guide",
         "note": "Compare the explicit computation with the library reference implementation."
+      },
+      {
+        "title": "On Layer Normalization in the Transformer Architecture",
+        "url": "https://arxiv.org/abs/2002.04745",
+        "kind": "paper",
+        "note": "Compare pre-LN and post-LN residual equations; this educational block uses pre-LN, while the original Transformer used post-LN."
       }
     ]
   }

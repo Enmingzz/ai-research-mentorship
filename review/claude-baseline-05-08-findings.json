@@ -1,0 +1,406 @@
+{
+  "reviewer": "Claude (claude-opus-5-5), independent technical proofreading pass, no tools, browsing, or code execution",
+  "reviewedTopicIds": [
+    "05-01",
+    "05-02",
+    "05-03",
+    "05-04",
+    "05-05",
+    "05-06",
+    "05-07",
+    "05-08",
+    "05-09",
+    "05-10",
+    "05-11",
+    "05-12",
+    "05-13",
+    "05-14",
+    "06-01",
+    "06-02",
+    "06-03",
+    "06-04",
+    "06-05",
+    "06-06",
+    "06-07",
+    "06-08",
+    "06-09",
+    "06-10",
+    "06-11",
+    "06-12",
+    "07-01",
+    "07-02",
+    "07-03",
+    "07-04",
+    "07-05",
+    "07-06",
+    "07-07",
+    "07-08",
+    "07-09",
+    "07-10",
+    "07-11",
+    "08-01",
+    "08-02",
+    "08-03",
+    "08-04",
+    "08-05",
+    "08-06",
+    "08-07",
+    "08-08",
+    "08-09",
+    "08-10",
+    "08-11",
+    "08-12",
+    "08-13",
+    "08-14"
+  ],
+  "findings": [
+    {
+      "topicId": "05-02",
+      "severity": "low",
+      "confidence": "high",
+      "location": "sections.practice, final sentence",
+      "originalText": "Longer vocabularies may shorten sequences but enlarge embeddings and output projections",
+      "problem": "Terminology slip. Vocabularies are larger or smaller, not longer. 'Longer' could be misread as referring to longer tokens or longer sequences, which reverses the intended trade-off.",
+      "suggestedCorrection": "Larger vocabularies may shorten tokenized sequences but enlarge the embedding table and output projection.",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "05-03",
+      "severity": "low",
+      "confidence": "high",
+      "location": "sections.mechanism, 'Trace a four-token example'",
+      "originalText": "For [BOS, A, B, EOS] ... Logits have shape [B, T−1, V]",
+      "problem": "Notation collision. In the same paragraph, 'B' is both a token in the example sequence and the batch dimension. T is also left implicit (T = 4 here, so T−1 = 3). Mentees tracing the example by hand can conflate the two meanings of B.",
+      "suggestedCorrection": "Rename the batch dimension (e.g., [N_batch, T−1, V]) or rename the example tokens (e.g., [BOS, x, y, EOS]). State that T = 4 is the full sequence length, so T−1 = 3 target positions.",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "05-06",
+      "severity": "low",
+      "confidence": "high",
+      "location": "sections.intuition first sentence; exercise answer",
+      "originalText": "BERT uses bidirectional encoding trained with a masked-token objective ... BERT reads bidirectionally and predicts masked tokens",
+      "problem": "Incomplete description of the original BERT objective. The cited BERT paper pretrains with masked language modeling plus next-sentence prediction (NSP). The article frames 'BERT versus LLaMA' as an objective comparison, so omitting NSP makes the objective description inaccurate for the original model. Later variants such as RoBERTa dropped NSP.",
+      "suggestedCorrection": "Original BERT is pretrained with a masked-language-modeling objective plus a next-sentence-prediction objective; many later encoder variants drop NSP.",
+      "verificationNeeded": false,
+      "sourceUrls": [
+        "https://arxiv.org/abs/1810.04805"
+      ]
+    },
+    {
+      "topicId": "05-07",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "references",
+      "originalText": "References: LLaMA (2302.13971); InstructGPT (2203.02155)",
+      "problem": "Source-support gap. The article's distinctive claim concerns continued (domain-adaptive) pretraining and its retention trade-offs. Neither cited source studies continued pretraining. LLaMA covers from-scratch pretraining, and InstructGPT covers SFT and RLHF. The SFT claims are supported; the continued-pretraining claims are not.",
+      "suggestedCorrection": "Add a primary source on domain- and task-adaptive continued pretraining, e.g., Gururangan et al., 'Don't Stop Pretraining' (believed to be arXiv:2004.10964). Alternatively, label the continued-pretraining paragraph as general practice rather than a cited claim.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2004.10964"
+      ]
+    },
+    {
+      "topicId": "05-09",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "sections.mechanism; takeaways[0]",
+      "originalText": "Temperature rescales logits; top-k and top-p remove candidates.",
+      "problem": "Potential misconception when the controls are combined. A positive temperature never changes the top-k candidate set, because ranking is preserved. It does change which tokens fall inside the top-p nucleus: a sharper distribution reaches p with fewer tokens, and a flatter one needs more. Libraries also differ in the order they apply temperature and truncation. The article presents these as 'separate generation controls' without noting this interaction, which matters for reproducing reported decoding settings.",
+      "suggestedCorrection": "Add: 'When combined, temperature applied before top-p changes how many tokens enter the nucleus (top-k membership is unaffected by any positive temperature). Report the order in which your implementation applies these operations.'",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/1904.09751"
+      ]
+    },
+    {
+      "topicId": "05-13",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "sections.mechanism and exercise (packing and document-aware masking); references",
+      "originalText": "Packing concatenates shorter examples ... A block-diagonal attention policy and ordinary concatenation are different training objectives.",
+      "problem": "Source-support gap. The packing and cross-document masking claims are technically sound, but neither cited reference addresses them. Lee et al. covers deduplication, and LLaMA covers corpus composition. Mentees following the references will not find support for the packing discussion.",
+      "suggestedCorrection": "Cite a source on packing without cross-contamination, e.g., Krell et al., 'Efficient Sequence Packing without Cross-contamination' (believed to be arXiv:2107.02027; verify). Alternatively, mark the packing paragraph as engineering practice.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2107.02027"
+      ]
+    },
+    {
+      "topicId": "06-05",
+      "severity": "low",
+      "confidence": "low",
+      "location": "references (same URL also in 06-06, 06-08, 06-12)",
+      "originalText": "https://huggingface.co/docs/peft/v0.21.0/package_reference/lora",
+      "problem": "Version-pinned documentation URL that this pass could not verify. I cannot confirm that a v0.21.0 docs path exists or that it documents the claimed behaviors (rank_pattern, initialization options, quantized-LoRA restrictions). Version-pinned API claims go stale quickly.",
+      "suggestedCorrection": "Confirm the URL resolves and matches the PEFT version the course environment installs. Otherwise link the unversioned page (https://huggingface.co/docs/peft/package_reference/lora) and tell readers to check the installed version.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://huggingface.co/docs/peft/v0.21.0/package_reference/lora"
+      ]
+    },
+    {
+      "topicId": "07-02",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "sections.practice, debugging test",
+      "originalText": "A useful debugging test sends every token to one chosen expert and checks that the layer matches that standalone MLP.",
+      "problem": "The test as stated fails for a correct implementation in a common configuration. With Switch-style top-1 routing that keeps the unnormalized gate probability (described in 07-04), the MoE output equals g·Expert(x), not Expert(x). A learner could wrongly conclude a correct layer is buggy, or 'fix' it by removing the gate.",
+      "suggestedCorrection": "...checks that the layer output equals that standalone MLP's output multiplied by the gate weight, or equals it exactly when the gate is forced to 1 or renormalized top-1 is used.",
+      "verificationNeeded": false,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2101.03961"
+      ]
+    },
+    {
+      "topicId": "07-03",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "exercise answer (and practice section)",
+      "originalText": "For probabilities [0.2, 0.5, 0.3] ... Experts one and two.",
+      "problem": "Ambiguous indexing. The answer is correct only under zero-based indexing, which the practice section uses implicitly ('experts zero and one'). A reader counting naturally would call the selected experts the second and third, so 'experts one and two' may look wrong or be misread as the experts with probabilities 0.2 and 0.5.",
+      "suggestedCorrection": "The experts at zero-based indices 1 and 2 (probabilities 0.5 and 0.3, i.e., the second and third experts). State the zero-based convention once in the practice section.",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    },
+    {
+      "topicId": "07-06",
+      "severity": "low",
+      "confidence": "medium",
+      "location": "sections.mechanism formula",
+      "originalText": "L_balance = E Σₑ fₑ Pₑ",
+      "problem": "Symbol overloading within the MoE unit. Here E is the number of experts, but 07-05 uses E_e(x) for an expert's function, and a leading 'E' is easily read as an expectation operator. The formula also omits the coefficient that the prose says scales the term.",
+      "suggestedCorrection": "Write L_balance = N_E · Σₑ fₑ Pₑ, with N_E the number of experts, and show the total loss as L_task + λ·L_balance. This matches the Switch Transformer form α·N·Σ f_i P_i.",
+      "verificationNeeded": false,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2101.03961"
+      ]
+    },
+    {
+      "topicId": "07-10",
+      "severity": "low",
+      "confidence": "low",
+      "location": "references",
+      "originalText": "DeepSeekMoE ... Inspect the expert design alongside efficiency considerations.",
+      "problem": "Weak source-to-claim fit. The article's core content is all-to-all dispatch in expert parallelism and its communication cost. DeepSeekMoE focuses on specialization through fine-grained and shared experts. Shazeer et al. (2017) discusses bandwidth constraints but predates the standard all-to-all expert-parallel formulation.",
+      "suggestedCorrection": "Add GShard (Lepikhin et al., arXiv:2006.16668) or point to the Switch Transformer's distributed-implementation discussion (already in the library) as the primary reference for all-to-all expert parallelism.",
+      "verificationNeeded": true,
+      "sourceUrls": [
+        "https://arxiv.org/abs/2006.16668",
+        "https://arxiv.org/abs/2101.03961"
+      ]
+    },
+    {
+      "topicId": "08-02",
+      "severity": "low",
+      "confidence": "high",
+      "location": "sections.intuition and sections.mechanism",
+      "originalText": "Each output channel combines information from all input channels within the kernel footprint. ... it has 16 × 3 × 3 × 3 = 432 kernel parameters.",
+      "problem": "True only for standard convolution (groups = 1). Grouped and depthwise convolutions, common in modern CNNs such as MobileNet and ConvNeXt, restrict each output channel to a subset of input channels. They also change the parameter count to C_out·(C_in/groups)·k².",
+      "suggestedCorrection": "In a standard (ungrouped) convolution, each output channel combines all input channels within the kernel footprint. Grouped and depthwise variants restrict this, and their parameter count is C_out·(C_in/groups)·k_h·k_w.",
+      "verificationNeeded": false,
+      "sourceUrls": []
+    }
+  ],
+  "numericalChecks": [
+    {
+      "topicId": "05-01",
+      "calculation": "Sequence probability 0.5·0.25·0.8; NLL as the sum of token NLLs",
+      "result": "0.5·0.25 = 0.125; ·0.8 = 0.1. Token NLLs: −ln0.5 = 0.6931, −ln0.25 = 1.3863, −ln0.8 = 0.2231; sum = 2.3026 = −ln(0.1). Article's 0.1 and ≈2.303 nats are correct."
+    },
+    {
+      "topicId": "05-02",
+      "calculation": "BPE toy merge (a,b)→ab on [a,b,a,b]",
+      "result": "Both adjacent (a,b) pairs merge, giving [ab, ab]. Correct."
+    },
+    {
+      "topicId": "05-03",
+      "calculation": "Four-token example shapes; five real tokens followed by three pads",
+      "result": "[BOS,A,B,EOS] yields 3 inputs and 3 targets, so T−1 = 3. With 5 real tokens, positions 1–4 predict tokens 2–5 (4 targets), and position 5's target is padding and excluded. Answer 4 is correct."
+    },
+    {
+      "topicId": "05-04",
+      "calculation": "Combined perplexity of equal-length sequences with PPL 4 and 16; uniform-predictor perplexity",
+      "result": "ln4 = 1.3863, ln16 = 2.7726, mean = 2.0794 = ln8, so PPL = 8 (the geometric mean). The arithmetic mean of 10 is wrong, as stated. Uniform over V: mean NLL = ln V, so PPL = V. Correct."
+    },
+    {
+      "topicId": "05-09",
+      "calculation": "Top-p = 0.75 on [0.50, 0.30, 0.15, 0.05]",
+      "result": "Cumulative sums are 0.50 (<0.75), then 0.80 (≥0.75), so two tokens are kept. Renormalized: 0.50/0.80 = 0.625 and 0.30/0.80 = 0.375, summing to 1. Correct."
+    },
+    {
+      "topicId": "05-12",
+      "calculation": "Fixed C ≈ 6ND with N doubled",
+      "result": "6·(2N)·D' = 6ND gives D' = D/2. Halving is correct within the approximation."
+    },
+    {
+      "topicId": "05-14",
+      "calculation": "80% vs 81% on 100 questions",
+      "result": "Net difference is 1 question (1 percentage point). Rough unpaired binomial SE per model ≈ sqrt(0.8·0.2/100) = 0.04 (±4 pp), so 1 pp is well within noise. This supports the article's caution; a paired test on disagreements would be the right analysis."
+    },
+    {
+      "topicId": "06-01",
+      "calculation": "Trainable fraction with 100M frozen and 2M adapter parameters; practice-section 1M/100M",
+      "result": "2/102 = 0.019608 ≈ 1.96%. Correct. In the practice section, 1M/100M = 1% relative to full fine-tuning's trainable count, a different denominator. Both are consistent."
+    },
+    {
+      "topicId": "06-02",
+      "calculation": "Can a rank-one update map 0 (2×2) to I₂?",
+      "result": "rank(I₂) = 2 > 1 ≥ rank(uvᵀ), so no; e₁e₁ᵀ + e₂e₂ᵀ = I uses two terms. Correct. Also uvᵀx = (vᵀx)u, so every correction lies along u. Correct."
+    },
+    {
+      "topicId": "06-03",
+      "calculation": "LoRA parameter counts for (8,6,r=2) and (1024,1024,r=8); row-vector shapes",
+      "result": "Full matrix 6·8 = 48; A: 2·8 = 16, B: 6·2 = 12, total 28. Correct. Break-even rank = 48/14 ≈ 3.43. 8·1024 + 1024·8 = 16,384; 1024² = 1,048,576; ratio = 64. Correct. X[b,d_in]·Aᵀ[d_in,r]·Bᵀ[r,d_out] gives [b,d_out]. Correct."
+    },
+    {
+      "topicId": "06-04",
+      "calculation": "s = α/r for (16,8), (16,32); doubling both",
+      "result": "16/8 = 2; 16/32 = 0.5; (2α)/(2r) = α/r unchanged. Correct. Inverted dropout: E[m/(1−p)] = (1−p)/(1−p) = 1, so the expectation is preserved. Correct."
+    },
+    {
+      "topicId": "06-05",
+      "calculation": "Budget equality for four 512×512 projections; 256×1024 at r=4",
+      "result": "Rank 4 per target: 4·(512+512) = 4,096; ×4 = 16,384. Rank 8 on Q and V: 8·1,024 = 8,192; ×2 = 16,384. Equal. Correct. 4·(1024+256) = 5,120; square: 4·2048 = 8,192. Correct."
+    },
+    {
+      "topicId": "06-06",
+      "calculation": "Gradients at B=0 for y = Wx + sBAx",
+      "result": "∂L/∂B = s·g·(Ax)ᵀ, nonzero when A≠0. ∂L/∂A = s·Bᵀ·g·xᵀ = 0 when B=0. Both vanish when A = B = 0. The article's claims are correct."
+    },
+    {
+      "topicId": "06-07",
+      "calculation": "Soft prompt d=768, m=20; adapter and prefix formulas",
+      "result": "20·768 = 15,360. Correct. Bottleneck d·b + b·d = 2db; KV prefix 2·L·m·d. Consistent with the stated approximations."
+    },
+    {
+      "topicId": "06-08",
+      "calculation": "1B parameters at 4 bits vs 2 bytes (decimal GB)",
+      "result": "1e9·0.5 B = 0.5e9 B = 0.5 GB; 1e9·2 B = 2 GB. Correct."
+    },
+    {
+      "topicId": "06-09",
+      "calculation": "Bits per weight with block scales",
+      "result": "4 + 32/64 = 4.5 (matches the QLoRA no-double-quantization accounting). 4 + 16/32 = 4.5. Both correct."
+    },
+    {
+      "topicId": "06-10",
+      "calculation": "rsLoRA multiplier α/√r",
+      "result": "16/√64 = 16/8 = 2; standard 16/64 = 0.25. Correct. From r=16 to 64: √r goes from 4 to 8, so the multiplier halves; standard α/r falls by a factor of 4. Correct."
+    },
+    {
+      "topicId": "06-11",
+      "calculation": "80 ± 2 vs 81 ± 2",
+      "result": "Gap of 1 is smaller than either spread of 2. The 'no' answer is justified."
+    },
+    {
+      "topicId": "07-01",
+      "calculation": "8 experts × 10M with top-2; 6 experts with top-2",
+      "result": "Stored 80M, active 20M, inactive 60M. Correct. 2/6 = 1/3. Correct."
+    },
+    {
+      "topicId": "07-02",
+      "calculation": "Two-matrix expert parameter counts",
+      "result": "16·32·2 = 1,024; ×4 = 4,096. 64·128·2 = 16,384; ×4 = 65,536. Correct. Shapes W₁ ∈ ℝ^(h×d), W₂ ∈ ℝ^(d×h) map ℝ^d → ℝ^h → ℝ^d. Correct."
+    },
+    {
+      "topicId": "07-03",
+      "calculation": "Top-2 renormalization",
+      "result": "0.55 + 0.25 = 0.80; 0.55/0.8 = 0.6875; 0.25/0.8 = 0.3125. Exercise: top-2 of [0.2,0.5,0.3] is 0.5 and 0.3 (zero-based indices 1 and 2); 0.5/0.8 = 0.625, 0.3/0.8 = 0.375. Correct."
+    },
+    {
+      "topicId": "07-04",
+      "calculation": "Assignments for T=120, k=2, E=6",
+      "result": "kT = 240; 240/6 = 40 per expert. Correct."
+    },
+    {
+      "topicId": "07-05",
+      "calculation": "Weighted mixtures",
+      "result": "0.75·[2,0] + 0.25·[0,4] = [1.5,0] + [0,1] = [1.5,1]. 0.4·[1,3] + 0.6·[5,1] = [0.4,1.2] + [3.0,0.6] = [3.4,1.8]. Correct."
+    },
+    {
+      "topicId": "07-06",
+      "calculation": "Switch-style balance term N·Σ fP",
+      "result": "Uniform with 4 experts: 4·(4·0.25·0.25) = 4·0.25 = 1. Fully collapsed: 4·(1·1) = 4. Exercise: 2·(0.75·0.6 + 0.25·0.4) = 2·(0.45 + 0.10) = 1.1. All correct."
+    },
+    {
+      "topicId": "07-07",
+      "calculation": "Capacity and overflow",
+      "result": "1.25·(1·64/4) = 1.25·16 = 20; ceil = 20. Overflow 25 − 20 = 5. Exercise: 5/23 = 0.2174 ≈ 21.7%. Correct."
+    },
+    {
+      "topicId": "07-08",
+      "calculation": "Code share 70% vs 80% dataset base rate",
+      "result": "Lift = 0.70/0.80 = 0.875 < 1, so traffic is relatively under-represented in code. Correct."
+    },
+    {
+      "topicId": "07-09",
+      "calculation": "Total and active parameter counts",
+      "result": "20 + 8·10 = 100M total; 20 + 2·10 = 40M active. 30 + 12·5 = 90M total; 30 + 3·5 = 45M active. Correct."
+    },
+    {
+      "topicId": "07-10",
+      "calculation": "Dispatch payload kTdb",
+      "result": "2·1024·2048·2 = 8,388,608 B ≈ 8.39 MB (decimal), which is 8 MiB. Correct. Payload is linear in k, so doubling k doubles it. Correct."
+    },
+    {
+      "topicId": "08-01",
+      "calculation": "Patch counts and raw sizes",
+      "result": "224/16 = 14, 14² = 196. 32·32·3 = 3,072; (32/8)² = 16 patches; 8·8·3 = 192 values per patch. Correct."
+    },
+    {
+      "topicId": "08-02",
+      "calculation": "Conv output size and parameters",
+      "result": "k=3, p=1, s=1: (32 + 2 − 2 − 1)/1 + 1 = 32. Preserved. Correct. 16·3·3·3 = 432. Correct. Stride 2: (31)/2 = 15.5, +1 = 16.5, floor = 16. Correct (equivalent to PyTorch's floor(31/2) + 1 = 16)."
+    },
+    {
+      "topicId": "08-03",
+      "calculation": "ViT sequence lengths",
+      "result": "224/16 = 14, 196 patches; 3·16·16 = 768 raw values per patch; +CLS gives 197. 256/16 = 16, 256 patches, +1 gives 257. Correct."
+    },
+    {
+      "topicId": "08-04",
+      "calculation": "Attention matrix growth from 196 to 784 tokens",
+      "result": "784/196 = 4; 196² = 38,416; 784² = 614,656; ratio = 16. Doubling H and W quadruples N, so the N² term grows 16×. Correct."
+    },
+    {
+      "topicId": "08-05",
+      "calculation": "Horizontal flip of [10,30] with W=100",
+      "result": "[100−30, 100−10] = [70, 90], order preserved. Correct."
+    },
+    {
+      "topicId": "08-07",
+      "calculation": "InfoNCE with scores 2 vs 0 at τ=1; 8 equal candidates",
+      "result": "e² = 7.389; 7.389/8.389 = 0.8808; −ln(0.8808) = 0.1269. Equal scores: p = 1/8, loss = ln8 = 2.0794. Correct."
+    },
+    {
+      "topicId": "08-08",
+      "calculation": "Similarity matrix for 32 images and 32 captions",
+      "result": "[32,512]·[512,32] = [32,32], 1,024 scores. Correct."
+    },
+    {
+      "topicId": "08-09",
+      "calculation": "Temperature scaling of cosines 0.3 and 0.2",
+      "result": "τ = 0.1 gives logits 3 and 2, softmax top = 1/(1+e^−1) = 0.731. τ = 0.01 gives logits 30 and 20, top = 1/(1+e^−10) ≈ 0.99995. Ranking unchanged. Correct."
+    },
+    {
+      "topicId": "08-10",
+      "calculation": "Sigmoid pair loss at z=2; pair counts at B=4",
+      "result": "Positive: ln(1 + e^−2) = ln(1.1353) = 0.1269. Negative: ln(1 + e²) = ln(8.389) = 2.1269. 4² = 16 pairs: 4 diagonal and 12 off-diagonal (= B(B−1)). Correct."
+    },
+    {
+      "topicId": "08-12",
+      "calculation": "Global average pool of [B,14,14,768]",
+      "result": "Averaging over 14·14 = 196 positions gives [B,768]. A sum is permutation-invariant, so permuted maps pool identically. Correct."
+    },
+    {
+      "topicId": "08-13",
+      "calculation": "Mask IoU for two 100-pixel masks overlapping on 60",
+      "result": "Union = 100 + 100 − 60 = 140; IoU = 60/140 = 0.4286. Correct."
+    }
+  ],
+  "overallAssessment": "All 51 articles were reviewed. The library is technically careful. Every numerical example and exercise answer I recomputed by hand is correct, and that covers every explicit calculation in the set. Formula signs and conventions also checked out: chain-rule factorization, NLL and perplexity aggregation, the temperature softmax, LoRA shapes in both column- and row-vector form, α/r and α/√r scaling, inverted dropout, Switch capacity and balance loss, InfoNCE, the SigLIP softplus loss, conv output size, and IoU. Architecture statements match my knowledge of the primary papers: LLaMA's pre-norm, RMSNorm, RoPE, and SwiGLU; Switch top-1; Mixtral top-2; DeepSeekMoE fine-grained and shared experts; QLoRA NF4 with block-64 FP32 constants (0.5 bits per weight); the DINO EMA teacher; and the SAM and SAM 2 interfaces. Claims are consistently hedged, so there are no unjustified guarantees. I found no high- or medium-severity definite errors. The findings are low severity: one terminology slip, notation collisions, an incomplete description of BERT's original objective, an omitted temperature/top-p interaction, a debugging test that fails for correct gated implementations, an indexing ambiguity, a conv statement that holds only for ungrouped convolutions, and several places where cited sources do not directly support a specific claim. This review does not establish that the content is error-free.",
+  "limitations": "Tools were disabled. No papers, documentation pages, or URLs were opened, and no code was executed. All arithmetic was done by hand. Statements about paper contents (BERT's NSP, the QLoRA block size, the Switch loss form, LoRA initialization, Mixtral routing, and others) come from memory of the primary sources and should be spot-checked. The arXiv identifiers in the articles match my recollection of the named papers, but I could not confirm that the Hugging Face guide URLs currently resolve or contain the described sections. The version-pinned PEFT v0.21.0 URL is unverified. The identifiers for references I suggested adding (2004.10964, 2107.02027, 2006.16668) are given from memory and are marked for verification. The prerequisite topics referenced (e.g., 01-xx through 04-xx) were not supplied, so I could not check cross-article consistency with them. Pedagogical judgments about mentee confusion are reviewer opinion, not empirical findings."
+}

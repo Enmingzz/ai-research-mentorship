@@ -11,7 +11,7 @@
     "kind": "book",
     "url": "https://www.deeplearningbook.org/",
     "level": "essential",
-    "note": "Read chapters 2–5 for math and probability, then connect networks, regularization, and optimization in chapters 6–8."
+    "note": "A reference for the mathematical language used throughout the library. Chapters 2–5 connect linear algebra, probability, numerical computation, and statistical learning; chapters 6–8 develop networks, regularization, and optimization. Chapters 9–10 cover convolutional and recurrent sequence models. Follow the assumptions behind each definition, especially when a statement about training loss is extended to unseen data."
   },
   {
     "id": "adam",
@@ -24,7 +24,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1412.6980",
     "level": "essential",
-    "note": "Write out the first and second moment updates and bias correction, then explain how Adam differs from SGD."
+    "note": "Introduces adaptive updates based on moving averages of gradients and squared gradients. Follow the bias corrections from their zero initialization and compare a coordinate-wise update with SGD. The paper also proposes a convex regret analysis; Reddi, Kale, and Kumar later identified a flaw and convex nonconvergence examples in On the Convergence of Adam and Beyond, linked in the Adam article. Empirical usefulness is not a universal convergence guarantee."
   },
   {
     "id": "pytorch-basics",
@@ -37,7 +37,7 @@
     "kind": "guide",
     "url": "https://docs.pytorch.org/tutorials/beginner/basics/intro.html",
     "level": "essential",
-    "note": "Follow the complete workflow: tensors, DataLoader, autograd, training loops, and saving models."
+    "note": "An official, connected example of tensors, datasets, models, automatic differentiation, training, and checkpoints. Trace which objects hold parameters, gradients, and optimizer state. This is implementation documentation rather than a research result; use the version of the API that matches your environment."
   },
   {
     "id": "pytorch-amp",
@@ -50,7 +50,7 @@
     "kind": "guide",
     "url": "https://docs.pytorch.org/tutorials/recipes/recipes/amp_recipe.html",
     "level": "further",
-    "note": "Add autocast and GradScaler to your training loop, then measure speed and GPU memory use."
+    "note": "An official example of combining autocast with gradient scaling for mixed-precision training. Distinguish operation dtype, parameter storage, and gradient range. Scaling is especially relevant to FP16; BF16 has a different exponent range. The useful comparison is measured accuracy, runtime, and memory on the actual model and hardware."
   },
   {
     "id": "resnet",
@@ -64,7 +64,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1512.03385",
     "level": "essential",
-    "note": "Understand residual mappings in ResNet, then check tensor shapes and gradient paths across skip connections."
+    "note": "Studies the optimization of deep image-recognition networks using residual mappings. Follow the identity shortcut and the projection used when shapes change, then compare the controlled depth experiments. A shortcut offers a direct gradient path, but does not by itself guarantee stable optimization or improved generalization in every network."
   },
   {
     "id": "layernorm",
@@ -77,7 +77,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1607.06450",
     "level": "further",
-    "note": "Mark the dimensions used for normalization and compare the statistics in LayerNorm and BatchNorm."
+    "note": "Defines normalization using statistics within an individual example rather than across a minibatch. Identify exactly which feature axes enter the mean and variance, and where the learned scale and bias act. This axis-based view makes the differences from BatchNorm precise and helps interpret later Transformer variants."
   },
   {
     "id": "attention",
@@ -90,7 +90,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1706.03762",
     "level": "essential",
-    "note": "Work through Q/K/V, the scaling factor, multi-head attention, and the FFN, labeling every tensor shape."
+    "note": "The original Transformer paper connects scaled dot-product attention, multiple heads, positional information, and an encoder–decoder architecture. Trace Q, K, and V shapes before reading the experimental comparisons. Keep its specific block design separate from later decoder-only models, normalization placements, and positional encodings."
   },
   {
     "id": "rope",
@@ -103,7 +103,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2104.09864",
     "level": "essential",
-    "note": "Understand RoPE through 2D rotations and derive how relative position enters the Q–K dot product."
+    "note": "Introduces rotary position embeddings through rotations of query and key coordinates. Follow how the two positions enter their dot product through a relative offset. This algebra explains the positional interaction; successful extrapolation to much longer sequences also depends on the frequency choices, training distribution, and inference setup."
   },
   {
     "id": "flashattention",
@@ -117,7 +117,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2205.14135",
     "level": "further",
-    "note": "Distinguish arithmetic complexity from GPU memory I/O, and explain how tiling and recomputation reduce memory costs."
+    "note": "Reorganizes exact attention around GPU memory movement using tiling and online softmax. Follow which intermediate matrices are materialized and what is recomputed in the backward pass. The gain concerns memory traffic and storage; dense pairwise attention arithmetic remains quadratic in sequence length."
   },
   {
     "id": "llama",
@@ -130,7 +130,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2302.13971",
     "level": "essential",
-    "note": "Trace the data, normalization, positional encoding, and pretraining pipeline of a decoder-only model."
+    "note": "Describes the original LLaMA family and its decoder architecture, data mixture, and pretraining choices. Connect RMSNorm, rotary embeddings, and SwiGLU to the corresponding concept articles. Interpret the reported results under the paper’s model sizes and training setup rather than assuming every later Llama model uses identical details."
   },
   {
     "id": "scaling-laws",
@@ -143,7 +143,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2001.08361",
     "level": "further",
-    "note": "Read the curves for model size, dataset size, and compute budget, then discuss the limits of these empirical laws."
+    "note": "Fits empirical relationships between language-model loss, parameter count, data, and compute. Inspect which variables are held fixed and which training regimes are compared. Compare with Hoffmann et al., Training Compute-Optimal Large Language Models, linked in the scaling-laws article: its experimental protocol led to a different parameter/data allocation. A fitted scaling prescription should not be treated as a universal constant."
   },
   {
     "id": "lora",
@@ -156,7 +156,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2106.09685",
     "level": "essential",
-    "note": "Derive the parameter count of a low-rank update, implement a LoRA linear layer, and compare ranks and target layers."
+    "note": "Models an update to a frozen weight matrix as a product of two smaller trainable matrices. Read the forward equation together with the initialization and target-layer experiments, then count adapter parameters. Low rank constrains the update, not the rank of the complete pretrained matrix or the complexity of the entire model."
   },
   {
     "id": "qlora",
@@ -169,7 +169,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2305.14314",
     "level": "essential",
-    "note": "Separate frozen quantized weights from trainable adapters, and understand NF4, double quantization, and memory use."
+    "note": "Combines a frozen quantized backbone with trainable low-rank adapters, using NF4, double quantization, and paged optimizers to reduce memory requirements. Separate stored weight precision from computation and optimizer-state precision. Four-bit storage does not imply that all operations or all training memory use four bits."
   },
   {
     "id": "switch-transformer",
@@ -182,7 +182,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2101.03961",
     "level": "essential",
-    "note": "Understand top-1 routing, capacity limits, and load balancing; use routing histograms to check for expert collapse."
+    "note": "Simplifies sparse expert routing to one selected expert per token and studies balancing, capacity, and training stability. Trace the router probability and auxiliary objective alongside the dispatch rules. Sparse activation reduces expert computation, while communication, shared layers, and capacity handling still contribute to practical cost."
   },
   {
     "id": "mixtral",
@@ -195,7 +195,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2401.04088",
     "level": "essential",
-    "note": "Compare sparse experts with dense FFNs, and explain total parameters, active parameters, and compute costs."
+    "note": "Describes a sparse model with eight feedforward experts and two selected experts per token in each expert layer. Compare total parameters with the shared and selected parameters involved in an inference step. The routing choice saves some computation, but the reported active count is not a guarantee of proportional wall-clock speedup."
   },
   {
     "id": "vit",
@@ -208,7 +208,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2010.11929",
     "level": "essential",
-    "note": "Start with patch embeddings and trace ViT's sequence length, CLS token, and positional encodings."
+    "note": "Treats an image as a sequence of embedded patches processed by a Transformer. Follow patch size, sequence length, positional embeddings, and the classification representation, then inspect the pretraining and transfer experiments. The paper’s results depend on data scale and training choices; they do not imply that Transformers always outperform CNNs."
   },
   {
     "id": "clip",
@@ -221,7 +221,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2103.00020",
     "level": "essential",
-    "note": "Write out CLIP's bidirectional contrastive loss and explain how text prompts enable zero-shot classification."
+    "note": "Learns aligned image and text embeddings from paired data using a symmetric contrastive objective. Inspect normalized similarities, the learned logit scale, and the conversion of class names into text prompts. This supports retrieval and zero-shot classification; CLIP itself is not an autoregressive visual-question-answering model."
   },
   {
     "id": "dino",
@@ -234,7 +234,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2104.14294",
     "level": "further",
-    "note": "Compare DINO's self-distillation objective with CLIP's image–text alignment, and explore uses for patch features."
+    "note": "Learns visual representations by matching a student to a moving-average teacher across augmented views. Follow the roles of centering, sharpening, and stop-gradient rather than assuming the labels come from text. The paper’s visual features and attention maps are empirical findings under its training setup, not universal segmentation guarantees."
   },
   {
     "id": "vae",
@@ -247,7 +247,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1312.6114",
     "level": "essential",
-    "note": "Derive the VAE's ELBO and explain how reparameterization enables backpropagation through stochastic latent variables."
+    "note": "Derives a tractable evidence lower bound and uses reparameterization to optimize a probabilistic latent-variable model. Connect the reconstruction expectation and prior KL to the approximate posterior. The bound’s gap is a posterior KL; a low reconstruction error alone does not establish an accurate likelihood or useful generative prior."
   },
   {
     "id": "ddpm",
@@ -260,7 +260,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2006.11239",
     "level": "essential",
-    "note": "Connect the forward noising process, noise prediction loss, and reverse sampling; plot a noise schedule yourself."
+    "note": "Defines a Gaussian forward noising process and learns reverse denoising transitions. Track the distinction between a single-step noise variance and the cumulative signal coefficient, then compare the variational objective with the simplified noise-prediction loss. Sampling quality depends on the trained model and the chosen reverse procedure."
   },
   {
     "id": "flow-matching",
@@ -273,7 +273,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2210.02747",
     "level": "further",
-    "note": "Use a 2D toy distribution to understand probability paths, velocity field regression, and ODE sampling."
+    "note": "Trains a continuous-time velocity field by regression using conditional probability paths. Follow why conditional targets can produce the desired marginal field and how an ODE solver generates samples afterward. The path, endpoint coupling, and solver are distinct choices; training on straight conditional paths does not guarantee every learned trajectory is straight."
   },
   {
     "id": "llava",
@@ -286,7 +286,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2304.08485",
     "level": "essential",
-    "note": "Draw LLaVA's vision encoder → projector → LLM pipeline, and distinguish alignment from instruction tuning."
+    "note": "Connects a pretrained visual encoder to a language model and studies visual instruction tuning. Read the modality-alignment and instruction-tuning stages alongside which components are frozen or updated. The original paper’s projector and data setup should be distinguished from later LLaVA variants and from Q-Former-based approaches."
   },
   {
     "id": "blip2",
@@ -299,7 +299,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2301.12597",
     "level": "essential",
-    "note": "Understand how Q-Former queries connect a frozen vision encoder with a frozen language model."
+    "note": "Uses a trainable Q-Former to bridge a frozen image encoder and a frozen language model. Inspect what the learnable queries attend to and how the training objectives change across stages. Its fixed query representation is a learned interface; it is neither a simple patch average nor a guarantee that every visual detail is retained."
   },
   {
     "id": "qwen25vl",
@@ -312,7 +312,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2502.13923",
     "level": "further",
-    "note": "Focus on dynamic resolution, visual tokens, and temporal encoding; trace the path from an image to an answer."
+    "note": "Describes a generative vision-language model with dynamic-resolution visual processing and time-aware video representations. Trace the visual encoder, spatial merging, and language-model input separately. Compare visual token counts only after specifying image preprocessing and merging; patch counts, language-model tokens, and video time positions are different quantities."
   },
   {
     "id": "distillation",
@@ -326,7 +326,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1503.02531",
     "level": "essential",
-    "note": "Understand soft targets and temperature, write the distillation loss, and explain the teacher and student roles."
+    "note": "Uses a teacher’s softened output distribution as a learning signal for a student. Follow temperature in both networks and the scaling of the soft-target term, alongside any hard-label loss. Teacher probabilities can carry useful class relationships, but they can also transmit teacher errors and do not establish factual correctness."
   },
   {
     "id": "llm-int8",
@@ -339,7 +339,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2208.07339",
     "level": "further",
-    "note": "Understand how outliers affect quantization error, and report accuracy, inference latency, and peak GPU memory."
+    "note": "Addresses large activation outliers with a mixed-precision matrix-multiplication approach. Distinguish the main eight-bit computation from the higher-precision outlier handling. The result motivates measuring accuracy, runtime, and memory together; it should not be summarized as uniformly converting every operation and value to INT8."
   },
   {
     "id": "ppo",
@@ -352,7 +352,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/1707.06347",
     "level": "further",
-    "note": "Plot PPO's clipped objective and explain the probability ratio, advantage, and limits on policy updates."
+    "note": "Optimizes a surrogate based on new-to-old policy probability ratios, using clipping to limit the incentive for certain changes. Work through positive and negative advantages separately. Clipping the objective is not a hard bound on the resulting policy ratio, parameter update, or KL divergence; monitoring remains part of the algorithm’s practical use."
   },
   {
     "id": "dpo",
@@ -365,7 +365,7 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2305.18290",
     "level": "essential",
-    "note": "Build intuition for the DPO loss from preference pairs, explain the reference policy, and compare the workflow with RLHF."
+    "note": "Derives a preference-learning objective using reference-relative log probabilities of chosen and rejected responses. Connect its logistic loss to the assumed preference model and KL-regularized reward formulation. The standard workflow avoids an explicit reward-model training stage, but its behavior still depends on preference data, reference support, and model capacity."
   },
   {
     "id": "instructgpt",
@@ -378,6 +378,6 @@
     "kind": "paper",
     "url": "https://arxiv.org/abs/2203.02155",
     "level": "essential",
-    "note": "Trace the training signals through InstructGPT's SFT, preference data, reward modeling, and PPO stages."
+    "note": "Combines supervised demonstrations, human comparisons, reward modeling, and PPO-based fine-tuning. Follow the distinct data and objectives in each stage rather than treating RLHF as one loss. The human-preference evaluations describe the studied tasks and raters; they do not guarantee general truthfulness, safety, or correctness."
   }
 ]
