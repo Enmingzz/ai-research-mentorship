@@ -90,4 +90,5 @@ assert.equal(escapeHTML('<script>"&'), '&lt;script&gt;&quot;&amp;','Article cont
 execFileSync(process.execPath,['tools/check-interactions.mjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['tools/check-projects.mjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['tools/check-math.mjs'],{stdio:'inherit'});
+execFileSync(process.execPath,['tools/check-subject-map.mjs'],{stdio:'inherit'});
 console.log(`PASS · ${modules.length} subjects · ${topics.length} complete articles · ${papers.length} curated readings · references, navigation, content and JavaScript`);

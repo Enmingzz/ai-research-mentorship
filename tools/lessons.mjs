@@ -54,7 +54,7 @@ export function lessonDocument(lesson,library) {
 <aside class="sidebar" aria-label="Library navigation">
 <a class="brand" href="../../"><span class="brand-mark">e<span>g</span></span><span>enming<br><b>group</b></span></a>
 <div class="space-label">ENMING GROUP / REFERENCE LIBRARY</div>
-<nav><a href="../../"><span aria-hidden="true">◈</span>Research projects</a><a href="../../library.html#overview"><span aria-hidden="true">◈</span>Library overview</a><a href="../../library.html#subjects"><span aria-hidden="true">▤</span>Subjects</a><a class="active" href="../../library.html#articles"><span aria-hidden="true">▦</span>Articles</a><a href="../../library.html#papers"><span aria-hidden="true">↗</span>Papers & resources</a></nav>
+<nav><a href="../../"><span aria-hidden="true">◈</span>Research projects</a><a href="../../library.html#subjects"><span aria-hidden="true">▤</span>Subject map</a><a class="active" href="../../library.html#articles"><span aria-hidden="true">▦</span>Articles</a><a href="../../library.html#papers"><span aria-hidden="true">↗</span>Papers & resources</a></nav>
 <div class="side-path"><div class="eyebrow">BROWSE THE LIBRARY</div><a href="../../library.html#articles">All ${lessons.length} articles <span>↗</span></a><a href="../../library.html#subject/${subject.id}">Subject ${subject.id} <span>↗</span></a></div>
 <div class="sidebar-bottom"><div class="eyebrow">IDEAS, METHODS & SOURCES</div><p>Technical explanations and original references.</p></div>
 </aside>

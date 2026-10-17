@@ -1,0 +1,114 @@
+{
+  "note": "Choose a direction, follow useful connections, and revisit foundations when needed. Connections show suggested background, not mandatory prerequisites; subjects within the same stage can be explored in parallel.",
+  "nodes": [
+    {
+      "id": "01",
+      "label": "Mathematics & ML",
+      "caption": "Understand shapes, probability, and optimization.",
+      "branch": "foundations"
+    },
+    {
+      "id": "02",
+      "label": "Engineering",
+      "caption": "Turn ideas into reproducible experiments.",
+      "branch": "foundations"
+    },
+    {
+      "id": "03",
+      "label": "Neural Networks",
+      "caption": "Learn the building blocks of neural models.",
+      "branch": "foundations"
+    },
+    {
+      "id": "04",
+      "label": "Transformers",
+      "caption": "Understand attention and Transformer computation.",
+      "branch": "foundations"
+    },
+    {
+      "id": "05",
+      "label": "Language Models",
+      "caption": "Explore how language models learn and generate.",
+      "branch": "language"
+    },
+    {
+      "id": "06",
+      "label": "Fine-Tuning & LoRA",
+      "caption": "Adapt pretrained models with efficient updates.",
+      "branch": "language"
+    },
+    {
+      "id": "07",
+      "label": "Mixture of Experts",
+      "caption": "Explore routing and sparse model capacity.",
+      "branch": "language"
+    },
+    {
+      "id": "08",
+      "label": "Visual Representations",
+      "caption": "Learn visual features and image–text alignment.",
+      "branch": "vision"
+    },
+    {
+      "id": "09",
+      "label": "Generative Models",
+      "caption": "Explore latent models, diffusion, and flow.",
+      "branch": "generative"
+    },
+    {
+      "id": "10",
+      "label": "Vision–Language Models",
+      "caption": "Connect visual representations with language.",
+      "branch": "vision"
+    },
+    {
+      "id": "11",
+      "label": "Efficient Deep Learning",
+      "caption": "Measure and improve memory, speed, and quality.",
+      "branch": "efficiency"
+    },
+    {
+      "id": "12",
+      "label": "Post-Training & RL",
+      "caption": "Explore supervision, preferences, and reinforcement learning.",
+      "branch": "language"
+    }
+  ],
+  "edges": [
+    ["01", "03"],
+    ["02", "03"],
+    ["03", "04"],
+    ["03", "09"],
+    ["04", "05"],
+    ["04", "08"],
+    ["04", "07"],
+    ["04", "11"],
+    ["05", "06"],
+    ["05", "12"],
+    ["05", "10"],
+    ["08", "10"]
+  ],
+  "paths": [
+    {
+      "id": "vlm",
+      "label": "Vision–Language",
+      "description": "Bring language and visual representations together. Explore Language Models and Visual Representations in parallel; optional extensions cover adaptation, efficiency, and alignment.",
+      "stages": [["01", "02"], ["03"], ["04"], ["05", "08"], ["10"]],
+      "extensions": ["06", "11", "12"]
+    },
+    {
+      "id": "language",
+      "label": "Language",
+      "description": "Follow language modeling into post-training and reinforcement learning. Branch into fine-tuning, sparse architectures, or efficiency when useful.",
+      "stages": [["01", "02"], ["03"], ["04"], ["05"], ["12"]],
+      "extensions": ["06", "07", "11"]
+    },
+    {
+      "id": "generative",
+      "label": "Generative",
+      "description": "Explore latent models, diffusion, and flow from neural-network foundations. Optional connections add visual representations, Transformer architectures, and efficiency.",
+      "stages": [["01", "02"], ["03"], ["09"]],
+      "extensions": ["08", "04", "11"]
+    }
+  ]
+}

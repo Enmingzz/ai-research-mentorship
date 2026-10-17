@@ -3,7 +3,7 @@
 A mentee-facing workspace for research projects and tasks, with an AI reference library alongside it. Maintain assignments locally in `data/projects.json` and push updates to publish them. The public website contains no repository-management or source-code backlinks.
 
 - [Research homepage](https://enmingzz.github.io/vlm-project/): shared projects, links, and tasks.
-- [Reference library](https://enmingzz.github.io/vlm-project/library.html): 12 subjects, 174 articles, and 29 reading resources, with featured VLM papers, search, and subject filters.
+- [Subject map](https://enmingzz.github.io/vlm-project/library.html): the library landing page connects 12 subjects through branching reading routes, alongside 174 articles and 29 reading resources.
 - [Example article](https://enmingzz.github.io/vlm-project/learn/04-03/): a standalone explanation with worked examples and original source links.
 
 Built with static HTML, CSS, and JavaScript, with no runtime dependencies. The repository is `Enmingzz/vlm-project`. Article paths remain `learn/<topicId>/` under the new site URL. On this site, `course.html` redirects to `library.html` and older topic hashes still resolve. Use the new site URL for sharing; the previous GitHub Pages base path is no longer the published address.
@@ -61,7 +61,9 @@ When removing a project, first move its tasks to another project or set their `p
 
 ## Use the Library
 
-- Open `library.html` to browse subjects, articles, and papers. Search for an idea or filter by subject.
+- Open `library.html` for the subject map. Mathematics and engineering are parallel starting points; follow suggested connections through neural networks into language, vision, generative models, and other directions.
+- Select the Vision–Language, Language, or Generative route to highlight related subjects. Routes suggest background rather than mandatory prerequisites. Every subject remains available, and subject pages link to useful background and possible next directions.
+- Use **Browse as a list** for the searchable subject index, or **Articles** and **Papers** for their collections. `#overview` and earlier subject bookmarks still resolve; the research project page remains the primary homepage.
 - Every topic links to an English article and relevant papers, textbooks, or official documentation. Original papers appear at the top of each article; a source-reading section connects their motivation, mechanism, assumptions, and limitations to the topic.
 - Articles at `learn/<topicId>/` are static pages that can be shared directly and read without JavaScript. Each has explanations, examples, related concepts, and sources.
 - Readers can open any topic in any order. There are no completion checkboxes, reading statuses, personal notes, schedules, or progress dashboards.
@@ -91,9 +93,12 @@ Research projects and tasks are shared records maintained on GitHub. The library
 | --- | --- |
 | `data/curriculum.json` | Subjects and their topic lists; legacy planning fields are not displayed |
 | `data/papers.json` | Shared reading resources, linked to subjects through `moduleIds` |
+| `data/subject-map.json` | Subject captions, suggested directed connections, and reading routes; independent of article prerequisites |
 | `data/lessons/01.json`–`12.json` | One article and topic-specific reading list per topic |
 
 Subject IDs use `"01"`–`"12"`. The source schema retains the names `modules` and `moduleIds`. Keep topic IDs stable because they identify article URLs. Use only existing topic IDs in article prerequisites.
+
+The subject map uses one node per subject. Its `edges` are `[from, to]` suggestions and must remain acyclic. Each route has sequential `stages`; subjects within one stage can be explored in parallel. `extensions` list optional related directions. The responsive card layout lives in `app.js` and `subject-map.css`; adding or removing subjects also requires updating that layout. Checks validate graph coverage, connected routes, legacy navigation, and access to every article.
 
 Each article has a `topicId`, `title`, `summary`, `prerequisites`, at least three `sections`, an `exercise` with a `prompt` and `answer`, `takeaways`, and `references`. Sections use a unique `id`, a `title`, and a `paragraphs` array. Optional `formula`, `code`, `language`, and `bullets` fields add worked material. Ordinary prose is plain text; HTML is escaped when rendered.
 
