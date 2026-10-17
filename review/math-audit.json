@@ -1,0 +1,47 @@
+{
+  "reviewDate": "2026-10-16",
+  "baselineCommit": "8eaf6a99a2c27bd477c2afb77171bbe8b3518d7e",
+  "scope": "LaTeX notation and build-time typesetting for the English enming group reference library",
+  "coverage": {
+    "articlesReviewed": 174,
+    "subjects": 12,
+    "articlesWithTypesetMath": 143,
+    "displayFormulaFields": 101,
+    "inlineExpressions": 1406,
+    "publishedPagesChecked": 177,
+    "localLinkAndAssetTargetsChecked": 3818,
+    "selfHostedMathFontFiles": 60
+  },
+  "rangeReports": ["review/math-01-04.json", "review/math-05-08.json", "review/math-09-12.json"],
+  "implementation": {
+    "engine": "KaTeX 0.19.0",
+    "rendering": "Build-time HTML plus accessible MathML with TeX annotations; self-hosted CSS and fonts; no runtime math library or CDN",
+    "sourceConvention": "Raw LaTeX in section.formula; explicit \\(...\\) or \\[...\\] delimiters in article prose; doubled backslashes in JSON",
+    "parser": "Explicit delimiters only. Strict parsing fails on invalid TeX or mismatched delimiters. Plain prose and code remain HTML-escaped.",
+    "overflow": "Width-constrained scroll containers preserve long equations. Progressive enhancement names and focuses a scroll container only when its content overflows; checks repeat after resize, fonts, and details changes."
+  },
+  "preservation": {
+    "comparison": "All 174 articles compared programmatically with baseline: titles, summaries, IDs, prerequisites, section IDs/titles, code, references/notes, ordering, and content-field counts unchanged.",
+    "displayCountBeforeAndAfter": 101,
+    "semanticReview": "Each conversion range reviewed its notation. Independent review of all 36 display formulas in 05-08 and high-risk ELBO, KL, CFG, PPO, and DPO expressions in 09-12 found no mathematical-equivalence defects.",
+    "residualScan": "All 12 modules scanned outside explicit math delimiters. One missed guidance-weight variable in 09-14 was corrected. Remaining API/code strings and model names are intentionally plain text."
+  },
+  "validation": {
+    "npmRunCheck": "passed",
+    "npmRunBuild": "passed",
+    "strictMathParsing": "101 display formulas and 1406 inline expressions passed with strict:error and throwOnError:true",
+    "renderingChecks": "Fractions, indices/exponents, matrices, escaped prose, accessible MathML, malformed delimiter rejection, invalid TeX rejection, and self-hosted font paths verified.",
+    "interactionChecks": "DOM adapter verified overflow becoming/ceasing keyboard-focusable, hidden expressions, fonts/details changes, and resize fallback. Supplied test dimensions are not browser layout measurements.",
+    "localHttp": "Five representative article routes (01-01, 04-03, 06-03, 09-04, 12-13), KaTeX CSS, and a WOFF2 font returned HTTP 200; article responses contain rendered MathML.",
+    "browserVisualQA": "Not completed. Native Computer Use stopped because it could not determine the current browser URL confidently enough to enforce policy. No browser automation continued after that stop."
+  },
+  "independentReviewResolution": {
+    "finding": "Overflowing inline formulas lacked consistent keyboard scroll access.",
+    "fix": "Conditional tabindex, named region, visible focus, and layout/font/details refreshes added to the existing article script.",
+    "test": "Overflow state-transition tests passed without adding unnecessary tab stops or moving focus."
+  },
+  "limitations": [
+    "This conversion preserves the reviewed scientific content but is not a new scientific review or a new Claude review. review/content-audit.json remains the historical record of the prior Claude Code passes.",
+    "Desktop/mobile screenshots, real-browser layout, and screen-reader behavior were not verified in this pass. Static HTML/CSS checks and simulated DOM dimensions do not establish visual correctness."
+  ]
+}

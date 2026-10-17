@@ -28,6 +28,11 @@ for(const file of files){
     assert(!/type=["']checkbox["']|id=["'](?:topic-understood|completion-status|backup-dialog|module-notes|start-date)["']/.test(html),`${file}: no personal tracking interface`);
     assert(!/href=["'][^"']*(?:#schedule|course\.html)/.test(html),`${file}: reference navigation excludes the retired course`);
   }
+  if(file.startsWith('learn/')){
+    assert(html.includes('vendor/katex/katex.min.css?v='),`${file}: local mathematical fonts and stylesheet`);
+    assert(!html.includes('class="katex-error"'),`${file}: no failed mathematical rendering`);
+    if(html.includes('class="katex"'))assert(html.includes('class="katex-mathml"')&&html.includes('application/x-tex'),`${file}: accessible pre-rendered mathematics with TeX annotation`);
+  }
   for(const [tag] of html.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g))assert(/rel="[^"]*noopener[^\"]*noreferrer/.test(tag),`${file}: external links isolate the new tab`);
   for(const [,href] of html.matchAll(/(?:href|src)="([^"]+)"/g)){
     if(href.startsWith('#')){
@@ -49,6 +54,9 @@ for(const file of files){
   }
 }
 assert.equal(assetVersions.size,1,'Every published page references the same asset version');
+const mathCSS=await readFile(resolve(root,'vendor/katex/katex.min.css'),'utf8');
+for(const [,font] of mathCSS.matchAll(/url\(([^)]+)\)/g))await access(resolve(root,'vendor/katex',font.replace(/^['"]|['"]$/g,'')));
+await assert.rejects(access(resolve(root,'vendor/katex/katex.mjs')),{code:'ENOENT'},'The build-time renderer is not shipped as runtime JavaScript');
 for(const file of ['app.js','projects.js']){
   const source=await readFile(resolve(root,file),'utf8');
   assert(source.includes(`const BUILD_VERSION = '${[...assetVersions][0]}';`),`${file}: data and assets share the build version`);

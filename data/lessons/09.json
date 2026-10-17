@@ -12,16 +12,16 @@
         "id": "intuition",
         "title": "The bottleneck creates a learning problem",
         "paragraphs": [
-          "An encoder maps an input x to a latent representation z, and a decoder maps z back to a reconstruction. Training minimizes a discrepancy between the reconstruction and the original input. If the network can copy every detail without constraint, it may learn an unhelpful identity map. A small bottleneck, noise, sparsity, or another regularizer can encourage a more useful representation, but none guarantees semantic features by itself."
+          "An encoder maps an input \\(x\\) to a latent representation \\(z\\), and a decoder maps \\(z\\) back to a reconstruction. Training minimizes a discrepancy between the reconstruction and the original input. If the network can copy every detail without constraint, it may learn an unhelpful identity map. A small bottleneck, noise, sparsity, or another regularizer can encourage a more useful representation, but none guarantees semantic features by itself."
         ]
       },
       {
         "id": "mechanism",
         "title": "Follow a simple image example",
         "paragraphs": [
-          "A flattened 28-by-28 grayscale image has 784 values. An encoder might map it to 32 latent values, and a decoder expand those values back to 784 outputs. For normalized continuous pixels, mean squared error is one possible loss; other observation models lead to other losses. The latent coordinate count is smaller, but storing 32 unrestricted floating-point numbers is not yet a complete compression codec. Quantization, metadata, and a coding scheme determine actual storage."
+          "A flattened \\(28\\times28\\) grayscale image has 784 values. An encoder might map it to 32 latent values, and a decoder expand those values back to 784 outputs. For normalized continuous pixels, mean squared error is one possible loss; other observation models lead to other losses. The latent coordinate count is smaller, but storing 32 unrestricted floating-point numbers is not yet a complete compression codec. Quantization, metadata, and a coding scheme determine actual storage."
         ],
-        "formula": "z = encoder(x); x̂ = decoder(z); per-pixel MSE = (1/(N D)) Σₙ₌₁ᴺ Σⱼ₌₁ᴰ (xₙⱼ − x̂ₙⱼ)², with N examples and D pixels"
+        "formula": "\\begin{aligned}z&=\\operatorname{encoder}(x),\\qquad \\hat{x}=\\operatorname{decoder}(z)\\\\ \\operatorname{MSE}_{\\text{per-pixel}}&=\\frac{1}{ND}\\sum_{n=1}^{N}\\sum_{j=1}^{D}(x_{nj}-\\hat{x}_{nj})^2\\\\ &\\text{with }N\\text{ examples and }D\\text{ pixels}\\end{aligned}"
       },
       {
         "id": "practice",
@@ -76,37 +76,37 @@
         "id": "intuition",
         "title": "Represent uncertainty in the latent code",
         "paragraphs": [
-          "A deterministic autoencoder assigns one latent vector to each input. A VAE encoder instead defines an approximate posterior distribution q(z|x), commonly a diagonal Gaussian with learned mean and variance. Sampling from that distribution yields a latent used by a probabilistic decoder p(x|z). A prior p(z), often standard normal, defines how to generate without an observed input. The encoder is an inference mechanism; the prior and decoder together define the generative model."
+          "A deterministic autoencoder assigns one latent vector to each input. A VAE encoder instead defines an approximate posterior distribution \\(q(z\\mid x)\\), commonly a diagonal Gaussian with learned mean and variance. Sampling from that distribution yields a latent used by a probabilistic decoder \\(p(x\\mid z)\\). A prior \\(p(z)\\), often standard normal, defines how to generate without an observed input. The encoder is an inference mechanism; the prior and decoder together define the generative model."
         ]
       },
       {
         "id": "mechanism",
         "title": "Separate inference from generation",
         "paragraphs": [
-          "For reconstruction, compute q(z|x), sample z, and decode. For unconditional generation, sample z from p(z) and decode without using the encoder. These are different latent distributions. Training includes a term that encourages the approximate posterior to remain compatible with the prior, reducing the mismatch between inference-time latents and generative samples. A decoder may output distribution parameters such as pixel means rather than a single unqualified image prediction."
+          "For reconstruction, compute \\(q(z\\mid x)\\), sample \\(z\\), and decode. For unconditional generation, sample \\(z\\) from \\(p(z)\\) and decode without using the encoder. These are different latent distributions. Training includes a term that encourages the approximate posterior to remain compatible with the prior, reducing the mismatch between inference-time latents and generative samples. A decoder may output distribution parameters such as pixel means rather than a single unqualified image prediction."
         ],
-        "formula": "Generative model: p(x,z) = p(z)p(x|z); inference model: q(z|x)"
+        "formula": "\\text{Generative model: }p(x,z)=p(z)p(x\\mid z);\\qquad \\text{inference model: }q(z\\mid x)"
       },
       {
         "id": "practice",
         "title": "A two-dimensional example",
         "paragraphs": [
-          "Suppose an input produces mean [1, −1] and standard deviation [0.2, 0.5]. Repeated latent samples form an ellipse around that mean; the decoder sees related but nonidentical codes. A small variance makes inference nearly deterministic, but the training objective also accounts for how that distribution differs from the prior. Do not interpret every latent axis as an independently meaningful concept merely because the prior factorizes. Evaluate reconstruction, prior samples, and latent sensitivity separately; each reveals a different property of the learned model."
+          "Suppose an input produces mean \\([1,-1]\\) and standard deviation \\([0.2,0.5]\\). Repeated latent samples form an ellipse around that mean; the decoder sees related but nonidentical codes. A small variance makes inference nearly deterministic, but the training objective also accounts for how that distribution differs from the prior. Do not interpret every latent axis as an independently meaningful concept merely because the prior factorizes. Evaluate reconstruction, prior samples, and latent sensitivity separately; each reveals a different property of the learned model."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the paper: two distributions over the latent",
         "paragraphs": [
-          "In Auto-Encoding Variational Bayes, follow the distinction between the generative model pθ(x,z) and the recognition distribution qφ(z|x). The latter is a tractable inference mechanism, not the prior used to generate a new observation. Keep their conditioning variables visible in every equation.",
+          "In Auto-Encoding Variational Bayes, follow the distinction between the generative model \\(p_\\theta(x,z)\\) and the recognition distribution \\(q_\\phi(z\\mid x)\\). The latter is a tractable inference mechanism, not the prior used to generate a new observation. Keep their conditioning variables visible in every equation.",
           "Imagine encoding ten handwritten sevens. Their posterior means may cluster, while each posterior also has its own uncertainty. Sampling those posteriors explores reconstructions around observed sevens; sampling the prior explores the model's overall latent space. These experiments answer different questions even when they use the same decoder.",
           "A useful diagnostic is to compare posterior reconstructions with prior samples at a fixed decoder setting. Good reconstructions accompanied by poor prior samples can expose a mismatch between regions reached by inference and regions emphasized by the prior. Neither experiment alone measures the entire probabilistic model."
         ]
       }
     ],
     "exercise": {
-      "prompt": "Which distribution is used to sample a new unconditional example after VAE training: q(z|x) or p(z)?",
-      "answer": "Use p(z), then sample or decode through p(x|z). q(z|x) requires an observed x and is used for approximate inference or reconstruction."
+      "prompt": "Which distribution is used to sample a new unconditional example after VAE training: \\(q(z\\mid x)\\) or \\(p(z)\\)?",
+      "answer": "Use \\(p(z)\\), then sample or decode through \\(p(x\\mid z)\\). \\(q(z\\mid x)\\) requires an observed \\(x\\) and is used for approximate inference or reconstruction."
     },
     "takeaways": [
       "The encoder approximates inference; the prior and decoder define generation.",
@@ -134,36 +134,36 @@
         "id": "intuition",
         "title": "The marginal likelihood hides an integral",
         "paragraphs": [
-          "A latent model assigns p(x) = ∫p(x,z) dz. Computing this integral exactly is often difficult because the decoder is nonlinear and the latent space is large. Introduce a tractable q(z|x), multiply and divide the integrand by q, and apply Jensen's inequality to the logarithm. This produces a lower bound on log p(x). Optimizing the bound provides a practical objective, but it does not make the approximate posterior exact automatically."
+          "A latent model assigns \\(p(x)=\\int p(x,z)\\,\\mathrm{d}z\\). Computing this integral exactly is often difficult because the decoder is nonlinear and the latent space is large. Introduce a tractable \\(q(z\\mid x)\\), multiply and divide the integrand by \\(q\\), and apply Jensen's inequality to the logarithm. This produces a lower bound on \\(\\log p(x)\\). Optimizing the bound provides a practical objective, but it does not make the approximate posterior exact automatically."
         ]
       },
       {
         "id": "mechanism",
         "title": "Keep both KL directions explicit",
         "paragraphs": [
-          "The ELBO can be written as an expected reconstruction log-likelihood minus KL(q(z|x) || p(z)). Separately, the gap between log p(x) and the ELBO is KL(q(z|x) || p(z|x)), where p(z|x) is the true posterior. These are different distributions and different roles for KL. The first appears in the tractable objective; the second explains why the expression is a lower bound. Nonnegativity of the latter establishes the bound."
+          "The ELBO can be written as an expected reconstruction log-likelihood minus \\(\\operatorname{KL}(q(z\\mid x)\\,\\|\\,p(z))\\). Separately, the gap between \\(\\log p(x)\\) and the ELBO is \\(\\operatorname{KL}(q(z\\mid x)\\,\\|\\,p(z\\mid x))\\), where \\(p(z\\mid x)\\) is the true posterior. These are different distributions and different roles for KL. The first appears in the tractable objective; the second explains why the expression is a lower bound. Nonnegativity of the latter establishes the bound."
         ],
-        "formula": "ELBO = E_q[log p(x|z)] − KL(q(z|x) || p(z)); log p(x) − ELBO = KL(q(z|x) || p(z|x))"
+        "formula": "\\begin{aligned}\\operatorname{ELBO}&=\\mathbb{E}_{q}[\\log p(x\\mid z)]-\\operatorname{KL}\\!\\left(q(z\\mid x)\\,\\|\\,p(z)\\right)\\\\ \\log p(x)-\\operatorname{ELBO}&=\\operatorname{KL}\\!\\left(q(z\\mid x)\\,\\|\\,p(z\\mid x)\\right)\\end{aligned}"
       },
       {
         "id": "practice",
         "title": "Interpret a numerical comparison",
         "paragraphs": [
-          "Suppose two models have ELBO estimates of −100 and −95 nats per example under the same likelihood convention. The second has a higher lower bound, but this alone does not guarantee better perceptual samples. Also, a lower bound can improve because the generative model improves, the inference approximation improves, or both. Compare consistent units and reductions: summing over pixels in one implementation and averaging in another changes the apparent scale. A common mistake is reversing the KL arguments or treating the posterior-matching gap as the same term as the prior regularizer."
+          "Suppose two models have ELBO estimates of \\(-100\\) and \\(-95\\) nats per example under the same likelihood convention. The second has a higher lower bound, but this alone does not guarantee better perceptual samples. Also, a lower bound can improve because the generative model improves, the inference approximation improves, or both. Compare consistent units and reductions: summing over pixels in one implementation and averaging in another changes the apparent scale. A common mistake is reversing the KL arguments or treating the posterior-matching gap as the same term as the prior regularizer."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the paper: identifying the variational gap",
         "paragraphs": [
-          "Read Auto-Encoding Variational Bayes by labeling which expectation uses qφ(z|x), which density is the prior, and which density is the true posterior. The two KL divergences in the ELBO identities have different roles; their arguments should never be shortened to an unlabeled KL.",
-          "Suppose the evidence for a fixed observation is unchanged while a better inference distribution raises its ELBO from −25 to −22. The posterior approximation gap has decreased by three nats. This thought experiment improves inference without changing the generative model, showing why an ELBO increase need not represent better evidence when both components are being optimized.",
+          "Read Auto-Encoding Variational Bayes by labeling which expectation uses \\(q_\\phi(z\\mid x)\\), which density is the prior, and which density is the true posterior. The two KL divergences in the ELBO identities have different roles; their arguments should never be shortened to an unlabeled KL.",
+          "Suppose the evidence for a fixed observation is unchanged while a better inference distribution raises its ELBO from \\(-25\\) to \\(-22\\). The posterior approximation gap has decreased by three nats. This thought experiment improves inference without changing the generative model, showing why an ELBO increase need not represent better evidence when both components are being optimized.",
           "Conversely, a restricted inference family can favor generative parameters whose posteriors are easier to approximate. When comparing models, record the variational family and the evidence estimator as well as the reported bound. A bound is informative only when its looseness is interpreted."
         ]
       }
     ],
     "exercise": {
-      "prompt": "If log p(x) is −20 and the ELBO is −23, what is KL(q(z|x) || p(z|x))?",
+      "prompt": "If \\(\\log p(x)\\) is \\(-20\\) and the ELBO is \\(-23\\), what is \\(\\operatorname{KL}(q(z\\mid x)\\,\\|\\,p(z\\mid x))\\)?",
       "answer": "It is 3 nats. The nonnegative gap is consistent with the ELBO being below the log evidence."
     },
     "takeaways": [
@@ -192,16 +192,16 @@
         "id": "intuition",
         "title": "Reconstruction is a likelihood choice",
         "paragraphs": [
-          "A VAE's reconstruction term is a negative log-likelihood under p(x|z). Mean squared error corresponds to a Gaussian observation model under particular variance assumptions; binary cross-entropy is a Bernoulli negative log-likelihood for binary observations. Applying the same expression to continuous intensities in [0,1] does not by itself define a normalized continuous likelihood; a continuous Bernoulli, for example, needs an additional parameter-dependent normalizer. These choices express different assumptions about the data. Replacing one with another or changing its reduction changes the optimization problem. The decoder's output activation and the numerical loss function must agree, such as using logits with a stable logits-based binary loss."
+          "A VAE's reconstruction term is a negative log-likelihood under \\(p(x\\mid z)\\). Mean squared error corresponds to a Gaussian observation model under particular variance assumptions; binary cross-entropy is a Bernoulli negative log-likelihood for binary observations. Applying the same expression to continuous intensities in \\([0,1]\\) does not by itself define a normalized continuous likelihood; a continuous Bernoulli, for example, needs an additional parameter-dependent normalizer. These choices express different assumptions about the data. Replacing one with another or changing its reduction changes the optimization problem. The decoder's output activation and the numerical loss function must agree, such as using logits with a stable logits-based binary loss."
         ]
       },
       {
         "id": "mechanism",
         "title": "Compute the Gaussian prior penalty",
         "paragraphs": [
-          "For q(z|x) = N(μ, diag(σ²)) and p(z) = N(0,I), the KL is one half of the sum of μ² + σ² − log σ² − 1 across latent dimensions. It is zero when μ = 0 and σ² = 1. For one dimension with μ = 1 and σ² = 1, the KL is 0.5 nats. This penalty discourages unconstrained encoding, but it does not directly measure pixel reconstruction quality."
+          "For \\(q(z\\mid x)=\\mathcal{N}(\\mu,\\operatorname{diag}(\\sigma^2))\\) and \\(p(z)=\\mathcal{N}(0,I)\\), the KL is one half of the sum of \\(\\mu^2+\\sigma^2-\\log\\sigma^2-1\\) across latent dimensions. It is zero when \\(\\mu=0\\) and \\(\\sigma^2=1\\). For one dimension with \\(\\mu=1\\) and \\(\\sigma^2=1\\), the KL is 0.5 nats. This penalty discourages unconstrained encoding, but it does not directly measure pixel reconstruction quality."
         ],
-        "formula": "KL = ½ Σⱼ (μⱼ² + σⱼ² − log σⱼ² − 1)"
+        "formula": "\\operatorname{KL}=\\frac12\\sum_j\\left(\\mu_j^2+\\sigma_j^2-\\log\\sigma_j^2-1\\right)"
       },
       {
         "id": "practice",
@@ -221,8 +221,8 @@
       }
     ],
     "exercise": {
-      "prompt": "What is the KL for one latent dimension with μ = 0 and variance 4 against a standard normal prior?",
-      "answer": "½(0 + 4 − log 4 − 1) ≈ 0.807 nats. The variance mismatch is penalized even though the means agree."
+      "prompt": "What is the KL for one latent dimension with \\(\\mu=0\\) and variance 4 against a standard normal prior?",
+      "answer": "\\(\\frac12(0+4-\\log4-1)\\approx0.807\\) nats. The variance mismatch is penalized even though the means agree."
     },
     "takeaways": [
       "Reconstruction losses encode an observation model.",
@@ -256,22 +256,22 @@
         "id": "intuition",
         "title": "Sampling needs a gradient strategy",
         "paragraphs": [
-          "A VAE trains an encoder that controls a latent distribution. A direct sampling operation may obscure how changing the distribution parameters changes the expected loss. Reparameterization rewrites the sample as a deterministic transformation of independent noise and learned parameters. For a Gaussian, sample ε from a standard normal and set z = μ + σε. The random draw remains, but the path from μ and σ to z is now an ordinary differentiable computation."
+          "A VAE trains an encoder that controls a latent distribution. A direct sampling operation may obscure how changing the distribution parameters changes the expected loss. Reparameterization rewrites the sample as a deterministic transformation of independent noise and learned parameters. For a Gaussian, sample \\(\\varepsilon\\) from a standard normal and set \\(z=\\mu+\\sigma\\varepsilon\\). The random draw remains, but the path from \\(\\mu\\) and \\(\\sigma\\) to \\(z\\) is now an ordinary differentiable computation."
         ]
       },
       {
         "id": "mechanism",
         "title": "Differentiate the transformed sample",
         "paragraphs": [
-          "For a fixed noise draw, ∂z/∂μ = 1 and ∂z/∂σ = ε in one dimension. Backpropagation can multiply these derivatives by the decoder loss gradient. Encoders often output log variance ℓ, using σ = exp(ℓ/2) to ensure positivity. The resulting estimator approximates a gradient of an expectation using sampled noise. It is not the same as differentiating the random-number generator, and its validity relies on suitable assumptions about exchanging differentiation and expectation."
+          "For a fixed noise draw, \\(\\frac{\\partial z}{\\partial\\mu}=1\\) and \\(\\frac{\\partial z}{\\partial\\sigma}=\\varepsilon\\) in one dimension. Backpropagation can multiply these derivatives by the decoder loss gradient. Encoders often output log variance \\(\\ell\\), using \\(\\sigma=\\exp(\\ell/2)\\) to ensure positivity. The resulting estimator approximates a gradient of an expectation using sampled noise. It is not the same as differentiating the random-number generator, and its validity relies on suitable assumptions about exchanging differentiation and expectation."
         ],
-        "formula": "ε ~ N(0,I); z = μ + exp(½ℓ) ⊙ ε"
+        "formula": "\\varepsilon\\sim\\mathcal{N}(0,I),\\qquad z=\\mu+\\exp\\!\\left(\\frac{\\ell}{2}\\right)\\odot\\varepsilon"
       },
       {
         "id": "practice",
         "title": "Check the implementation with fixed noise",
         "paragraphs": [
-          "Take μ = 2, σ = 3, and ε = −0.5. The sampled z is 0.5. If the loss is z², the derivative with respect to μ is 2z = 1 and with respect to σ is 2zε = −0.5. Fixing ε makes a finite-difference check meaningful; resampling noise at every perturbation would add variance to the comparison. A common mistake is detaching z or converting it through a non-differentiable external operation before decoding, which breaks the encoder's gradient path despite using the correct sampling formula."
+          "Take \\(\\mu=2\\), \\(\\sigma=3\\), and \\(\\varepsilon=-0.5\\). The sampled \\(z\\) is 0.5. If the loss is \\(z^2\\), the derivative with respect to \\(\\mu\\) is \\(2z=1\\) and with respect to \\(\\sigma\\) is \\(2z\\varepsilon=-0.5\\). Fixing \\(\\varepsilon\\) makes a finite-difference check meaningful; resampling noise at every perturbation would add variance to the comparison. A common mistake is detaching \\(z\\) or converting it through a non-differentiable external operation before decoding, which breaks the encoder's gradient path despite using the correct sampling formula."
         ]
       },
       {
@@ -279,14 +279,14 @@
         "title": "Reading the paper: where randomness enters the graph",
         "paragraphs": [
           "The reparameterization construction in Auto-Encoding Variational Bayes places random sampling in a parameter-independent noise variable. Trace the computation from that variable to the latent and onward to the decoder. This makes clear which operations ordinary differentiation can traverse and which expectations Monte Carlo approximates.",
-          "For z=μ+exp(ℓ/2)ε with fixed ε, differentiating with respect to log variance ℓ gives ∂z/∂ℓ=ε exp(ℓ/2)/2. At ℓ=0 and ε=2, this derivative is one. Using exp(ℓ) instead would both change the sampling variance and give the wrong derivative for the intended parameterization.",
+          "For \\(z=\\mu+\\exp(\\ell/2)\\varepsilon\\) with fixed \\(\\varepsilon\\), differentiating with respect to log variance \\(\\ell\\) gives \\(\\frac{\\partial z}{\\partial\\ell}=\\frac{\\varepsilon\\exp(\\ell/2)}{2}\\). At \\(\\ell=0\\) and \\(\\varepsilon=2\\), this derivative is one. Using \\(\\exp(\\ell)\\) instead would both change the sampling variance and give the wrong derivative for the intended parameterization.",
           "Check an implementation with a fixed noise draw and finite differences before averaging many draws. A single realization's derivative need not resemble the final expected gradient. The useful guarantee concerns an estimator under suitable differentiability and integrability assumptions, not a deterministic gradient for every sampled latent."
         ]
       }
     ],
     "exercise": {
-      "prompt": "With z = μ + σε and loss z², what are the gradients when μ = 1, σ = 2, and ε = 1?",
-      "answer": "z = 3, so ∂L/∂μ = 6 and ∂L/∂σ = 6. These are gradients for this fixed noise sample."
+      "prompt": "With \\(z=\\mu+\\sigma\\varepsilon\\) and loss \\(z^2\\), what are the gradients when \\(\\mu=1\\), \\(\\sigma=2\\), and \\(\\varepsilon=1\\)?",
+      "answer": "\\(z=3\\), so \\(\\frac{\\partial L}{\\partial\\mu}=6\\) and \\(\\frac{\\partial L}{\\partial\\sigma}=6\\). These are gradients for this fixed noise sample."
     },
     "takeaways": [
       "Reparameterization differentiates a deterministic transformation of noise.",
@@ -313,16 +313,16 @@
         "id": "intuition",
         "title": "The decoder may find an easier route",
         "paragraphs": [
-          "If a powerful decoder can predict data well without z, the model can reduce its KL cost by making q(z|x) close to the prior for every input. The latent then carries little input-specific information. This is especially intuitive with an autoregressive decoder that already sees substantial context. A low total loss can conceal this outcome. Collapse is a statement about latent usage, not merely about whether the generated examples look reasonable."
+          "If a powerful decoder can predict data well without \\(z\\), the model can reduce its KL cost by making \\(q(z\\mid x)\\) close to the prior for every input. The latent then carries little input-specific information. This is especially intuitive with an autoregressive decoder that already sees substantial context. A low total loss can conceal this outcome. Collapse is a statement about latent usage, not merely about whether the generated examples look reasonable."
         ]
       },
       {
         "id": "mechanism",
         "title": "Look beyond one averaged KL value",
         "paragraphs": [
-          "Per-dimension KL values reveal whether only some latent coordinates are active. Compare reconstructions after replacing z with a prior sample, shuffling latents across inputs, or fixing z to a constant. If output behavior barely changes, the decoder may be ignoring it. Yet low KL does not always mean complete collapse: units, objective scaling, and the task's information needs matter. Combine numerical diagnostics with interventions rather than imposing one universal threshold."
+          "Per-dimension KL values reveal whether only some latent coordinates are active. Compare reconstructions after replacing \\(z\\) with a prior sample, shuffling latents across inputs, or fixing \\(z\\) to a constant. If output behavior barely changes, the decoder may be ignoring it. Yet low KL does not always mean complete collapse: units, objective scaling, and the task's information needs matter. Combine numerical diagnostics with interventions rather than imposing one universal threshold."
         ],
-        "formula": "A collapsed limiting case is q(z|x) ≈ p(z) with decoder output largely independent of z"
+        "formula": "\\begin{gathered}\\text{A collapsed limiting case: }q(z\\mid x)\\approx p(z)\\\\ \\text{with decoder output largely independent of }z\\end{gathered}"
       },
       {
         "id": "practice",
@@ -377,37 +377,37 @@
         "id": "intuition",
         "title": "One changes a trade-off, the other a representation",
         "paragraphs": [
-          "A β-VAE multiplies the prior KL term by β, changing the balance between reconstruction and latent regularization. Values above one commonly impose a stronger information constraint, but they do not guarantee independently interpretable factors. VQ-VAE instead maps encoder outputs to entries in a finite learned codebook. It changes the latent representation and training mechanism, not simply the coefficient of a Gaussian KL term. The two names should not be treated as adjacent settings of one identical model."
+          "A β-VAE multiplies the prior KL term by \\(\\beta\\), changing the balance between reconstruction and latent regularization. Values above one commonly impose a stronger information constraint, but they do not guarantee independently interpretable factors. VQ-VAE instead maps encoder outputs to entries in a finite learned codebook. It changes the latent representation and training mechanism, not simply the coefficient of a Gaussian KL term. The two names should not be treated as adjacent settings of one identical model."
         ]
       },
       {
         "id": "mechanism",
         "title": "Write the two mechanisms separately",
         "paragraphs": [
-          "For β-VAE, minimize reconstruction loss plus β KL(q(z|x) || p(z)). For vector quantization, choose the codebook vector e_k nearest to an encoder output z_e. The discrete nearest-neighbor choice is not ordinarily differentiable, so training uses a gradient approximation and codebook/commitment mechanisms. A generative model over code indices is needed to sample useful discrete latents; selecting random indices uniformly is not generally equivalent to sampling the learned data distribution."
+          "For β-VAE, minimize reconstruction loss plus \\(\\beta\\operatorname{KL}(q(z\\mid x)\\,\\|\\,p(z))\\). For vector quantization, choose the codebook vector \\(e_k\\) nearest to an encoder output \\(z_e\\). The discrete nearest-neighbor choice is not ordinarily differentiable, so training uses a gradient approximation and codebook/commitment mechanisms. A generative model over code indices is needed to sample useful discrete latents; selecting random indices uniformly is not generally equivalent to sampling the learned data distribution."
         ],
-        "formula": "β-VAE: L = L_reconstruction + β KL; VQ: k* = argmin_k ‖z_e − e_k‖²"
+        "formula": "\\begin{aligned}\\beta\\text{-VAE: }L&=L_{\\text{reconstruction}}+\\beta\\operatorname{KL}\\\\ \\text{VQ: }k^*&=\\operatorname*{arg\\,min}_k\\|z_e-e_k\\|^2\\end{aligned}"
       },
       {
         "id": "practice",
         "title": "Compare two concrete failure modes",
         "paragraphs": [
-          "Increasing β can produce smoother prior compatibility while losing reconstruction detail. A VQ model can instead use only a small fraction of its codebook, wasting available codes. Track reconstruction quality and latent statistics appropriate to each method: KL and active dimensions for a continuous model, code usage and assignment distributions for a discrete one. A common mistake is claiming that a factorized prior alone identifies the true generative factors. Interpretability also depends on data, assumptions, supervision, and the ambiguities of representation learning."
+          "Increasing \\(\\beta\\) can produce smoother prior compatibility while losing reconstruction detail. A VQ model can instead use only a small fraction of its codebook, wasting available codes. Track reconstruction quality and latent statistics appropriate to each method: KL and active dimensions for a continuous model, code usage and assignment distributions for a discrete one. A common mistake is claiming that a factorized prior alone identifies the true generative factors. Interpretability also depends on data, assumptions, supervision, and the ambiguities of representation learning."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the papers: bottleneck pressure versus a codebook",
         "paragraphs": [
-          "Start with Higgins et al.'s 2017 β-VAE paper for the β-weighted objective. Burgess et al.'s Understanding Disentangling in β-VAE is a follow-up analysis of information capacity. Compare both with Neural Discrete Representation Learning, which changes the latent representation to a discrete codebook rather than simply reweighting a continuous prior KL.",
-          "Consider a continuous model whose KL remains near zero even after changing β. Its effective channel is already barely used, so the hyperparameter alone says little about learned factors. In a discrete model, a 256-entry dictionary also says little if nearly every input selects the same entry.",
+          "Start with Higgins et al.'s 2017 β-VAE paper for the \\(\\beta\\)-weighted objective. Burgess et al.'s Understanding Disentangling in β-VAE is a follow-up analysis of information capacity. Compare both with Neural Discrete Representation Learning, which changes the latent representation to a discrete codebook rather than simply reweighting a continuous prior KL.",
+          "Consider a continuous model whose KL remains near zero even after changing \\(\\beta\\). Its effective channel is already barely used, so the hyperparameter alone says little about learned factors. In a discrete model, a 256-entry dictionary also says little if nearly every input selects the same entry.",
           "Measure continuous rate or discrete code usage alongside reconstruction and downstream behavior. In the capacity-controlled β-VAE discussion, distinguish a target information capacity from a fixed multiplier on KL. In VQ-VAE, separate codebook updates from commitment pressure. Neither a nominal latent dimension nor a dictionary size establishes disentanglement."
         ]
       }
     ],
     "exercise": {
       "prompt": "A codebook has 256 possible entries. How many bits are needed for one fixed-length code index, ignoring entropy coding?",
-      "answer": "log₂(256) = 8 bits. Actual compressed rate also depends on how often codes occur and how many indices represent an input."
+      "answer": "\\(\\log_2(256)=8\\) bits. Actual compressed rate also depends on how often codes occur and how many indices represent an input."
     },
     "takeaways": [
       "β-VAE changes regularization strength; VQ-VAE changes latent quantization.",
@@ -454,15 +454,15 @@
         "id": "mechanism",
         "title": "Balance rate and distortion",
         "paragraphs": [
-          "Rate measures the number of bits needed to encode the representation. Distortion measures reconstruction error or another fidelity criterion. A common learning objective combines expected rate with a weighted distortion term. If a quantized symbol has probability p under a coding model, its ideal code length is approximately −log₂p bits. Frequently occurring symbols can therefore cost less than a fixed-length code, but a mismatched probability model wastes bits."
+          "Rate measures the number of bits needed to encode the representation. Distortion measures reconstruction error or another fidelity criterion. A common learning objective combines expected rate with a weighted distortion term. If a quantized symbol has probability \\(p\\) under a coding model, its ideal code length is approximately \\(-\\log_2 p\\) bits. Frequently occurring symbols can therefore cost less than a fixed-length code, but a mismatched probability model wastes bits."
         ],
-        "formula": "L = R + λD; ideal symbol length ≈ −log₂ p(symbol)"
+        "formula": "L=R+\\lambda D;\\qquad \\text{ideal symbol length}\\approx-\\log_2 p(\\text{symbol})"
       },
       {
         "id": "practice",
         "title": "Compute a simple storage example",
         "paragraphs": [
-          "A 64-by-64 latent grid with 256 possible codes per location uses 4,096 × 8 = 32,768 bits, or 4,096 bytes, under fixed-length indexing. Entropy coding may reduce this if codes are predictable. Compare the result with the original image's actual encoding, not just its raw tensor size. A common mistake is optimizing a perceptual score and claiming lossless compression: a visually plausible reconstruction can invent or remove details. Evaluate rate, distortion, and task-specific consequences separately, especially when exact text, measurements, or object identity must be preserved."
+          "A \\(64\\times64\\) latent grid with 256 possible codes per location uses \\(4{,}096\\times8=32{,}768\\) bits, or 4,096 bytes, under fixed-length indexing. Entropy coding may reduce this if codes are predictable. Compare the result with the original image's actual encoding, not just its raw tensor size. A common mistake is optimizing a perceptual score and claiming lossless compression: a visually plausible reconstruction can invent or remove details. Evaluate rate, distortion, and task-specific consequences separately, especially when exact text, measurements, or object identity must be preserved."
         ]
       },
       {
@@ -476,8 +476,8 @@
       }
     ],
     "exercise": {
-      "prompt": "A symbol occurs with probability 1/8 under an ideal coding model. What is its ideal code length?",
-      "answer": "−log₂(1/8) = 3 bits. This is an information-theoretic ideal; finite coding overhead and model mismatch affect practical size."
+      "prompt": "A symbol occurs with probability \\(\\frac18\\) under an ideal coding model. What is its ideal code length?",
+      "answer": "\\(-\\log_2\\!\\left(\\frac18\\right)=3\\) bits. This is an information-theoretic ideal; finite coding overhead and model mismatch affect practical size."
     },
     "takeaways": [
       "Compression requires quantization and a decodable bitstream.",
@@ -518,9 +518,9 @@
         "id": "mechanism",
         "title": "Understand the adversarial objective",
         "paragraphs": [
-          "In the original minimax formulation, the discriminator maximizes log D(x) for real examples and log(1 − D(G(z))) for generated examples. The generator minimizes the fake-example part. In practice, alternative generator losses can provide better gradients, so identify the exact loss being implemented. A discriminator score is not a universal image-quality metric: it reflects the current opponent and training distribution. The generator may improve visual plausibility without representing every important mode of the data."
+          "In the original minimax formulation, the discriminator maximizes \\(\\log D(x)\\) for real examples and \\(\\log(1-D(G(z)))\\) for generated examples. The generator minimizes the fake-example part. In practice, alternative generator losses can provide better gradients, so identify the exact loss being implemented. A discriminator score is not a universal image-quality metric: it reflects the current opponent and training distribution. The generator may improve visual plausibility without representing every important mode of the data."
         ],
-        "formula": "min_G max_D E_data[log D(x)] + E_z[log(1 − D(G(z)))]"
+        "formula": "\\min_G\\max_D\\left\\{\\mathbb{E}_{\\text{data}}[\\log D(x)]+\\mathbb{E}_z[\\log(1-D(G(z)))]\\right\\}"
       },
       {
         "id": "practice",
@@ -540,7 +540,7 @@
       }
     ],
     "exercise": {
-      "prompt": "Does a standard GAN automatically provide q(z|x), an encoder for reconstructing a particular input?",
+      "prompt": "Does a standard GAN automatically provide \\(q(z\\mid x)\\), an encoder for reconstructing a particular input?",
       "answer": "No. The basic generator–discriminator setup has no required inference encoder. Reconstruction needs an additional inference mechanism or optimization over latent variables."
     },
     "takeaways": [
@@ -575,22 +575,22 @@
         "id": "intuition",
         "title": "Make the corruption easy to sample",
         "paragraphs": [
-          "A forward diffusion process adds Gaussian noise in small steps. In a variance-preserving discrete formulation, each step scales the previous sample and adds noise with variance β_t. Define α_t = 1 − β_t and ᾱ_t as the product of α values up to t. The accumulated process has a closed-form marginal, allowing a training example at any selected timestep without simulating every earlier step."
+          "A forward diffusion process adds Gaussian noise in small steps. In a variance-preserving discrete formulation, each step scales the previous sample and adds noise with variance \\(\\beta_t\\). Define \\(\\alpha_t=1-\\beta_t\\) and \\(\\bar{\\alpha}_t\\) as the product of \\(\\alpha\\) values up to \\(t\\). The accumulated process has a closed-form marginal, allowing a training example at any selected timestep without simulating every earlier step."
         ]
       },
       {
         "id": "mechanism",
         "title": "The reverse direction is learned",
         "paragraphs": [
-          "Given clean x₀, sample ε from a standard normal and form x_t = √ᾱ_t x₀ + √(1 − ᾱ_t)ε. A model receives x_t and t and predicts a quantity such as ε. During generation, the clean x₀ is unknown; the learned predictions guide repeated reverse updates starting from noise. The reverse process is not obtained by subtracting the exact forward noise, because that noise is unavailable for a newly generated sample."
+          "Given clean \\(x_0\\), sample \\(\\varepsilon\\) from a standard normal and form \\(x_t=\\sqrt{\\bar{\\alpha}_t}\\,x_0+\\sqrt{1-\\bar{\\alpha}_t}\\,\\varepsilon\\). A model receives \\(x_t\\) and \\(t\\) and predicts a quantity such as \\(\\varepsilon\\). During generation, the clean \\(x_0\\) is unknown; the learned predictions guide repeated reverse updates starting from noise. The reverse process is not obtained by subtracting the exact forward noise, because that noise is unavailable for a newly generated sample."
         ],
-        "formula": "x_t = √ᾱ_t x₀ + √(1 − ᾱ_t)ε"
+        "formula": "x_t=\\sqrt{\\bar{\\alpha}_t}\\,x_0+\\sqrt{1-\\bar{\\alpha}_t}\\,\\varepsilon"
       },
       {
         "id": "practice",
         "title": "Distinguish a training batch from a sampling chain",
         "paragraphs": [
-          "Training commonly samples one timestep per example and computes a regression loss there. Generation usually performs many sequential model evaluations. These are different workloads. For ᾱ_t = 0.64, the clean-signal coefficient is 0.8 and the noise coefficient is 0.6. As ᾱ_t approaches zero, little information about the specific original example remains. A common error is confusing α_t with ᾱ_t in the noising equation; the former describes a single step, while the latter describes accumulated corruption. Check endpoints and tensor broadcasting when implementing schedules."
+          "Training commonly samples one timestep per example and computes a regression loss there. Generation usually performs many sequential model evaluations. These are different workloads. For \\(\\bar{\\alpha}_t=0.64\\), the clean-signal coefficient is 0.8 and the noise coefficient is 0.6. As \\(\\bar{\\alpha}_t\\) approaches zero, little information about the specific original example remains. A common error is confusing \\(\\alpha_t\\) with \\(\\bar{\\alpha}_t\\) in the noising equation; the former describes a single step, while the latter describes accumulated corruption. Check endpoints and tensor broadcasting when implementing schedules."
         ]
       },
       {
@@ -598,14 +598,14 @@
         "title": "Reading the paper: check the forward marginal first",
         "paragraphs": [
           "In Denoising Diffusion Probabilistic Models, connect the product of per-step signal factors to the closed-form noisy marginal. This is what permits training at a randomly chosen noise level without explicitly executing every earlier corruption step. The reverse model is then conditioned on that level.",
-          "Test the algebra with two steps whose α values are both 0.8. The accumulated signal variance coefficient is 0.64, so the clean-sample coefficient is 0.8 rather than 0.64. Confusing a variance coefficient with its square root creates a different training distribution even though the code still runs.",
+          "Test the algebra with two steps whose \\(\\alpha\\) values are both 0.8. The accumulated signal variance coefficient is 0.64, so the clean-sample coefficient is 0.8 rather than 0.64. Confusing a variance coefficient with its square root creates a different training distribution even though the code still runs.",
           "Use simulated scalar data to check the marginal mean and variance before trying images. Keep posterior variance choices, the predicted quantity, and the training weighting separate when reading the reverse process. Matching one displayed mean equation does not ensure that an entire sampler reproduces the paper's stochastic transition."
         ]
       }
     ],
     "exercise": {
-      "prompt": "If ᾱ_t = 0.25, what are the coefficients of x₀ and ε in the noisy sample?",
-      "answer": "The coefficients are 0.5 and √0.75 ≈ 0.866. They are square roots of signal and noise variance fractions."
+      "prompt": "If \\(\\bar{\\alpha}_t=0.25\\), what are the coefficients of \\(x_0\\) and \\(\\varepsilon\\) in the noisy sample?",
+      "answer": "The coefficients are 0.5 and \\(\\sqrt{0.75}\\approx0.866\\). They are square roots of signal and noise variance fractions."
     },
     "takeaways": [
       "Closed-form marginals make random-timestep training efficient.",
@@ -639,9 +639,9 @@
         "id": "mechanism",
         "title": "Deterministic does not mean one possible image",
         "paragraphs": [
-          "A common DDIM setting uses η = 0, producing a deterministic trajectory given an initial noise sample, conditioning, and fixed numerical execution. Different initial noise samples still produce different outputs. Other settings can inject stochasticity. A sampler first estimates the clean signal from the noisy input and model prediction, then constructs the next state according to its update rule. Skipping timesteps requires the corresponding schedule coefficients, not repeatedly applying a one-step formula with arbitrary indices."
+          "A common DDIM setting uses \\(\\eta=0\\), producing a deterministic trajectory given an initial noise sample, conditioning, and fixed numerical execution. Different initial noise samples still produce different outputs. Other settings can inject stochasticity. A sampler first estimates the clean signal from the noisy input and model prediction, then constructs the next state according to its update rule. Skipping timesteps requires the corresponding schedule coefficients, not repeatedly applying a one-step formula with arbitrary indices."
         ],
-        "formula": "x̂₀ = (x_t − √(1 − ᾱ_t) ε̂_t) / √ᾱ_t"
+        "formula": "\\hat{x}_0=\\frac{x_t-\\sqrt{1-\\bar{\\alpha}_t}\\,\\hat{\\varepsilon}_t}{\\sqrt{\\bar{\\alpha}_t}}"
       },
       {
         "id": "practice",
@@ -661,7 +661,7 @@
       }
     ],
     "exercise": {
-      "prompt": "If η = 0 in a deterministic DDIM sampler, can you still generate diverse images?",
+      "prompt": "If \\(\\eta=0\\) in a deterministic DDIM sampler, can you still generate diverse images?",
       "answer": "Yes. Changing the initial noise or conditioning changes the trajectory. Determinism only fixes the output for a fixed initial state and other settings."
     },
     "takeaways": [
@@ -695,22 +695,22 @@
         "id": "intuition",
         "title": "Time is an index into corruption strength",
         "paragraphs": [
-          "The same numerical timestep can represent very different noise levels under different schedules. In a variance-preserving process, ᾱ_t and 1 − ᾱ_t are the squared signal and noise coefficients. For unit-variance data and independent standard Gaussian noise, they also give the two variance contributions. Their ratio is the conventional signal-to-noise ratio. Early high-signal states preserve image detail, while late low-signal states require stronger reliance on the learned data distribution and conditioning. The schedule decides how training and sampling traverse these regimes."
+          "The same numerical timestep can represent very different noise levels under different schedules. In a variance-preserving process, \\(\\bar{\\alpha}_t\\) and \\(1-\\bar{\\alpha}_t\\) are the squared signal and noise coefficients. For unit-variance data and independent standard Gaussian noise, they also give the two variance contributions. Their ratio is the conventional signal-to-noise ratio. Early high-signal states preserve image detail, while late low-signal states require stronger reliance on the learned data distribution and conditioning. The schedule decides how training and sampling traverse these regimes."
         ]
       },
       {
         "id": "mechanism",
         "title": "Read the accumulated schedule",
         "paragraphs": [
-          "A sequence of β_t values defines per-step noise increments, but the product ᾱ_t = ∏(1 − β_s) determines accumulated corruption. Linear β spacing does not imply linear loss of signal. For ᾱ_t = 0.9, SNR is 9; for ᾱ_t = 0.1, it is 1/9. Plot ᾱ_t or log SNR to compare schedules meaningfully. The endpoint should be checked as well: starting generation from nearly pure noise assumes the terminal training distribution is compatible with that initialization."
+          "A sequence of \\(\\beta_t\\) values defines per-step noise increments, but the product \\(\\bar{\\alpha}_t=\\prod_{s=1}^{t}(1-\\beta_s)\\) determines accumulated corruption. Linear \\(\\beta\\) spacing does not imply linear loss of signal. For \\(\\bar{\\alpha}_t=0.9\\), SNR is 9; for \\(\\bar{\\alpha}_t=0.1\\), it is \\(\\frac19\\). Plot \\(\\bar{\\alpha}_t\\) or \\(\\log\\operatorname{SNR}\\) to compare schedules meaningfully. The endpoint should be checked as well: starting generation from nearly pure noise assumes the terminal training distribution is compatible with that initialization."
         ],
-        "formula": "Conventional SNR(t) = ᾱ_t / (1 − ᾱ_t); actual variance ratio = ᾱ_t Var(x₀) / (1 − ᾱ_t) for independent unit-variance noise"
+        "formula": "\\begin{aligned}\\operatorname{SNR}_{\\text{conventional}}(t)&=\\frac{\\bar{\\alpha}_t}{1-\\bar{\\alpha}_t}\\\\ \\text{actual variance ratio}&=\\frac{\\bar{\\alpha}_t\\operatorname{Var}(x_0)}{1-\\bar{\\alpha}_t}\\\\ &\\text{for independent unit-variance noise}\\end{aligned}"
       },
       {
         "id": "practice",
         "title": "Sampling density is another choice",
         "paragraphs": [
-          "Even with a fixed training schedule, a sampler can spend more evaluations in some regions than others. Timestep sampling during training and loss weighting also affect which noise levels receive emphasis. Keep these choices distinct in experiments. A common error is switching the inference schedule without checking whether the model's timestep input and prediction parameterization expect the same noise convention. Test a schedule on a small known distribution first and visualize noisy samples at several signal levels, rather than trusting a plot of β alone."
+          "Even with a fixed training schedule, a sampler can spend more evaluations in some regions than others. Timestep sampling during training and loss weighting also affect which noise levels receive emphasis. Keep these choices distinct in experiments. A common error is switching the inference schedule without checking whether the model's timestep input and prediction parameterization expect the same noise convention. Test a schedule on a small known distribution first and visualize noisy samples at several signal levels, rather than trusting a plot of \\(\\beta\\) alone."
         ]
       },
       {
@@ -718,17 +718,17 @@
         "title": "Reading the paper: schedules depend on data scale",
         "paragraphs": [
           "In Improved Denoising Diffusion Probabilistic Models, inspect the accumulated signal curve when comparing schedule choices. A schedule is a distribution of prediction difficulties over training time, not merely a list of noise increments. Its usefulness also depends on preprocessing and loss weighting.",
-          "At ᾱ=0.5, unit-variance data produces equal signal and noise variance. If the clean data instead has variance four, the same coefficients give signal variance two and noise variance 0.5, an actual ratio of four. The conventional coefficient SNR remains one, so reporting its definition prevents a misleading interpretation.",
+          "At \\(\\bar{\\alpha}=0.5\\), unit-variance data produces equal signal and noise variance. If the clean data instead has variance four, the same coefficients give signal variance two and noise variance 0.5, an actual ratio of four. The conventional coefficient SNR remains one, so reporting its definition prevents a misleading interpretation.",
           "Plot noisy examples after the real normalization pipeline, and evaluate the terminal distribution against the sampler's starting prior. When trying another schedule, preserve or deliberately change the meaning of the timestep embedding. An improvement can otherwise reflect a changed data scale or training emphasis rather than the schedule shape alone."
         ]
       }
     ],
     "exercise": {
-      "prompt": "At what ᾱ value is the conventional signal-to-noise ratio equal to one?",
-      "answer": "ᾱ/(1 − ᾱ) = 1 implies ᾱ = 0.5. With unit-variance data and independent standard Gaussian noise, signal and noise each contribute half the variance."
+      "prompt": "At what \\(\\bar{\\alpha}\\) value is the conventional signal-to-noise ratio equal to one?",
+      "answer": "\\(\\frac{\\bar{\\alpha}}{1-\\bar{\\alpha}}=1\\) implies \\(\\bar{\\alpha}=0.5\\). With unit-variance data and independent standard Gaussian noise, signal and noise each contribute half the variance."
     },
     "takeaways": [
-      "Inspect accumulated signal or log SNR, not only per-step β.",
+      "Inspect accumulated signal or \\(\\log\\operatorname{SNR}\\), not only per-step \\(\\beta\\).",
       "Training timestep sampling, loss weighting, and inference steps are separate settings."
     ],
     "references": [
@@ -759,41 +759,41 @@
         "id": "intuition",
         "title": "Name the target before reading a loss",
         "paragraphs": [
-          "A denoiser may predict the added noise ε, the clean data x₀, or a combined target v. The network output can have the same tensor shape in all three cases, so a shape check cannot distinguish them. The scheduler must interpret the output using the matching parameterization. Using an ε scheduler with a v-prediction checkpoint can produce incorrect updates even though every tensor operation executes successfully."
+          "A denoiser may predict the added noise \\(\\varepsilon\\), the clean data \\(x_0\\), or a combined target \\(v\\). The network output can have the same tensor shape in all three cases, so a shape check cannot distinguish them. The scheduler must interpret the output using the matching parameterization. Using an \\(\\varepsilon\\) scheduler with a \\(v\\)-prediction checkpoint can produce incorrect updates even though every tensor operation executes successfully."
         ]
       },
       {
         "id": "mechanism",
         "title": "Derive the conversion as a rotation",
         "paragraphs": [
-          "Write x_t = a x₀ + s ε with a² + s² = 1. Define diffusion v = a ε − s x₀. These equations form a two-dimensional rotation in the pair of data and noise variables. Inverting gives x₀ = a x_t − s v and ε = s x_t + a v. This v convention is not automatically the same as a flow-matching velocity dx_t/dt; that depends on the chosen path and time parameter."
+          "Write \\(x_t=ax_0+s\\varepsilon\\) with \\(a^2+s^2=1\\). Define diffusion \\(v=a\\varepsilon-sx_0\\). These equations form a two-dimensional rotation in the pair of data and noise variables. Inverting gives \\(x_0=ax_t-sv\\) and \\(\\varepsilon=sx_t+av\\). This \\(v\\) convention is not automatically the same as a flow-matching velocity \\(\\frac{\\mathrm{d}x_t}{\\mathrm{d}t}\\); that depends on the chosen path and time parameter."
         ],
-        "formula": "v = aε − sx₀; x₀ = ax_t − sv; ε = sx_t + av"
+        "formula": "v=a\\varepsilon-sx_0,\\qquad x_0=ax_t-sv,\\qquad \\varepsilon=sx_t+av"
       },
       {
         "id": "practice",
         "title": "Equivalent representations can train differently",
         "paragraphs": [
-          "An error in ε produces an x₀ error scaled by s/a when converted, which can become large at low signal. Different target choices and loss weightings therefore emphasize noise regimes differently. For a = 0.8, s = 0.6, x₀ = 2, and ε = −1, x_t = 1 and v = −2. The inverse formulas recover the originals exactly. A common mistake is calling all v targets velocity without defining their equation, or mixing standard deviations with variance coefficients when converting between targets."
+          "An error in \\(\\varepsilon\\) produces an \\(x_0\\) error scaled by \\(\\frac{s}{a}\\) when converted, which can become large at low signal. Different target choices and loss weightings therefore emphasize noise regimes differently. For \\(a=0.8\\), \\(s=0.6\\), \\(x_0=2\\), and \\(\\varepsilon=-1\\), \\(x_t=1\\) and \\(v=-2\\). The inverse formulas recover the originals exactly. A common mistake is calling all \\(v\\) targets velocity without defining their equation, or mixing standard deviations with variance coefficients when converting between targets."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the paper: v is an angular derivative",
         "paragraphs": [
-          "In Progressive Distillation for Fast Sampling of Diffusion Models, follow the parameterization that writes the signal and noise coefficients as cosine and sine. Its v target is naturally the derivative with respect to that angle. This explains why calling every v output a time velocity is unsafe.",
-          "For xφ=cos(φ)x₀+sin(φ)ε, differentiation gives vφ=−sin(φ)x₀+cos(φ)ε. If a separate clock t controls φ, then dx/dt=vφ dφ/dt. A clock that runs twice as fast doubles the time derivative without changing the angular target at the same noisy point.",
-          "Check the coefficient identity before applying the inverse formulas. The simple rotation inverse assumes a²+s²=1; other paths need their own transformation. In a reproduction, record the noisy-input scaling, target scaling, and solver's time variable together so that a correct network output is not inserted into an incompatible update."
+          "In Progressive Distillation for Fast Sampling of Diffusion Models, follow the parameterization that writes the signal and noise coefficients as cosine and sine. Its \\(v\\) target is naturally the derivative with respect to that angle. This explains why calling every \\(v\\) output a time velocity is unsafe.",
+          "For \\(x_\\phi=\\cos(\\phi)x_0+\\sin(\\phi)\\varepsilon\\), differentiation gives \\(v_\\phi=-\\sin(\\phi)x_0+\\cos(\\phi)\\varepsilon\\). If a separate clock \\(t\\) controls \\(\\phi\\), then \\(\\frac{\\mathrm{d}x}{\\mathrm{d}t}=v_\\phi\\frac{\\mathrm{d}\\phi}{\\mathrm{d}t}\\). A clock that runs twice as fast doubles the time derivative without changing the angular target at the same noisy point.",
+          "Check the coefficient identity before applying the inverse formulas. The simple rotation inverse assumes \\(a^2+s^2=1\\); other paths need their own transformation. In a reproduction, record the noisy-input scaling, target scaling, and solver's time variable together so that a correct network output is not inserted into an incompatible update."
         ]
       }
     ],
     "exercise": {
-      "prompt": "Using a = 0.6, s = 0.8, x_t = 1, and predicted v = 0.5, recover x̂₀ and ε̂.",
-      "answer": "x̂₀ = 0.6 × 1 − 0.8 × 0.5 = 0.2. ε̂ = 0.8 × 1 + 0.6 × 0.5 = 1.1."
+      "prompt": "Using \\(a=0.6\\), \\(s=0.8\\), \\(x_t=1\\), and predicted \\(v=0.5\\), recover \\(\\hat{x}_0\\) and \\(\\hat{\\varepsilon}\\).",
+      "answer": "\\(\\hat{x}_0=0.6\\times1-0.8\\times0.5=0.2\\). \\(\\hat{\\varepsilon}=0.8\\times1+0.6\\times0.5=1.1\\)."
     },
     "takeaways": [
       "The scheduler and checkpoint must agree on prediction type.",
-      "Define v explicitly before relating it to any continuous-time velocity."
+      "Define \\(v\\) explicitly before relating it to any continuous-time velocity."
     ],
     "references": [
       {
@@ -824,9 +824,9 @@
         "id": "mechanism",
         "title": "Make the scale convention explicit",
         "paragraphs": [
-          "Using one common convention, ε_guided = ε_uncond + w(ε_cond − ε_uncond). Here w = 0 gives the unconditional prediction, w = 1 gives the ordinary conditional prediction, and w > 1 extrapolates beyond it. Some papers and implementations shift the scale by one, so compare equations rather than just numerical labels. For ε_uncond = 2, ε_cond = 1, and w = 3, the guided value is −1; it is not a probability or a convex average."
+          "Using one common convention, \\(\\varepsilon_{\\text{guided}}=\\varepsilon_{\\text{uncond}}+w(\\varepsilon_{\\text{cond}}-\\varepsilon_{\\text{uncond}})\\). Here \\(w=0\\) gives the unconditional prediction, \\(w=1\\) gives the ordinary conditional prediction, and \\(w>1\\) extrapolates beyond it. Some papers and implementations shift the scale by one, so compare equations rather than just numerical labels. For \\(\\varepsilon_{\\text{uncond}}=2\\), \\(\\varepsilon_{\\text{cond}}=1\\), and \\(w=3\\), the guided value is \\(-1\\); it is not a probability or a convex average."
         ],
-        "formula": "ε_guided = ε_uncond + w(ε_cond − ε_uncond)"
+        "formula": "\\varepsilon_{\\text{guided}}=\\varepsilon_{\\text{uncond}}+w\\left(\\varepsilon_{\\text{cond}}-\\varepsilon_{\\text{uncond}}\\right)"
       },
       {
         "id": "practice",
@@ -840,14 +840,14 @@
         "title": "Reading the paper: identify the guidance convention",
         "paragraphs": [
           "Classifier-Free Diffusion Guidance combines conditional and unconditional predictions. Read its coefficients literally before copying a guidance number from another implementation: different conventions assign different numeric names to the same extrapolation. Also verify what conditioning is actually removed in the unconditional branch.",
-          "Ho and Salimans use (1+w_p)c − w_p u, where c and u are conditional and unconditional predictions. This article uses u+w_a(c−u), so w_p=w_a−1. The paper's w_p=0 corresponds to w_a=1 here, both yielding c. Likewise, this article's scale three matches the paper's scale two.",
+          "Ho and Salimans use \\((1+w_p)c-w_p\\,u\\), where \\(c\\) and \\(u\\) are conditional and unconditional predictions. This article uses \\(u+w_a(c-u)\\), so \\(w_p=w_a-1\\). The paper's \\(w_p=0\\) corresponds to \\(w_a=1\\) here, both yielding \\(c\\). Likewise, this article's scale three matches the paper's scale two.",
           "Use the same noisy input and timestep for both branches when testing the combination. Increasing extrapolation can amplify model error as well as conditioning information, so inspect diversity and artifacts instead of treating guidance as free accuracy. If clipping or rescaling follows the combination, report that extra operation because it changes the effective update."
         ]
       }
     ],
     "exercise": {
-      "prompt": "Under the stated convention, what value of w reproduces the conditional prediction exactly?",
-      "answer": "w = 1. Substituting gives ε_uncond + ε_cond − ε_uncond = ε_cond."
+      "prompt": "Under the stated convention, what value of \\(w\\) reproduces the conditional prediction exactly?",
+      "answer": "\\(w=1\\). Substituting gives \\(\\varepsilon_{\\text{uncond}}+\\varepsilon_{\\text{cond}}-\\varepsilon_{\\text{uncond}}=\\varepsilon_{\\text{cond}}\\)."
     },
     "takeaways": [
       "Guidance scale conventions differ; read the actual equation.",
@@ -882,9 +882,9 @@
         "id": "mechanism",
         "title": "Count latent positions carefully",
         "paragraphs": [
-          "For an image of height H and width W, a spatial downsampling factor f produces roughly H/f by W/f latent positions. A 512-by-512 image compressed by f = 8 gives a 64-by-64 grid, sixty-four times fewer spatial positions. Channel counts and architecture still matter, so this is not automatically a sixty-four-fold runtime reduction. Text or other conditioning can enter denoiser blocks through mechanisms such as cross-attention, while latent scaling determines the numerical distribution seen during training."
+          "For an image of height \\(H\\) and width \\(W\\), a spatial downsampling factor \\(f\\) produces roughly \\(\\frac{H}{f}\\times\\frac{W}{f}\\) latent positions. A \\(512\\times512\\) image compressed by \\(f=8\\) gives a \\(64\\times64\\) grid, sixty-four times fewer spatial positions. Channel counts and architecture still matter, so this is not automatically a sixty-four-fold runtime reduction. Text or other conditioning can enter denoiser blocks through mechanisms such as cross-attention, while latent scaling determines the numerical distribution seen during training."
         ],
-        "formula": "N_latent = HW/f²"
+        "formula": "N_{\\text{latent}}=\\frac{HW}{f^2}"
       },
       {
         "id": "practice",
@@ -904,8 +904,8 @@
       }
     ],
     "exercise": {
-      "prompt": "A 768-by-512 image is compressed by a spatial factor of eight. What is the latent grid size?",
-      "answer": "It is 96 by 64, assuming the encoder supports those dimensions without additional padding. That gives 6,144 latent positions."
+      "prompt": "A \\(768\\times512\\) image is compressed by a spatial factor of eight. What is the latent grid size?",
+      "answer": "It is \\(96\\times64\\), assuming the encoder supports those dimensions without additional padding. That gives 6,144 latent positions."
     },
     "takeaways": [
       "Latent diffusion inherits the autoencoder's representation limits.",
@@ -933,16 +933,16 @@
         "id": "intuition",
         "title": "Direction can be easier than normalized density",
         "paragraphs": [
-          "The score of a density p at x is ∇_x log p(x). It points toward locally increasing log density and has one component per input dimension. It is not a scalar confidence score or a classifier logit. If p is known only up to a multiplicative normalizing constant, that constant disappears under the gradient. This makes score estimation attractive for distributions whose normalized density is hard to compute."
+          "The score of a density \\(p\\) at \\(x\\) is \\(\\nabla_x\\log p(x)\\). It points toward locally increasing log density and has one component per input dimension. It is not a scalar confidence score or a classifier logit. If \\(p\\) is known only up to a multiplicative normalizing constant, that constant disappears under the gradient. This makes score estimation attractive for distributions whose normalized density is hard to compute."
         ]
       },
       {
         "id": "mechanism",
         "title": "Use a Gaussian to build intuition",
         "paragraphs": [
-          "For a one-dimensional Gaussian with mean μ and variance σ², the score is −(x − μ)/σ². At x > μ it points left, and at x < μ it points right. Its magnitude depends on both distance and variance. Denoising score matching creates noisy data with a known corruption process and trains a network against a tractable conditional score target. Under Gaussian corruption, predicted noise and predicted score are closely related through the noise scale."
+          "For a one-dimensional Gaussian with mean \\(\\mu\\) and variance \\(\\sigma^2\\), the score is \\(-\\frac{x-\\mu}{\\sigma^2}\\). At \\(x>\\mu\\) it points left, and at \\(x<\\mu\\) it points right. Its magnitude depends on both distance and variance. Denoising score matching creates noisy data with a known corruption process and trains a network against a tractable conditional score target. Under Gaussian corruption, predicted noise and predicted score are closely related through the noise scale."
         ],
-        "formula": "For N(μ,σ²): ∇_x log p(x) = −(x − μ)/σ²"
+        "formula": "\\text{For }\\mathcal{N}(\\mu,\\sigma^2):\\qquad \\nabla_x\\log p(x)=-\\frac{x-\\mu}{\\sigma^2}"
       },
       {
         "id": "practice",
@@ -956,14 +956,14 @@
         "title": "Reading the paper: a score field is not a sample",
         "paragraphs": [
           "In Generative Modeling by Estimating Gradients of the Data Distribution, connect noise-conditioned score estimation with a sampling procedure. Estimating a local direction and generating a distribution are separate steps. The noise level identifies which smoothed density supplies the score.",
-          "For a unit Gaussian, the score is −x. Deterministic gradient ascent therefore moves every point toward zero, eventually destroying the distribution's variance. In contrast, a suitable stochastic dynamics balances this restoring tendency with injected noise. This toy case explains why repeatedly following a score does not automatically produce representative samples.",
+          "For a unit Gaussian, the score is \\(-x\\). Deterministic gradient ascent therefore moves every point toward zero, eventually destroying the distribution's variance. In contrast, a suitable stochastic dynamics balances this restoring tendency with injected noise. This toy case explains why repeatedly following a score does not automatically produce representative samples.",
           "Plot the estimated field for a one-dimensional mixture at several noise scales. Heavy smoothing may merge modes that become separate near the data distribution. Inspect errors near low-density regions too: a sampler can pass through them even if ordinary held-out samples rarely do. Good average regression error need not imply robust sampling trajectories."
         ]
       }
     ],
     "exercise": {
-      "prompt": "What is the score at x = 5 for a Gaussian with μ = 1 and variance 4?",
-      "answer": "−(5 − 1)/4 = −1. The local direction of increasing log density is toward smaller x."
+      "prompt": "What is the score at \\(x=5\\) for a Gaussian with \\(\\mu=1\\) and variance 4?",
+      "answer": "\\(-\\frac{5-1}{4}=-1\\). The local direction of increasing log density is toward smaller \\(x\\)."
     },
     "takeaways": [
       "The score is a vector field over inputs, not a probability value.",
@@ -997,16 +997,16 @@
         "id": "intuition",
         "title": "A vector field tells a point how to move",
         "paragraphs": [
-          "An ordinary differential equation dx/dt = v(x,t) specifies the instantaneous velocity at a position and time. Given an initial point and suitable regularity, its path is determined. A stochastic differential equation adds a noise term, commonly written g(t)dW_t for Brownian motion. Two paths starting at the same location can then diverge because they receive different random increments. Deterministic dynamics can still generate diverse samples when their initial points are randomly drawn."
+          "An ordinary differential equation \\(\\frac{\\mathrm{d}x}{\\mathrm{d}t}=v(x,t)\\) specifies the instantaneous velocity at a position and time. Given an initial point and suitable regularity, its path is determined. A stochastic differential equation adds a noise term, commonly written \\(g(t)\\,\\mathrm{d}W_t\\) for Brownian motion. Two paths starting at the same location can then diverge because they receive different random increments. Deterministic dynamics can still generate diverse samples when their initial points are randomly drawn."
         ]
       },
       {
         "id": "mechanism",
         "title": "Discretize the random term at the right scale",
         "paragraphs": [
-          "For a time step h, an Euler ODE update is x_next = x + h v(x,t). A simple Euler–Maruyama SDE update adds g(t)√h ξ, where ξ is standard Gaussian. The square root matters because Brownian increment variance scales with elapsed time. Replacing √h by h changes the stochastic process and can make the noise vanish too quickly as step size decreases. Drift and diffusion coefficients also have distinct units and roles."
+          "For a time step \\(h\\), an Euler ODE update is \\(x_{\\text{next}}=x+h\\,v(x,t)\\). A simple Euler–Maruyama SDE update adds \\(g(t)\\sqrt{h}\\,\\xi\\), where \\(\\xi\\) is standard Gaussian. The square root matters because Brownian increment variance scales with elapsed time. Replacing \\(\\sqrt{h}\\) by \\(h\\) changes the stochastic process and can make the noise vanish too quickly as step size decreases. Drift and diffusion coefficients also have distinct units and roles."
         ],
-        "formula": "ODE: dx = v dt; SDE: dx = f dt + g dW; noise increment ≈ g√h ξ"
+        "formula": "\\begin{aligned}\\text{ODE: }&\\mathrm{d}x=v\\,\\mathrm{d}t\\\\ \\text{SDE: }&\\mathrm{d}x=f\\,\\mathrm{d}t+g\\,\\mathrm{d}W\\\\ \\text{noise increment}&\\approx g\\sqrt{h}\\,\\xi\\end{aligned}"
       },
       {
         "id": "practice",
@@ -1020,14 +1020,14 @@
         "title": "Reading the paper: direction and time parameterization",
         "paragraphs": [
           "In Score-Based Generative Modeling through Stochastic Differential Equations, read the forward SDE, reverse-time SDE, and probability-flow ODE as three different equations. Their related marginal distributions do not make their drifts interchangeable. Pay particular attention to which direction the time variable runs.",
-          "For the forward scalar process dx=σ dW, an interval h adds variance σ²h. A numerical update using σhε instead would add σ²h² and converge toward the wrong behavior as steps shrink. The square-root timestep factor is therefore a distributional requirement, not a tuning convention.",
+          "For the forward scalar process \\(\\mathrm{d}x=\\sigma\\,\\mathrm{d}W\\), an interval \\(h\\) adds variance \\(\\sigma^2h\\). A numerical update using \\(\\sigma h\\varepsilon\\) instead would add \\(\\sigma^2h^2\\) and converge toward the wrong behavior as steps shrink. The square-root timestep factor is therefore a distributional requirement, not a tuning convention.",
           "Test a solver on a process with known Gaussian marginals before using a learned score. If integrating backward, state whether the code uses negative increments or a new increasing reverse clock. Mixing those conventions can flip a drift sign while leaving tensor shapes and ordinary software checks entirely valid."
         ]
       }
     ],
     "exercise": {
       "prompt": "If an SDE time step shrinks from 0.04 to 0.01, how does the standard deviation of a Brownian increment change?",
-      "answer": "It decreases from √0.04 = 0.2 to √0.01 = 0.1, so it halves rather than becoming one quarter."
+      "answer": "It decreases from \\(\\sqrt{0.04}=0.2\\) to \\(\\sqrt{0.01}=0.1\\), so it halves rather than becoming one quarter."
     },
     "takeaways": [
       "Random initial conditions can make deterministic ODE sampling diverse.",
@@ -1055,22 +1055,22 @@
         "id": "intuition",
         "title": "Choose a path you can supervise",
         "paragraphs": [
-          "Let z be a sample from a simple noise distribution and x a data sample. A basic path is x_t = (1 − t)z + tx for t between zero and one. For that paired path, the derivative is x − z, so it supplies a direct regression target. A network receives x_t and t and predicts a velocity. Training samples time and pairs; it need not numerically solve the full generative trajectory for every training example."
+          "Let \\(z\\) be a sample from a simple noise distribution and \\(x\\) a data sample. A basic path is \\(x_t=(1-t)z+tx\\) for \\(t\\) between zero and one. For that paired path, the derivative is \\(x-z\\), so it supplies a direct regression target. A network receives \\(x_t\\) and \\(t\\) and predicts a velocity. Training samples time and pairs; it need not numerically solve the full generative trajectory for every training example."
         ]
       },
       {
         "id": "mechanism",
         "title": "Conditional targets become a marginal field",
         "paragraphs": [
-          "Many different source–data pairs can pass near the same location at the same time with different velocities. Under squared error, the best prediction is their conditional mean velocity given x_t and t. The learned generative field therefore does not simply memorize one straight line for every arbitrary pair. At sampling time, integrate the learned ODE from a new noise point. Rectified flow develops closely related straight-path constructions and procedures for improving transport trajectories, but exact objectives and couplings should be checked."
+          "Many different source–data pairs can pass near the same location at the same time with different velocities. Under squared error, the best prediction is their conditional mean velocity given \\(x_t\\) and \\(t\\). The learned generative field therefore does not simply memorize one straight line for every arbitrary pair. At sampling time, integrate the learned ODE from a new noise point. Rectified flow develops closely related straight-path constructions and procedures for improving transport trajectories, but exact objectives and couplings should be checked."
         ],
-        "formula": "x_t = (1 − t)z + tx; target u_t = x − z; L = E‖vθ(x_t,t) − u_t‖²"
+        "formula": "\\begin{aligned}x_t&=(1-t)z+tx,\\qquad u_t=x-z\\\\ L&=\\mathbb{E}\\!\\left[\\|v_\\theta(x_t,t)-u_t\\|^2\\right]\\end{aligned}"
       },
       {
         "id": "practice",
         "title": "Test the direction convention",
         "paragraphs": [
-          "With z = 0 and x = 4 in one dimension, the path at t = 0.25 is 1 and its target velocity is 4. If another implementation uses t = 0 for data and t = 1 for noise, both the interpolation and velocity sign change. A common mistake is mixing these conventions between training and sampling. Begin with a two-dimensional toy distribution, plot intermediate sample clouds, and inspect whether they move toward the data. Straight conditional paths do not guarantee that every learned marginal trajectory is straight or easy to integrate."
+          "With \\(z=0\\) and \\(x=4\\) in one dimension, the path at \\(t=0.25\\) is 1 and its target velocity is 4. If another implementation uses \\(t=0\\) for data and \\(t=1\\) for noise, both the interpolation and velocity sign change. A common mistake is mixing these conventions between training and sampling. Begin with a two-dimensional toy distribution, plot intermediate sample clouds, and inspect whether they move toward the data. Straight conditional paths do not guarantee that every learned marginal trajectory is straight or easy to integrate."
         ]
       },
       {
@@ -1084,8 +1084,8 @@
       }
     ],
     "exercise": {
-      "prompt": "For z = [0, 2], x = [4, 0], and t = 0.5, find x_t and the conditional velocity.",
-      "answer": "x_t = [2, 1] and x − z = [4, −2]. The velocity is constant along this chosen straight conditional path."
+      "prompt": "For \\(z=[0,2]\\), \\(x=[4,0]\\), and \\(t=0.5\\), find \\(x_t\\) and the conditional velocity.",
+      "answer": "\\(x_t=[2,1]\\) and \\(x-z=[4,-2]\\). The velocity is constant along this chosen straight conditional path."
     },
     "takeaways": [
       "Flow matching provides supervised velocity targets from chosen paths.",
@@ -1126,9 +1126,9 @@
         "id": "mechanism",
         "title": "Compare Euler with a two-stage correction",
         "paragraphs": [
-          "Euler uses the velocity at the current point. Heun's method predicts an endpoint with Euler, evaluates the velocity there, and averages the two slopes. For dx/dt = x, x(0) = 1, and h = 0.5, Euler gives 1.5. Heun gives 1 + 0.25(1 + 1.5) = 1.625, closer to the exact exp(0.5) ≈ 1.649. Heun uses two field evaluations for this step, illustrating the accuracy–compute trade-off."
+          "Euler uses the velocity at the current point. Heun's method predicts an endpoint with Euler, evaluates the velocity there, and averages the two slopes. For \\(\\frac{\\mathrm{d}x}{\\mathrm{d}t}=x\\), \\(x(0)=1\\), and \\(h=0.5\\), Euler gives 1.5. Heun gives \\(1+0.25(1+1.5)=1.625\\), closer to the exact \\(\\exp(0.5)\\approx1.649\\). Heun uses two field evaluations for this step, illustrating the accuracy–compute trade-off."
         ],
-        "formula": "Euler: xₙ₊₁ = xₙ + h v(xₙ,tₙ); Heun: xₙ₊₁ = xₙ + (h/2)(v_current + v_predicted)"
+        "formula": "\\begin{aligned}\\text{Euler: }x_{n+1}&=x_n+h\\,v(x_n,t_n)\\\\ \\text{Heun: }x_{n+1}&=x_n+\\frac{h}{2}\\left(v_{\\text{current}}+v_{\\text{predicted}}\\right)\\end{aligned}"
       },
       {
         "id": "practice",
@@ -1142,14 +1142,14 @@
         "title": "Reading the paper: straight paths and integration error",
         "paragraphs": [
           "Flow Straight and Fast motivates studying transport paths together with numerical integration. Read geometric claims as statements about a particular learned or ideal field, not as a universal guarantee that one large Euler step is accurate. Field estimation error remains distinct from discretization error.",
-          "Use the test equation dx/dt=x from x(0)=1. Over a step of 0.5, Euler gives 1.5 and Heun gives 1.625, while the exact value is exp(0.5). Heun improves this example by evaluating the field again at a predicted endpoint, so its cost must include that extra evaluation.",
+          "Use the test equation \\(\\frac{\\mathrm{d}x}{\\mathrm{d}t}=x\\) from \\(x(0)=1\\). Over a step of 0.5, Euler gives 1.5 and Heun gives 1.625, while the exact value is \\(\\exp(0.5)\\). Heun improves this example by evaluating the field again at a predicted endpoint, so its cost must include that extra evaluation.",
           "Then replace the exact field by a biased one and repeat the step-size study. Smaller steps can reduce integration error while converging toward the wrong solution of that biased field. Plot quality against function evaluations and wall-clock time, and report the solver tolerance or step grid rather than its name alone."
         ]
       }
     ],
     "exercise": {
-      "prompt": "For dx/dt = 2x, x = 1, and h = 0.1, what does one Euler step produce?",
-      "answer": "x_next = 1 + 0.1 × 2 = 1.2. The exact value after that interval is exp(0.2) ≈ 1.221, showing a finite-step error."
+      "prompt": "For \\(\\frac{\\mathrm{d}x}{\\mathrm{d}t}=2x\\), \\(x=1\\), and \\(h=0.1\\), what does one Euler step produce?",
+      "answer": "\\(x_{\\text{next}}=1+0.1\\times2=1.2\\). The exact value after that interval is \\(\\exp(0.2)\\approx1.221\\), showing a finite-step error."
     },
     "takeaways": [
       "Separate field approximation error from solver discretization error.",
@@ -1197,9 +1197,9 @@
         "id": "mechanism",
         "title": "Compare one pair of concrete objectives",
         "paragraphs": [
-          "In a variance-preserving noise-prediction setup, create x_t from clean data and Gaussian noise, then regress the sampled ε. In a straight-path flow setup, interpolate between noise z and data x and regress x − z. The distributions of training inputs and the target magnitudes differ. Transformations can connect noise, score, and velocity descriptions for appropriate paths, but an unweighted squared loss in one parameterization need not equal an unweighted loss in another. Time-dependent scaling can change the effective weighting."
+          "In a variance-preserving noise-prediction setup, create \\(x_t\\) from clean data and Gaussian noise, then regress the sampled \\(\\varepsilon\\). In a straight-path flow setup, interpolate between noise \\(z\\) and data \\(x\\) and regress \\(x-z\\). The distributions of training inputs and the target magnitudes differ. Transformations can connect noise, score, and velocity descriptions for appropriate paths, but an unweighted squared loss in one parameterization need not equal an unweighted loss in another. Time-dependent scaling can change the effective weighting."
         ],
-        "formula": "Noise regression: E‖εθ(x_t,t) − ε‖²; straight-path flow regression: E‖vθ(x_t,t) − (x − z)‖²"
+        "formula": "\\begin{aligned}\\text{Noise regression: }&\\mathbb{E}\\!\\left[\\|\\varepsilon_\\theta(x_t,t)-\\varepsilon\\|^2\\right]\\\\ \\text{Straight-path flow regression: }&\\mathbb{E}\\!\\left[\\|v_\\theta(x_t,t)-(x-z)\\|^2\\right]\\end{aligned}"
       },
       {
         "id": "practice",
@@ -1212,7 +1212,7 @@
         "id": "source-reading",
         "title": "Reading the papers: compare equations before family names",
         "paragraphs": [
-          "Read the diffusion, score-SDE, and flow-matching papers using a shared worksheet: input distribution at time t, supervised target, weighting, and generation equation. These labels reveal overlap that broad family names hide. A probability-flow ODE already provides a deterministic transport associated with a diffusion process.",
+          "Read the diffusion, score-SDE, and flow-matching papers using a shared worksheet: input distribution at time \\(t\\), supervised target, weighting, and generation equation. These labels reveal overlap that broad family names hide. A probability-flow ODE already provides a deterministic transport associated with a diffusion process.",
           "For a Gaussian corruption path, noise, score, and clean-sample predictions can be converted algebraically when the coefficients are nonzero. Yet an unweighted squared error on each converted target generally gives different emphasis across time. Equivalent representations of an exact field do not imply identical finite-model training.",
           "Build comparisons around one controlled change: keep architecture and data fixed while changing target weighting, or keep the learned field fixed while changing the solver. Report endpoint conventions and evaluation budgets. Otherwise a claimed advantage for an entire model family may actually come from resolution, conditioning, optimization, or numerical choices."
         ]

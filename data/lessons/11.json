@@ -18,7 +18,7 @@
         "id": "mechanism",
         "title": "Follow one matrix multiplication",
         "paragraphs": [
-          "Multiplying A with shape [m,k] by B with shape [k,n] requires approximately mkn MACs, or 2mkn FLOPs. A [32,128] input projected to 64 features therefore needs 262,144 MACs. Latency measures elapsed time for one request or batch. Throughput measures completed items per second at a specified load. Batching can raise throughput while increasing the waiting time experienced by an individual request."
+          "Multiplying \\(A\\) with shape \\([m,k]\\) by \\(B\\) with shape \\([k,n]\\) requires approximately \\(mkn\\) MACs, or \\(2mkn\\) FLOPs. A \\([32,128]\\) input projected to 64 features therefore needs 262,144 MACs. Latency measures elapsed time for one request or batch. Throughput measures completed items per second at a specified load. Batching can raise throughput while increasing the waiting time experienced by an individual request."
         ]
       },
       {
@@ -40,7 +40,7 @@
     ],
     "exercise": {
       "prompt": "A batch of 8 requests completes in 40 ms. What are its throughput and batch latency?",
-      "answer": "Throughput is 8 / 0.04 = 200 requests per second, and batch latency is 40 ms. Each request in that simultaneous batch waits roughly 40 ms, not 5 ms; queueing can add more."
+      "answer": "Throughput is \\(\\frac{8}{0.04}=200\\) requests per second, and batch latency is 40 ms. Each request in that simultaneous batch waits roughly 40 ms, not 5 ms; queueing can add more."
     },
     "takeaways": [
       "State the FLOP/MAC counting convention.",
@@ -130,7 +130,7 @@
         "id": "mechanism",
         "title": "Build a first estimate",
         "paragraphs": [
-          "For N parameters, an all-FP32 Adam setup commonly needs roughly 4N bytes each for weights, gradients, and two moment buffers: about 16N bytes before activations. This is a budgeting approximation, not a universal rule. Mixed precision may introduce master weights or different state dtypes; fused optimizers and sharding change the inventory. Activation storage often grows with batch size, sequence length, hidden width, and depth, and attention implementations affect its scaling."
+          "For \\(N\\) parameters, an all-FP32 Adam setup commonly needs roughly \\(4N\\) bytes each for weights, gradients, and two moment buffers: about \\(16N\\) bytes before activations. This is a budgeting approximation, not a universal rule. Mixed precision may introduce master weights or different state dtypes; fused optimizers and sharding change the inventory. Activation storage often grows with batch size, sequence length, hidden width, and depth, and attention implementations affect its scaling."
         ]
       },
       {
@@ -193,7 +193,7 @@
         "id": "mechanism",
         "title": "Estimate an autoregressive cache",
         "paragraphs": [
-          "For a conventional decoder cache, bytes are approximately 2 × L × B × S × Hkv × dh × b. L is layer count, B batch size, S cached length, Hkv the number of KV heads, dh head dimension, and b bytes per element. The factor two accounts for keys and values. Grouped-query attention reduces Hkv relative to query heads. Actual layouts, quantization metadata, padding, and serving allocation policies modify the measured value."
+          "For a conventional decoder cache, bytes are approximately \\(2\\times L\\times B\\times S\\times H_{\\mathrm{kv}}\\times d_h\\times b\\). \\(L\\) is layer count, \\(B\\) batch size, \\(S\\) cached length, \\(H_{\\mathrm{kv}}\\) the number of KV heads, \\(d_h\\) head dimension, and \\(b\\) bytes per element. The factor two accounts for keys and values. Grouped-query attention reduces \\(H_{\\mathrm{kv}}\\) relative to query heads. Actual layouts, quantization metadata, padding, and serving allocation policies modify the measured value."
         ]
       },
       {
@@ -207,15 +207,15 @@
         "id": "source-reading",
         "title": "Reading the sources: identify the cached head dimension",
         "paragraphs": [
-          "In GQA, trace how several query heads share a key and value head. The number retained in the cache is Hkv, not necessarily the query-head count. This directly connects the architectural choice to the cache formula and its bandwidth cost.",
-          "At fixed layer count, batch, sequence length, head width, and dtype, reducing Hkv from 32 to eight reduces raw key/value tensor bytes by a factor of four. It does not reduce every weight tensor or activation by that factor. An implementation that expands and materializes shared heads can also forfeit some expected savings.",
+          "In GQA, trace how several query heads share a key and value head. The number retained in the cache is \\(H_{\\mathrm{kv}}\\), not necessarily the query-head count. This directly connects the architectural choice to the cache formula and its bandwidth cost.",
+          "At fixed layer count, batch, sequence length, head width, and dtype, reducing \\(H_{\\mathrm{kv}}\\) from 32 to eight reduces raw key/value tensor bytes by a factor of four. It does not reduce every weight tensor or activation by that factor. An implementation that expands and materializes shared heads can also forfeit some expected savings.",
           "Check actual cache shapes and storage rather than inferring them from the displayed attention-head count. Separately consult Autograd Mechanics before using eval() as a memory intervention: evaluation behavior does not disable graph recording. Cache compression, parameter freezing, and disabling gradient recording address different memory terms and should be measured independently."
         ]
       }
     ],
     "exercise": {
-      "prompt": "For L=2, B=1, S=100, Hkv=4, dh=8, and b=2, how large is the simple cache estimate?",
-      "answer": "The estimate is 2 × 2 × 1 × 100 × 4 × 8 × 2 = 25,600 bytes. Doubling the cached length doubles this estimate without changing the model's weight storage."
+      "prompt": "For \\(L=2\\), \\(B=1\\), \\(S=100\\), \\(H_{\\mathrm{kv}}=4\\), \\(d_h=8\\), and \\(b=2\\), how large is the simple cache estimate?",
+      "answer": "The estimate is \\(2\\times2\\times1\\times100\\times4\\times8\\times2=25{,}600\\) bytes. Doubling the cached length doubles this estimate without changing the model's weight storage."
     },
     "takeaways": [
       "Inference memory depends on the serving workload.",
@@ -248,14 +248,14 @@
         "id": "intuition",
         "title": "Map a continuum onto a grid",
         "paragraphs": [
-          "Floating-point tensors contain more representational detail than some tasks need. Quantization approximates values using a small integer range plus scaling information. An affine scheme uses q = clamp(round(x/s) + z), then reconstructs x̂ = s(q − z), where s is a scale and z a zero point. The approximation introduces rounding and clipping errors. Lower bit width reduces storage but leaves fewer values with which to represent the same range."
+          "Floating-point tensors contain more representational detail than some tasks need. Quantization approximates values using a small integer range plus scaling information. An affine scheme uses \\(q=\\operatorname{clamp}\\!\\left(\\operatorname{round}\\!\\left(\\frac{x}{s}\\right)+z\\right)\\), then reconstructs \\(\\hat{x}=s(q-z)\\), where \\(s\\) is a scale and \\(z\\) a zero point. The approximation introduces rounding and clipping errors. Lower bit width reduces storage but leaves fewer values with which to represent the same range."
         ]
       },
       {
         "id": "mechanism",
         "title": "Compare two adaptation routes",
         "paragraphs": [
-          "Post-training quantization chooses representations after the original model is trained, often using a calibration sample to estimate activation ranges. Quantization-aware training simulates quantization effects during optimization so weights can adapt. Weight-only quantization and weight-plus-activation quantization are different systems. With a symmetric scale s=0.1, a value 0.26 rounds to integer 3 and reconstructs as 0.3. An outlier can force a wider range and make typical small values less precise."
+          "Post-training quantization chooses representations after the original model is trained, often using a calibration sample to estimate activation ranges. Quantization-aware training simulates quantization effects during optimization so weights can adapt. Weight-only quantization and weight-plus-activation quantization are different systems. With a symmetric scale \\(s=0.1\\), a value 0.26 rounds to integer 3 and reconstructs as 0.3. An outlier can force a wider range and make typical small values less precise."
         ]
       },
       {
@@ -276,8 +276,8 @@
       }
     ],
     "exercise": {
-      "prompt": "Using s=0.25 and z=0, quantize x=0.6 without clipping and reconstruct it.",
-      "answer": "Using round-to-nearest, 0.6/0.25=2.4 gives q=2, so x̂=0.5 and the signed reconstruction error is −0.1. Among round-to-nearest conventions, tie-breaking matters only at exact ties; other rules such as ceiling or stochastic rounding are different quantizers."
+      "prompt": "Using \\(s=0.25\\) and \\(z=0\\), quantize \\(x=0.6\\) without clipping and reconstruct it.",
+      "answer": "Using round-to-nearest, \\(\\frac{0.6}{0.25}=2.4\\) gives \\(q=2\\), so \\(\\hat{x}=0.5\\) and the signed reconstruction error is \\(-0.1\\). Among round-to-nearest conventions, tie-breaking matters only at exact ties; other rules such as ceiling or stochastic rounding are different quantizers."
     },
     "takeaways": [
       "Bit width alone does not specify a quantization method.",
@@ -317,7 +317,7 @@
         "id": "mechanism",
         "title": "Write the matching objective",
         "paragraphs": [
-          "For classification, logit distillation can minimize KL(pteacher || pstudent) on the same input. Feature matching might minimize ||P(hstudent) − hteacher||² with a learned projection P when widths differ. Response distillation typically applies token-level likelihood to a teacher-generated sequence. For example, a six-layer student may match selected layers of a twelve-layer teacher instead of forcing a one-to-one correspondence. Explicitly state which positions, layers, and token masks contribute to the loss."
+          "For classification, logit distillation can minimize \\(\\operatorname{KL}(p_{\\text{teacher}}\\|p_{\\text{student}})\\) on the same input. Feature matching might minimize \\(\\left\\|P(h_{\\text{student}})-h_{\\text{teacher}}\\right\\|^2\\) with a learned projection \\(P\\) when widths differ. Response distillation typically applies token-level likelihood to a teacher-generated sequence. For example, a six-layer student may match selected layers of a twelve-layer teacher instead of forcing a one-to-one correspondence. Explicitly state which positions, layers, and token masks contribute to the loss."
         ]
       },
       {
@@ -378,36 +378,36 @@
         "id": "intuition",
         "title": "Why soften a confident prediction?",
         "paragraphs": [
-          "A teacher may assign almost all probability to one class while its remaining probabilities still encode useful relationships. A dog image might be closer to wolf than truck. Dividing logits by a temperature T greater than one flattens the softmax, making those alternatives more visible. Temperature below one sharpens it. This is a transformation of probabilities, not a way to make the teacher's knowledge intrinsically more correct."
+          "A teacher may assign almost all probability to one class while its remaining probabilities still encode useful relationships. A dog image might be closer to wolf than truck. Dividing logits by a temperature \\(T\\) greater than one flattens the softmax, making those alternatives more visible. Temperature below one sharpens it. This is a transformation of probabilities, not a way to make the teacher's knowledge intrinsically more correct."
         ]
       },
       {
         "id": "mechanism",
         "title": "Use a consistent distillation loss",
         "paragraphs": [
-          "Define pT(i)=exp(zi/T)/Σj exp(zj/T). A common distillation objective combines ordinary label loss with T² KL(pteacher,T || pstudent,T). The T² factor compensates for the leading high-temperature gradient scaling under the standard formulation; it does not make gradients exactly invariant at every temperature. Both teacher and student distributions must use the same temperature for this comparison. For logits [2,0], the first-class probability is about 0.881 at T=1 and 0.731 at T=2, illustrating how relative alternatives become less suppressed."
+          "Define \\(p_T(i)=\\frac{\\exp(z_i/T)}{\\sum_j\\exp(z_j/T)}\\). A common distillation objective combines ordinary label loss with \\(T^2\\operatorname{KL}(p_{\\text{teacher},T}\\|p_{\\text{student},T})\\). The \\(T^2\\) factor compensates for the leading high-temperature gradient scaling under the standard formulation; it does not make gradients exactly invariant at every temperature. Both teacher and student distributions must use the same temperature for this comparison. For logits \\([2,0]\\), the first-class probability is about 0.881 at \\(T=1\\) and 0.731 at \\(T=2\\), illustrating how relative alternatives become less suppressed."
         ]
       },
       {
         "id": "practice",
         "title": "Keep calibration and generation separate",
         "paragraphs": [
-          "Post-hoc temperature calibration fits a temperature on held-out validation data to adjust confidence. Distillation temperature shapes training targets. Generation temperature changes which tokens are sampled. They use related mathematics but optimize different goals. Tune temperature without looking at test outcomes, and report the mixture weight between hard-label and distillation losses. At high temperature, probability differences shrink, but T²-scaled distillation retains a centered-logit matching signal in the limit. Nearly uniform targets therefore do not imply vanishing information in that scaled objective; which distinctions help still depends on the task and teacher."
+          "Post-hoc temperature calibration fits a temperature on held-out validation data to adjust confidence. Distillation temperature shapes training targets. Generation temperature changes which tokens are sampled. They use related mathematics but optimize different goals. Tune temperature without looking at test outcomes, and report the mixture weight between hard-label and distillation losses. At high temperature, probability differences shrink, but \\(T^2\\)-scaled distillation retains a centered-logit matching signal in the limit. Nearly uniform targets therefore do not imply vanishing information in that scaled objective; which distinctions help still depends on the task and teacher."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the paper: the high-temperature limit",
         "paragraphs": [
-          "In Distilling the Knowledge in a Neural Network, inspect the gradient argument behind multiplying the soft-target loss by T². The key object is the derivative with respect to student logits, not the visual flatness of a probability plot.",
-          "With K classes and centered logits, high-temperature softmax probabilities are approximately 1/K plus the centered logit divided by KT. Differentiating the T²-scaled cross-entropy or KL with fixed teacher targets yields a student-logit gradient approaching the centered student–teacher logit difference divided by K. Probability gaps shrink while the scaling preserves a finite matching signal.",
-          "Use this approximation to diagnose a temperature experiment: removing T² changes both target softness and effective loss scale. Keep the hard-label mixture explicit, and compare gradients as well as losses. Centering matters because adding a constant to every logit leaves the distribution unchanged; distillation cannot identify that unobservable common offset."
+          "In Distilling the Knowledge in a Neural Network, inspect the gradient argument behind multiplying the soft-target loss by \\(T^2\\). The key object is the derivative with respect to student logits, not the visual flatness of a probability plot.",
+          "With \\(K\\) classes and centered logits, high-temperature softmax probabilities are approximately \\(\\frac{1}{K}\\) plus the centered logit divided by \\(KT\\). Differentiating the \\(T^2\\)-scaled cross-entropy or KL with fixed teacher targets yields a student-logit gradient approaching the centered student–teacher logit difference divided by \\(K\\). Probability gaps shrink while the scaling preserves a finite matching signal.",
+          "Use this approximation to diagnose a temperature experiment: removing \\(T^2\\) changes both target softness and effective loss scale. Keep the hard-label mixture explicit, and compare gradients as well as losses. Centering matters because adding a constant to every logit leaves the distribution unchanged; distillation cannot identify that unobservable common offset."
         ]
       }
     ],
     "exercise": {
-      "prompt": "What happens to a finite logit vector as T grows without bound?",
-      "answer": "Its softmax approaches a uniform distribution over the available classes because every scaled logit approaches zero. Class rankings remain the same for finite positive T, but probability differences shrink."
+      "prompt": "What happens to a finite logit vector as \\(T\\) grows without bound?",
+      "answer": "Its softmax approaches a uniform distribution over the available classes because every scaled logit approaches zero. Class rankings remain the same for finite positive \\(T\\), but probability differences shrink."
     },
     "takeaways": [
       "Apply temperature consistently to teacher and student.",
@@ -441,7 +441,7 @@
         "id": "mechanism",
         "title": "Follow a small network",
         "paragraphs": [
-          "Consider a linear layer from 128 inputs to 64 outputs. Removing 16 output neurons changes its weight matrix from [64,128] to [48,128], and the following layer must accept 48 features. In contrast, setting a quarter of entries to zero leaves the shape unchanged. Magnitude pruning uses small weights as candidates, but weight magnitude is only a heuristic for functional importance. Fine-tuning can help the remaining network adapt after removal."
+          "Consider a linear layer from 128 inputs to 64 outputs. Removing 16 output neurons changes its weight matrix from \\([64,128]\\) to \\([48,128]\\), and the following layer must accept 48 features. In contrast, setting a quarter of entries to zero leaves the shape unchanged. Magnitude pruning uses small weights as candidates, but weight magnitude is only a heuristic for functional importance. Fine-tuning can help the remaining network adapt after removal."
         ]
       },
       {
@@ -462,8 +462,8 @@
       }
     ],
     "exercise": {
-      "prompt": "A dense [64,128] matrix has half its entries set to zero. Has its dense GEMM shape changed?",
-      "answer": "No. It is still [64,128], so an ordinary dense kernel performs essentially the same shaped operation. A smaller structure or compatible sparse execution is required to turn zeros into arithmetic savings."
+      "prompt": "A dense \\([64,128]\\) matrix has half its entries set to zero. Has its dense GEMM shape changed?",
+      "answer": "No. It is still \\([64,128]\\), so an ordinary dense kernel performs essentially the same shaped operation. A smaller structure or compatible sparse execution is required to turn zeros into arithmetic savings."
     },
     "takeaways": [
       "Zero weights and smaller tensors are different outcomes.",
@@ -498,7 +498,7 @@
         "id": "mechanism",
         "title": "Trace shapes and costs",
         "paragraphs": [
-          "A sequence X with shape [B,N,D] becomes [B,M,D] with M smaller than N. Attention interaction work changes from roughly N² to M² for subsequent layers, while projections and FFNs scale approximately linearly with sequence length. Reducing 196 tokens to 98 quarters the pairwise attention count, not necessarily total runtime. A weighted merge can use xnew=(w1x1+w2x2)/(w1+w2), carrying the combined weight forward so repeated merges do not unintentionally favor tiny groups."
+          "A sequence \\(X\\) with shape \\([B,N,D]\\) becomes \\([B,M,D]\\) with \\(M\\) smaller than \\(N\\). Attention interaction work changes from roughly \\(N^2\\) to \\(M^2\\) for subsequent layers, while projections and FFNs scale approximately linearly with sequence length. Reducing 196 tokens to 98 quarters the pairwise attention count, not necessarily total runtime. A weighted merge can use \\(x_{\\text{new}}=\\frac{w_1x_1+w_2x_2}{w_1+w_2}\\), carrying the combined weight forward so repeated merges do not unintentionally favor tiny groups."
         ]
       },
       {
@@ -555,7 +555,7 @@
         "id": "mechanism",
         "title": "Locate the transformation",
         "paragraphs": [
-          "Suppose the vision encoder emits X with shape [B,576,1024]. A compressor reduces this to [B,64,1024], then a projector maps features into the language model width. Compression could instead occur before the vision encoder or inside its blocks, producing different savings and losses. A learned-query resampler uses M queries to cross-attend to N image tokens, with an interaction term proportional to MN. It therefore adds its own computation even as it reduces downstream sequence length."
+          "Suppose the vision encoder emits \\(X\\) with shape \\([B,576,1024]\\). A compressor reduces this to \\([B,64,1024]\\), then a projector maps features into the language model width. Compression could instead occur before the vision encoder or inside its blocks, producing different savings and losses. A learned-query resampler uses \\(M\\) queries to cross-attend to \\(N\\) image tokens, with an interaction term proportional to \\(MN\\). It therefore adds its own computation even as it reduces downstream sequence length."
         ]
       },
       {
@@ -618,7 +618,7 @@
         "id": "mechanism",
         "title": "Track the cache budget",
         "paragraphs": [
-          "A layer's cache often has shape [B,Hkv,S,dh] for keys and the same for values. Reducing S removes stored positions; reducing bytes per element changes precision. Under a budget of 128 positions, a policy might reserve 32 recent entries and 96 historically useful entries. Accumulated attention can inform usefulness, but it is a proxy rather than a guarantee. Retained entries must preserve correct positional meaning, especially when rotary embeddings are involved."
+          "A layer's cache often has shape \\([B,H_{\\mathrm{kv}},S,d_h]\\) for keys and the same for values. Reducing \\(S\\) removes stored positions; reducing bytes per element changes precision. Under a budget of 128 positions, a policy might reserve 32 recent entries and 96 historically useful entries. Accumulated attention can inform usefulness, but it is a proxy rather than a guarantee. Retained entries must preserve correct positional meaning, especially when rotary embeddings are involved."
         ]
       },
       {
@@ -674,14 +674,14 @@
         "id": "intuition",
         "title": "Avoid materializing a huge intermediate",
         "paragraphs": [
-          "Naive attention forms a score matrix with one entry for every query-key pair and often stores its normalized probabilities. For a long sequence, this N-by-N intermediate is expensive to write to and read from high-bandwidth memory. Tiled attention processes blocks while maintaining the statistics needed for softmax. The goal is to move less data through slow memory levels, rather than to remove the interactions that define dense attention."
+          "Naive attention forms a score matrix with one entry for every query-key pair and often stores its normalized probabilities. For a long sequence, this \\(N\\times N\\) intermediate is expensive to write to and read from high-bandwidth memory. Tiled attention processes blocks while maintaining the statistics needed for softmax. The goal is to move less data through slow memory levels, rather than to remove the interactions that define dense attention."
         ]
       },
       {
         "id": "mechanism",
         "title": "Understand online softmax",
         "paragraphs": [
-          "For each query, track a running maximum m, a rescaled exponential sum l, and a weighted value accumulator. When a new score block raises the maximum, rescale the previous accumulators before incorporating the new block. This keeps the normalization numerically stable without storing every score simultaneously. Backward can recompute selected quantities instead of retaining the full probability matrix. The resulting operation implements exact dense attention mathematically, though floating-point rounding can differ from another evaluation order."
+          "For each query, track a running maximum \\(m\\), a rescaled exponential sum \\(\\ell\\), and a weighted value accumulator. When a new score block raises the maximum, rescale the previous accumulators before incorporating the new block. This keeps the normalization numerically stable without storing every score simultaneously. Backward can recompute selected quantities instead of retaining the full probability matrix. The resulting operation implements exact dense attention mathematically, though floating-point rounding can differ from another evaluation order."
         ]
       },
       {
@@ -696,7 +696,7 @@
         "title": "Reading the paper: combine blocks without losing normalization",
         "paragraphs": [
           "In FlashAttention, follow the online softmax accumulators across score blocks. The central numerical problem is combining quantities normalized around different maxima while avoiding a full score matrix in slower memory. Exactness refers to the mathematical attention operation, not identical floating-point evaluation order.",
-          "Suppose an earlier block's maximum is two and a new block raises it to five. Its old exponential sum and weighted value accumulator must both be rescaled by exp(−3) before combining with quantities expressed relative to five. Rescaling only the denominator changes the attention output even if the final probabilities appear normalized.",
+          "Suppose an earlier block's maximum is two and a new block raises it to five. Its old exponential sum and weighted value accumulator must both be rescaled by \\(\\exp(-3)\\) before combining with quantities expressed relative to five. Rescaling only the denominator changes the attention output even if the final probabilities appear normalized.",
           "Test a tiny implementation against ordinary softmax using blocks with deliberately different maxima. Then profile representative long sequences to study memory traffic. A correct tiled algorithm still computes dense pairwise interactions; its advantage comes from scheduling and storage, and its end-to-end benefit is limited by time spent elsewhere in the model."
         ]
       }
@@ -738,7 +738,7 @@
         "id": "mechanism",
         "title": "Preserve the intended gradient",
         "paragraphs": [
-          "With K equally sized microbatches and mean losses, divide each microbatch loss by K before backward, then step once after all K backward passes. This matches the mean-gradient calculation of the combined batch under suitable assumptions. Variable numbers of valid tokens require weighting by token counts instead of blindly averaging microbatch means. BatchNorm statistics, dropout randomness, and other batch-dependent operations can prevent exact equivalence to a single large forward pass."
+          "With \\(K\\) equally sized microbatches and mean losses, divide each microbatch loss by \\(K\\) before backward, then step once after all \\(K\\) backward passes. This matches the mean-gradient calculation of the combined batch under suitable assumptions. Variable numbers of valid tokens require weighting by token counts instead of blindly averaging microbatch means. BatchNorm statistics, dropout randomness, and other batch-dependent operations can prevent exact equivalence to a single large forward pass."
         ]
       },
       {
@@ -760,7 +760,7 @@
     ],
     "exercise": {
       "prompt": "You accumulate four equal microbatches with mean loss and forget to divide each loss by four. What changes?",
-      "answer": "The accumulated gradient is four times the intended combined-batch mean gradient. Under plain SGD this gives a four-times-larger step at the same learning rate. For Adam, a constant positive rescaling of the entire gradient history largely cancels between first and second moments, apart from ε; changing scale midway or introducing clipping and coupled regularization can break that cancellation. Normalize explicitly instead of assuming every optimizer responds identically."
+      "answer": "The accumulated gradient is four times the intended combined-batch mean gradient. Under plain SGD this gives a four-times-larger step at the same learning rate. For Adam, a constant positive rescaling of the entire gradient history largely cancels between first and second moments, apart from \\(\\varepsilon\\); changing scale midway or introducing clipping and coupled regularization can break that cancellation. Normalize explicitly instead of assuming every optimizer responds identically."
     },
     "takeaways": [
       "Normalize accumulated losses to the intended objective.",
@@ -801,7 +801,7 @@
         "id": "mechanism",
         "title": "Trace a linear layer",
         "paragraphs": [
-          "For Y=XW, column parallelism splits W into column blocks and produces corresponding output feature blocks. A later operation may need these blocks gathered or may consume them in a compatible partition. Row parallelism splits the reduction dimension and combines partial outputs. DDP instead computes a complete local layer on different examples, then reduces gradients. FSDP changes where parameter, gradient, and optimizer shards live; transient gathers mean peak memory is not simply total model size divided by worker count."
+          "For \\(Y=XW\\), column parallelism splits \\(W\\) into column blocks and produces corresponding output feature blocks. A later operation may need these blocks gathered or may consume them in a compatible partition. Row parallelism splits the reduction dimension and combines partial outputs. DDP instead computes a complete local layer on different examples, then reduces gradients. FSDP changes where parameter, gradient, and optimizer shards live; transient gathers mean peak memory is not simply total model size divided by worker count."
         ]
       },
       {
@@ -816,7 +816,7 @@
         "title": "Reading the documentation: identify what each collective moves",
         "paragraphs": [
           "Read the DDP, FSDP, and tensor-parallel documentation with a tensor ownership diagram. Ask which device holds each parameter, gradient, optimizer state, and intermediate activation before and after an operation. A label such as distributed training does not specify that ownership.",
-          "For Y=XW, column-sharding W partitions output features. Row-sharding W partitions the summed input dimension, so local partial results must be combined to recover Y. These are different communication patterns even when the devices store similar numbers of weight elements.",
+          "For \\(Y=XW\\), column-sharding \\(W\\) partitions output features. Row-sharding \\(W\\) partitions the summed input dimension, so local partial results must be combined to recover \\(Y\\). These are different communication patterns even when the devices store similar numbers of weight elements.",
           "Trace one forward and backward step, including temporary all-gathers and gradient synchronization. FSDP's sharded resting state does not imply that its full working parameters are never materialized. DDP gradient buckets can overlap communication with backward work, so adding isolated timings may overestimate total latency. Confirm compatible collective order across ranks and profile the actual critical path before selecting a strategy."
         ]
       }
@@ -891,7 +891,7 @@
     ],
     "exercise": {
       "prompt": "Only 20% of runtime is spent in a kernel. What is the maximum speedup from making that kernel instantaneous, without changing anything else?",
-      "answer": "The remaining runtime is 80% of the original, so the maximum speedup is 1/0.8 = 1.25×. This upper bound assumes the same workload and no new overhead or overlap effects."
+      "answer": "The remaining runtime is 80% of the original, so the maximum speedup is \\(\\frac{1}{0.8}=1.25\\times\\). This upper bound assumes the same workload and no new overhead or overlap effects."
     },
     "takeaways": [
       "Optimize the critical path, not the largest-looking tensor.",

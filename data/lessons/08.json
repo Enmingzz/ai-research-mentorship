@@ -19,9 +19,9 @@
         "id": "mechanism",
         "title": "Keep track of shape and preprocessing",
         "paragraphs": [
-          "A batch of images often uses shape [B, C, H, W] in convolutional code, while a Transformer may operate on [B, N, d] patch representations. For a 224-by-224 image with 16-by-16 patches, N is 196 before any special tokens. Preprocessing is part of the encoder's contract: channel order, resizing, normalization, and interpolation affect the resulting features. Passing values in [0, 255] to an encoder expecting normalized floating-point values can damage representations without triggering a shape error."
+          "A batch of images often uses shape \\([B,C,H,W]\\) in convolutional code, while a Transformer may operate on \\([B,N,d]\\) patch representations. For a \\(224\\times224\\) image with \\(16\\times16\\) patches, \\(N\\) is 196 before any special tokens. Preprocessing is part of the encoder's contract: channel order, resizing, normalization, and interpolation affect the resulting features. Passing values in \\([0,255]\\) to an encoder expecting normalized floating-point values can damage representations without triggering a shape error."
         ],
-        "formula": "N = (H/P)(W/P), when H and W are divisible by patch size P"
+        "formula": "N=\\frac HP\\frac WP,\\qquad H,W\\text{ divisible by patch size }P"
       },
       {
         "id": "practice",
@@ -40,8 +40,8 @@
       }
     ],
     "exercise": {
-      "prompt": "How many raw values are in a 32-by-32 RGB image, and how many 8-by-8 patches does it contain?",
-      "answer": "There are 32 × 32 × 3 = 3,072 raw values and 4 × 4 = 16 patches. Each flattened patch contains 8 × 8 × 3 = 192 values."
+      "prompt": "How many raw values are in a \\(32\\times32\\) RGB image, and how many \\(8\\times8\\) patches does it contain?",
+      "answer": "There are \\(32\\times32\\times3=3{,}072\\) raw values and \\(4\\times4=16\\) patches. Each flattened patch contains \\(8\\times8\\times3=192\\) values."
     },
     "takeaways": [
       "Representation quality is relative to a task and preprocessing contract.",
@@ -82,15 +82,15 @@
         "id": "mechanism",
         "title": "Derive one output shape",
         "paragraphs": [
-          "For one spatial dimension, output size is floor((input + 2 padding − dilation(kernel − 1) − 1)/stride + 1). A 3-by-3 convolution with stride one and padding one preserves a 32-by-32 grid. With 3 input channels and 16 output channels, it has 16 × 3 × 3 × 3 = 432 kernel parameters. A residual block adds its transformed output to the input; when widths or spatial sizes differ, a projection or other matching operation is required."
+          "For one spatial dimension, output size is \\(\\left\\lfloor\\frac{\\text{input}+2\\,\\text{padding}-\\text{dilation}(\\text{kernel}-1)-1}{\\text{stride}}+1\\right\\rfloor\\). A \\(3\\times3\\) convolution with stride one and padding one preserves a \\(32\\times32\\) grid. With 3 input channels and 16 output channels, it has \\(16\\times3\\times3\\times3=432\\) kernel parameters. A residual block adds its transformed output to the input; when widths or spatial sizes differ, a projection or other matching operation is required."
         ],
-        "formula": "H_out = floor((H + 2p − d(k − 1) − 1)/s + 1)"
+        "formula": "H_{\\text{out}}=\\left\\lfloor\\frac{H+2p-d(k-1)-1}{s}+1\\right\\rfloor"
       },
       {
         "id": "practice",
         "title": "Understand what the skip path helps",
         "paragraphs": [
-          "Write a block as y = x + F(x). Its input gradient includes a direct path from the identity term as well as a path through F. This can make optimization of deep stacks easier, but it does not eliminate all vanishing, exploding, or poorly conditioned gradients. In a toy network, compare gradient norms across plain and residual stacks with matched widths. Check tensor shapes at every addition: broadcasting an incorrectly shaped shortcut can produce a legal tensor operation that implements the wrong architecture."
+          "Write a block as \\(y=x+F(x)\\). Its input gradient includes a direct path from the identity term as well as a path through \\(F\\). This can make optimization of deep stacks easier, but it does not eliminate all vanishing, exploding, or poorly conditioned gradients. In a toy network, compare gradient norms across plain and residual stacks with matched widths. Check tensor shapes at every addition: broadcasting an incorrectly shaped shortcut can produce a legal tensor operation that implements the wrong architecture."
         ]
       },
       {
@@ -103,8 +103,8 @@
       }
     ],
     "exercise": {
-      "prompt": "A 32-by-32 input uses kernel 3, padding 1, dilation 1, and stride 2. What is the output size?",
-      "answer": "floor((32 + 2 − 2 − 1)/2 + 1) = 16 in each spatial dimension, so the output grid is 16 by 16."
+      "prompt": "A \\(32\\times32\\) input uses kernel 3, padding 1, dilation 1, and stride 2. What is the output size?",
+      "answer": "\\(\\left\\lfloor\\frac{32+2-2-1}{2}+1\\right\\rfloor=16\\) in each spatial dimension, so the output grid is \\(16\\times16\\)."
     },
     "takeaways": [
       "Convolution shares local filters; residual addition creates a direct path.",
@@ -138,16 +138,16 @@
         "id": "intuition",
         "title": "Patches become the sequence elements",
         "paragraphs": [
-          "Split an image into nonoverlapping P-by-P patches. Flatten each patch's channel values and linearly project them to a hidden width d. A learned CLS token may be prepended to the sequence and used as the classification representation. Positional embeddings tell the model where patches came from. The original ViT design uses these ingredients to apply familiar Transformer blocks to images; different vision architectures may omit CLS tokens or use alternative pooling and position schemes."
+          "Split an image into nonoverlapping \\(P\\times P\\) patches. Flatten each patch's channel values and linearly project them to a hidden width \\(d\\). A learned CLS token may be prepended to the sequence and used as the classification representation. Positional embeddings tell the model where patches came from. The original ViT design uses these ingredients to apply familiar Transformer blocks to images; different vision architectures may omit CLS tokens or use alternative pooling and position schemes."
         ]
       },
       {
         "id": "mechanism",
         "title": "Follow a complete shape example",
         "paragraphs": [
-          "Take B images of shape [B, 3, 224, 224], patch size 16, and width 768. There are 14 × 14 = 196 patches. Each patch contains 3 × 16 × 16 = 768 raw values and is projected to a 768-dimensional embedding. Prepending CLS, as in the original ViT, gives [B, 197, 768]. Attention operates across these 197 positions, not across individual pixels. The equality of raw patch width and hidden width in this example is coincidental; the projection can change dimensionality."
+          "Take \\(B\\) images of shape \\([B,3,224,224]\\), patch size 16, and width 768. There are \\(14\\times14=196\\) patches. Each patch contains \\(3\\times16\\times16=768\\) raw values and is projected to a 768-dimensional embedding. Prepending CLS, as in the original ViT, gives \\([B,197,768]\\). Attention operates across these 197 positions, not across individual pixels. The equality of raw patch width and hidden width in this example is coincidental; the projection can change dimensionality."
         ],
-        "formula": "Patch count N = HW/P²; sequence length with CLS = N + 1"
+        "formula": "\\text{Patch count: }N=\\frac{HW}{P^2};\\qquad\\text{sequence length with CLS}=N+1"
       },
       {
         "id": "practice",
@@ -160,14 +160,14 @@
         "id": "source-reading",
         "title": "Reading the original paper",
         "paragraphs": [
-          "In the ViT paper, follow an image from patch extraction to the classification representation before studying the attention blocks. Write separate dimensions for the flattened patch and the hidden embedding; their equality in the 224-by-224 example here is accidental. For a patch with 192 raw values projected to width 384, the learned projection changes dimensionality even though the number of patches stays fixed.",
+          "In the ViT paper, follow an image from patch extraction to the classification representation before studying the attention blocks. Write separate dimensions for the flattened patch and the hidden embedding; their equality in the \\(224\\times224\\) example here is accidental. For a patch with 192 raw values projected to width 384, the learned projection changes dimensionality even though the number of patches stays fixed.",
           "Next, inspect the role of the classification token and positional embeddings. Permute the patch tokens while holding the classification token fixed, first without positional information and then with positions attached to image locations. The two experiments test different functions. This is why patch-order equivariance alone cannot recover an image layout. When reading higher-resolution results, distinguish interpolation of a learned positional grid from learning new image content. The input token count and attention cost also change, so improved resolution carries a computational consequence beyond simply resizing a table of positional values."
         ]
       }
     ],
     "exercise": {
-      "prompt": "For a 256-by-256 image with 16-by-16 patches and one CLS token, what is the sequence length?",
-      "answer": "There are 16 × 16 = 256 patch tokens, so the sequence length is 257."
+      "prompt": "For a \\(256\\times256\\) image with \\(16\\times16\\) patches and one CLS token, what is the sequence length?",
+      "answer": "There are \\(16\\times16=256\\) patch tokens, so the sequence length is 257."
     },
     "takeaways": [
       "Patch size determines both spatial granularity and token count.",
@@ -202,9 +202,9 @@
         "id": "mechanism",
         "title": "Compare sequence scaling with feature-map scaling",
         "paragraphs": [
-          "For a standard dense attention layer with N tokens and hidden width d, the attention interaction term scales roughly as N²d. A convolution's cost depends on spatial output size, kernel area, input channels, and output channels. If image height and width double with fixed patch size, ViT patch count quadruples and the N² interaction term grows sixteenfold. CNN cost often grows roughly with spatial area when the architecture and channel widths remain fixed, although details vary by layer."
+          "For a standard dense attention layer with \\(N\\) tokens and hidden width \\(d\\), the attention interaction term scales roughly as \\(N^2d\\). A convolution's cost depends on spatial output size, kernel area, input channels, and output channels. If image height and width double with fixed patch size, ViT patch count quadruples and the \\(N^2\\) interaction term grows sixteenfold. CNN cost often grows roughly with spatial area when the architecture and channel widths remain fixed, although details vary by layer."
         ],
-        "formula": "Dense attention interaction cost ∝ N²d"
+        "formula": "\\text{Dense attention interaction cost}\\propto N^2d"
       },
       {
         "id": "practice",
@@ -224,7 +224,7 @@
     ],
     "exercise": {
       "prompt": "If a standard ViT's patch count increases from 196 to 784, how does its pairwise attention matrix size change?",
-      "answer": "It grows from 196² to 784² entries, a factor of 16. Other components may scale differently, so total runtime need not grow by exactly that factor."
+      "answer": "It grows from \\(196^2\\) to \\(784^2\\) entries, a factor of 16. Other components may scale differently, so total runtime need not grow by exactly that factor."
     },
     "takeaways": [
       "Compare computational structures and training recipes together.",
@@ -265,9 +265,9 @@
         "id": "mechanism",
         "title": "Transform labels and geometry together",
         "paragraphs": [
-          "For detection and segmentation, geometric transforms must also update boxes or masks. A horizontal flip of an image with width W maps a box [x_min, x_max] to [W − x_max, W − x_min] under a continuous coordinate convention. The convention changes for integer pixel indices, so use one consistently. Cropping can truncate boxes and create empty targets. Color-only changes usually leave geometry intact but may still change semantic cues or invalidate assumptions about photometric measurements."
+          "For detection and segmentation, geometric transforms must also update boxes or masks. A horizontal flip of an image with width \\(W\\) maps a box \\([x_{\\min},x_{\\max}]\\) to \\([W-x_{\\max},W-x_{\\min}]\\) under a continuous coordinate convention. The convention changes for integer pixel indices, so use one consistently. Cropping can truncate boxes and create empty targets. Color-only changes usually leave geometry intact but may still change semantic cues or invalidate assumptions about photometric measurements."
         ],
-        "formula": "Horizontal box flip: [x_min, x_max] → [W − x_max, W − x_min]"
+        "formula": "\\text{Horizontal box flip:}\\qquad[x_{\\min},x_{\\max}]\\longmapsto[W-x_{\\max},W-x_{\\min}]"
       },
       {
         "id": "practice",
@@ -286,8 +286,8 @@
       }
     ],
     "exercise": {
-      "prompt": "A box spans x = 10 to 30 in an image of continuous width 100. What are its bounds after a horizontal flip?",
-      "answer": "The bounds become [100 − 30, 100 − 10] = [70, 90]. Both endpoints change and their order must remain valid."
+      "prompt": "A box spans \\(x=10\\) to 30 in an image of continuous width 100. What are its bounds after a horizontal flip?",
+      "answer": "The bounds become \\([100-30,100-10]=[70,90]\\). Both endpoints change and their order must remain valid."
     },
     "takeaways": [
       "Every augmentation encodes an invariance or equivariance assumption.",
@@ -330,7 +330,7 @@
         "paragraphs": [
           "A reconstruction objective encourages features that retain information needed to recover missing pixels or patches. A view-consistency objective encourages agreement across augmentations, potentially suppressing features that those augmentations change. Neither objective automatically selects the information needed for every downstream task. If color is heavily perturbed, a learned representation may become less useful for color-sensitive labels. If reconstruction focuses on local textures, good reconstruction alone may not imply strong semantic classification."
         ],
-        "formula": "Example masked objective: L = mean over masked patches ‖prediction − target‖²"
+        "formula": "\\text{Example masked objective:}\\quad L=\\frac{1}{|\\mathcal M|}\\sum_{i\\in\\mathcal M}\\lVert\\text{prediction}_i-\\text{target}_i\\rVert^2,\\quad\\mathcal M=\\{\\text{masked patches}\\}"
       },
       {
         "id": "practice",
@@ -391,9 +391,9 @@
         "id": "mechanism",
         "title": "Read the denominator carefully",
         "paragraphs": [
-          "For anchor q and positive k+, the loss is minus the log of exp(sim(q,k+)/τ) divided by the sum over all candidates, including the positive. Temperature τ controls how sharply score differences affect probabilities. For a positive score of 2 and one negative score of 0 at τ = 1, the positive probability is exp(2)/(exp(2)+1), about 0.881, and the loss is about 0.127. Lower loss means better identification within that candidate set."
+          "For anchor \\(q\\) and positive \\(k_+\\), the loss is minus the log of \\(\\exp(\\operatorname{sim}(q,k_+)/\\tau)\\) divided by the sum over all candidates, including the positive. Temperature \\(\\tau\\) controls how sharply score differences affect probabilities. For a positive score of 2 and one negative score of 0 at \\(\\tau=1\\), the positive probability is \\(\\frac{\\exp(2)}{\\exp(2)+1}\\), about 0.881, and the loss is about 0.127. Lower loss means better identification within that candidate set."
         ],
-        "formula": "L = −log [exp(sim(q,k+)/τ) / Σⱼ exp(sim(q,kⱼ)/τ)]"
+        "formula": "L=-\\log\\!\\left(\\frac{\\exp(\\operatorname{sim}(q,k_+)/\\tau)}{\\sum_j\\exp(\\operatorname{sim}(q,k_j)/\\tau)}\\right)"
       },
       {
         "id": "practice",
@@ -413,7 +413,7 @@
     ],
     "exercise": {
       "prompt": "If every candidate has the same score and there are eight candidates, what is the InfoNCE loss?",
-      "answer": "The positive probability is 1/8, so the loss is log(8) ≈ 2.079 nats."
+      "answer": "The positive probability is \\(\\frac18\\), so the loss is \\(\\log(8)\\approx2.079\\) nats."
     },
     "takeaways": [
       "The positive/negative construction defines the learning task.",
@@ -454,9 +454,9 @@
         "id": "mechanism",
         "title": "Trace a batch similarity matrix",
         "paragraphs": [
-          "Let image embeddings I and text embeddings T each have shape [B, d] after normalization. Their matrix product ITᵀ has shape [B, B], where entry i,j compares image i with text j. Matched pairs lie on the diagonal under the usual batch ordering. A learned logit scale sharpens the similarity scores before the contrastive loss. Normalization matters because it turns the dot product into cosine similarity and prevents vector norm alone from dominating the comparison."
+          "Let image embeddings \\(I\\) and text embeddings \\(T\\) each have shape \\([B,d]\\) after normalization. Their matrix product \\(IT^\\mathsf{T}\\) has shape \\([B,B]\\), where entry \\((i,j)\\) compares image \\(i\\) with text \\(j\\). Matched pairs lie on the diagonal under the usual batch ordering. A learned logit scale sharpens the similarity scores before the contrastive loss. Normalization matters because it turns the dot product into cosine similarity and prevents vector norm alone from dominating the comparison."
         ],
-        "formula": "S = scale × normalize(I) normalize(T)ᵀ"
+        "formula": "S=\\text{scale}\\times\\operatorname{normalize}(I)\\operatorname{normalize}(T)^\\mathsf{T}"
       },
       {
         "id": "practice",
@@ -476,7 +476,7 @@
     ],
     "exercise": {
       "prompt": "With 32 images and 32 captions, each embedded in 512 dimensions, what is the similarity matrix shape?",
-      "answer": "It is [32, 32]. Each image is compared with every caption, producing 1,024 pair scores."
+      "answer": "It is \\([32,32]\\). Each image is compared with every caption, producing \\(1{,}024\\) pair scores."
     },
     "takeaways": [
       "CLIP compares image and text vectors in a shared embedding space.",
@@ -511,9 +511,9 @@
         "id": "mechanism",
         "title": "Temperature changes confidence more directly than rank",
         "paragraphs": [
-          "For normalized vectors, logits are their cosine similarities divided by temperature, or multiplied by an equivalent positive scale. Decreasing temperature makes softmax probabilities sharper. With two similarities 0.3 and 0.2, temperature 0.1 produces logits 3 and 2, while temperature 0.01 produces 30 and 20. The ranking is unchanged, but the probabilities differ greatly. Thus a high softmax score among candidate labels is not automatically a calibrated probability that the label is correct."
+          "For normalized vectors, logits are their cosine similarities divided by temperature, or multiplied by an equivalent positive scale. Decreasing temperature makes softmax probabilities sharper. With two similarities \\(0.3\\) and \\(0.2\\), temperature \\(0.1\\) produces logits 3 and 2, while temperature \\(0.01\\) produces 30 and 20. The ranking is unchanged, but the probabilities differ greatly. Thus a high softmax score among candidate labels is not automatically a calibrated probability that the label is correct."
         ],
-        "formula": "p(class c|image) = softmax_c(sim(image, text_c)/τ)"
+        "formula": "p(\\text{class }c\\mid\\text{image})=\\operatorname{softmax}_c\\!\\left(\\frac{\\operatorname{sim}(\\text{image},\\text{text}_c)}{\\tau}\\right)"
       },
       {
         "id": "practice",
@@ -568,15 +568,15 @@
         "id": "mechanism",
         "title": "Write a binary pair loss",
         "paragraphs": [
-          "Let y be +1 for a matched pair and −1 for a mismatched pair. With logit z, a logistic loss is log(1 + exp(−yz)). The logit may include a learned similarity scale and bias. For z = 2, a positive pair has loss about 0.127; a negative pair with the same logit has loss about 2.127. The bias can account for the imbalance between few positives and many negatives. Stable implementations use softplus rather than directly exponentiating large numbers."
+          "Let \\(y\\) be \\(+1\\) for a matched pair and \\(-1\\) for a mismatched pair. With logit \\(z\\), a logistic loss is \\(\\log(1+\\exp(-yz))\\). The logit may include a learned similarity scale and bias. For \\(z=2\\), a positive pair has loss about 0.127; a negative pair with the same logit has loss about 2.127. The bias can account for the imbalance between few positives and many negatives. Stable implementations use softplus rather than directly exponentiating large numbers."
         ],
-        "formula": "L_pair = softplus(−y z), y ∈ {−1, +1}"
+        "formula": "L_{\\text{pair}}=\\operatorname{softplus}(-yz),\\qquad y\\in\\{-1,+1\\}"
       },
       {
         "id": "practice",
         "title": "Batch design still matters",
         "paragraphs": [
-          "A batch of B matched examples yields B diagonal positives and potentially B(B − 1) mismatches. Pair subsampling, weighting, and distributed computation determine how those terms enter training. Removing a global softmax denominator does not make batch composition irrelevant. It also does not make the raw sigmoid output a universally calibrated match probability on arbitrary deployment data. Evaluate retrieval or zero-shot classification with a consistent preprocessing and prompt protocol. When comparing with CLIP, hold encoder size, data, and training budget fixed if the goal is to isolate the loss change."
+          "A batch of \\(B\\) matched examples yields \\(B\\) diagonal positives and potentially \\(B(B-1)\\) mismatches. Pair subsampling, weighting, and distributed computation determine how those terms enter training. Removing a global softmax denominator does not make batch composition irrelevant. It also does not make the raw sigmoid output a universally calibrated match probability on arbitrary deployment data. Evaluate retrieval or zero-shot classification with a consistent preprocessing and prompt protocol. When comparing with CLIP, hold encoder size, data, and training budget fixed if the goal is to isolate the loss change."
         ]
       },
       {
@@ -584,12 +584,12 @@
         "title": "Reading the original paper",
         "paragraphs": [
           "Read the sigmoid objective in SigLIP next to CLIP's row-and-column softmax objective. The crucial difference is how pair losses are formed and normalized, not whether mismatched examples disappear. For a batch of four pairs, explicitly label the sixteen image-text combinations and calculate one positive and one negative logistic term using the same score.",
-          "Inspect the reduction over those terms as carefully as the pair formula. The paper normalizes the summed pair losses by B; a mean over all B² pairs differs by a batch-size-dependent scale; that difference matters when comparing gradients or changing batch size. The learned bias also participates in the positive-negative imbalance, so copying only a similarity scale is not a complete transcription of the studied objective. An independent comparison should hold encoder, data, and evaluation protocol fixed while recording the negative-pair policy. This keeps the reading focused on the loss design rather than attributing every system-level gain to the word sigmoid."
+          "Inspect the reduction over those terms as carefully as the pair formula. The paper normalizes the summed pair losses by \\(B\\); a mean over all \\(B^2\\) pairs differs by a batch-size-dependent scale; that difference matters when comparing gradients or changing batch size. The learned bias also participates in the positive-negative imbalance, so copying only a similarity scale is not a complete transcription of the studied objective. An independent comparison should hold encoder, data, and evaluation protocol fixed while recording the negative-pair policy. This keeps the reading focused on the loss design rather than attributing every system-level gain to the word sigmoid."
         ]
       }
     ],
     "exercise": {
-      "prompt": "For B = 4 matched image–text pairs and all pair combinations, how many positives and negatives are available?",
+      "prompt": "For \\(B=4\\) matched image–text pairs and all pair combinations, how many positives and negatives are available?",
       "answer": "There are 16 pairs: four matched diagonal positives and twelve off-diagonal negatives, before accounting for any semantically valid cross-pairs."
     },
     "takeaways": [
@@ -687,9 +687,9 @@
         "id": "mechanism",
         "title": "Track the effect of pooling",
         "paragraphs": [
-          "Suppose a feature map has shape [B, 14, 14, 768]. Global average pooling produces [B, 768] by averaging over 196 positions. The result cannot preserve all distinctions in the original map. Two maps with spatially permuted vectors have the same average. A CLS representation is another aggregation mechanism, but its learned pooling behavior differs from arithmetic averaging. Dense prediction usually keeps spatial indices and uses a task head or decoder to map features to boxes, masks, or coordinates."
+          "Suppose a feature map has shape \\([B,14,14,768]\\). Global average pooling produces \\([B,768]\\) by averaging over 196 positions. The result cannot preserve all distinctions in the original map. Two maps with spatially permuted vectors have the same average. A CLS representation is another aggregation mechanism, but its learned pooling behavior differs from arithmetic averaging. Dense prediction usually keeps spatial indices and uses a task head or decoder to map features to boxes, masks, or coordinates."
         ],
-        "formula": "g = (1/N) Σᵢ hᵢ"
+        "formula": "g=\\frac1N\\sum_{i=1}^{N}h_i"
       },
       {
         "id": "practice",
@@ -749,9 +749,9 @@
         "id": "mechanism",
         "title": "Boxes and masks use different geometry",
         "paragraphs": [
-          "For two regions A and B, intersection-over-union is the area of their intersection divided by the area of their union. A predicted box can overlap a ground-truth box well while including substantial background. A mask can follow a nonrectangular boundary more precisely. Detection also requires matching predictions to ground truth and dealing with duplicates or missing objects. In set-based detectors, matching is part of the training design rather than simply assigning every prediction to its nearest target."
+          "For two regions \\(A\\) and \\(B\\), intersection-over-union is the area of their intersection divided by the area of their union. A predicted box can overlap a ground-truth box well while including substantial background. A mask can follow a nonrectangular boundary more precisely. Detection also requires matching predictions to ground truth and dealing with duplicates or missing objects. In set-based detectors, matching is part of the training design rather than simply assigning every prediction to its nearest target."
         ],
-        "formula": "IoU(A,B) = area(A ∩ B) / area(A ∪ B)"
+        "formula": "\\operatorname{IoU}(A,B)=\\frac{\\operatorname{area}(A\\cap B)}{\\operatorname{area}(A\\cup B)}"
       },
       {
         "id": "practice",
@@ -771,7 +771,7 @@
     ],
     "exercise": {
       "prompt": "Two masks each cover 100 pixels and overlap on 60. What is their IoU?",
-      "answer": "The union has 100 + 100 − 60 = 140 pixels, so IoU is 60/140 ≈ 0.429."
+      "answer": "The union has \\(100+100-60=140\\) pixels, so IoU is \\(\\frac{60}{140}\\approx0.429\\)."
     },
     "takeaways": [
       "Choose boxes, semantic labels, or instance masks according to the task.",

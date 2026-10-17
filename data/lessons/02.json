@@ -199,7 +199,7 @@
         "id": "mechanism",
         "title": "Split heads, then reorder them",
         "paragraphs": [
-          "Start with a projected tensor shaped [B, T, H·D]. Reshape it to [B, T, H, D], then permute to [B, H, T, D] for attention. The first operation splits a feature axis; the second moves the head axis. Einsum can make a contraction explicit: 'btd,dh->bth' projects features while retaining batch and time. With an explicit output, dimensions whose labels are omitted from that output are summed, whether or not a label repeats across operands. Repeating a label within one operand selects its diagonal; for example, 'ii->i' extracts a diagonal without summing it."
+          "Start with a projected tensor shaped \\([B,T,H\\cdot D]\\). Reshape it to \\([B, T, H, D]\\), then permute to \\([B, H, T, D]\\) for attention. The first operation splits a feature axis; the second moves the head axis. Einsum can make a contraction explicit: 'btd,dh->bth' projects features while retaining batch and time. With an explicit output, dimensions whose labels are omitted from that output are summed, whether or not a label repeats across operands. Repeating a label within one operand selects its diagonal; for example, 'ii->i' extracts a diagonal without summing it."
         ]
       },
       {
@@ -221,8 +221,8 @@
       }
     ],
     "exercise": {
-      "prompt": "A tensor has shape [2, 5, 24] with 3 attention heads. Give the reshape and permutation needed for head dimension 8.",
-      "answer": "First reshape to [2, 5, 3, 8]. Then permute axes as (0, 2, 1, 3), producing [2, 3, 5, 8]. A single reshape directly to the final shape would generally assign different values to head and token positions."
+      "prompt": "A tensor has shape \\([2, 5, 24]\\) with 3 attention heads. Give the reshape and permutation needed for head dimension 8.",
+      "answer": "First reshape to \\([2, 5, 3, 8]\\). Then permute axes as \\((0, 2, 1, 3)\\), producing \\([2, 3, 5, 8]\\). A single reshape directly to the final shape would generally assign different values to head and token positions."
     },
     "takeaways": [
       "Reshape splits or combines axes; permute moves them.",
@@ -269,28 +269,28 @@
         "id": "mechanism",
         "title": "Work through a batched attention product",
         "paragraphs": [
-          "Let Q have shape [4, 2, 7, 8] and K have shape [4, 2, 9, 8], representing batch, heads, positions, and head features. Q @ K.transpose(-2, -1) produces [4, 2, 7, 9]. The final feature dimension contracts. By contrast, multiplying Q by a scale of shape [8] is elementwise and preserves [4, 2, 7, 8]. A scale of [2] does not automatically select the head axis; it aligns with the last axis and fails here."
+          "Let \\(Q\\) have shape \\([4, 2, 7, 8]\\) and \\(K\\) have shape \\([4, 2, 9, 8]\\), representing batch, heads, positions, and head features. Q @ K.transpose(-2, -1) produces \\([4, 2, 7, 9]\\). The final feature dimension contracts. By contrast, multiplying \\(Q\\) by a scale of shape \\([8]\\) is elementwise and preserves \\([4, 2, 7, 8]\\). A scale of \\([2]\\) does not automatically select the head axis; it aligns with the last axis and fails here."
         ]
       },
       {
         "id": "practice",
         "title": "Use explicit singleton dimensions",
         "paragraphs": [
-          "To scale each head separately, reshape head weights to [1, 2, 1, 1]. This states exactly where variation is allowed. Broadcasting often avoids allocating repeated inputs, but the resulting output can still be huge: comparing all pairs of B examples creates B² entries. In-place operations are more restrictive because the destination cannot change shape. Prefer small shape assertions and a hand-calculated batch before optimizing a complicated contraction."
+          "To scale each head separately, reshape head weights to \\([1, 2, 1, 1]\\). This states exactly where variation is allowed. Broadcasting often avoids allocating repeated inputs, but the resulting output can still be huge: comparing all pairs of \\(B\\) examples creates \\(B^2\\) entries. In-place operations are more restrictive because the destination cannot change shape. Prefer small shape assertions and a hand-calculated batch before optimizing a complicated contraction."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the broadcasting rules alongside the tensor tutorial's distinction between elementwise and matrix products. For the attention example, separate the leading [4, 2] batch/head dimensions from the final matrix dimensions before multiplying. The inner feature width 8 is contracted, while the two position lengths 7 and 9 remain. Replacing the matrix product with elementwise multiplication would not express the same comparisons, even if selected input dimensions happened to match.",
-          "A per-head scale is a useful diagnostic because its intended semantics are easy to state: all positions and features within one head receive the same multiplier. The shape [1, 2, 1, 1] records exactly that policy. If a future model happens to have feature width 2, the incorrect shape [2] might stop raising an error while still scaling features instead of heads. Test deliberately unequal dimensions to avoid letting coincidences conceal an axis mistake."
+          "Read the broadcasting rules alongside the tensor tutorial's distinction between elementwise and matrix products. For the attention example, separate the leading \\([4, 2]\\) batch/head dimensions from the final matrix dimensions before multiplying. The inner feature width 8 is contracted, while the two position lengths 7 and 9 remain. Replacing the matrix product with elementwise multiplication would not express the same comparisons, even if selected input dimensions happened to match.",
+          "A per-head scale is a useful diagnostic because its intended semantics are easy to state: all positions and features within one head receive the same multiplier. The shape \\([1, 2, 1, 1]\\) records exactly that policy. If a future model happens to have feature width 2, the incorrect shape \\([2]\\) might stop raising an error while still scaling features instead of heads. Test deliberately unequal dimensions to avoid letting coincidences conceal an axis mistake."
         ]
       }
     ],
     "exercise": {
-      "prompt": "X is [3, 5, 4] and W is [1, 4, 6]. What is X @ W? What shape should a per-example scalar have to multiply that result?",
-      "answer": "The product has shape [3, 5, 6]: W's batch dimension broadcasts across three examples. Per-example scalars should have shape [3, 1, 1], so each scalar is shared across positions and output features."
+      "prompt": "\\(X\\) is \\([3, 5, 4]\\) and \\(W\\) is \\([1, 4, 6]\\). What is \\(X\\mathbin{@}W\\)? What shape should a per-example scalar have to multiply that result?",
+      "answer": "The product has shape \\([3, 5, 6]\\): \\(W\\)'s batch dimension broadcasts across three examples. Per-example scalars should have shape \\([3, 1, 1]\\), so each scalar is shared across positions and output features."
     },
     "takeaways": [
       "Broadcasting aligns trailing axes.",
@@ -347,13 +347,13 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "The autograd tutorial distinguishes recording a computation from updating parameters. Use the small polynomial here to follow that boundary: backward produces the derivative 7 at x = 2, but x itself remains 2 until some update changes it. Repeated backward calls from independent computations add contributions into the leaf gradient. Inspect the parameter value and its gradient separately to avoid mistaking successful differentiation for successful learning.",
+          "The autograd tutorial distinguishes recording a computation from updating parameters. Use the small polynomial here to follow that boundary: backward produces the derivative 7 at \\(x = 2\\), but \\(x\\) itself remains 2 until some update changes it. Repeated backward calls from independent computations add contributions into the leaf gradient. Inspect the parameter value and its gradient separately to avoid mistaking successful differentiation for successful learning.",
           "Trace detach and no_grad through the same example. A detached value can still participate in later differentiable work with other parameters, but it no longer carries a path back through the original history. Evaluation mode is a separate switch that affects selected modules' behavior. This distinction is useful when reading saliency or attribution code: evaluating a model and differentiating its prediction with respect to an input can be intentional. Turning off gradient recording would prevent that calculation."
         ]
       }
     ],
     "exercise": {
-      "prompt": "A scalar parameter w has gradient 3 after one backward pass. A second independent loss contributes gradient 5, with no zeroing in between. What will w.grad contain?",
+      "prompt": "A scalar parameter \\(w\\) has gradient 3 after one backward pass. A second independent loss contributes gradient 5, with no zeroing in between. What will w.grad contain?",
       "answer": "It contains 8 because backward accumulates gradients. That is useful for deliberate gradient accumulation, but wrong if each batch is supposed to produce an independent optimizer step."
     },
     "takeaways": [
@@ -453,7 +453,7 @@
         "id": "mechanism",
         "title": "Variable lengths need an explicit policy",
         "paragraphs": [
-          "Three token sequences of lengths 3, 5, and 2 cannot be stacked directly into one rectangular tensor. A collation function can pad them to length 5, producing [3, 5] token IDs plus lengths or a validity mask. Padding values are placeholders, not observations. Attention should avoid reading them, and loss reduction should exclude them. Alternatively, bucketing similar lengths reduces wasted computation without changing the model's maximum supported context."
+          "Three token sequences of lengths 3, 5, and 2 cannot be stacked directly into one rectangular tensor. A collation function can pad them to length 5, producing \\([3, 5]\\) token IDs plus lengths or a validity mask. Padding values are placeholders, not observations. Attention should avoid reading them, and loss reduction should exclude them. Alternatively, bucketing similar lengths reduces wasted computation without changing the model's maximum supported context."
         ]
       },
       {
@@ -467,14 +467,14 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the basic data tutorial for the separation between examples and batches, then use torch.utils.data for the detailed collation and worker rules. With lengths [2, 4, 3], a rectangular representation allocates twelve positions but contains only nine observations. The tensor shape, attention-validity mask, and loss-validity mask describe different aspects of that representation. For next-token prediction, identify valid shifted targets explicitly rather than blindly reusing an input-length count.",
+          "Read the basic data tutorial for the separation between examples and batches, then use torch.utils.data for the detailed collation and worker rules. With lengths \\([2, 4, 3]\\), a rectangular representation allocates twelve positions but contains only nine observations. The tensor shape, attention-validity mask, and loss-validity mask describe different aspects of that representation. For next-token prediction, identify valid shifted targets explicitly rather than blindly reusing an input-length count.",
           "The iterable-dataset examples are particularly relevant to streaming corpora. Multiple workers can each receive a dataset replica, so independent iteration without sharding may repeat the same examples. Inspect sample identifiers across one small epoch before increasing worker count. Likewise, changing drop_last can change which observations contribute to an update. A throughput improvement should be reported separately from any simultaneous change in sample exposure, padding policy, or randomness; otherwise the comparison no longer isolates pipeline speed."
         ]
       }
     ],
     "exercise": {
-      "prompt": "Sequences have lengths [2, 4, 3]. How many padded positions are introduced when batching to the longest length, and how many positions should contribute to a token-averaged loss?",
-      "answer": "The rectangular batch has 3·4 = 12 positions. The sequences contain 2 + 4 + 3 = 9 real positions, so three are padding. The loss denominator should count nine valid positions, or the appropriate valid shifted targets for next-token training."
+      "prompt": "Sequences have lengths \\([2, 4, 3]\\). How many padded positions are introduced when batching to the longest length, and how many positions should contribute to a token-averaged loss?",
+      "answer": "The rectangular batch has \\(3\\cdot4=12\\) positions. The sequences contain \\(2 + 4 + 3 = 9\\) real positions, so three are padding. The loss denominator should count nine valid positions, or the appropriate valid shifted targets for next-token training."
     },
     "takeaways": [
       "Padding requires matching attention and loss masks.",
@@ -713,7 +713,7 @@
     ],
     "exercise": {
       "prompt": "Why should gradient clipping happen after unscaling FP16 gradients? What error occurs if a norm threshold of 1 is applied to gradients scaled by 1024?",
-      "answer": "Clipping should act on the real gradient. Before unscaling, the norm is inflated by 1024, so applying threshold 1 can shrink the eventual unscaled gradient toward a norm of 1/1024 instead of 1, making updates unnecessarily small."
+      "answer": "Clipping should act on the real gradient. Before unscaling, the norm is inflated by 1024, so applying threshold 1 can shrink the eventual unscaled gradient toward a norm of \\(\\frac1{1024}\\) instead of 1, making updates unnecessarily small."
     },
     "takeaways": [
       "Exponent range and fractional precision are separate properties.",

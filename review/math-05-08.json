@@ -1,0 +1,442 @@
+{
+  "range": "05-08",
+  "reviewer": "OpenAI Codex agent /root/papers",
+  "date": "2026-10-16",
+  "status": "complete",
+  "reviewedTopicIds": [
+    "05-01",
+    "05-02",
+    "05-03",
+    "05-04",
+    "05-05",
+    "05-06",
+    "05-07",
+    "05-08",
+    "05-09",
+    "05-10",
+    "05-11",
+    "05-12",
+    "05-13",
+    "05-14",
+    "06-01",
+    "06-02",
+    "06-03",
+    "06-04",
+    "06-05",
+    "06-06",
+    "06-07",
+    "06-08",
+    "06-09",
+    "06-10",
+    "06-11",
+    "06-12",
+    "07-01",
+    "07-02",
+    "07-03",
+    "07-04",
+    "07-05",
+    "07-06",
+    "07-07",
+    "07-08",
+    "07-09",
+    "07-10",
+    "07-11",
+    "08-01",
+    "08-02",
+    "08-03",
+    "08-04",
+    "08-05",
+    "08-06",
+    "08-07",
+    "08-08",
+    "08-09",
+    "08-10",
+    "08-11",
+    "08-12",
+    "08-13",
+    "08-14"
+  ],
+  "coverage": {
+    "articles": 51,
+    "moduleCounts": {
+      "05": 14,
+      "06": 12,
+      "07": 11,
+      "08": 14
+    },
+    "method": "Every article's paragraphs, formula blocks, exercise prompt/answer, and takeaways were read individually. Explicit per-article notation mappings were applied and the converted mathematical contexts were reviewed; no automatic inference from a repository-wide regex was used.",
+    "fieldsConverted": [
+      "sections[].formula",
+      "sections[].paragraphs[]",
+      "sections[].bullets[] when present",
+      "exercise.prompt",
+      "exercise.answer",
+      "takeaways[]"
+    ],
+    "protectedFields": "Titles, summaries, references and reference notes, IDs, prerequisites, code, and all other structural fields were compared with the before snapshot and preserved."
+  },
+  "mathCounts": {
+    "displayFormulas": 36,
+    "inlineExpressions": 393,
+    "totalExpressions": 429,
+    "perTopic": [
+      {
+        "topicId": "05-01",
+        "display": 1,
+        "inline": 5
+      },
+      {
+        "topicId": "05-02",
+        "display": 0,
+        "inline": 2
+      },
+      {
+        "topicId": "05-03",
+        "display": 1,
+        "inline": 11
+      },
+      {
+        "topicId": "05-04",
+        "display": 1,
+        "inline": 4
+      },
+      {
+        "topicId": "05-05",
+        "display": 0,
+        "inline": 0
+      },
+      {
+        "topicId": "05-06",
+        "display": 0,
+        "inline": 0
+      },
+      {
+        "topicId": "05-07",
+        "display": 0,
+        "inline": 0
+      },
+      {
+        "topicId": "05-08",
+        "display": 0,
+        "inline": 0
+      },
+      {
+        "topicId": "05-09",
+        "display": 1,
+        "inline": 10
+      },
+      {
+        "topicId": "05-10",
+        "display": 0,
+        "inline": 0
+      },
+      {
+        "topicId": "05-11",
+        "display": 0,
+        "inline": 0
+      },
+      {
+        "topicId": "05-12",
+        "display": 1,
+        "inline": 9
+      },
+      {
+        "topicId": "05-13",
+        "display": 0,
+        "inline": 0
+      },
+      {
+        "topicId": "05-14",
+        "display": 0,
+        "inline": 2
+      },
+      {
+        "topicId": "06-01",
+        "display": 0,
+        "inline": 2
+      },
+      {
+        "topicId": "06-02",
+        "display": 1,
+        "inline": 17
+      },
+      {
+        "topicId": "06-03",
+        "display": 1,
+        "inline": 36
+      },
+      {
+        "topicId": "06-04",
+        "display": 1,
+        "inline": 21
+      },
+      {
+        "topicId": "06-05",
+        "display": 1,
+        "inline": 18
+      },
+      {
+        "topicId": "06-06",
+        "display": 1,
+        "inline": 19
+      },
+      {
+        "topicId": "06-07",
+        "display": 1,
+        "inline": 11
+      },
+      {
+        "topicId": "06-08",
+        "display": 1,
+        "inline": 4
+      },
+      {
+        "topicId": "06-09",
+        "display": 1,
+        "inline": 2
+      },
+      {
+        "topicId": "06-10",
+        "display": 1,
+        "inline": 14
+      },
+      {
+        "topicId": "06-11",
+        "display": 0,
+        "inline": 4
+      },
+      {
+        "topicId": "06-12",
+        "display": 0,
+        "inline": 8
+      },
+      {
+        "topicId": "07-01",
+        "display": 1,
+        "inline": 0
+      },
+      {
+        "topicId": "07-02",
+        "display": 1,
+        "inline": 13
+      },
+      {
+        "topicId": "07-03",
+        "display": 1,
+        "inline": 21
+      },
+      {
+        "topicId": "07-04",
+        "display": 1,
+        "inline": 14
+      },
+      {
+        "topicId": "07-05",
+        "display": 1,
+        "inline": 12
+      },
+      {
+        "topicId": "07-06",
+        "display": 1,
+        "inline": 11
+      },
+      {
+        "topicId": "07-07",
+        "display": 1,
+        "inline": 13
+      },
+      {
+        "topicId": "07-08",
+        "display": 1,
+        "inline": 5
+      },
+      {
+        "topicId": "07-09",
+        "display": 1,
+        "inline": 10
+      },
+      {
+        "topicId": "07-10",
+        "display": 1,
+        "inline": 13
+      },
+      {
+        "topicId": "07-11",
+        "display": 0,
+        "inline": 0
+      },
+      {
+        "topicId": "08-01",
+        "display": 1,
+        "inline": 11
+      },
+      {
+        "topicId": "08-02",
+        "display": 1,
+        "inline": 9
+      },
+      {
+        "topicId": "08-03",
+        "display": 1,
+        "inline": 11
+      },
+      {
+        "topicId": "08-04",
+        "display": 1,
+        "inline": 6
+      },
+      {
+        "topicId": "08-05",
+        "display": 1,
+        "inline": 5
+      },
+      {
+        "topicId": "08-06",
+        "display": 1,
+        "inline": 0
+      },
+      {
+        "topicId": "08-07",
+        "display": 1,
+        "inline": 8
+      },
+      {
+        "topicId": "08-08",
+        "display": 1,
+        "inline": 10
+      },
+      {
+        "topicId": "08-09",
+        "display": 1,
+        "inline": 4
+      },
+      {
+        "topicId": "08-10",
+        "display": 1,
+        "inline": 12
+      },
+      {
+        "topicId": "08-11",
+        "display": 0,
+        "inline": 0
+      },
+      {
+        "topicId": "08-12",
+        "display": 1,
+        "inline": 2
+      },
+      {
+        "topicId": "08-13",
+        "display": 1,
+        "inline": 4
+      },
+      {
+        "topicId": "08-14",
+        "display": 0,
+        "inline": 0
+      }
+    ]
+  },
+  "validation": {
+    "renderer": "tools/math.mjs using vendored KaTeX 0.19.0",
+    "options": {
+      "strict": "error",
+      "throwOnError": true
+    },
+    "status": "passed",
+    "failures": [],
+    "protectedFieldIssues": [],
+    "allDisplayDelimitersAbsent": true,
+    "allDisplayUnicodeMathConverted": true,
+    "checks": [
+      "All 36 original section.formula fields converted to raw LaTeX without delimiters.",
+      "All 393 inline expressions parsed through mathSegments and renderMathText.",
+      "Display formulas rendered with renderFormula(..., {displayMode:true}).",
+      "No protected content fields changed; all topic IDs and article ordering preserved.",
+      "Scanned prose outside explicit math delimiters for remaining Unicode operators, subscripts, exponents, and plain-text function/equation patterns.",
+      "Manually corrected a possessive boundary so paper's remains ordinary prose."
+    ]
+  },
+  "ambiguityDecisions": [
+    {
+      "topicId": "05-02",
+      "decision": "Toy tokenizer symbols use upright text labels inside mathematical sequences; the SentencePiece whitespace marker remains literal text because it is a tokenizer character, not a mathematical variable."
+    },
+    {
+      "topicId": "05-03",
+      "decision": "BOS/A/B/EOS are upright token labels; N_batch and N_valid have textual subscripts. The existing valid-target sum is made explicit with a defined valid-position set, without changing which targets count."
+    },
+    {
+      "topicId": "05-04",
+      "decision": "Perplexity and named functions use operator notation. The existing sum over valid targets is preserved with an explicitly defined valid-position set."
+    },
+    {
+      "topicId": "06-02",
+      "decision": "A used as a matrix is typeset, while the English indefinite article A remains prose. This distinction was checked throughout LoRA articles."
+    },
+    {
+      "topicId": "06-03",
+      "decision": "Tensor shapes remain bracketed dimension lists; row-vector transpose conventions use a superscript T. Numeric parameter counts and break-even examples are unchanged."
+    },
+    {
+      "topicId": "06-05",
+      "decision": "Projection symbols Q/K/V/O are math; q_proj and other API identifiers remain literal prose. The target-sum index is written as j with textual input/output subscripts."
+    },
+    {
+      "topicId": "06-10",
+      "decision": "DoRA norms use paired norm delimiters, scalar/vector and matrix-axis qualifiers remain intact, and rsLoRA's square-root rank scaling remains distinct from standard alpha/r."
+    },
+    {
+      "topicId": "07-05",
+      "decision": "The existing selected-expert sum is expressed using a defined selected-expert set for token t."
+    },
+    {
+      "topicId": "07-07",
+      "decision": "The capacity factor is c, as already defined in prose; ceil is typeset with ceiling delimiters."
+    },
+    {
+      "topicId": "07-09",
+      "decision": "M is an upright million-parameter unit; the entire arithmetic expression is multiplied by M so both sides of the displayed inline equality use the same units, preserving counts 90M and 45M."
+    },
+    {
+      "topicId": "08-02",
+      "decision": "Convolution floor operations use paired floor delimiters; labels in the expanded prose equation remain upright text."
+    },
+    {
+      "topicId": "08-06",
+      "decision": "The original mean over masked-patch squared norms is expanded as a sum divided by the number of masked patches, with the masked set defined."
+    },
+    {
+      "topicId": "08-07",
+      "decision": "The positive key uses subscript +, candidate keys use subscript j, similarity uses operatorname, and temperature uses tau."
+    },
+    {
+      "topicId": "08-10",
+      "decision": "Preserved the distinction between per-pair sigmoid loss and the paper's batch-size reduction: B and B squared are typeset without altering the reviewed reduction claim."
+    },
+    {
+      "topicId": "all",
+      "decision": "Ordinary descriptive counts, model names, publication names, API identifiers, and prose method names remain text unless they are part of a mathematical expression, tensor shape, probability/parameter expression, or unit-bearing calculation. Titles and summaries are deliberately unchanged under the task scope."
+    }
+  ],
+  "scientificPreservation": "This pass changes mathematical presentation, not objectives, assumptions, examples, numerical results, or reviewed reference claims. It does not constitute another scientific audit or model experiment.",
+  "files": [
+    {
+      "path": "data/lessons/05.json",
+      "sha256": "49406afe5a154d1983db1bbdd8d454bd093e4304f1b78d8a65358995f72322fd"
+    },
+    {
+      "path": "data/lessons/06.json",
+      "sha256": "212464cae95ac282fe01c602a46c71e7271fac942284d6a5ce1529f0a0ab02d5"
+    },
+    {
+      "path": "data/lessons/07.json",
+      "sha256": "9c2a9dd3ee9180e95a05bc5b003533ebd802fd6bc7fbe864bf148faa5e4a4ef3"
+    },
+    {
+      "path": "data/lessons/08.json",
+      "sha256": "8fedd404205e2e093fc49c363146bb31da1e0da9ff643cae2a1848dd00e29b8b"
+    }
+  ],
+  "unresolved": []
+}

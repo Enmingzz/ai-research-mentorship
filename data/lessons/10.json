@@ -21,7 +21,7 @@
         "paragraphs": [
           "A CLIP-style system computes a compatibility score between an image and a candidate text. A generative VLM models the probability of the next answer token given the image, prompt, and previous answer tokens. It can express a new sentence without enumerating every possible answer beforehand. However, fluent generation can also introduce unsupported details. Neither a high similarity score nor a confident generated answer proves that the system has correctly grounded every statement in the image."
         ],
-        "formula": "Generative factorization: p(y|image,prompt) = ∏ₜ p(yₜ|image,prompt,y_<t)"
+        "formula": "p(y\\mid\\text{image},\\text{prompt})=\\prod_t p(y_t\\mid\\text{image},\\text{prompt},y_{<t})"
       },
       {
         "id": "practice",
@@ -84,9 +84,9 @@
         "id": "mechanism",
         "title": "Annotate a complete shape path",
         "paragraphs": [
-          "Consider a hypothetical batch with vision features [B, 196, 768] and an LLM width of 2048. A token-wise linear projector maps the final dimension to produce [B, 196, 2048]. If the prompt has 32 text tokens and all visual tokens are inserted, the combined input has 228 positions before special tokens. The language model outputs hidden states of width 2048, then a vocabulary head produces logits over text tokens. A width-changing projector does not necessarily change the visual token count."
+          "Consider a hypothetical batch with vision features \\([B,196,768]\\) and an LLM width of 2048. A token-wise linear projector maps the final dimension to produce \\([B,196,2048]\\). If the prompt has 32 text tokens and all visual tokens are inserted, the combined input has 228 positions before special tokens. The language model outputs hidden states of width 2048, then a vocabulary head produces logits over text tokens. A width-changing projector does not necessarily change the visual token count."
         ],
-        "formula": "[B,N,d_vision] → projector → [B,N,d_language]"
+        "formula": "[B,N,d_{\\text{vision}}]\\xrightarrow{\\text{projector}}[B,N,d_{\\text{language}}]"
       },
       {
         "id": "practice",
@@ -100,14 +100,14 @@
         "title": "Reading the papers: an interface has two jobs",
         "paragraphs": [
           "In Visual Instruction Tuning and BLIP-2, track both the feature width and the sequence length at each modality interface. A map can solve a dimensional mismatch without reducing token count, while a query-based bottleneck can change both. The diagram alone may hide this distinction.",
-          "Take 100 image features of width 768 and a language model width of 2048. A tokenwise linear projection needs a 768-by-2048 weight matrix under the row-vector convention, but still emits 100 positions. Compressing to 25 positions requires an additional selection, pooling, or learned aggregation mechanism.",
+          "Take 100 image features of width 768 and a language model width of 2048. A tokenwise linear projection needs a \\(768\\times2048\\) weight matrix under the row-vector convention, but still emits 100 positions. Compressing to 25 positions requires an additional selection, pooling, or learned aggregation mechanism.",
           "Use this trace to identify where visual information could be lost and where computation is actually saved. Inspect gradient flow as well: an adapter can learn while both pretrained components remain fixed. Shape compatibility is necessary for execution, but successful training must also align feature meaning and numerical scale with the language model's expected interface."
         ]
       }
     ],
     "exercise": {
-      "prompt": "A projector maps [2, 256, 1024] features to an LLM width of 4096 without token pooling. What is the output shape?",
-      "answer": "[2, 256, 4096]. It changes feature width, not batch size or token count."
+      "prompt": "A projector maps \\([2,256,1024]\\) features to an LLM width of 4096 without token pooling. What is the output shape?",
+      "answer": "\\([2,256,4096]\\). It changes feature width, not batch size or token count."
     },
     "takeaways": [
       "Track visual token count and hidden width separately.",
@@ -150,7 +150,7 @@
         "paragraphs": [
           "Suppose a prompt contains 64 visual positions followed by 20 text positions. The model may process all 84 positions while computing training loss only on selected text response tokens. Visual input positions generally do not need vocabulary labels in this setup. Ignored loss positions still influence later hidden states through attention. Therefore, a label mask is not the same thing as an attention mask. Blocking image positions from attention would remove the visual evidence the answer is supposed to use."
         ],
-        "formula": "Input positions = visual positions + text positions + any special-token positions"
+        "formula": "\\begin{aligned}\\text{Input positions}&=\\text{visual positions}+\\text{text positions}\\\\ &\\quad+\\text{any special-token positions}\\end{aligned}"
       },
       {
         "id": "practice",
@@ -212,9 +212,9 @@
         "id": "mechanism",
         "title": "Queries can gather across positions",
         "paragraphs": [
-          "A Q-Former uses learned query representations that interact with image features through attention. If there are M learned queries and N visual positions, the interface can output M query features rather than N directly projected patch features. The query count is therefore a possible information bottleneck. Cross-attention scores have a query-by-visual-position structure, while a purely token-wise projector has no mechanism to mix information across positions by itself. The encoder may already have mixed context before projection."
+          "A Q-Former uses learned query representations that interact with image features through attention. If there are \\(M\\) learned queries and \\(N\\) visual positions, the interface can output \\(M\\) query features rather than \\(N\\) directly projected patch features. The query count is therefore a possible information bottleneck. Cross-attention scores have a query-by-visual-position structure, while a purely token-wise projector has no mechanism to mix information across positions by itself. The encoder may already have mixed context before projection."
         ],
-        "formula": "Token-wise projector: [B,N,d_v] → [B,N,d_l]; query interface: [B,N,d_v] → [B,M,d_q]"
+        "formula": "\\begin{aligned}\\text{Token-wise projector: }&[B,N,d_v]\\to[B,N,d_l]\\\\ \\text{Query interface: }&[B,N,d_v]\\to[B,M,d_q]\\end{aligned}"
       },
       {
         "id": "practice",
@@ -278,7 +278,7 @@
         "paragraphs": [
           "For an image and target caption, the language loss rewards predicting caption tokens while conditioned on visual features. For instruction examples, the input also contains a question or command and the target is the desired response. Some training pipelines compute loss only on response tokens; others use a different masking policy. Both data format and loss mask affect what the model learns. A chat template mismatch can turn role markers or instructions into unintended prediction targets."
         ],
-        "formula": "Typical response loss: L = −Σ over answer positions log p(yₜ|image,prompt,y_<t)"
+        "formula": "L=-\\sum_{t\\in\\text{answer positions}}\\log p(y_t\\mid\\text{image},\\text{prompt},y_{<t})"
       },
       {
         "id": "practice",
@@ -479,9 +479,9 @@
         "id": "mechanism",
         "title": "Count patches and downstream tokens separately",
         "paragraphs": [
-          "For an image H by W and nonoverlapping patches of size P, the patch count is approximately HW/P² after accounting for padding or resizing. A 224-by-224 image with P = 16 produces 196 patches; a 448-by-448 image produces 784. If a merger compresses four patches into one language-model token, these counts change again. In a direct dense-attention sequence, the interaction cost depends on the square of visual plus text positions, not on image pixels alone."
+          "For an image \\(H\\times W\\) and nonoverlapping patches of size \\(P\\), the patch count is approximately \\(\\frac{HW}{P^2}\\) after accounting for padding or resizing. A \\(224\\times224\\) image with \\(P=16\\) produces 196 patches; a \\(448\\times448\\) image produces 784. If a merger compresses four patches into one language-model token, these counts change again. In a direct dense-attention sequence, the interaction cost depends on the square of visual plus text positions, not on image pixels alone."
         ],
-        "formula": "N_patch ≈ HW/P²; attention interactions ∝ (N_visual + N_text)²"
+        "formula": "N_{\\text{patch}}\\approx\\frac{HW}{P^2};\\qquad \\text{attention interactions}\\propto(N_{\\text{visual}}+N_{\\text{text}})^2"
       },
       {
         "id": "practice",
@@ -543,15 +543,15 @@
         "id": "mechanism",
         "title": "Merging changes both count and representation",
         "paragraphs": [
-          "A spatial merger groups nearby visual features and maps them to a smaller number of output tokens. In a simple 2-by-2 grouping, four features become one, reducing count by four when the grid dimensions are compatible. Qwen2.5-VL's report describes grouping four neighboring patch features before its MLP-based merger. Concatenation followed by projection can retain information differently from averaging. The resulting token is a learned local summary, not merely one selected original patch."
+          "A spatial merger groups nearby visual features and maps them to a smaller number of output tokens. In a simple \\(2\\times2\\) grouping, four features become one, reducing count by four when the grid dimensions are compatible. Qwen2.5-VL's report describes grouping four neighboring patch features before its MLP-based merger. Concatenation followed by projection can retain information differently from averaging. The resulting token is a learned local summary, not merely one selected original patch."
         ],
-        "formula": "A 2-by-2 merge maps an H_p × W_p grid to (H_p/2) × (W_p/2) positions"
+        "formula": "\\text{A }2\\times2\\text{ merge: }\\quad H_p\\times W_p\\ \\longrightarrow\\ \\frac{H_p}{2}\\times\\frac{W_p}{2}\\text{ positions}"
       },
       {
         "id": "practice",
         "title": "Check geometry at the boundaries",
         "paragraphs": [
-          "For a 24-by-16 patch grid, 2-by-2 merging produces 12-by-8 = 96 tokens from 384 patches. Odd grid dimensions require a defined resize, pad, or grouping policy. Preserve the mapping between merged tokens and image coordinates when evaluating localization. A common mistake is comparing models at equal post-merge token count while ignoring different encoder workloads: one may process many more raw patches before compression. Measure both stages, and test whether merging harms tasks that depend on a small isolated feature or precise character boundaries."
+          "For a \\(24\\times16\\) patch grid, \\(2\\times2\\) merging produces \\(12\\times8=96\\) tokens from 384 patches. Odd grid dimensions require a defined resize, pad, or grouping policy. Preserve the mapping between merged tokens and image coordinates when evaluating localization. A common mistake is comparing models at equal post-merge token count while ignoring different encoder workloads: one may process many more raw patches before compression. Measure both stages, and test whether merging harms tasks that depend on a small isolated feature or precise character boundaries."
         ]
       },
       {
@@ -559,14 +559,14 @@
         "title": "Reading the report: locate the spatial merger",
         "paragraphs": [
           "In the Qwen2.5-VL Technical Report, trace the four-neighbor spatial merging operation relative to the visual encoder and language model. The location matters: reducing the language sequence does not retroactively erase visual encoding work. Also distinguish this merger from preprocessing that changes the patch grid itself.",
-          "With a 20-by-30 feature grid, grouping nonoverlapping two-by-two neighborhoods produces 10-by-15 groups, or 150 outputs. Concatenating a group's features temporarily increases its width before the learned projection. Token count and channel width therefore move in different directions during the same operation.",
+          "With a \\(20\\times30\\) feature grid, grouping nonoverlapping two-by-two neighborhoods produces \\(10\\times15\\) groups, or 150 outputs. Concatenating a group's features temporarily increases its width before the learned projection. Token count and channel width therefore move in different directions during the same operation.",
           "Test a document containing text across neighborhood boundaries. A fixed local merger must preserve useful fine detail through its learned representation, and excessive upstream downsampling can remove that detail earlier. When reproducing results, record image size bounds, patch-grid constraints, merging factor, and the final visual sequence length instead of describing the system only as dynamic resolution."
         ]
       }
     ],
     "exercise": {
-      "prompt": "A 20-by-30 patch grid is merged in nonoverlapping 2-by-2 groups. How many output positions remain?",
-      "answer": "The output grid is 10 by 15, so 150 positions remain from 600 original patches."
+      "prompt": "A \\(20\\times30\\) patch grid is merged in nonoverlapping \\(2\\times2\\) groups. How many output positions remain?",
+      "answer": "The output grid is \\(10\\times15\\), so 150 positions remain from 600 original patches."
     },
     "takeaways": [
       "Dynamic resolution needs explicit pixel and token limits.",
@@ -666,7 +666,7 @@
         "paragraphs": [
           "For OCR, character error rate counts substitutions, deletions, and insertions relative to reference characters. Grounding may use overlap or point-in-region criteria. VQA can require accounting for multiple acceptable human answers, while caption evaluation must tolerate paraphrases without rewarding unsupported objects. A generic string match across all tasks is inadequate. For a sign reading 'EXIT 12', replacing 12 with 21 is a meaningful OCR error even if the sentence remains fluent and semantically plausible."
         ],
-        "formula": "Character error rate = (substitutions + deletions + insertions) / reference characters"
+        "formula": "\\text{Character error rate}=\\frac{\\text{substitutions}+\\text{deletions}+\\text{insertions}}{\\text{reference characters}}"
       },
       {
         "id": "practice",
@@ -687,7 +687,7 @@
     ],
     "exercise": {
       "prompt": "A five-character reference has one substitution and one deletion, with no insertions. What is the character error rate?",
-      "answer": "(1 + 1 + 0)/5 = 0.4, or 40%, under that alignment. A fluent surrounding sentence does not remove those transcription errors."
+      "answer": "\\(\\frac{1+1+0}{5}=0.4\\), or 40%, under that alignment. A fluent surrounding sentence does not remove those transcription errors."
     },
     "takeaways": [
       "Task-specific outputs need task-specific evaluation.",
@@ -728,9 +728,9 @@
         "id": "mechanism",
         "title": "Spatial tokens multiply across frames",
         "paragraphs": [
-          "If each of F frames produces N visual tokens, a simple sequence contains roughly FN tokens before temporal compression or merging. Eight frames with 196 tokens each yield 1,568 visual positions. Temporal position information distinguishes ordering and duration; otherwise a set of frames can confuse opening with closing or before with after. Some architectures compress frames or use memory, so actual token counts and interaction patterns should be inspected rather than inferred from this simple product."
+          "If each of \\(F\\) frames produces \\(N\\) visual tokens, a simple sequence contains roughly \\(FN\\) tokens before temporal compression or merging. Eight frames with 196 tokens each yield 1,568 visual positions. Temporal position information distinguishes ordering and duration; otherwise a set of frames can confuse opening with closing or before with after. Some architectures compress frames or use memory, so actual token counts and interaction patterns should be inspected rather than inferred from this simple product."
         ],
-        "formula": "Uncompressed visual positions ≈ frames × tokens per frame"
+        "formula": "\\text{Uncompressed visual positions}\\approx\\text{frames}\\times\\text{tokens per frame}"
       },
       {
         "id": "practice",
@@ -794,7 +794,7 @@
         "paragraphs": [
           "Hold a question fixed and change the image, remove relevant regions, or swap image–question pairings. A grounded answer should respond to changes that matter for the question. Compare against a text-only baseline to identify questions answerable through dataset priors. These interventions need careful interpretation: an unchanged answer can be correct if the manipulated region was irrelevant. Measure object presence with balanced positive and negative queries so that always saying yes or always saying no is not rewarded."
         ],
-        "formula": "Useful comparison: performance with matched images versus shuffled or removed visual evidence"
+        "formula": "\\begin{gathered}\\text{Useful comparison: performance with matched images}\\\\ \\text{versus shuffled or removed visual evidence}\\end{gathered}"
       },
       {
         "id": "practice",

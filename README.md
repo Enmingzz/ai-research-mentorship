@@ -95,7 +95,18 @@ Research projects and tasks are shared records maintained on GitHub. The library
 
 Subject IDs use `"01"`–`"12"`. The source schema retains the names `modules` and `moduleIds`. Keep topic IDs stable because they identify article URLs. Use only existing topic IDs in article prerequisites.
 
-Each article has a `topicId`, `title`, `summary`, `prerequisites`, at least three `sections`, an `exercise` with a `prompt` and `answer`, `takeaways`, and `references`. Sections use a unique `id`, a `title`, and a `paragraphs` array. Optional `formula`, `code`, `language`, and `bullets` fields add worked material. Write plain text and Unicode mathematics; HTML is escaped when rendered.
+Each article has a `topicId`, `title`, `summary`, `prerequisites`, at least three `sections`, an `exercise` with a `prompt` and `answer`, `takeaways`, and `references`. Sections use a unique `id`, a `title`, and a `paragraphs` array. Optional `formula`, `code`, `language`, and `bullets` fields add worked material. Ordinary prose is plain text; HTML is escaped when rendered.
+
+Use LaTeX for mathematics. A section's `formula` field contains raw LaTeX without delimiters. In paragraphs, bullets, worked examples, and takeaways, enclose inline mathematics in `\(...\)` or a displayed expression in `\[...\]`. JSON requires every backslash to be doubled:
+
+```json
+{
+  "paragraphs": ["For \\(x_i > 0\\), the logarithm is defined."],
+  "formula": "\\frac{1}{N}\\sum_{i=1}^{N} x_i"
+}
+```
+
+Keep titles, summaries, reference labels, URLs, and code as plain text. Currency dollar signs do not start math mode. Invalid LaTeX or unmatched delimiters fail validation and the build. KaTeX renders HTML and accessible MathML during the build; its CSS and fonts are hosted with the site, so mathematics works without JavaScript or an external math service. The vendored KaTeX version, integrity, and license are recorded in `vendor/katex/`.
 
 Article references contain `title`, `url`, `kind` (`paper`, `book`, or `guide`), and `note` describing the source. A lead source appears on each article card. Papers are highlighted above the article body, with the full source list at the end; topics without papers highlight their books or official guides. Shared reading resources in `papers.json` additionally include `id`, `authors`, `year`, `moduleIds`, and `level` (`essential` or `further`).
 
@@ -112,6 +123,8 @@ The [content audit](review/content-audit.json) records the reviewed article IDs,
 Claude reviewed the baseline and expanded content with tools disabled. Original-paper verification and executable numerical/code checks were performed separately, and proposed corrections were assessed before adoption. This is evidence of review, not a guarantee that every scientific statement is error-free. Future content changes need their own source verification; the stored hashes identify the version covered by this audit.
 
 The local review runner accepts the installed Claude Code executable path and uses its existing sign-in. Raw CLI envelopes and duplicate article snapshots are ignored by Git; curated findings and audit evidence are retained. No credentials belong in the repository.
+
+The later [LaTeX conversion audit](review/math-audit.json) records notation coverage and rendering checks against the reviewed content baseline. The earlier Claude review remains a record of its original content snapshot; it is not a new review of subsequent formatting changes.
 
 ## Local Preview and Validation
 

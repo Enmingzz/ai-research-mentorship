@@ -2,6 +2,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import {loadLessons,makeTopicIndex,lessonDocument,wordCount,escapeHTML,SITE_URL} from './lessons.mjs';
+import {renderMathText,renderFormula} from './math.mjs';
 const load=async name=>JSON.parse(await readFile(`data/${name}.json`,'utf8'));
 const [modules,papers,projects]=await Promise.all(['curriculum','papers','projects'].map(load));
 assert.equal(SITE_URL,'https://enmingzz.github.io/vlm-project','Canonical site follows the renamed repository');
@@ -78,9 +79,9 @@ for(const lesson of course.lessons){
   assert(structured&&['Article','TechArticle'].includes(structured['@type']),`${label}: article structured data`);
   assert.equal(structured.url,`${SITE_URL}/learn/${label}/`);
   assert.equal(structured.isPartOf?.url,`${SITE_URL}/library.html`);
-  for(const section of lesson.sections){for(const paragraph of section.paragraphs)assert(page.includes(escapeHTML(paragraph)),`${label}: full explanatory prose`);if(section.code)assert(page.includes(escapeHTML(section.code)),`${label}: code example`);if(section.formula)assert(page.includes(escapeHTML(section.formula)),`${label}: formula`);for(const bullet of section.bullets||[])assert(page.includes(escapeHTML(bullet)),`${label}: explanatory list`);}
-  assert(page.includes(escapeHTML(lesson.exercise.prompt))&&page.includes(escapeHTML(lesson.exercise.answer)),`${label}: example and answer preserved`);
-  for(const takeaway of lesson.takeaways)assert(page.includes(escapeHTML(takeaway)),`${label}: takeaway preserved`);
+  for(const section of lesson.sections){for(const paragraph of section.paragraphs)assert(page.includes(renderMathText(paragraph)),`${label}: full explanatory prose and inline mathematics`);if(section.code)assert(page.includes(escapeHTML(section.code)),`${label}: code example`);if(section.formula)assert(page.includes(renderFormula(section.formula,{displayMode:true})),`${label}: typeset formula`);for(const bullet of section.bullets||[])assert(page.includes(renderMathText(bullet)),`${label}: explanatory list`);}
+  assert(page.includes(renderMathText(lesson.exercise.prompt))&&page.includes(renderMathText(lesson.exercise.answer)),`${label}: example and answer preserved`);
+  for(const takeaway of lesson.takeaways)assert(page.includes(renderMathText(takeaway)),`${label}: takeaway preserved`);
   for(const ref of lesson.references){assert(page.includes(`href="${escapeHTML(ref.url)}" target="_blank" rel="noopener noreferrer"`),`${label}: safe source link`);assert(page.includes(escapeHTML(ref.note)),`${label}: source reading focus`);}
   for(const id of lesson.prerequisites)assert(page.includes(`href="../${id}/"`),`${label}: related concept navigation`);
   assert(!/href="\.\.\/undefined\//.test(page),`${label}: valid article navigation`);
@@ -88,4 +89,5 @@ for(const lesson of course.lessons){
 assert.equal(escapeHTML('<script>"&'), '&lt;script&gt;&quot;&amp;','Article content is escaped');
 execFileSync(process.execPath,['tools/check-interactions.mjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['tools/check-projects.mjs'],{stdio:'inherit'});
+execFileSync(process.execPath,['tools/check-math.mjs'],{stdio:'inherit'});
 console.log(`PASS · ${modules.length} subjects · ${topics.length} complete articles · ${papers.length} curated readings · references, navigation, content and JavaScript`);

@@ -137,13 +137,21 @@ for(const type of ['pageshow','storage'])library.windowEvents.get(type)?.({persi
 library.assertStorageUntouched();
 
 // Copy-link and section indicators remain useful without a personal state store.
-async function articleHarness({clipboardFails=false}={}){
-  const controls=new Map(),events=new Map(),copied=[],observed=[];let observeEntries;
+async function articleHarness({clipboardFails=false,resizeObserver=true}={}){
+  const controls=new Map(),events=new Map(),documentEvents=new Map(),fontEvents=new Map(),copied=[],observed=[],observedMath=[];let observeEntries,resizeEntries,resolveFonts;
   const get=selector=>{if(!controls.has(selector))controls.set(selector,element());return controls.get(selector);};
   const toc=[element(),element(),element(),element()];toc.forEach((link,i)=>link.setAttribute('href',i%2?'#references':'#section-intuition'));
   const sections=[{id:'section-intuition'},{id:'references'}];
+  // Dimensions are supplied by the adapter: these assertions test state changes, not browser layout.
+  const math=[element(),element(),element()];
+  Object.assign(math[0],{clientWidth:240,scrollWidth:240});
+  Object.assign(math[1],{clientWidth:240,scrollWidth:480});
+  Object.assign(math[2],{clientWidth:0,scrollWidth:0});
+  math[2].setAttribute('tabindex','0');math[2].setAttribute('role','region');math[2].setAttribute('aria-label','Mathematical formula');
+  const fontsReady=new Promise(resolve=>{resolveFonts=resolve;});
   class IntersectionObserver{constructor(callback){observeEntries=callback;}observe(section){observed.push(section.id);}}
-  const context={document:{querySelector:get,querySelectorAll:selector=>selector==='.article-section'?sections:toc},window:{IntersectionObserver,addEventListener:(type,fn)=>events.set(type,fn)},IntersectionObserver,
+  class ResizeObserver{constructor(callback){resizeEntries=callback;}observe(container){observedMath.push(container);}}
+  const context={document:{querySelector:get,querySelectorAll:selector=>selector==='.article-section'?sections:selector==='.article-toc a, .mobile-toc nav a'?toc:selector==='.math-inline, .math-in-prose-display, .article-formula'?math:[],addEventListener:(type,fn,capture)=>{if(type==='toggle')assert.equal(capture,true,'Non-bubbling details toggle events are captured');documentEvents.set(type,fn);},fonts:{ready:fontsReady,addEventListener:(type,fn)=>fontEvents.set(type,fn)}},window:{IntersectionObserver,...(resizeObserver?{ResizeObserver}:{}),addEventListener:(type,fn)=>events.set(type,fn)},IntersectionObserver,
     navigator:{clipboard:{async writeText(value){if(clipboardFails)throw new Error('Unavailable');copied.push(value);}}},location:{href:'https://enmingzz.github.io/vlm-project/learn/04-03/#references'},setTimeout:()=>1,clearTimeout(){}};
   const assertStorageUntouched=storageGuard(context);
   vm.runInNewContext(lessonSource,context,{filename:'lesson.js'});
@@ -153,11 +161,34 @@ async function articleHarness({clipboardFails=false}={}){
   assert.deepEqual(observed,sections.map(section=>section.id),'All article sections are observed');
   observeEntries([{isIntersecting:true,target:sections[1]}]);
   toc.forEach((link,i)=>assert.equal(link.getAttribute('aria-current'),i%2?'location':null,'Desktop and mobile section navigation indicate the current location'));
+  const assertScrollable=(container,expected,message)=>{
+    assert.equal(container.getAttribute('tabindex'),expected?'0':null,message);
+    assert.equal(container.getAttribute('role'),expected?'region':null,'Only a clipped formula creates a named scroll region');
+    assert.equal(container.getAttribute('aria-label'),expected?'Scrollable mathematical expression':null,'Keyboard scroll targets have an accessible name');
+  };
+  assertScrollable(math[0],false,'Fitting inline math adds no tab stop');
+  assertScrollable(math[1],true,'Overflowing inline math is keyboard-focusable');
+  assertScrollable(math[2],false,'Hidden math loses a stale static tab stop');
+  if(resizeObserver)assert.deepEqual(observedMath,math,'Every math container is observed for layout changes');
+  else assert(events.has('resize'),'Window resize provides the no-ResizeObserver fallback');
+  const resized=()=>resizeObserver?resizeEntries([]):events.get('resize')();
+  math[0].scrollWidth=400;math[1].scrollWidth=240;resized();
+  assertScrollable(math[0],true,'A fitting expression becomes focusable when it overflows');
+  assertScrollable(math[1],false,'An expression that stops overflowing loses its tab stop and region name');
+  math[2].clientWidth=200;math[2].scrollWidth=350;resolveFonts();await fontsReady;
+  assertScrollable(math[2],true,'Font readiness refreshes overflow state');
+  math[0].scrollWidth=240;fontEvents.get('loadingdone')();
+  assertScrollable(math[0],false,'Later font loading also refreshes overflow state');
+  math[1].clientWidth=200;math[1].scrollWidth=350;documentEvents.get('toggle')();
+  assertScrollable(math[1],true,'Opening details refreshes math scroll targets');
+  math[1].clientWidth=0;math[1].scrollWidth=0;documentEvents.get('toggle')();
+  assertScrollable(math[1],false,'Closing details removes hidden math tab stops');
+  assert(math.every(container=>container.focusCount===0),'Overflow updates never move keyboard focus');
   for(const type of ['pageshow','storage'])events.get(type)?.({persisted:true,key:'research-fieldnotes-v1'});
   assertStorageUntouched();
 }
 assert(lessonDocument(course.lessons[0],course).includes('id="copy-article"'),'The tested copy-link button is rendered');
-await articleHarness();await articleHarness({clipboardFails:true});
+await articleHarness();await articleHarness({clipboardFails:true,resizeObserver:false});
 
 const inlineScripts=[...legacyHTML.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(match=>match[1]).filter(script=>script.trim());
 assert(inlineScripts.length,'Old course bookmarks have a redirect script');
@@ -167,4 +198,4 @@ for(const hash of ['','#overview','#curriculum','#module/04','#schedule/week-5',
   assert.deepEqual(redirects,['./library.html?from=saved'+hash],'The course compatibility page preserves search and hash');
   assert.equal(fallback.href,'./library.html?from=saved'+hash,'The visible fallback preserves the old bookmark destination');
 }
-console.log('PASS · library routes, legacy links, browse/search/combined filters, pagination, source links, safe text, article controls, and zero browser-storage access');
+console.log('PASS · library routes, legacy links, browse/search/combined filters, pagination, source links, safe text, article controls, math overflow state transitions (DOM adapter, not layout QA), and zero browser-storage access');

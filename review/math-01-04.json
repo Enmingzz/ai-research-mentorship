@@ -1,0 +1,496 @@
+{
+  "reviewer": "OpenAI Codex",
+  "scope": "Notation-only conversion of data/lessons/01.json through 04.json. No renderer, build, shared data, reference metadata or publication changes.",
+  "reviewedTopicIds": [
+    "01-01",
+    "01-02",
+    "01-03",
+    "01-04",
+    "01-05",
+    "01-06",
+    "01-07",
+    "01-08",
+    "01-09",
+    "01-10",
+    "01-11",
+    "02-01",
+    "02-02",
+    "02-03",
+    "02-04",
+    "02-05",
+    "02-06",
+    "02-07",
+    "02-08",
+    "02-09",
+    "02-10",
+    "02-11",
+    "02-12",
+    "02-13",
+    "02-14",
+    "03-01",
+    "03-02",
+    "03-03",
+    "03-04",
+    "03-05",
+    "03-06",
+    "03-07",
+    "03-08",
+    "03-09",
+    "03-10",
+    "03-11",
+    "03-12",
+    "04-01",
+    "04-02",
+    "04-03",
+    "04-04",
+    "04-05",
+    "04-06",
+    "04-07",
+    "04-08",
+    "04-09",
+    "04-10",
+    "04-11",
+    "04-12",
+    "04-13",
+    "04-14",
+    "04-15",
+    "04-16",
+    "04-17",
+    "04-18"
+  ],
+  "coverage": {
+    "articles": 55,
+    "displayFormulaFieldsConverted": 35,
+    "inlineMathExpressions": 480,
+    "perArticle": [
+      {
+        "topicId": "01-01",
+        "formulaCount": 1,
+        "inlineCount": 17
+      },
+      {
+        "topicId": "01-02",
+        "formulaCount": 1,
+        "inlineCount": 32
+      },
+      {
+        "topicId": "01-03",
+        "formulaCount": 1,
+        "inlineCount": 19
+      },
+      {
+        "topicId": "01-04",
+        "formulaCount": 1,
+        "inlineCount": 27
+      },
+      {
+        "topicId": "01-05",
+        "formulaCount": 1,
+        "inlineCount": 20
+      },
+      {
+        "topicId": "01-06",
+        "formulaCount": 1,
+        "inlineCount": 14
+      },
+      {
+        "topicId": "01-07",
+        "formulaCount": 1,
+        "inlineCount": 1
+      },
+      {
+        "topicId": "01-08",
+        "formulaCount": 1,
+        "inlineCount": 10
+      },
+      {
+        "topicId": "01-09",
+        "formulaCount": 1,
+        "inlineCount": 24
+      },
+      {
+        "topicId": "01-10",
+        "formulaCount": 1,
+        "inlineCount": 4
+      },
+      {
+        "topicId": "01-11",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "02-01",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "02-02",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "02-03",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "02-04",
+        "formulaCount": 0,
+        "inlineCount": 7
+      },
+      {
+        "topicId": "02-05",
+        "formulaCount": 0,
+        "inlineCount": 23
+      },
+      {
+        "topicId": "02-06",
+        "formulaCount": 0,
+        "inlineCount": 3
+      },
+      {
+        "topicId": "02-07",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "02-08",
+        "formulaCount": 0,
+        "inlineCount": 5
+      },
+      {
+        "topicId": "02-09",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "02-10",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "02-11",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "02-12",
+        "formulaCount": 0,
+        "inlineCount": 1
+      },
+      {
+        "topicId": "02-13",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "02-14",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "03-01",
+        "formulaCount": 1,
+        "inlineCount": 8
+      },
+      {
+        "topicId": "03-02",
+        "formulaCount": 1,
+        "inlineCount": 24
+      },
+      {
+        "topicId": "03-03",
+        "formulaCount": 1,
+        "inlineCount": 7
+      },
+      {
+        "topicId": "03-04",
+        "formulaCount": 1,
+        "inlineCount": 6
+      },
+      {
+        "topicId": "03-05",
+        "formulaCount": 1,
+        "inlineCount": 17
+      },
+      {
+        "topicId": "03-06",
+        "formulaCount": 1,
+        "inlineCount": 15
+      },
+      {
+        "topicId": "03-07",
+        "formulaCount": 1,
+        "inlineCount": 8
+      },
+      {
+        "topicId": "03-08",
+        "formulaCount": 1,
+        "inlineCount": 5
+      },
+      {
+        "topicId": "03-09",
+        "formulaCount": 1,
+        "inlineCount": 7
+      },
+      {
+        "topicId": "03-10",
+        "formulaCount": 1,
+        "inlineCount": 13
+      },
+      {
+        "topicId": "03-11",
+        "formulaCount": 1,
+        "inlineCount": 1
+      },
+      {
+        "topicId": "03-12",
+        "formulaCount": 1,
+        "inlineCount": 6
+      },
+      {
+        "topicId": "04-01",
+        "formulaCount": 0,
+        "inlineCount": 0
+      },
+      {
+        "topicId": "04-02",
+        "formulaCount": 1,
+        "inlineCount": 11
+      },
+      {
+        "topicId": "04-03",
+        "formulaCount": 1,
+        "inlineCount": 31
+      },
+      {
+        "topicId": "04-04",
+        "formulaCount": 1,
+        "inlineCount": 8
+      },
+      {
+        "topicId": "04-05",
+        "formulaCount": 1,
+        "inlineCount": 13
+      },
+      {
+        "topicId": "04-06",
+        "formulaCount": 1,
+        "inlineCount": 3
+      },
+      {
+        "topicId": "04-07",
+        "formulaCount": 0,
+        "inlineCount": 5
+      },
+      {
+        "topicId": "04-08",
+        "formulaCount": 1,
+        "inlineCount": 1
+      },
+      {
+        "topicId": "04-09",
+        "formulaCount": 1,
+        "inlineCount": 14
+      },
+      {
+        "topicId": "04-10",
+        "formulaCount": 1,
+        "inlineCount": 10
+      },
+      {
+        "topicId": "04-11",
+        "formulaCount": 1,
+        "inlineCount": 16
+      },
+      {
+        "topicId": "04-12",
+        "formulaCount": 1,
+        "inlineCount": 12
+      },
+      {
+        "topicId": "04-13",
+        "formulaCount": 1,
+        "inlineCount": 9
+      },
+      {
+        "topicId": "04-14",
+        "formulaCount": 1,
+        "inlineCount": 2
+      },
+      {
+        "topicId": "04-15",
+        "formulaCount": 0,
+        "inlineCount": 3
+      },
+      {
+        "topicId": "04-16",
+        "formulaCount": 0,
+        "inlineCount": 3
+      },
+      {
+        "topicId": "04-17",
+        "formulaCount": 1,
+        "inlineCount": 13
+      },
+      {
+        "topicId": "04-18",
+        "formulaCount": 0,
+        "inlineCount": 2
+      }
+    ]
+  },
+  "method": "Read every article's paragraphs, equations, worked example, answer and takeaways. Used 307 explicitly selected article-specific expression mappings plus context-limited mathematical variable wrapping; existing API expressions were deliberately retained as literal prose. Every resulting expression was parsed with the project renderer.",
+  "preserved": {
+    "topicIdsAndOrder": true,
+    "titles": true,
+    "summaries": true,
+    "prerequisites": true,
+    "referencesIncludingNotes": true,
+    "sectionIdsAndTitles": true,
+    "allCodeAndLanguageFields": true,
+    "sectionAndParagraphCounts": true,
+    "exerciseMeaning": true,
+    "takeawayCounts": true,
+    "scientificExamplesAndNumericalValues": true,
+    "allSourceReadingContent": true
+  },
+  "notationDecisions": [
+    {
+      "topicIds": [
+        "01-01",
+        "01-02",
+        "01-03",
+        "04-03"
+      ],
+      "original": "Nested list notation for numerical matrices and column vectors.",
+      "resolution": "Use \\begin{bmatrix}...\\end{bmatrix} with original rows and values; retain one-row vector notation and explicit ^{\\top} where present. Tensor shapes remain bracketed tuples rather than becoming numeric matrices.",
+      "meaningChange": false
+    },
+    {
+      "topicIds": [
+        "01-01",
+        "01-04",
+        "01-05",
+        "01-10",
+        "03-02",
+        "03-12"
+      ],
+      "original": "Unicode transposes, gradients, subscripts, hats, superscripts, norms and inline slash fractions.",
+      "resolution": "Use ^{\\top}, \\nabla, explicit subscripts, \\hat{}, powers, \\lVert...\\rVert and \\frac{}{} with the original grouping and operator order.",
+      "meaningChange": false
+    },
+    {
+      "topicIds": [
+        "01-03"
+      ],
+      "original": "rank(A) = number of nonzero singular values",
+      "resolution": "\\operatorname{rank}(A)=\\#\\{i:\\sigma_i\\ne0\\}",
+      "meaningChange": false
+    },
+    {
+      "topicIds": [
+        "01-06",
+        "01-07",
+        "01-08",
+        "01-09",
+        "03-05"
+      ],
+      "original": "Probability conditionals, expectations, implicit sums, argmax, distribution symbols and second moments.",
+      "resolution": "Use \\mid for conditioning, \\mathbb{E}, indexed sums over the original support, \\operatorname*{arg\\,max}, \\mathcal{N}, and explicit square/fraction grouping.",
+      "meaningChange": false
+    },
+    {
+      "topicIds": [
+        "01-10"
+      ],
+      "original": "Three-line Adam update, with epsilon outside the square root.",
+      "resolution": "Use an aligned environment, preserving first/second moments, both bias corrections, and the exact denominator sqrt(v-hat)+epsilon.",
+      "meaningChange": false
+    },
+    {
+      "topicIds": [
+        "03-05",
+        "03-09",
+        "03-10",
+        "04-13",
+        "04-14"
+      ],
+      "original": "fan_in/fan_out, in/out shape labels, vocabulary dimensions, channel counts, KV heads and cache byte factors.",
+      "resolution": "Typeset mathematical indices explicitly; use \\text{...} for descriptive labels. Preserve every cache factor and distinction between dimension labels and API names.",
+      "meaningChange": false
+    },
+    {
+      "topicIds": [
+        "04-06"
+      ],
+      "original": "mask_ij = 0 if allowed, otherwise negative infinity.",
+      "resolution": "Use a cases environment with the same permitted/forbidden conditions and negative infinity.",
+      "meaningChange": false
+    },
+    {
+      "topicIds": [
+        "04-09",
+        "04-16"
+      ],
+      "original": "Position rotations R_(n−m), prime m′ and online-softmax exponential rescaling.",
+      "resolution": "Use R_{n-m}, m' and \\exp(m-m') without changing rotation order or the rescaling sign.",
+      "meaningChange": false
+    },
+    {
+      "topicIds": [
+        "04-13"
+      ],
+      "original": "8/32 = one quarter",
+      "resolution": "Typeset \\frac8{32}=\\frac14, retaining the explanatory words 'one quarter'.",
+      "meaningChange": false
+    },
+    {
+      "topicIds": [
+        "04-17"
+      ],
+      "original": "O(TD²), O(T²D), O(BHT²), and 1024 × 1024.",
+      "resolution": "Use conventional calligraphic big-O and explicit powers/multiplication; retain the 2 MiB per-matrix and 32 MiB full-tensor distinction.",
+      "meaningChange": false
+    },
+    {
+      "topicIds": [
+        "02-02",
+        "02-04",
+        "02-05",
+        "02-06",
+        "02-07",
+        "03-09",
+        "03-11",
+        "04-06"
+      ],
+      "original": "Shell assignments, einsum strings, tensor indexing, PyTorch method calls and configuration names.",
+      "resolution": "Keep actual API/code syntax literal rather than passing it into math mode. Examples include DATA_ROOT=/datasets, btd,dh->bth, ii->i, y[0, 0], Q @ K.transpose(-2, -1), w.grad, model(x), padding_idx, and repackage_hidden.",
+      "meaningChange": false
+    }
+  ],
+  "validation": {
+    "executed": true,
+    "renderer": "tools/math.mjs: renderFormula, renderMathText, mathSegments",
+    "engine": "Self-hosted KaTeX 0.19.0",
+    "settings": {
+      "strict": "error",
+      "throwOnError": true
+    },
+    "displayParsed": 35,
+    "inlineParsed": 480,
+    "parseErrors": [],
+    "preservationFailures": [],
+    "residualScan": "Remaining unwrapped operator-like strings are intentional shell/Python/einsum API syntax; all mathematical Unicode operator sequences and tensor-shape expressions in allowed prose fields were inspected."
+  },
+  "finalSha256": {
+    "01": "97c5414dc7d194568366b44bf904d6a2150f51fdd4dc32bc24cb70674964f8d9",
+    "02": "994e451d6db669bcf72434db22603212f0fa5058219e4ea7b32c89fdb4f0ede0",
+    "03": "fe45e2bf69a6ac541c9f6fdf4fdd84d7eb567b9d791e1df9c2af1baa046ea31b",
+    "04": "793c667d6647faf8c740e7d5944455c448bc51fce514f3b970e26eabd65a7e52"
+  },
+  "limitations": [
+    "This pass verifies notation preservation and successful strict parsing, not scientific claims anew; the prior factual audit and executable examples remain separate evidence.",
+    "Browser layout and full-site build validation are handled by the parent. Some inspected articles contain no symbolic mathematics and therefore required no inline delimiters."
+  ]
+}

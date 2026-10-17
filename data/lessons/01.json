@@ -16,29 +16,29 @@
         "id": "mechanism",
         "title": "Follow one multiplication by hand",
         "paragraphs": [
-          "Let a row vector x = [2, −1] and a weight matrix W = [[1, 3], [4, 2]]. Multiplication gives xW = [−2, 4]: the first output is 2·1 − 1·4, and the second is 2·3 − 1·2. The transpose swaps rows and columns; it does not invert a transformation. In reverse-mode differentiation, transposes appear because a gradient must travel from output coordinates back into input coordinates."
+          "Let a row vector \\(x=[2,-1]\\) and a weight matrix \\(W=\\begin{bmatrix}1&3\\\\4&2\\end{bmatrix}\\). Multiplication gives \\(xW=[-2,4]\\): the first output is \\(2\\cdot1-1\\cdot4\\), and the second is \\(2\\cdot3-1\\cdot2\\). The transpose swaps rows and columns; it does not invert a transformation. In reverse-mode differentiation, transposes appear because a gradient must travel from output coordinates back into input coordinates."
         ],
-        "formula": "Y = XW;  ∂L/∂X = (∂L/∂Y)Wᵀ"
+        "formula": "Y=XW;\\qquad \\frac{\\partial L}{\\partial X}=\\frac{\\partial L}{\\partial Y}W^{\\top}"
       },
       {
         "id": "practice",
         "title": "Measure size without losing meaning",
         "paragraphs": [
-          "The Euclidean norm measures vector length. The Frobenius norm treats a matrix as one long vector, whereas its spectral norm measures the largest possible amplification of a unit input. Those quantities answer different questions: total weight magnitude and worst-direction amplification need not move together. Multiplication is also order-sensitive; changing XW into WX can change both meaning and validity. Write the input and output spaces beside every matrix before manipulating an expression."
+          "The Euclidean norm measures vector length. The Frobenius norm treats a matrix as one long vector, whereas its spectral norm measures the largest possible amplification of a unit input. Those quantities answer different questions: total weight magnitude and worst-direction amplification need not move together. Multiplication is also order-sensitive; changing \\(XW\\) into \\(WX\\) can change both meaning and validity. Write the input and output spaces beside every matrix before manipulating an expression."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Use the Linear Algebra chapter of Deep Learning as a notation reference: identify the input and output spaces whenever a matrix appears. Then revisit the example here with basis inputs [1, 0] and [0, 1]. They select the two rows of W, so [2, −1] produces twice the first row minus the second. This gives a geometric interpretation of the multiplication and a quick way to detect a mistaken transpose.",
-          "For the discussion of norms, construct a comparison that separates total size from maximum amplification: diag(4, 0) and diag(√8, √8) both have Frobenius norm 4, but their spectral norms differ. The first map concentrates its strength in one direction; the second spreads it evenly. A weight-size report therefore needs the norm name and a reason for choosing it. None of these matrix measurements, by itself, determines prediction quality after nonlinear layers."
+          "Use the Linear Algebra chapter of Deep Learning as a notation reference: identify the input and output spaces whenever a matrix appears. Then revisit the example here with basis inputs \\([1, 0]\\) and \\([0, 1]\\). They select the two rows of \\(W\\), so \\([2,-1]\\) produces twice the first row minus the second. This gives a geometric interpretation of the multiplication and a quick way to detect a mistaken transpose.",
+          "For the discussion of norms, construct a comparison that separates total size from maximum amplification: \\(\\operatorname{diag}(4,0)\\) and \\(\\operatorname{diag}(\\sqrt8,\\sqrt8)\\) both have Frobenius norm 4, but their spectral norms differ. The first map concentrates its strength in one direction; the second spreads it evenly. A weight-size report therefore needs the norm name and a reason for choosing it. None of these matrix measurements, by itself, determines prediction quality after nonlinear layers."
         ]
       }
     ],
     "exercise": {
-      "prompt": "For W = [[3, 0], [0, 4]], compute its Frobenius and spectral norms. Which unit vector receives the largest amplification?",
-      "answer": "The Frobenius norm is √(9 + 16) = 5. The spectral norm is 4. The unit vector [0, 1] is stretched to [0, 4], achieving that maximum; its negative works as well."
+      "prompt": "For \\(W=\\begin{bmatrix}3&0\\\\0&4\\end{bmatrix}\\), compute its Frobenius and spectral norms. Which unit vector receives the largest amplification?",
+      "answer": "The Frobenius norm is \\(\\sqrt{9+16}=5\\). The spectral norm is 4. The unit vector \\([0, 1]\\) is stretched to \\([0, 4]\\), achieving that maximum; its negative works as well."
     },
     "takeaways": [
       "Matrix multiplication composes linear maps.",
@@ -65,36 +65,36 @@
         "id": "intuition",
         "title": "Shapes carry semantic labels",
         "paragraphs": [
-          "A tensor shape becomes useful when each axis has a name. For a batch of sentences, [B, T, D] means examples, token positions, and features. The identical numerical shape could describe entirely different data, so checking only sizes is insufficient. Shape reasoning follows which axes survive, which are contracted, and which are newly introduced. This often catches an incorrect implementation before any loss curve can reveal it."
+          "A tensor shape becomes useful when each axis has a name. For a batch of sentences, \\([B, T, D]\\) means examples, token positions, and features. The identical numerical shape could describe entirely different data, so checking only sizes is insufficient. Shape reasoning follows which axes survive, which are contracted, and which are newly introduced. This often catches an incorrect implementation before any loss curve can reveal it."
         ]
       },
       {
         "id": "mechanism",
         "title": "Trace a projection and a comparison",
         "paragraphs": [
-          "Suppose X has shape [2, 5, 12] and W has shape [12, 8]. The product XW has shape [2, 5, 8]; the feature axis contracts while batch and token axes remain. A bias [8] broadcasts over both leading axes. To compare every token with every other token, multiply Q of shape [2, 5, 8] by K transposed on its final two axes, obtaining scores [2, 5, 5]."
+          "Suppose \\(X\\) has shape \\([2, 5, 12]\\) and \\(W\\) has shape \\([12, 8]\\). The product \\(XW\\) has shape \\([2, 5, 8]\\); the feature axis contracts while batch and token axes remain. A bias \\([8]\\) broadcasts over both leading axes. To compare every token with every other token, multiply \\(Q\\) of shape \\([2, 5, 8]\\) by \\(K\\) transposed on its final two axes, obtaining scores \\([2, 5, 5]\\)."
         ],
-        "formula": "[B, T, D] @ [D, H] → [B, T, H]"
+        "formula": "[B,T,D]\\mathbin{@}[D,H]\\longrightarrow[B,T,H]"
       },
       {
         "id": "practice",
         "title": "Broadcasting can hide an error",
         "paragraphs": [
-          "Broadcasting aligns shapes from the right. Two axes are compatible when they are equal or one has size one; missing leading axes act like ones. That convenience can silently create a pairwise operation: subtracting labels [B] from predictions [B, 1] (predictions − labels) produces [B, B], rather than B individual residuals. Explicitly reshape labels, and assert named dimensions at module boundaries. Avoid a plain transpose on higher-dimensional tensors when only the feature and sequence axes should swap."
+          "Broadcasting aligns shapes from the right. Two axes are compatible when they are equal or one has size one; missing leading axes act like ones. That convenience can silently create a pairwise operation: subtracting labels \\([B]\\) from predictions \\([B, 1]\\) (\\(\\text{predictions}-\\text{labels}\\)) produces \\([B, B]\\), rather than \\(B\\) individual residuals. Explicitly reshape labels, and assert named dimensions at module boundaries. Avoid a plain transpose on higher-dimensional tensors when only the feature and sequence axes should swap."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Pair the textbook's matrix notation with PyTorch's Broadcasting Semantics reference. For any proposed operation, write the semantic axis names above the shape before applying the documented compatibility rules. In the classifier example, [16, 1] means sixteen examples with one prediction each, whereas [16] means sixteen scalar labels. The accidental [16, 16] result compares each prediction with every label, so the mistake is statistical as well as dimensional.",
-          "A useful independent check is to use two predictions, [[10], [20]], and targets [10, 20]. The intended residuals are both zero, but broadcasting predictions − targets yields [[0, −10], [10, 0]]. A successful operation has therefore implemented the wrong comparisons. Repeat the derivation after reshaping the targets to [2, 1]. This habit becomes especially valuable with attention masks, where a singleton placed on the wrong axis can produce a valid shape and an unintended information boundary."
+          "Pair the textbook's matrix notation with PyTorch's Broadcasting Semantics reference. For any proposed operation, write the semantic axis names above the shape before applying the documented compatibility rules. In the classifier example, \\([16, 1]\\) means sixteen examples with one prediction each, whereas \\([16]\\) means sixteen scalar labels. The accidental \\([16, 16]\\) result compares each prediction with every label, so the mistake is statistical as well as dimensional.",
+          "A useful independent check is to use two predictions, \\(\\begin{bmatrix}10\\\\20\\end{bmatrix}\\), and targets \\([10, 20]\\). The intended residuals are both zero, but broadcasting \\(\\text{predictions}-\\text{targets}\\) yields \\(\\begin{bmatrix}0&-10\\\\10&0\\end{bmatrix}\\). A successful operation has therefore implemented the wrong comparisons. Repeat the derivation after reshaping the targets to \\([2, 1]\\). This habit becomes especially valuable with attention masks, where a singleton placed on the wrong axis can produce a valid shape and an unintended information boundary."
         ]
       }
     ],
     "exercise": {
-      "prompt": "A classifier produces [16, 1] predictions and receives [16] scalar targets. What shape does subtraction produce, and how should you fix it?",
-      "answer": "Right-aligned broadcasting expands [16] to [1, 16], so the result is [16, 16]. Reshape targets to [16, 1], or squeeze the final prediction dimension to [16], before computing the elementwise loss."
+      "prompt": "A classifier produces \\([16, 1]\\) predictions and receives \\([16]\\) scalar targets. What shape does subtraction produce, and how should you fix it?",
+      "answer": "Right-aligned broadcasting expands \\([16]\\) to \\([1, 16]\\), so the result is \\([16, 16]\\). Reshape targets to \\([16, 1]\\), or squeeze the final prediction dimension to \\([16]\\), before computing the elementwise loss."
     },
     "takeaways": [
       "Name axes before deriving their sizes.",
@@ -134,29 +134,29 @@
         "id": "mechanism",
         "title": "Separate rotation from scaling",
         "paragraphs": [
-          "An eigenvector of a square matrix is a nonzero vector mapped to a scalar multiple of itself. For real eigenvalues, a negative value reverses its direction and zero maps it to the zero vector. Some real matrices, such as a 90-degree planar rotation, have no real eigenvectors. The singular value decomposition works for rectangular matrices too: A = UΣVᵀ. For the column-vector convention y = Ax, a right singular vector vᵢ is mapped to σᵢuᵢ: V specifies input directions and U output directions. In the row-vector convention y = xW used earlier, W = UΣVᵀ instead maps uᵢᵀ to σᵢvᵢᵀ, so those roles swap. Keeping the largest r singular values gives the best rank-r approximation in Frobenius norm, although that matrix error does not directly guarantee task accuracy."
+          "An eigenvector of a square matrix is a nonzero vector mapped to a scalar multiple of itself. For real eigenvalues, a negative value reverses its direction and zero maps it to the zero vector. Some real matrices, such as a 90-degree planar rotation, have no real eigenvectors. The singular value decomposition works for rectangular matrices too: \\(A=U\\Sigma V^{\\top}\\). For the column-vector convention \\(y=Ax\\), a right singular vector \\(v_i\\) is mapped to \\(\\sigma_i u_i\\): \\(V\\) specifies input directions and \\(U\\) output directions. In the row-vector convention \\(y=xW\\) used earlier, \\(W=U\\Sigma V^{\\top}\\) instead maps \\(u_i^{\\top}\\) to \\(\\sigma_i v_i^{\\top}\\), so those roles swap. Keeping the largest \\(r\\) singular values gives the best rank-\\(r\\) approximation in Frobenius norm, although that matrix error does not directly guarantee task accuracy."
         ],
-        "formula": "A = UΣVᵀ;  rank(A) = number of nonzero singular values"
+        "formula": "A=U\\Sigma V^{\\top};\\qquad \\operatorname{rank}(A)=\\#\\{i:\\sigma_i\\ne 0\\}"
       },
       {
         "id": "practice",
         "title": "Exact rank is not effective rank",
         "paragraphs": [
-          "For A = [[2, 0], [0, 0.001]], exact rank is two, but one direction is amplified two thousand times more than the other. Finite precision and noise may make the weak direction unusable. Numerical rank therefore depends on a tolerance and scale. Eigenvalues can also mislead for nonsymmetric matrices: singular values, rather than eigenvalue magnitudes alone, describe one-step worst-case amplification. Inspect the singular spectrum instead of reporting only a single integer."
+          "For \\(A=\\begin{bmatrix}2&0\\\\0&0.001\\end{bmatrix}\\), exact rank is two, but one direction is amplified two thousand times more than the other. Finite precision and noise may make the weak direction unusable. Numerical rank therefore depends on a tolerance and scale. Eigenvalues can also mislead for nonsymmetric matrices: singular values, rather than eigenvalue magnitudes alone, describe one-step worst-case amplification. Inspect the singular spectrum instead of reporting only a single integer."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the textbook's eigendecomposition and SVD discussions side by side, keeping square-matrix eigenvectors separate from singular vectors. For an additional check, consider A = [[1, 10], [0, 1]]. Its eigenvalues are both 1, yet multiplying [0, 1]ᵀ produces [10, 1]ᵀ. The length grows to √101. Eigenvalue magnitudes alone therefore miss the largest one-step amplification of this nonsymmetric map.",
+          "Read the textbook's eigendecomposition and SVD discussions side by side, keeping square-matrix eigenvectors separate from singular vectors. For an additional check, consider \\(A=\\begin{bmatrix}1&10\\\\0&1\\end{bmatrix}\\). Its eigenvalues are both 1, yet multiplying \\([0,1]^{\\top}\\) produces \\([10,1]^{\\top}\\). The length grows to \\(\\sqrt{101}\\). Eigenvalue magnitudes alone therefore miss the largest one-step amplification of this nonsymmetric map.",
           "Use the singular-value example in this article to distinguish an approximation guarantee from an application guarantee. Discarding the singular value 2 gives a Frobenius error of 2, but a downstream task might rely entirely on that discarded direction. Conversely, a large discarded direction might mainly encode nuisance variation. When reading a compression paper, identify the matrix being approximated, the norm used to measure its error, and the separate experiment that measures task performance. A mathematical approximation bound and an accuracy result answer different questions."
         ]
       }
     ],
     "exercise": {
-      "prompt": "A matrix has singular values [5, 2, 0]. What is its rank, and what Frobenius error results from retaining only the largest singular value?",
-      "answer": "The rank is two. Removing singular values 2 and 0 leaves Frobenius error √(2² + 0²) = 2. The squared error is 4; confusing error with squared error changes the reported quantity."
+      "prompt": "A matrix has singular values \\([5, 2, 0]\\). What is its rank, and what Frobenius error results from retaining only the largest singular value?",
+      "answer": "The rank is two. Removing singular values 2 and 0 leaves Frobenius error \\(\\sqrt{2^2+0^2}=2\\). The squared error is 4; confusing error with squared error changes the reported quantity."
     },
     "takeaways": [
       "Rank counts independent directions.",
@@ -190,29 +190,29 @@
         "id": "mechanism",
         "title": "Compose sensitivities in the right order",
         "paragraphs": [
-          "Consider x mapped to z = Wx + b, then h = tanh(z), then a scalar loss. The derivative of the loss with respect to z multiplies the incoming gradient elementwise by 1 − tanh²(z). The derivative with respect to x is Wᵀ times that result. Backpropagation computes these vector-Jacobian products without constructing an enormous Jacobian explicitly. A shared variable receives a sum of contributions from every path that uses it."
+          "Consider \\(x\\) mapped to \\(z=Wx+b\\), then \\(h=\\tanh(z)\\), then a scalar loss. The derivative of the loss with respect to \\(z\\) multiplies the incoming gradient elementwise by \\(1-\\tanh^2(z)\\). The derivative with respect to \\(x\\) is \\(W^{\\top}\\) times that result. Backpropagation computes these vector-Jacobian products without constructing an enormous Jacobian explicitly. A shared variable receives a sum of contributions from every path that uses it."
         ],
-        "formula": "∇ₓL = Wᵀ[(∇ₕL) ⊙ (1 − tanh²(z))]"
+        "formula": "\\nabla_x L=W^{\\top}\\left[(\\nabla_h L)\\odot\\left(1-\\tanh^2(z)\\right)\\right]"
       },
       {
         "id": "practice",
         "title": "Check a derivative numerically",
         "paragraphs": [
-          "For f(w) = (3w − 1)², the derivative is 6(3w − 1). At w = 1 it equals 12. Compare this with the centered difference [f(w + ε) − f(w − ε)]/(2ε). A moderate ε balances approximation error against floating-point cancellation. Use float64 for a small gradient check, avoid nondifferentiable points such as a ReLU kink, and check a few coordinates rather than assuming a successful backward call proves correctness."
+          "For \\(f(w)=(3w-1)^2\\), the derivative is \\(6(3w-1)\\). At \\(w = 1\\) it equals 12. Compare this with the centered difference \\(\\frac{f(w+\\varepsilon)-f(w-\\varepsilon)}{2\\varepsilon}\\). A moderate \\(\\varepsilon\\) balances approximation error against floating-point cancellation. Use float64 for a small gradient check, avoid nondifferentiable points such as a ReLU kink, and check a few coordinates rather than assuming a successful backward call proves correctness."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Use Numerical Computation for derivative and Jacobian notation, then Deep Feedforward Networks for computational graphs and backpropagation. Translate each operation into a small dependency diagram before differentiating. For y = ab + a², draw two routes from a to y and one from b. This diagram explains the sum b + 2a without relying on a remembered formula, and the same reasoning applies when a shared embedding or projection is reused at many positions.",
+          "Use Numerical Computation for derivative and Jacobian notation, then Deep Feedforward Networks for computational graphs and backpropagation. Translate each operation into a small dependency diagram before differentiating. For \\(y=ab+a^2\\), draw two routes from \\(a\\) to \\(y\\) and one from \\(b\\). This diagram explains the sum \\(b + 2a\\) without relying on a remembered formula, and the same reasoning applies when a shared embedding or projection is reused at many positions.",
           "To connect that notation with numerical evidence, evaluate the centered difference at several step sizes rather than selecting one successful value. A large step can measure curvature beyond the local neighborhood, while an extremely small step can subtract nearly equal floating-point numbers. Agreement across a reasonable range is stronger evidence. Also inspect the point being tested: a ReLU at zero has no ordinary derivative, so a mismatch there does not necessarily reveal an implementation error."
         ]
       }
     ],
     "exercise": {
-      "prompt": "Let y = ab + a². Find both partial derivatives at a = 2 and b = 3. Why does the derivative with respect to a have two terms?",
-      "answer": "∂y/∂a = b + 2a = 7 and ∂y/∂b = a = 2. The variable a affects y through both the product ab and the square a², so the chain rule adds both path contributions."
+      "prompt": "Let \\(y=ab+a^2\\). Find both partial derivatives at \\(a = 2\\) and \\(b = 3\\). Why does the derivative with respect to \\(a\\) have two terms?",
+      "answer": "\\(\\frac{\\partial y}{\\partial a}=b+2a=7\\) and \\(\\frac{\\partial y}{\\partial b}=a=2\\). The variable \\(a\\) affects \\(y\\) through both the product \\(ab\\) and the square \\(a^2\\), so the chain rule adds both path contributions."
     },
     "takeaways": [
       "Gradients are local sensitivities.",
@@ -252,9 +252,9 @@
         "id": "mechanism",
         "title": "Use the first-order approximation",
         "paragraphs": [
-          "For parameters θ and a small displacement Δ, the loss is approximately L(θ) + ∇L(θ)ᵀΔ. Choosing Δ = −η∇L gives a predicted first-order change of −η‖∇L‖². For L(w) = aw²/2 with a > 0, the update is exactly w_next = (1 − ηa)w. It converges when 0 < ηa < 2. Larger curvature therefore requires a smaller stable step."
+          "For parameters \\(\\theta\\) and a small displacement \\(\\Delta\\), the loss is approximately \\(L(\\theta)+\\nabla L(\\theta)^{\\top}\\Delta\\). Choosing \\(\\Delta=-\\eta\\nabla L\\) gives a predicted first-order change of \\(-\\eta\\lVert\\nabla L\\rVert^2\\). For \\(L(w)=\\frac{aw^2}{2}\\) with \\(a > 0\\), the update is exactly \\(w_{\\text{next}}=(1-\\eta a)w\\). It converges when \\(0<\\eta a<2\\). Larger curvature therefore requires a smaller stable step."
         ],
-        "formula": "θ_next = θ − η∇L(θ)"
+        "formula": "\\theta_{\\text{next}}=\\theta-\\eta\\nabla L(\\theta)"
       },
       {
         "id": "practice",
@@ -267,14 +267,14 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Use the textbook's discussion of gradient descent to separate the proposed direction from the chosen distance. The local linear approximation predicts improvement along a negative gradient, but it does not choose a universally safe learning rate. The quadratic in this article makes that distinction exact: its multiplicative update factor is 1 − 10η. Convergence requires the magnitude of that factor to be less than one.",
-          "An instructive extension is a two-coordinate loss with very different curvatures, such as (w₁² + 100w₂²)/2. A learning rate suitable for the first coordinate may destabilize the second. Draw the two scalar update factors before attributing slow learning to an insufficiently expressive model. When comparing an optimizer paper with your own run, record feature scaling and loss reduction too: either can change effective curvature and make a quoted learning rate inappropriate."
+          "Use the textbook's discussion of gradient descent to separate the proposed direction from the chosen distance. The local linear approximation predicts improvement along a negative gradient, but it does not choose a universally safe learning rate. The quadratic in this article makes that distinction exact: its multiplicative update factor is \\(1-10\\eta\\). Convergence requires the magnitude of that factor to be less than one.",
+          "An instructive extension is a two-coordinate loss with very different curvatures, such as \\(\\frac{w_1^2+100w_2^2}{2}\\). A learning rate suitable for the first coordinate may destabilize the second. Draw the two scalar update factors before attributing slow learning to an insufficiently expressive model. When comparing an optimizer paper with your own run, record feature scaling and loss reduction too: either can change effective curvature and make a quoted learning rate inappropriate."
         ]
       }
     ],
     "exercise": {
-      "prompt": "For L(w) = 5w² and w = 1, compare one gradient step with learning rates 0.1 and 0.3. Which step reduces the loss?",
-      "answer": "The gradient is 10w. With η = 0.1, w becomes 0 and loss becomes 0. With η = 0.3, w becomes −2 and loss rises from 5 to 20. The stable interval is 0 < η < 0.2."
+      "prompt": "For \\(L(w)=5w^2\\) and \\(w = 1\\), compare one gradient step with learning rates 0.1 and 0.3. Which step reduces the loss?",
+      "answer": "The gradient is \\(10w\\). With \\(\\eta=0.1\\), \\(w\\) becomes 0 and loss becomes 0. With \\(\\eta=0.3\\), \\(w\\) becomes \\(-2\\) and loss rises from 5 to 20. The stable interval is \\(0<\\eta<0.2\\)."
     },
     "takeaways": [
       "Negative gradients offer local descent, not a global guarantee.",
@@ -299,16 +299,16 @@
         "id": "intuition",
         "title": "Conditioning changes the question",
         "paragraphs": [
-          "A probability describes uncertainty under a specified information set. P(A) asks about an event before seeing evidence; P(A | B) asks after learning B. These need not be similar. In machine learning, the training distribution supplies one information environment, while deployment may supply another. Writing the conditioning variables explicitly prevents ambiguous claims such as a model being accurate without saying on which examples or under which sampling process."
+          "A probability describes uncertainty under a specified information set. \\(P(A)\\) asks about an event before seeing evidence; \\(P(A\\mid B)\\) asks after learning \\(B\\). These need not be similar. In machine learning, the training distribution supplies one information environment, while deployment may supply another. Writing the conditioning variables explicitly prevents ambiguous claims such as a model being accurate without saying on which examples or under which sampling process."
         ]
       },
       {
         "id": "mechanism",
         "title": "Reverse a conditional with base rates",
         "paragraphs": [
-          "Suppose 10% of documents are technical. A keyword appears in 80% of technical documents and 20% of other documents. Among 100 imagined documents, 8 technical and 18 nontechnical documents contain it. The probability that a keyword-containing document is technical is therefore 8/26, about 0.308. It is not 0.8: that number answers the opposite conditional. Bayes' rule combines likelihood with the prior frequency of the event."
+          "Suppose 10% of documents are technical. A keyword appears in 80% of technical documents and 20% of other documents. Among 100 imagined documents, 8 technical and 18 nontechnical documents contain it. The probability that a keyword-containing document is technical is therefore \\(\\frac8{26}\\), about 0.308. It is not 0.8: that number answers the opposite conditional. Bayes' rule combines likelihood with the prior frequency of the event."
         ],
-        "formula": "P(A | B) = P(B | A)P(A) / P(B)"
+        "formula": "P(A\\mid B)=\\frac{P(B\\mid A)P(A)}{P(B)}"
       },
       {
         "id": "practice",
@@ -327,8 +327,8 @@
       }
     ],
     "exercise": {
-      "prompt": "A binary variable X equals 1 with probability 0.25. Compute E[X], E[X²], and Var(X). What changes for Y = 4X?",
-      "answer": "E[X] = E[X²] = 0.25, so Var(X) = 0.25 − 0.0625 = 0.1875. For Y, E[Y] = 1 and Var(Y) = 16·0.1875 = 3. Scaling changes variance quadratically."
+      "prompt": "A binary variable \\(X\\) equals 1 with probability 0.25. Compute \\(\\mathbb{E}[X]\\), \\(\\mathbb{E}[X^2]\\), and \\(\\operatorname{Var}(X)\\). What changes for \\(Y = 4X\\)?",
+      "answer": "\\(\\mathbb{E}[X]=\\mathbb{E}[X^2]=0.25\\), so \\(\\operatorname{Var}(X)=0.25-0.0625=0.1875\\). For \\(Y\\), \\(\\mathbb{E}[Y]=1\\) and \\(\\operatorname{Var}(Y)=16\\cdot0.1875=3\\). Scaling changes variance quadratically."
     },
     "takeaways": [
       "Conditional probabilities depend on the direction of the question.",
@@ -362,9 +362,9 @@
         "id": "mechanism",
         "title": "Connect outputs to valid parameters",
         "paragraphs": [
-          "A Bernoulli model needs a probability p between zero and one, often obtained with a sigmoid. A categorical model needs nonnegative probabilities that sum to one, usually produced by softmax logits. A Gaussian model needs a mean and a positive variance; predicting an unconstrained log-variance is one way to enforce positivity. Multiple independent binary labels generally require several Bernoulli outputs, not one categorical distribution that forces only one label to be correct."
+          "A Bernoulli model needs a probability \\(p\\) between zero and one, often obtained with a sigmoid. A categorical model needs nonnegative probabilities that sum to one, usually produced by softmax logits. A Gaussian model needs a mean and a positive variance; predicting an unconstrained log-variance is one way to enforce positivity. Multiple independent binary labels generally require several Bernoulli outputs, not one categorical distribution that forces only one label to be correct."
         ],
-        "formula": "Bernoulli: P(X = x) = pˣ(1 − p)¹⁻ˣ;  Gaussian: X ∼ N(μ, σ²)"
+        "formula": "\\text{Bernoulli:}\\quad P(X=x)=p^x(1-p)^{1-x};\\qquad \\text{Gaussian:}\\quad X\\sim\\mathcal{N}(\\mu,\\sigma^2)"
       },
       {
         "id": "practice",
@@ -419,29 +419,29 @@
         "id": "mechanism",
         "title": "Products become sums of log probabilities",
         "paragraphs": [
-          "For independent Bernoulli observations, the likelihood multiplies p for every success and 1 − p for every failure. Taking logs turns the product into a sum, which is easier to optimize and less vulnerable to numerical underflow. Differentiating that sum shows that the maximum-likelihood estimate is the empirical success rate. For a Gaussian with fixed variance, maximizing log likelihood is equivalent to minimizing squared residuals; changing the distribution changes the loss."
+          "For independent Bernoulli observations, the likelihood multiplies \\(p\\) for every success and \\(1-p\\) for every failure. Taking logs turns the product into a sum, which is easier to optimize and less vulnerable to numerical underflow. Differentiating that sum shows that the maximum-likelihood estimate is the empirical success rate. For a Gaussian with fixed variance, maximizing log likelihood is equivalent to minimizing squared residuals; changing the distribution changes the loss."
         ],
-        "formula": "θ̂ = argmaxθ Σᵢ log pθ(xᵢ) = argminθ −Σᵢ log pθ(xᵢ)"
+        "formula": "\\hat{\\theta}=\\operatorname*{arg\\,max}_{\\theta}\\sum_i\\log p_{\\theta}(x_i)=\\operatorname*{arg\\,min}_{\\theta}\\left[-\\sum_i\\log p_{\\theta}(x_i)\\right]"
       },
       {
         "id": "practice",
         "title": "Likelihood does not protect against overfitting",
         "paragraphs": [
-          "A flexible model can assign high likelihood to training examples by memorizing peculiarities that do not recur. Evaluate on held-out data and consider regularization or a prior when data are limited. With all Bernoulli observations equal to one, MLE gives p = 1, assigning zero probability to any future failure. That boundary estimate illustrates why finite data can produce overconfident conclusions even when the optimization is mathematically correct."
+          "A flexible model can assign high likelihood to training examples by memorizing peculiarities that do not recur. Evaluate on held-out data and consider regularization or a prior when data are limited. With all Bernoulli observations equal to one, MLE gives \\(p = 1\\), assigning zero probability to any future failure. That boundary estimate illustrates why finite data can produce overconfident conclusions even when the optimization is mathematically correct."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Locate the maximum-likelihood construction in Machine Learning Basics, then derive the Bernoulli example without treating likelihood as a distribution over p. Seven successes and three failures give a parameter-dependent term p⁷(1 − p)³. Taking its logarithm produces 7 log p + 3 log(1 − p); the stationary point is p = 0.7. This connects the probability model directly to the scalar objective an optimizer receives.",
-          "A useful boundary case is a dataset containing only successes. The optimum occurs at p = 1, not at an interior point where the same stationary-point argument applies. The data do not guarantee that failure is impossible, even though the fitted model assigns it zero probability. For regression, check whether variance is fixed before claiming that Gaussian likelihood is equivalent to squared-error minimization. Learning the variance introduces additional terms and a different optimization problem."
+          "Locate the maximum-likelihood construction in Machine Learning Basics, then derive the Bernoulli example without treating likelihood as a distribution over \\(p\\). Seven successes and three failures give a parameter-dependent term \\(p^7(1-p)^3\\). Taking its logarithm produces \\(7\\log p+3\\log(1-p)\\); the stationary point is \\(p = 0.7\\). This connects the probability model directly to the scalar objective an optimizer receives.",
+          "A useful boundary case is a dataset containing only successes. The optimum occurs at \\(p = 1\\), not at an interior point where the same stationary-point argument applies. The data do not guarantee that failure is impossible, even though the fitted model assigns it zero probability. For regression, check whether variance is fixed before claiming that Gaussian likelihood is equivalent to squared-error minimization. Learning the variance introduces additional terms and a different optimization problem."
         ]
       }
     ],
     "exercise": {
       "prompt": "You observe 7 successes and 3 failures. What is the Bernoulli MLE? If the next observation is a failure, what is its negative log likelihood under that estimate?",
-      "answer": "The estimate is p = 7/10 = 0.7. A failure has probability 0.3, so its negative log likelihood is −ln(0.3), approximately 1.204 nats. The logarithm base determines the unit."
+      "answer": "The estimate is \\(p=\\frac7{10}=0.7\\). A failure has probability 0.3, so its negative log likelihood is \\(-\\ln(0.3)\\), approximately 1.204 nats. The logarithm base determines the unit."
     },
     "takeaways": [
       "A loss function often encodes a likelihood assumption.",
@@ -469,36 +469,36 @@
         "id": "intuition",
         "title": "Measure surprise under a distribution",
         "paragraphs": [
-          "An event with low predicted probability has high surprise, measured as negative log probability. Entropy averages that surprise when the predictions equal the true distribution p. Cross-entropy averages surprise when outcomes still come from p but a different distribution q supplies the predictions. KL divergence isolates the extra expected surprise caused by that mismatch. This distinction explains why a nonzero optimal loss need not mean a model is wrong."
+          "An event with low predicted probability has high surprise, measured as negative log probability. Entropy averages that surprise when the predictions equal the true distribution \\(p\\). Cross-entropy averages surprise when outcomes still come from \\(p\\) but a different distribution \\(q\\) supplies the predictions. KL divergence isolates the extra expected surprise caused by that mismatch. This distinction explains why a nonzero optimal loss need not mean a model is wrong."
         ]
       },
       {
         "id": "mechanism",
         "title": "Decompose the prediction cost",
         "paragraphs": [
-          "Expanding the definitions gives H(p, q) = H(p) + KL(p ∥ q). When p is fixed, minimizing cross-entropy also minimizes this forward KL because entropy does not depend on model parameters. For a fair binary source, a correct predictor still has entropy ln 2. A predictor q = [0.9, 0.1] incurs higher cross-entropy because it confidently favors one outcome without evidence. KL is directional, so reversing p and q changes the weighting of errors."
+          "Expanding the definitions gives \\(H(p,q)=H(p)+\\operatorname{KL}(p\\Vert q)\\). When \\(p\\) is fixed, minimizing cross-entropy also minimizes this forward KL because entropy does not depend on model parameters. For a fair binary source, a correct predictor still has entropy \\(\\ln2\\). A predictor \\(q = [0.9, 0.1]\\) incurs higher cross-entropy because it confidently favors one outcome without evidence. KL is directional, so reversing \\(p\\) and \\(q\\) changes the weighting of errors."
         ],
-        "formula": "H(p) = −Σ p log p;  H(p, q) = −Σ p log q"
+        "formula": "H(p)=-\\sum_i p_i\\log p_i;\\qquad H(p,q)=-\\sum_i p_i\\log q_i"
       },
       {
         "id": "practice",
         "title": "One-hot labels simplify, but do not redefine, the objective",
         "paragraphs": [
-          "With a one-hot observed label, cross-entropy reduces to −log q(correct). Averaging over examples estimates an expectation over the underlying data distribution; it does not prove that the true conditional entropy is zero. Never apply softmax twice when a loss expects logits, and distinguish mean from summed loss when comparing runs. If q assigns zero probability where p is positive, the forward KL is infinite rather than merely large."
+          "With a one-hot observed label, cross-entropy reduces to \\(-\\log q(\\text{correct})\\). Averaging over examples estimates an expectation over the underlying data distribution; it does not prove that the true conditional entropy is zero. Never apply softmax twice when a loss expects logits, and distinguish mean from summed loss when comparing runs. If \\(q\\) assigns zero probability where \\(p\\) is positive, the forward KL is infinite rather than merely large."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Use the information-theory definitions in the probability chapter to keep the distribution generating outcomes separate from the distribution scoring them. Write one table with columns for p, q, −log p, and −log q. Weight both surprise columns by p. This makes the entropy/cross-entropy distinction visible and prevents accidentally reversing the KL direction when translating between a paper's notation and a training loss.",
-          "For a concrete extension, retain p = [0.5, 0.5] but use q = [0.9, 0.1]. Cross-entropy is approximately 1.204 nats and the excess over ln 2 is approximately 0.511 nats. Those values describe expected predictive surprise, not classification accuracy: a deterministic choice from q can hide the probability calibration problem. When comparing losses, also check logarithm base, averaging denominator, and whether the targets are empirical one-hot observations or an explicitly supplied soft distribution."
+          "Use the information-theory definitions in the probability chapter to keep the distribution generating outcomes separate from the distribution scoring them. Write one table with columns for \\(p\\), \\(q\\), \\(-\\log p\\), and \\(-\\log q\\). Weight both surprise columns by \\(p\\). This makes the entropy/cross-entropy distinction visible and prevents accidentally reversing the KL direction when translating between a paper's notation and a training loss.",
+          "For a concrete extension, retain \\(p = [0.5, 0.5]\\) but use \\(q = [0.9, 0.1]\\). Cross-entropy is approximately 1.204 nats and the excess over \\(\\ln2\\) is approximately 0.511 nats. Those values describe expected predictive surprise, not classification accuracy: a deterministic choice from \\(q\\) can hide the probability calibration problem. When comparing losses, also check logarithm base, averaging denominator, and whether the targets are empirical one-hot observations or an explicitly supplied soft distribution."
         ]
       }
     ],
     "exercise": {
-      "prompt": "For p = [0.5, 0.5] and q = [0.5, 0.5], calculate entropy, cross-entropy, and KL using natural logs. What does their relationship tell you?",
-      "answer": "Entropy and cross-entropy both equal ln 2 ≈ 0.693 nats, while KL is zero. Prediction is distributionally correct despite positive loss, because the source itself remains uncertain."
+      "prompt": "For \\(p = [0.5, 0.5]\\) and \\(q = [0.5, 0.5]\\), calculate entropy, cross-entropy, and KL using natural logs. What does their relationship tell you?",
+      "answer": "Entropy and cross-entropy both equal \\(\\ln2\\approx0.693\\) nats, while KL is zero. Prediction is distributionally correct despite positive loss, because the source itself remains uncertain."
     },
     "takeaways": [
       "Cross-entropy equals entropy plus forward KL.",
@@ -533,9 +533,9 @@
         "id": "mechanism",
         "title": "Track moments and decay separately",
         "paragraphs": [
-          "Adam's first moment averages gradients; its second moment averages squared gradients. Bias correction compensates for both moving averages starting at zero. The normalized update divides the corrected first moment by the square root of the corrected second moment plus a stabilizing epsilon. AdamW additionally shrinks weights independently of that adaptive normalization. An L2 penalty added to the gradient is equivalent to weight decay in simple SGD under matching conventions, but generally not in Adam."
+          "Adam's first moment averages gradients; its second moment averages squared gradients. Bias correction compensates for both moving averages starting at zero. The normalized update divides the corrected first moment by the square root of the corrected second moment plus a stabilizing epsilon. AdamW additionally shrinks weights independently of that adaptive normalization. An \\(L_2\\) penalty added to the gradient is equivalent to weight decay in simple SGD under matching conventions, but generally not in Adam."
         ],
-        "formula": "mₜ = β₁mₜ₋₁ + (1 − β₁)gₜ;  vₜ = β₂vₜ₋₁ + (1 − β₂)gₜ²\nm̂ₜ = mₜ/(1 − β₁ᵗ);  v̂ₜ = vₜ/(1 − β₂ᵗ)\nθₜ = θₜ₋₁ − η·m̂ₜ/(√v̂ₜ + ε)"
+        "formula": "\\begin{aligned}m_t&=\\beta_1m_{t-1}+(1-\\beta_1)g_t,&v_t&=\\beta_2v_{t-1}+(1-\\beta_2)g_t^2\\\\ \\hat m_t&=\\frac{m_t}{1-\\beta_1^t},&\\hat v_t&=\\frac{v_t}{1-\\beta_2^t}\\\\ \\theta_t&=\\theta_{t-1}-\\eta\\frac{\\hat m_t}{\\sqrt{\\hat v_t}+\\varepsilon}\\end{aligned}"
       },
       {
         "id": "practice",
@@ -548,7 +548,7 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the Adam update algorithm before its reported benchmark results. Follow one coordinate through the first update: starting both moments at zero and applying bias correction makes the corrected first moment equal g and the corrected second moment equal g². The resulting step is approximately a signed learning-rate-sized move when |g| is much larger than epsilon. This helps explain why raw gradient magnitude does not directly determine an Adam update.",
+          "Read the Adam update algorithm before its reported benchmark results. Follow one coordinate through the first update: starting both moments at zero and applying bias correction makes the corrected first moment equal \\(g\\) and the corrected second moment equal \\(g^2\\). The resulting step is approximately a signed learning-rate-sized move when \\(\\lvert g\\rvert\\) is much larger than epsilon. This helps explain why raw gradient magnitude does not directly determine an Adam update.",
           "Compare AdamW's regularization with an explicit implementation. Does shrinkage enter the gradient before moment estimation, or change the parameter separately? These alternatives leave different optimizer histories, so matching a nominal decay coefficient does not make them equivalent. Preserve parameter-group settings and restore moments and step counts when resuming.",
           "Finally, read Reddi, Kale, and Kumar's analysis alongside Adam's original convergence claim. They identify a flaw in that proof and construct convex counterexamples to convergence. This limits the original guarantee; it does not imply that Adam fails on every practical task."
         ]

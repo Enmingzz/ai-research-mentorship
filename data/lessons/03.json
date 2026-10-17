@@ -19,9 +19,9 @@
         "id": "mechanism",
         "title": "Nonlinearity is what prevents collapse",
         "paragraphs": [
-          "Consider h = ReLU(xW₁ + b₁) followed by y = hW₂ + b₂. If the ReLU were removed, the two affine maps would combine into one affine map, regardless of hidden width. With ReLU, different input regions activate different hidden units, yielding different local linear behaviors. For input width 4, hidden width 8, and output width 3, the model has 4·8 + 8 + 8·3 + 3 = 67 parameters."
+          "Consider \\(h=\\operatorname{ReLU}(xW_1+b_1)\\) followed by \\(y=hW_2+b_2\\). If the ReLU were removed, the two affine maps would combine into one affine map, regardless of hidden width. With ReLU, different input regions activate different hidden units, yielding different local linear behaviors. For input width 4, hidden width 8, and output width 3, the model has \\(4\\cdot8+8+8\\cdot3+3=67\\) parameters."
         ],
-        "formula": "h = φ(xW₁ + b₁);  y = hW₂ + b₂"
+        "formula": "h=\\phi(xW_1+b_1);\\qquad y=hW_2+b_2"
       },
       {
         "id": "practice",
@@ -35,13 +35,13 @@
         "title": "Reading the original source",
         "paragraphs": [
           "Use the feedforward-network chapter's XOR discussion to distinguish a representational obstacle from an optimization failure. Four points can be easy to enumerate yet impossible to separate with one straight boundary. A hidden representation changes the coordinates supplied to the output classifier. Draw the input points and a proposed hidden feature before increasing depth; this connects the model's algebra to the decision geometry it is meant to express.",
-          "Then remove the activation from the two-layer example and multiply the affine maps explicitly. The effective weight becomes W₁W₂ and the effective bias becomes b₁W₂ + b₂. The 67 stored parameters no longer imply a nonlinear function merely because they are arranged in two layers. This is also a useful way to read architecture comparisons: count parameters, identify the nonlinear operations, and distinguish an expanded parameterization from an expanded family of input-output functions."
+          "Then remove the activation from the two-layer example and multiply the affine maps explicitly. The effective weight becomes \\(W_1W_2\\) and the effective bias becomes \\(b_1W_2+b_2\\). The 67 stored parameters no longer imply a nonlinear function merely because they are arranged in two layers. This is also a useful way to read architecture comparisons: count parameters, identify the nonlinear operations, and distinguish an expanded parameterization from an expanded family of input-output functions."
         ]
       }
     ],
     "exercise": {
       "prompt": "Why do three linear layers without any nonlinear activation still represent only one affine transformation? Include the role of biases.",
-      "answer": "Substituting each layer into the next multiplies the weight matrices and combines the transformed biases into one final bias. The result is xW + b for some W and b. Extra depth alone introduces no nonlinear decision boundary."
+      "answer": "Substituting each layer into the next multiplies the weight matrices and combines the transformed biases into one final bias. The result is \\(xW + b\\) for some \\(W\\) and \\(b\\). Extra depth alone introduces no nonlinear decision boundary."
     },
     "takeaways": [
       "Hidden layers learn representations for later decisions.",
@@ -76,9 +76,9 @@
         "id": "mechanism",
         "title": "Differentiate a two-layer network",
         "paragraphs": [
-          "For Z = XW₁ + b₁, H = ReLU(Z), and Y = HW₂ + b₂, let G be the gradient of loss with respect to Y. Then the gradient for W₂ is HᵀG, while the gradient for H is GW₂ᵀ. Multiply that by the indicator Z > 0 to obtain the gradient for Z. The first weight gradient is Xᵀ times that result. Bias gradients sum over every batch position where the bias was reused."
+          "For \\(Z=XW_1+b_1\\), \\(H=\\operatorname{ReLU}(Z)\\), and \\(Y=HW_2+b_2\\), let \\(G\\) be the gradient of loss with respect to \\(Y\\). Then the gradient for \\(W_2\\) is \\(H^{\\top}G\\), while the gradient for \\(H\\) is \\(GW_2^{\\top}\\). Multiply that by the indicator \\(Z > 0\\) to obtain the gradient for \\(Z\\). The first weight gradient is \\(X^{\\top}\\) times that result. Bias gradients sum over every batch position where the bias was reused."
         ],
-        "formula": "∂L/∂W₂ = HᵀG;  ∂L/∂Z = (GW₂ᵀ) ⊙ 1[Z > 0]"
+        "formula": "\\frac{\\partial L}{\\partial W_2}=H^{\\top}G;\\qquad \\frac{\\partial L}{\\partial Z}=(GW_2^{\\top})\\odot\\mathbf{1}[Z>0]"
       },
       {
         "id": "practice",
@@ -91,14 +91,14 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the textbook's backpropagation discussion by following the upstream gradient, not just the forward arrows. In the example here, G already contains the effects of the loss definition and reduction. The product HᵀG accumulates contributions over the batch, while GW₂ᵀ transports sensitivity back into hidden coordinates. Annotating the shapes of these three matrices is a reliable way to determine where a transpose belongs.",
+          "Read the textbook's backpropagation discussion by following the upstream gradient, not just the forward arrows. In the example here, \\(G\\) already contains the effects of the loss definition and reduction. The product \\(H^{\\top}G\\) accumulates contributions over the batch, while \\(GW_2^{\\top}\\) transports sensitivity back into hidden coordinates. Annotating the shapes of these three matrices is a reliable way to determine where a transpose belongs.",
           "To investigate shared computation, temporarily replace a reused parameter with two independent copies. Differentiate the expanded graph, then add the two gradients when identifying the copies as one shared parameter again. This reconstructs the accumulation rule rather than treating it as framework magic. Finite-difference comparisons should use the same scalar objective and avoid activation kinks. A discrepancy caused by sum-versus-mean reduction is a mathematical mismatch in the tested objective, not a small floating-point tolerance problem."
         ]
       }
     ],
     "exercise": {
-      "prompt": "A scalar weight w appears in y = wx + wz, and the upstream gradient ∂L/∂y is g. What is ∂L/∂w, and why is one contribution insufficient?",
-      "answer": "The gradient is g(x + z). The shared weight affects y through both products, so reverse-mode differentiation sums gx and gz. Keeping only one path would optimize a different function from the one used in the forward pass."
+      "prompt": "A scalar weight \\(w\\) appears in \\(y = wx + wz\\), and the upstream gradient \\(\\frac{\\partial L}{\\partial y}\\) is \\(g\\). What is \\(\\frac{\\partial L}{\\partial w}\\), and why is one contribution insufficient?",
+      "answer": "The gradient is \\(g(x + z)\\). The shared weight affects \\(y\\) through both products, so reverse-mode differentiation sums \\(gx\\) and \\(gz\\). Keeping only one path would optimize a different function from the one used in the forward pass."
     },
     "takeaways": [
       "Backpropagation and optimization are separate operations.",
@@ -133,9 +133,9 @@
         "id": "mechanism",
         "title": "Compare the formulas on one axis",
         "paragraphs": [
-          "ReLU(x) = max(0, x). GELU(x) = xΦ(x), with Φ the standard normal cumulative distribution function. SiLU(x) = xσ(x), using the logistic sigmoid. For a large positive input, each behaves approximately like the identity. For moderately negative inputs, GELU and SiLU can produce small negative outputs, while ReLU produces zero. Their smoothness changes gradient behavior, but does not by itself establish which activation will work best for a particular architecture."
+          "\\(\\operatorname{ReLU}(x)=\\max(0,x)\\). \\(\\operatorname{GELU}(x)=x\\Phi(x)\\), with \\(\\Phi\\) the standard normal cumulative distribution function. \\(\\operatorname{SiLU}(x)=x\\sigma(x)\\), using the logistic sigmoid. For a large positive input, each behaves approximately like the identity. For moderately negative inputs, GELU and SiLU can produce small negative outputs, while ReLU produces zero. Their smoothness changes gradient behavior, but does not by itself establish which activation will work best for a particular architecture."
         ],
-        "formula": "ReLU(x) = max(0, x);  GELU(x) = xΦ(x);  SiLU(x) = x/(1 + e⁻ˣ)"
+        "formula": "\\operatorname{ReLU}(x)=\\max(0,x);\\quad \\operatorname{GELU}(x)=x\\Phi(x);\\quad \\operatorname{SiLU}(x)=\\frac{x}{1+e^{-x}}"
       },
       {
         "id": "practice",
@@ -148,14 +148,14 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "The GELU paper defines a specific smooth weighting, so separate that function from implementations that use an approximation. The exact xΦ(x) expression in this article and a faster approximation are related choices, but they need not produce identical outputs or gradients. When reproducing an architecture, inspect the activation configuration rather than relying only on the name written in a diagram.",
+          "The GELU paper defines a specific smooth weighting, so separate that function from implementations that use an approximation. The exact \\(x\\Phi(x)\\) expression in this article and a faster approximation are related choices, but they need not produce identical outputs or gradients. When reproducing an architecture, inspect the activation configuration rather than relying only on the name written in a diagram.",
           "An informative comparison uses moderately negative inputs as well as large positive ones. ReLU outputs zero throughout the negative half-line, whereas GELU and SiLU can transmit a negative value. Their derivatives therefore shape optimization differently even when their positive tails look similar. A smooth curve alone does not demonstrate superior generalization: the paper's empirical results belong to particular tasks and training settings. Preserve initialization, normalization, model width, and training budget when asking whether the activation itself explains a change in your own experiment."
         ]
       }
     ],
     "exercise": {
-      "prompt": "For inputs [−2, 0, 3], what are the ReLU outputs? At which input is its ordinary derivative undefined, and what derivative is commonly selected there in implementations?",
-      "answer": "The outputs are [0, 0, 3]. The ordinary derivative is undefined at zero because the one-sided slopes differ. Implementations commonly select zero there as a valid subgradient convention."
+      "prompt": "For inputs \\([-2,0,3]\\), what are the ReLU outputs? At which input is its ordinary derivative undefined, and what derivative is commonly selected there in implementations?",
+      "answer": "The outputs are \\([0, 0, 3]\\). The ordinary derivative is undefined at zero because the one-sided slopes differ. Implementations commonly select zero there as a valid subgradient convention."
     },
     "takeaways": [
       "Activations change local signal and gradient flow.",
@@ -197,9 +197,9 @@
         "id": "mechanism",
         "title": "Connect gradients to prediction errors",
         "paragraphs": [
-          "For squared error (ŷ − y)²/2, the derivative with respect to ŷ is simply ŷ − y. For softmax cross-entropy, the gradient with respect to a logit is predicted probability minus the target probability. This compact result explains why confidently wrong predictions produce strong corrective signals. In practice, a numerically stable cross-entropy implementation accepts logits and combines log-softmax with the negative log-likelihood calculation."
+          "For squared error \\(\\frac{(\\hat y-y)^2}{2}\\), the derivative with respect to \\(\\hat y\\) is simply \\(\\hat y-y\\). For softmax cross-entropy, the gradient with respect to a logit is predicted probability minus the target probability. This compact result explains why confidently wrong predictions produce strong corrective signals. In practice, a numerically stable cross-entropy implementation accepts logits and combines log-softmax with the negative log-likelihood calculation."
         ],
-        "formula": "∂[(ŷ − y)²/2]/∂ŷ = ŷ − y;  ∂CE/∂z = softmax(z) − target"
+        "formula": "\\frac{\\partial}{\\partial\\hat y}\\left[\\frac{(\\hat y-y)^2}{2}\\right]=\\hat y-y;\\qquad \\frac{\\partial\\operatorname{CE}}{\\partial z}=\\operatorname{softmax}(z)-\\text{target}"
       },
       {
         "id": "practice",
@@ -218,8 +218,8 @@
       }
     ],
     "exercise": {
-      "prompt": "A classifier assigns probabilities [0.1, 0.7, 0.2], and the true class is the third. What is the cross-entropy gradient with respect to its three logits?",
-      "answer": "Subtract the one-hot target [0, 0, 1] from the prediction: [0.1, 0.7, −0.8]. Gradient descent lowers the first two logits and raises the third, moving probability toward the observed class."
+      "prompt": "A classifier assigns probabilities \\([0.1, 0.7, 0.2]\\), and the true class is the third. What is the cross-entropy gradient with respect to its three logits?",
+      "answer": "Subtract the one-hot target \\([0, 0, 1]\\) from the prediction: \\([0.1,0.7,-0.8]\\). Gradient descent lowers the first two logits and raises the third, moving probability toward the observed class."
     },
     "takeaways": [
       "Match loss semantics to the target and output representation.",
@@ -254,15 +254,15 @@
         "id": "mechanism",
         "title": "Count incoming contributions",
         "paragraphs": [
-          "A preactivation sums fan_in weighted inputs. Under simplifying independence assumptions and zero-mean weights, preactivation variance scales roughly as fan_in · Var(w) · E[x²]. This becomes fan_in · Var(w) · Var(x) when inputs are also zero-mean. ReLU outputs generally are not: for a symmetric zero-mean preactivation z, E[ReLU(z)²] = Var(z)/2. Xavier initialization balances incoming and outgoing widths, often using variance 2/(fan_in + fan_out). Kaiming initialization accounts for rectification and commonly uses variance 2/fan_in for ReLU forward signal preservation. The chosen mode and activation gain matter; these are not interchangeable names for arbitrary small random weights."
+          "A preactivation sums \\(\\text{fan}_{\\text{in}}\\) weighted inputs. Under simplifying independence assumptions and zero-mean weights, preactivation variance scales roughly as \\(\\text{fan}_{\\text{in}}\\cdot\\operatorname{Var}(w)\\cdot\\mathbb{E}[x^2]\\). This becomes \\(\\text{fan}_{\\text{in}}\\cdot\\operatorname{Var}(w)\\cdot\\operatorname{Var}(x)\\) when inputs are also zero-mean. ReLU outputs generally are not: for a symmetric zero-mean preactivation \\(z\\), \\(\\mathbb{E}[\\operatorname{ReLU}(z)^2]=\\frac{\\operatorname{Var}(z)}2\\). Xavier initialization balances incoming and outgoing widths, often using variance \\(\\frac2{\\text{fan}_{\\text{in}}+\\text{fan}_{\\text{out}}}\\). Kaiming initialization accounts for rectification and commonly uses variance \\(\\frac2{\\text{fan}_{\\text{in}}}\\) for ReLU forward signal preservation. The chosen mode and activation gain matter; these are not interchangeable names for arbitrary small random weights."
         ],
-        "formula": "Var(W_Xavier) ≈ 2/(fan_in + fan_out);  Var(W_Kaiming) ≈ 2/fan_in"
+        "formula": "\\operatorname{Var}(W_{\\text{Xavier}})\\approx\\frac{2}{\\text{fan}_{\\text{in}}+\\text{fan}_{\\text{out}}};\\qquad \\operatorname{Var}(W_{\\text{Kaiming}})\\approx\\frac{2}{\\text{fan}_{\\text{in}}}"
       },
       {
         "id": "practice",
         "title": "Symmetry and orientation can break the setup",
         "paragraphs": [
-          "Initializing every hidden unit identically can keep their updates identical, preventing useful specialization. Randomness breaks that symmetry. Matrix orientation matters too: a library may store a linear weight as [out, in] even when the mathematical expression uses [in, out]. Check which axis a custom initializer treats as fan_in. Inspect activation and gradient scales across several layers on a fixed batch; gross trends can reveal a mismatch before expensive training."
+          "Initializing every hidden unit identically can keep their updates identical, preventing useful specialization. Randomness breaks that symmetry. Matrix orientation matters too: a library may store a linear weight as \\([\\text{out},\\text{in}]\\) even when the mathematical expression uses \\([\\text{in},\\text{out}]\\). Check which axis a custom initializer treats as \\(\\text{fan}_{\\text{in}}\\). Inspect activation and gradient scales across several layers on a fixed batch; gross trends can reveal a mismatch before expensive training."
         ]
       },
       {
@@ -270,13 +270,13 @@
         "title": "Reading the original source",
         "paragraphs": [
           "Read Glorot and Bengio together with the rectifier-initialization paper, focusing on the assumptions behind each variance calculation. The useful question is which signal is intended to remain comparable across layers: forward activations, backward sensitivities, or a compromise between them. The ReLU rule in this article is tied to rectification and a specified fan convention; it is not a universal variance for every nonlinear block.",
-          "Connect the calculation to the storage orientation of a real layer. A custom xW implementation can store W as [in, out], while a library initializer may interpret a linear weight as [out, in]. Passing the wrong orientation can therefore select the wrong fan even though initialization completes successfully. After initialization, inspect several layers on the same small input batch. The theoretical calculation uses simplified statistical assumptions; observed activation and gradient scales test whether the implemented architecture starts in the intended regime."
+          "Connect the calculation to the storage orientation of a real layer. A custom \\(xW\\) implementation can store \\(W\\) as \\([\\text{in},\\text{out}]\\), while a library initializer may interpret a linear weight as \\([\\text{out},\\text{in}]\\). Passing the wrong orientation can therefore select the wrong fan even though initialization completes successfully. After initialization, inspect several layers on the same small input batch. The theoretical calculation uses simplified statistical assumptions; observed activation and gradient scales test whether the implemented architecture starts in the intended regime."
         ]
       }
     ],
     "exercise": {
-      "prompt": "A ReLU layer has fan_in = 100. Using the common Kaiming forward-preserving rule, what weight variance and standard deviation should you expect?",
-      "answer": "The variance is 2/100 = 0.02 and the standard deviation is √0.02 ≈ 0.1414. These values follow the stated assumptions and parameter orientation; they are not a universal prescription for every gated or residual architecture."
+      "prompt": "A ReLU layer has \\(\\text{fan}_{\\text{in}}=100\\). Using the common Kaiming forward-preserving rule, what weight variance and standard deviation should you expect?",
+      "answer": "The variance is \\(\\frac2{100}=0.02\\) and the standard deviation is \\(\\sqrt{0.02}\\approx0.1414\\). These values follow the stated assumptions and parameter orientation; they are not a universal prescription for every gated or residual architecture."
     },
     "takeaways": [
       "Initialization is a signal-scale design choice.",
@@ -317,9 +317,9 @@
         "id": "mechanism",
         "title": "Write down the reduction dimensions",
         "paragraphs": [
-          "For a token vector x with d features, LayerNorm subtracts its feature mean and divides by the square root of feature variance plus epsilon, then applies learned affine parameters. RMSNorm uses sqrt(mean(x²) + epsilon) instead. For x = [2, 4], centering gives [−1, 1], whereas RMS scaling preserves both positive signs. Neither operation changes the number of features, but they remove or preserve different information."
+          "For a token vector \\(x\\) with \\(d\\) features, LayerNorm subtracts its feature mean and divides by the square root of feature variance plus epsilon, then applies learned affine parameters. RMSNorm uses \\(\\sqrt{\\operatorname{mean}(x^2)+\\varepsilon}\\) instead. For \\(x = [2, 4]\\), centering gives \\([-1,1]\\), whereas RMS scaling preserves both positive signs. Neither operation changes the number of features, but they remove or preserve different information."
         ],
-        "formula": "LN(x) = γ ⊙ (x − mean(x))/√(var(x) + ε) + β"
+        "formula": "\\operatorname{LN}(x)=\\gamma\\odot\\frac{x-\\operatorname{mean}(x)}{\\sqrt{\\operatorname{var}(x)+\\varepsilon}}+\\beta"
       },
       {
         "id": "practice",
@@ -332,14 +332,14 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Compare the three normalization papers by writing down the set of values used to compute one output's statistics. For [B, T, D] token representations, feature-only normalization uses D values for each token, while mixing T into that reduction changes the function. The RMSNorm comparison isolates another choice: whether centering occurs before scaling. Learned affine parameters should be considered separately from this raw normalization step.",
-          "The [2, 4] example makes that distinction concrete. Without affine parameters and ignoring epsilon, centered normalization yields [−1, 1], while RMS normalization divides both positive entries by √10. A shared offset is therefore treated differently. When inspecting BatchNorm evaluation, check whether running statistics are actually enabled; the usual train/eval description assumes that configuration. A paper's normalization label is insufficient to reconstruct an implementation without its axes, epsilon convention, affine parameters, and running-statistics policy."
+          "Compare the three normalization papers by writing down the set of values used to compute one output's statistics. For \\([B, T, D]\\) token representations, feature-only normalization uses \\(D\\) values for each token, while mixing \\(T\\) into that reduction changes the function. The RMSNorm comparison isolates another choice: whether centering occurs before scaling. Learned affine parameters should be considered separately from this raw normalization step.",
+          "The \\([2, 4]\\) example makes that distinction concrete. Without affine parameters and ignoring epsilon, centered normalization yields \\([-1,1]\\), while RMS normalization divides both positive entries by \\(\\sqrt{10}\\). A shared offset is therefore treated differently. When inspecting BatchNorm evaluation, check whether running statistics are actually enabled; the usual train/eval description assumes that configuration. A paper's normalization label is insufficient to reconstruct an implementation without its axes, epsilon convention, affine parameters, and running-statistics policy."
         ]
       }
     ],
     "exercise": {
-      "prompt": "For an input [B, T, D], you want each token normalized across features without mixing examples or positions. Which axes should LayerNorm reduce, and what parameter shape is typical?",
-      "answer": "Reduce only the final D axis, producing separate statistics for each of the B·T tokens. The learned scale and bias typically each have shape [D], shared across examples and positions."
+      "prompt": "For an input \\([B, T, D]\\), you want each token normalized across features without mixing examples or positions. Which axes should LayerNorm reduce, and what parameter shape is typical?",
+      "answer": "Reduce only the final \\(D\\) axis, producing separate statistics for each of the \\(B\\cdot T\\) tokens. The learned scale and bias typically each have shape \\([D]\\), shared across examples and positions."
     },
     "takeaways": [
       "Reduction axes define normalization semantics.",
@@ -386,9 +386,9 @@
         "id": "mechanism",
         "title": "The backward path includes an identity term",
         "paragraphs": [
-          "For y = x + F(x), the local Jacobian is I + J_F. The identity contribution provides a route for gradients that does not require multiplying only through the residual branch. Addition requires compatible shapes. If the number of features or spatial resolution changes, the shortcut may need a learned projection or another explicit transformation. That projected path is no longer an exact identity, so its initialization and dimensions deserve separate attention."
+          "For \\(y = x + F(x)\\), the local Jacobian is \\(I+J_F\\). The identity contribution provides a route for gradients that does not require multiplying only through the residual branch. Addition requires compatible shapes. If the number of features or spatial resolution changes, the shortcut may need a learned projection or another explicit transformation. That projected path is no longer an exact identity, so its initialization and dimensions deserve separate attention."
         ],
-        "formula": "y = x + F(x);  ∂y/∂x = I + ∂F/∂x"
+        "formula": "y=x+F(x);\\qquad \\frac{\\partial y}{\\partial x}=I+\\frac{\\partial F}{\\partial x}"
       },
       {
         "id": "practice",
@@ -401,14 +401,14 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the residual-learning paper's mapping and shortcut construction before interpreting the depth comparisons. The expression x + F(x) isolates an additive connection; a complete architecture may add normalization or an activation around that addition. Those surrounding operations matter when asking whether setting the branch to zero makes the entire block an identity map. The simplified Jacobian here describes the additive operation itself.",
-          "The projection example offers a second distinction: matching shapes is necessary, but a projected shortcut is not an unchanged copy of the input. A stride-two 1×1 convolution changes channels and samples a lower-resolution grid. It may make addition possible while discarding spatial detail. When reproducing a residual architecture, trace both paths through the dimension-changing blocks and inspect where nonlinearities occur. The identity contribution helps explain gradient flow, but it does not guarantee that the full Jacobian cannot cancel or amplify particular directions."
+          "Read the residual-learning paper's mapping and shortcut construction before interpreting the depth comparisons. The expression \\(x + F(x)\\) isolates an additive connection; a complete architecture may add normalization or an activation around that addition. Those surrounding operations matter when asking whether setting the branch to zero makes the entire block an identity map. The simplified Jacobian here describes the additive operation itself.",
+          "The projection example offers a second distinction: matching shapes is necessary, but a projected shortcut is not an unchanged copy of the input. A stride-two \\(1\\times1\\) convolution changes channels and samples a lower-resolution grid. It may make addition possible while discarding spatial detail. When reproducing a residual architecture, trace both paths through the dimension-changing blocks and inspect where nonlinearities occur. The identity contribution helps explain gradient flow, but it does not guarantee that the full Jacobian cannot cancel or amplify particular directions."
         ]
       }
     ],
     "exercise": {
-      "prompt": "A block receives [8, 64, 32, 32] images and its main branch outputs [8, 128, 16, 16]. Can you add the original input directly? Propose a compatible shortcut.",
-      "answer": "No: channel count and spatial dimensions differ. A 1×1 convolution with 128 output channels and stride 2 can map the shortcut to [8, 128, 16, 16], provided the spatial sizing conventions match the main branch."
+      "prompt": "A block receives \\([8, 64, 32, 32]\\) images and its main branch outputs \\([8, 128, 16, 16]\\). Can you add the original input directly? Propose a compatible shortcut.",
+      "answer": "No: channel count and spatial dimensions differ. A \\(1\\times1\\) convolution with 128 output channels and stride 2 can map the shortcut to \\([8, 128, 16, 16]\\), provided the spatial sizing conventions match the main branch."
     },
     "takeaways": [
       "An identity path supports information and gradient flow.",
@@ -443,9 +443,9 @@
         "id": "mechanism",
         "title": "Preserve the expected activation scale",
         "paragraphs": [
-          "With inverted dropout and drop probability p, a retained activation is multiplied by 1/(1 − p). The expectation of the resulting activation equals the original value, so evaluation can use the unmodified activation without random masking. Weight decay applies a shrinkage proportional to the current weight. Under adaptive optimizers, decoupling this shrinkage from gradient normalization distinguishes AdamW from simply adding an L2 penalty to the loss."
+          "With inverted dropout and drop probability \\(p\\), a retained activation is multiplied by \\(\\frac1{1-p}\\). The expectation of the resulting activation equals the original value, so evaluation can use the unmodified activation without random masking. Weight decay applies a shrinkage proportional to the current weight. Under adaptive optimizers, decoupling this shrinkage from gradient normalization distinguishes AdamW from simply adding an \\(L_2\\) penalty to the loss."
         ],
-        "formula": "Dropout(x) = m ⊙ x/(1 − p),  with mᵢ ∼ Bernoulli(1 − p)"
+        "formula": "\\operatorname{Dropout}(x)=\\frac{m\\odot x}{1-p},\\qquad m_i\\sim\\operatorname{Bernoulli}(1-p)"
       },
       {
         "id": "practice",
@@ -465,7 +465,7 @@
     ],
     "exercise": {
       "prompt": "With dropout probability 0.25, a scalar activation of 6 is either removed or rescaled. What value does it take when retained, and what is its expectation?",
-      "answer": "When retained it becomes 6/0.75 = 8; otherwise it is zero. Its expectation is 0.75·8 + 0.25·0 = 6. This preserves the mean, although the sample-to-sample variance increases."
+      "answer": "When retained it becomes \\(\\frac6{0.75}=8\\); otherwise it is zero. Its expectation is \\(0.75\\cdot8+0.25\\cdot0=6\\). This preserves the mean, although the sample-to-sample variance increases."
     },
     "takeaways": [
       "Dropout perturbs activations; decay shrinks parameters.",
@@ -506,9 +506,9 @@
         "id": "mechanism",
         "title": "Lookup is equivalent to a sparse selection",
         "paragraphs": [
-          "For vocabulary size V and embedding width D, the table has shape [V, D]. IDs shaped [B, T] produce vectors [B, T, D]. Multiplying one-hot vectors by the table would yield the same result, but direct lookup avoids constructing huge one-hot arrays. In a pure lookup path, only selected rows receive gradient contributions from that batch; repeated IDs accumulate contributions. Tying this table to an output projection can introduce additional gradient paths."
+          "For vocabulary size \\(V\\) and embedding width \\(D\\), the table has shape \\([V, D]\\). IDs shaped \\([B, T]\\) produce vectors \\([B, T, D]\\). Multiplying one-hot vectors by the table would yield the same result, but direct lookup avoids constructing huge one-hot arrays. In a pure lookup path, only selected rows receive gradient contributions from that batch; repeated IDs accumulate contributions. Tying this table to an output projection can introduce additional gradient paths."
         ],
-        "formula": "E ∈ R^(V×D);  token IDs [B, T] → embeddings [B, T, D]"
+        "formula": "E\\in\\mathbb{R}^{V\\times D};\\qquad \\text{token IDs }[B,T]\\longrightarrow\\text{embeddings }[B,T,D]"
       },
       {
         "id": "practice",
@@ -527,8 +527,8 @@
       }
     ],
     "exercise": {
-      "prompt": "An embedding table has 1,000 rows and width 32. A batch contains IDs [4, 4, 9]. How many rows are accessed, what output shape results, and what happens to repeated-ID gradients?",
-      "answer": "Two distinct rows are accessed, but the output contains three vectors and has shape [3, 32]. Contributions from both occurrences of ID 4 are summed into the gradient for row 4 in the lookup path."
+      "prompt": "An embedding table has 1,000 rows and width 32. A batch contains IDs \\([4, 4, 9]\\). How many rows are accessed, what output shape results, and what happens to repeated-ID gradients?",
+      "answer": "Two distinct rows are accessed, but the output contains three vectors and has shape \\([3, 32]\\). Contributions from both occurrences of ID 4 are summed into the gradient for row 4 in the lookup path."
     },
     "takeaways": [
       "Token IDs select learned vectors rather than encode numerical magnitude.",
@@ -569,9 +569,9 @@
         "id": "mechanism",
         "title": "Track channels and spatial dimensions",
         "paragraphs": [
-          "A standard 2D convolution with C_in input channels, C_out output channels, and a k×k kernel uses C_out·C_in·k² weights, plus biases if enabled. For one spatial axis, output size is floor((n + 2p − d(k − 1) − 1)/s + 1), with padding p, dilation d, and stride s. A 3×3 stride-2 layer with padding 1 maps a 32-pixel axis to 16."
+          "A standard 2D convolution with \\(C_{\\text{in}}\\) input channels, \\(C_{\\text{out}}\\) output channels, and a \\(k\\times k\\) kernel uses \\(C_{\\text{out}}\\cdot C_{\\text{in}}\\cdot k^2\\) weights, plus biases if enabled. For one spatial axis, output size is \\(\\left\\lfloor\\frac{n+2p-d(k-1)-1}{s}+1\\right\\rfloor\\), with padding \\(p\\), dilation \\(d\\), and stride \\(s\\). A \\(3\\times3\\) stride-2 layer with padding 1 maps a 32-pixel axis to 16."
         ],
-        "formula": "n_out = floor((n + 2p − d(k − 1) − 1)/s + 1)"
+        "formula": "n_{\\text{out}}=\\left\\lfloor\\frac{n+2p-d(k-1)-1}{s}+1\\right\\rfloor"
       },
       {
         "id": "practice",
@@ -584,14 +584,14 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Use the convolution chapter to separate local connectivity, shared weights, and downsampling. They are related architectural choices, but none is a synonym for the others. Trace the same 3×3 filter at two interior locations: the weights are reused while the input neighborhood changes. The parameter count therefore stays fixed when image dimensions change, even though the number of filter applications and stored activations grows.",
+          "Use the convolution chapter to separate local connectivity, shared weights, and downsampling. They are related architectural choices, but none is a synonym for the others. Trace the same \\(3\\times3\\) filter at two interior locations: the weights are reused while the input neighborhood changes. The parameter count therefore stays fixed when image dimensions change, even though the number of filter applications and stored activations grows.",
           "Translation equivariance should be read with its assumptions visible. Boundary padding and stride can alter the relation between an input shift and an output shift. A one-pixel movement followed by stride-two sampling need not simply move the resulting feature map by one location. Pooling may add tolerance to some local changes while discarding information needed by another task. When reading a vision result, inspect the complete resizing and downsampling pipeline rather than assigning every robustness property to the convolution operator alone."
         ]
       }
     ],
     "exercise": {
-      "prompt": "A convolution takes 3 input channels to 16 output channels using 3×3 kernels and one bias per output channel. How many parameters does it have? Does image size change that count?",
-      "answer": "There are 16·3·3·3 = 432 weights and 16 biases, totaling 448 parameters. Image height and width change computation and activation storage, but not this layer's parameter count."
+      "prompt": "A convolution takes 3 input channels to 16 output channels using \\(3\\times3\\) kernels and one bias per output channel. How many parameters does it have? Does image size change that count?",
+      "answer": "There are \\(16\\cdot3\\cdot3\\cdot3=432\\) weights and 16 biases, totaling 448 parameters. Image height and width change computation and activation storage, but not this layer'\\(s\\) parameter count."
     },
     "takeaways": [
       "Convolution shares local weights across spatial positions.",
@@ -626,9 +626,9 @@
         "id": "mechanism",
         "title": "Gates control writing and retention",
         "paragraphs": [
-          "A vanilla recurrence might use h_t = tanh(W_x x_t + W_h h_(t−1) + b). Its long-range gradients involve repeated Jacobian products, which can shrink or grow rapidly. LSTMs introduce a cell state with gates controlling retention, writing, and exposure. GRUs use update and reset gates with a more compact state arrangement. Gates make memory flow learnable, but do not guarantee perfect retention over arbitrarily long sequences."
+          "A vanilla recurrence might use \\(h_t=\\tanh(W_xx_t+W_hh_{t-1}+b)\\). Its long-range gradients involve repeated Jacobian products, which can shrink or grow rapidly. LSTMs introduce a cell state with gates controlling retention, writing, and exposure. GRUs use update and reset gates with a more compact state arrangement. Gates make memory flow learnable, but do not guarantee perfect retention over arbitrarily long sequences."
         ],
-        "formula": "h_t = tanh(W_x x_t + W_h h_(t−1) + b)"
+        "formula": "h_t=\\tanh(W_xx_t+W_hh_{t-1}+b)"
       },
       {
         "id": "practice",
@@ -697,7 +697,7 @@
         "paragraphs": [
           "A linear warmup reaches the target learning rate after a chosen number of steps. A cosine decay then lowers it smoothly toward a minimum over the remaining budget. Global-norm clipping rescales the entire gradient vector only when its norm exceeds a threshold, preserving direction. Elementwise clipping has different geometry because it can change relative coordinate sizes. With mixed precision, clipping must inspect unscaled gradients."
         ],
-        "formula": "g_clipped = g · min(1, c/‖g‖₂)"
+        "formula": "g_{\\text{clipped}}=g\\cdot\\min\\left(1,\\frac{c}{\\lVert g\\rVert_2}\\right)"
       },
       {
         "id": "practice",
@@ -711,13 +711,13 @@
         "title": "Reading the original source",
         "paragraphs": [
           "Compare the clipping procedure in the recurrent-network paper with the learning-rate schedule in Attention Is All You Need. They control different quantities, and the original Transformer decay is inverse-square-root rather than cosine. The SGDR paper supplies the cosine-annealing source; its restart policy is a separate choice from using one decay phase. A reproduction should identify the actual schedule equation, its time unit, and how warmup connects to the remaining training budget.",
-          "The [3, 4] example makes global clipping a direction-preserving rescaling, but the optimizer can subsequently transform that gradient. For plain SGD, learning rate times the clipped vector is the update; with Adam or momentum, state and normalization intervene. Logging the gradient norm alone therefore does not establish a bound on the realized parameter change. During accumulation, clip after the intended gradient has been assembled and unscaled, and advance a step-based schedule with optimizer updates rather than individual microbatch forwards."
+          "The \\([3, 4]\\) example makes global clipping a direction-preserving rescaling, but the optimizer can subsequently transform that gradient. For plain SGD, learning rate times the clipped vector is the update; with Adam or momentum, state and normalization intervene. Logging the gradient norm alone therefore does not establish a bound on the realized parameter change. During accumulation, clip after the intended gradient has been assembled and unscaled, and advance a step-based schedule with optimizer updates rather than individual microbatch forwards."
         ]
       }
     ],
     "exercise": {
-      "prompt": "A gradient vector is [3, 4] and the global-norm threshold is 2. What clipped vector results? Would clipping each coordinate to [−2, 2] produce the same direction?",
-      "answer": "Its norm is 5, so global clipping scales it by 2/5, giving [1.2, 1.6]. Elementwise clipping gives [2, 2], which changes the direction. The two procedures are not interchangeable."
+      "prompt": "A gradient vector is \\([3, 4]\\) and the global-norm threshold is 2. What clipped vector results? Would clipping each coordinate to \\([-2,2]\\) produce the same direction?",
+      "answer": "Its norm is 5, so global clipping scales it by \\(\\frac25\\), giving \\([1.2, 1.6]\\). Elementwise clipping gives \\([2, 2]\\), which changes the direction. The two procedures are not interchangeable."
     },
     "takeaways": [
       "Scheduling changes the planned step size.",

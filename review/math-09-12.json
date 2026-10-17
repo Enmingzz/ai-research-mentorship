@@ -1,0 +1,607 @@
+{
+  "scope": "LaTeX notation conversion for reviewed lessons 09–12",
+  "reviewer": "OpenAI Codex",
+  "reviewedTopicIds": [
+    "09-01",
+    "09-02",
+    "09-03",
+    "09-04",
+    "09-05",
+    "09-06",
+    "09-07",
+    "09-08",
+    "09-09",
+    "09-10",
+    "09-11",
+    "09-12",
+    "09-13",
+    "09-14",
+    "09-15",
+    "09-16",
+    "09-17",
+    "09-18",
+    "09-19",
+    "09-20",
+    "10-01",
+    "10-02",
+    "10-03",
+    "10-04",
+    "10-05",
+    "10-06",
+    "10-07",
+    "10-08",
+    "10-09",
+    "10-10",
+    "10-11",
+    "10-12",
+    "10-13",
+    "10-14",
+    "11-01",
+    "11-02",
+    "11-03",
+    "11-04",
+    "11-05",
+    "11-06",
+    "11-07",
+    "11-08",
+    "11-09",
+    "11-10",
+    "11-11",
+    "11-12",
+    "11-13",
+    "11-14",
+    "11-15",
+    "11-16",
+    "12-01",
+    "12-02",
+    "12-03",
+    "12-04",
+    "12-05",
+    "12-06",
+    "12-07",
+    "12-08",
+    "12-09",
+    "12-10",
+    "12-11",
+    "12-12",
+    "12-13",
+    "12-14",
+    "12-15",
+    "12-16",
+    "12-17",
+    "12-18"
+  ],
+  "coverage": {
+    "articles": 68,
+    "displayFormulaFields": 30,
+    "inlineMathExpressions": 533,
+    "perModule": [
+      {
+        "moduleId": "09",
+        "articles": 20,
+        "displayFormulaFields": 20,
+        "inlineMathExpressions": 280
+      },
+      {
+        "moduleId": "10",
+        "articles": 14,
+        "displayFormulaFields": 10,
+        "inlineMathExpressions": 28
+      },
+      {
+        "moduleId": "11",
+        "articles": 16,
+        "displayFormulaFields": 0,
+        "inlineMathExpressions": 95
+      },
+      {
+        "moduleId": "12",
+        "articles": 18,
+        "displayFormulaFields": 0,
+        "inlineMathExpressions": 130
+      }
+    ],
+    "perTopic": [
+      {
+        "topicId": "09-01",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 4
+      },
+      {
+        "topicId": "09-02",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 17
+      },
+      {
+        "topicId": "09-03",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 17
+      },
+      {
+        "topicId": "09-04",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 11
+      },
+      {
+        "topicId": "09-05",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 35
+      },
+      {
+        "topicId": "09-06",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 4
+      },
+      {
+        "topicId": "09-07",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 8
+      },
+      {
+        "topicId": "09-08",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 6
+      },
+      {
+        "topicId": "09-09",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 3
+      },
+      {
+        "topicId": "09-10",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 21
+      },
+      {
+        "topicId": "09-11",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 2
+      },
+      {
+        "topicId": "09-12",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 17
+      },
+      {
+        "topicId": "09-13",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 39
+      },
+      {
+        "topicId": "09-14",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 19
+      },
+      {
+        "topicId": "09-15",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 9
+      },
+      {
+        "topicId": "09-16",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 14
+      },
+      {
+        "topicId": "09-17",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 15
+      },
+      {
+        "topicId": "09-18",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 20
+      },
+      {
+        "topicId": "09-19",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 13
+      },
+      {
+        "topicId": "09-20",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 6
+      },
+      {
+        "topicId": "10-01",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "10-02",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 5
+      },
+      {
+        "topicId": "10-03",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "10-04",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 4
+      },
+      {
+        "topicId": "10-05",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "10-06",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "10-07",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "10-08",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 6
+      },
+      {
+        "topicId": "10-09",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 9
+      },
+      {
+        "topicId": "10-10",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "10-11",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 1
+      },
+      {
+        "topicId": "10-12",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 3
+      },
+      {
+        "topicId": "10-13",
+        "displayFormulaCount": 1,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "10-14",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "11-01",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 8
+      },
+      {
+        "topicId": "11-02",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "11-03",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 3
+      },
+      {
+        "topicId": "11-04",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 17
+      },
+      {
+        "topicId": "11-05",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 12
+      },
+      {
+        "topicId": "11-06",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 3
+      },
+      {
+        "topicId": "11-07",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 17
+      },
+      {
+        "topicId": "11-08",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 4
+      },
+      {
+        "topicId": "11-09",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 8
+      },
+      {
+        "topicId": "11-10",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 6
+      },
+      {
+        "topicId": "11-11",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 2
+      },
+      {
+        "topicId": "11-12",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 4
+      },
+      {
+        "topicId": "11-13",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 4
+      },
+      {
+        "topicId": "11-14",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 6
+      },
+      {
+        "topicId": "11-15",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 1
+      },
+      {
+        "topicId": "11-16",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "12-01",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 3
+      },
+      {
+        "topicId": "12-02",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "12-03",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 3
+      },
+      {
+        "topicId": "12-04",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "12-05",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 32
+      },
+      {
+        "topicId": "12-06",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 16
+      },
+      {
+        "topicId": "12-07",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 3
+      },
+      {
+        "topicId": "12-08",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 5
+      },
+      {
+        "topicId": "12-09",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 18
+      },
+      {
+        "topicId": "12-10",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 5
+      },
+      {
+        "topicId": "12-11",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 13
+      },
+      {
+        "topicId": "12-12",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 11
+      },
+      {
+        "topicId": "12-13",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 9
+      },
+      {
+        "topicId": "12-14",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "12-15",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 6
+      },
+      {
+        "topicId": "12-16",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 0
+      },
+      {
+        "topicId": "12-17",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 5
+      },
+      {
+        "topicId": "12-18",
+        "displayFormulaCount": 0,
+        "inlineMathCount": 1
+      }
+    ]
+  },
+  "notationDecisions": [
+    {
+      "topicIds": [
+        "09-01",
+        "09-06",
+        "10-03",
+        "10-13"
+      ],
+      "decision": "Preserved verbal formula fields as LaTeX text, splitting long expressions with aligned or gathered rather than inventing mathematical equalities."
+    },
+    {
+      "topicIds": [
+        "09-03",
+        "09-04",
+        "11-06",
+        "11-07",
+        "12-03",
+        "12-05",
+        "12-06"
+      ],
+      "decision": "Preserved ordered KL arguments and prior/posterior conditioning; used operatorname KL, mid for conditionals, and parallel bars for distribution separation."
+    },
+    {
+      "topicIds": [
+        "09-05",
+        "11-12"
+      ],
+      "decision": "Rendered original log-variance ℓ and online-softmax accumulator l using LaTeX ell for legibility; these retain their original article-local meanings."
+    },
+    {
+      "topicIds": [
+        "09-07"
+      ],
+      "decision": "Kept β-VAE in model names and cited paper names as prose; wrapped mathematical β parameters, including the β-weighted objective."
+    },
+    {
+      "topicIds": [
+        "09-10",
+        "09-12"
+      ],
+      "decision": "Used bar alpha for accumulated diffusion coefficients. Made the existing product up to timestep t explicit as product from s=1 to t, consistent with the stated discrete-step convention."
+    },
+    {
+      "topicIds": [
+        "09-13"
+      ],
+      "decision": "Kept diffusion v, angular derivative v_phi, and time derivative distinct; no reinterpretation as an arbitrary flow velocity."
+    },
+    {
+      "topicIds": [
+        "09-14"
+      ],
+      "decision": "Preserved the audited paper/article CFG scale mapping w_p=w_a-1 and the unconditional/conditional subscripts; inserted multiplication spacing in w_p times u."
+    },
+    {
+      "topicIds": [
+        "10-02",
+        "10-04",
+        "11-01",
+        "11-08",
+        "11-09",
+        "11-10",
+        "11-11"
+      ],
+      "decision": "Kept tensor shapes as bracketed dimension lists rather than converting them to numerical matrices. Rendered geometric dimensions with times and hidden dimensions/head counts with subscripts."
+    },
+    {
+      "topicIds": [
+        "11-04",
+        "11-05",
+        "11-06"
+      ],
+      "decision": "Used descriptive text subscripts for KV heads, teacher/student variables, and quantization operators while preserving numeric byte estimates, clipping, and round-to-nearest semantics."
+    },
+    {
+      "topicIds": [
+        "11-07",
+        "12-03"
+      ],
+      "decision": "Teacher/student T and S labels remain local to the teacher-student objective; distillation temperature T is retained in the separate temperature lesson. Expanded E_D to E over x sampled from D, already stated in the same sentence."
+    },
+    {
+      "topicIds": [
+        "12-08"
+      ],
+      "decision": "Retained the original sum over k without inventing a fixed or infinite horizon; reward index remains r_{t+k} under the article's declared convention."
+    },
+    {
+      "topicIds": [
+        "12-09"
+      ],
+      "decision": "Rendered the loss pseudovariables stop_gradient and log_probability with text/operator notation inside the mathematical expression; ordinary PyTorch API names elsewhere remain prose."
+    },
+    {
+      "topicIds": [
+        "12-10",
+        "12-11",
+        "12-12",
+        "12-13",
+        "12-17"
+      ],
+      "decision": "Preserved policy superscripts, old versus fixed reference subscripts, clipping signs, leave-one-out fractions, DPO beta scaling, and target-over-behavior importance-weight direction."
+    },
+    {
+      "topicIds": [
+        "10-06",
+        "10-07",
+        "10-10",
+        "10-14",
+        "11-02",
+        "11-16",
+        "12-02",
+        "12-04",
+        "12-14",
+        "12-16"
+      ],
+      "decision": "Reviewed articles with no meaningful symbolic expressions and retained their prose without manufacturing equations or wrapping ordinary counts, percentages, software identifiers, or configuration labels."
+    }
+  ],
+  "preservation": {
+    "titles": true,
+    "summaries": true,
+    "ids": true,
+    "prerequisites": true,
+    "sectionIdsAndTitles": true,
+    "code": true,
+    "referencesAndNotes": true,
+    "scientificMeaningsAndWorkedExamples": "preserved; notation-only conversion"
+  },
+  "validation": {
+    "jsonParsing": "passed for all four files",
+    "strictKaTeX": {
+      "version": "0.19.0",
+      "helper": "tools/math.mjs",
+      "renderFormula": "all 30 display fields passed",
+      "renderMathText": "all 533 inline expressions passed",
+      "strict": "error",
+      "throwOnError": true,
+      "errors": []
+    },
+    "protectedFieldComparison": "passed: no changes to any field outside formula, paragraphs, bullets, exercise prompt/answer, or takeaways",
+    "residualNotationReview": "Remaining Greek outside math in converted text is the β-VAE model/paper name; API underscores remain prose intentionally.",
+    "gitDiffCheck": "passed; Git only reported existing LF/CRLF conversion warnings",
+    "numericExamples": "Previously audited values preserved; this task did not rerun scientific numerical simulations."
+  },
+  "finalFileSha256": {
+    "10": "bcdcdc2d50120ab97cf8b9605e4cba3e1a7ed16475a709f5005d0cab9c9f2596",
+    "11": "b465e7d5984b2549daedd2d6fbbad6c6ec038ba40034af2d2306826670b0f001",
+    "12": "85dee7f3ded0429d5759ea40fd40a36524aa0f4124f7dabbdb10763fc12a1e08",
+    "09": "dc85111cddd0999d8f5feb20579b30a9bd9bfe6108540980ed98f6a3395e2442"
+  },
+  "unresolved": [],
+  "limitations": [
+    "Validated static KaTeX output and scientific notation; no browser screenshots or visual layout inspection performed by this subagent.",
+    "Full repository checks, final page layout, publication, and deployment remain with the parent agent."
+  ],
+  "followupReview": {
+    "reviewer": "Independent Codex agent /root/curriculum",
+    "result": "No mathematical-equivalence defects in 09-12 versus 8eaf6a9. One bare guidance-weight variable in 09-14 was wrapped in inline math by the parent; counts and final hash updated."
+  }
+}

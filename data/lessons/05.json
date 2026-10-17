@@ -19,9 +19,9 @@
         "id": "mechanism",
         "title": "Factor a joint distribution with the chain rule",
         "paragraphs": [
-          "For tokens x₁ through x_T, the joint probability is the product of p(x_t | x_<t). Taking a negative logarithm produces a sum of next-token losses. During training, the full observed sequence is known, so a causal Transformer can compute losses at many positions in one pass. During free generation, later inputs are unknown until earlier choices are made, so ordinary sampling proceeds sequentially."
+          "For tokens \\(x_1\\) through \\(x_T\\), the joint probability is the product of \\(p(x_t\\mid x_{<t})\\). Taking a negative logarithm produces a sum of next-token losses. During training, the full observed sequence is known, so a causal Transformer can compute losses at many positions in one pass. During free generation, later inputs are unknown until earlier choices are made, so ordinary sampling proceeds sequentially."
         ],
-        "formula": "p(x₁,…,x_T) = ∏ₜ p(x_t | x_<t)"
+        "formula": "p(x_1,\\ldots,x_T)=\\prod_{t=1}^{T}p(x_t\\mid x_{<t})"
       },
       {
         "id": "practice",
@@ -41,7 +41,7 @@
     ],
     "exercise": {
       "prompt": "A model assigns probabilities 0.5, 0.25, and 0.8 to three observed tokens given their respective prefixes. What is the sequence probability and total negative log likelihood?",
-      "answer": "The sequence probability is 0.5·0.25·0.8 = 0.1. Total negative log likelihood is −ln(0.1) ≈ 2.303 nats, equal to the sum of the three token-level negative log probabilities."
+      "answer": "The sequence probability is \\(0.5\\cdot0.25\\cdot0.8=0.1\\). Total negative log likelihood is \\(-\\ln(0.1)\\approx2.303\\) nats, equal to the sum of the three token-level negative log probabilities."
     },
     "takeaways": [
       "Autoregression uses conditional dependence, not token independence.",
@@ -81,7 +81,7 @@
         "id": "mechanism",
         "title": "Learn reusable pieces from a corpus",
         "paragraphs": [
-          "BPE repeatedly merges frequent adjacent symbol pairs during tokenizer training. If a toy sequence begins as [a, b, a, b] and the learned merge combines a with b, it becomes [ab, ab]. Real tokenizers also define normalization, whitespace treatment, special tokens, and initial symbols such as bytes or characters. SentencePiece is a tokenizer framework that can train models such as BPE or unigram directly from raw sentences; it is not a synonym for one specific merge algorithm."
+          "BPE repeatedly merges frequent adjacent symbol pairs during tokenizer training. If a toy sequence begins as \\([\\text{a},\\text{b},\\text{a},\\text{b}]\\) and the learned merge combines a with b, it becomes \\([\\text{ab},\\text{ab}]\\). Real tokenizers also define normalization, whitespace treatment, special tokens, and initial symbols such as bytes or characters. SentencePiece is a tokenizer framework that can train models such as BPE or unigram directly from raw sentences; it is not a synonym for one specific merge algorithm."
         ]
       },
       {
@@ -137,16 +137,16 @@
         "id": "intuition",
         "title": "The output at one position predicts the next token",
         "paragraphs": [
-          "A causal model's hidden state at position t has seen tokens through t. Its vocabulary logits should therefore be compared with token t+1. If labels are aligned with the current input token, a model can learn an easier copying problem that does not train useful continuation. A low loss under that misalignment can look impressive while generation remains poor."
+          "A causal model's hidden state at position \\(t\\) has seen tokens through \\(t\\). Its vocabulary logits should therefore be compared with token \\(t+1\\). If labels are aligned with the current input token, a model can learn an easier copying problem that does not train useful continuation. A low loss under that misalignment can look impressive while generation remains poor."
         ]
       },
       {
         "id": "mechanism",
         "title": "Trace a four-token example",
         "paragraphs": [
-          "For [BOS, A, B, EOS], one explicit training pair uses inputs [BOS, A, B] and targets [A, B, EOS]. Here T = 4 is the full sequence length, leaving T−1 = 3 target positions. For N_batch such examples, logits have shape [N_batch, T−1, V], with one V-way classification problem per valid target. Some model APIs accept the full sequence as both input and labels and perform the shift internally; others expect pre-shifted tensors. Applying both conventions shifts twice. Check the interface with a tiny sequence whose expected targets you can list by hand."
+          "For \\([\\text{BOS},\\text{A},\\text{B},\\text{EOS}]\\), one explicit training pair uses inputs \\([\\text{BOS},\\text{A},\\text{B}]\\) and targets \\([\\text{A},\\text{B},\\text{EOS}]\\). Here \\(T=4\\) is the full sequence length, leaving \\(T-1=3\\) target positions. For \\(N_{\\text{batch}}\\) such examples, logits have shape \\([N_{\\text{batch}},T-1,V]\\), with one \\(V\\)-way classification problem per valid target. Some model APIs accept the full sequence as both input and labels and perform the shift internally; others expect pre-shifted tensors. Applying both conventions shifts twice. Check the interface with a tiny sequence whose expected targets you can list by hand."
         ],
-        "formula": "L = −(1/N_valid) Σ_valid log pθ(x_(t+1) | x_≤t)"
+        "formula": "L=-\\frac{1}{N_{\\text{valid}}}\\sum_{t\\in\\mathcal V}\\log p_\\theta(x_{t+1}\\mid x_{\\le t}),\\qquad \\mathcal V=\\{\\text{valid target positions}\\}"
       },
       {
         "id": "practice",
@@ -200,16 +200,16 @@
         "id": "intuition",
         "title": "Translate log loss into an intuitive scale",
         "paragraphs": [
-          "Perplexity exponentiates the average negative log probability assigned to observed tokens. A perfectly uniform predictor over V tokens has perplexity V. This motivates an interpretation as an effective number of equally likely alternatives, although a real model's probabilities vary by token and context. Lower held-out perplexity indicates better average probability assignment under a specified evaluation setup, not necessarily better factual answers or instruction following."
+          "Perplexity exponentiates the average negative log probability assigned to observed tokens. A perfectly uniform predictor over \\(V\\) tokens has perplexity \\(V\\). This motivates an interpretation as an effective number of equally likely alternatives, although a real model's probabilities vary by token and context. Lower held-out perplexity indicates better average probability assignment under a specified evaluation setup, not necessarily better factual answers or instruction following."
         ]
       },
       {
         "id": "mechanism",
         "title": "Aggregate losses before exponentiating",
         "paragraphs": [
-          "Using natural logs, PPL = exp(total negative log likelihood / number of valid targets). Unequal sequence lengths must contribute proportionally to their valid token counts. Averaging per-sequence perplexities is generally wrong because exponentiation is nonlinear. Context-limited models add another choice: evaluating independent chunks deprives early chunk positions of preceding context, while overlapping windows can preserve more context if already-scored targets are masked appropriately."
+          "Using natural logs, \\(\\operatorname{PPL}=\\exp\\!\\left(\\frac{\\text{total negative log likelihood}}{\\text{number of valid targets}}\\right)\\). Unequal sequence lengths must contribute proportionally to their valid token counts. Averaging per-sequence perplexities is generally wrong because exponentiation is nonlinear. Context-limited models add another choice: evaluating independent chunks deprives early chunk positions of preceding context, while overlapping windows can preserve more context if already-scored targets are masked appropriately."
         ],
-        "formula": "PPL = exp(−Σ_valid log p(x_t | context) / N_valid)"
+        "formula": "\\operatorname{PPL}=\\exp\\!\\left(-\\frac{1}{N_{\\text{valid}}}\\sum_{t\\in\\mathcal V}\\log p(x_t\\mid\\text{context})\\right),\\quad \\mathcal V=\\{\\text{valid target positions}\\}"
       },
       {
         "id": "practice",
@@ -229,7 +229,7 @@
     ],
     "exercise": {
       "prompt": "Two equally long sequences have perplexities 4 and 16 under the same tokenizer. What is their combined perplexity if each sequence has the same number of valid targets?",
-      "answer": "Average their log losses: (ln 4 + ln 16)/2 = ln 8, so combined perplexity is 8. The arithmetic mean 10 is incorrect. If lengths differ, weight each log loss by its valid-target count."
+      "answer": "Average their log losses: \\(\\frac{\\ln4+\\ln16}{2}=\\ln8\\), so combined perplexity is 8. The arithmetic mean 10 is incorrect. If lengths differ, weight each log loss by its valid-target count."
     },
     "takeaways": [
       "Average token log loss first, then exponentiate.",
@@ -531,9 +531,9 @@
         "id": "mechanism",
         "title": "Separate scaling from truncation",
         "paragraphs": [
-          "Temperature divides logits by a positive value before softmax: lower temperature sharpens probabilities, while higher temperature flattens them. Top-k keeps a fixed number of highest-scoring candidates. Top-p keeps a smallest high-probability prefix whose cumulative probability reaches a chosen threshold, so its candidate count adapts to uncertainty. After filtering, probabilities must be renormalized. Greedy decoding is a limiting or separate selection rule; literally dividing by temperature zero is undefined. Positive temperature scaling preserves the ranking and therefore top-k membership, but it can change the top-p nucleus. When combining controls, report whether temperature is applied before truncation."
+          "Temperature divides logits by a positive value before softmax: lower temperature sharpens probabilities, while higher temperature flattens them. \\(\\text{Top-}k\\) keeps a fixed number of highest-scoring candidates. \\(\\text{Top-}p\\) keeps a smallest high-probability prefix whose cumulative probability reaches a chosen threshold, so its candidate count adapts to uncertainty. After filtering, probabilities must be renormalized. Greedy decoding is a limiting or separate selection rule; literally dividing by temperature zero is undefined. Positive temperature scaling preserves the ranking and therefore \\(\\text{top-}k\\) membership, but it can change the \\(\\text{top-}p\\) nucleus. When combining controls, report whether temperature is applied before truncation."
         ],
-        "formula": "p_i(T) = exp(z_i/T) / Σ_j exp(z_j/T),  T > 0"
+        "formula": "p_i(T)=\\frac{\\exp(z_i/T)}{\\sum_j\\exp(z_j/T)},\\qquad T>0"
       },
       {
         "id": "practice",
@@ -552,11 +552,11 @@
       }
     ],
     "exercise": {
-      "prompt": "The sorted token probabilities are [0.50, 0.30, 0.15, 0.05]. Under top-p with p = 0.75, which tokens remain and what are their renormalized probabilities?",
-      "answer": "The first two tokens reach cumulative probability 0.80, so they remain. Dividing by 0.80 yields [0.625, 0.375]. The exact boundary convention should be checked in the implementation, but this example has no threshold tie."
+      "prompt": "The sorted token probabilities are \\([0.50,0.30,0.15,0.05]\\). Under \\(\\text{top-}p\\) with \\(p=0.75\\), which tokens remain and what are their renormalized probabilities?",
+      "answer": "The first two tokens reach cumulative probability 0.80, so they remain. Dividing by 0.80 yields \\([0.625,0.375]\\). The exact boundary convention should be checked in the implementation, but this example has no threshold tie."
     },
     "takeaways": [
-      "Temperature rescales logits; top-k and top-p remove candidates.",
+      "Temperature rescales logits; \\(\\text{top-}k\\) and \\(\\text{top-}p\\) remove candidates.",
       "Decoding changes output behavior without changing model knowledge."
     ],
     "references": [
@@ -707,9 +707,9 @@
         "id": "mechanism",
         "title": "Connect parameters and tokens to compute",
         "paragraphs": [
-          "A rough estimate for dense Transformer training is C ≈ 6ND, with N parameters and D training tokens, ignoring important architecture- and sequence-dependent overheads. In Kaplan et al., N counts non-embedding parameters and the estimate omits context-dependent attention FLOPs. Check each study's parameter-count and compute conventions before comparing allocation rules. Under fixed C, doubling N roughly halves the affordable D in this approximation. The best balance depends on how loss responds to both capacity and data. Compute-optimal training also differs from deployment-optimal design: a smaller model trained longer may be attractive when inference will be repeated many times."
+          "A rough estimate for dense Transformer training is \\(C\\approx6ND\\), with \\(N\\) parameters and \\(D\\) training tokens, ignoring important architecture- and sequence-dependent overheads. In Kaplan et al., \\(N\\) counts non-embedding parameters and the estimate omits context-dependent attention FLOPs. Check each study's parameter-count and compute conventions before comparing allocation rules. Under fixed \\(C\\), doubling \\(N\\) roughly halves the affordable \\(D\\) in this approximation. The best balance depends on how loss responds to both capacity and data. Compute-optimal training also differs from deployment-optimal design: a smaller model trained longer may be attractive when inference will be repeated many times."
         ],
-        "formula": "Approximate dense training compute: C ≈ 6ND"
+        "formula": "\\text{Approximate dense training compute:}\\qquad C\\approx6ND"
       },
       {
         "id": "practice",
@@ -723,12 +723,12 @@
         "title": "Reading the original paper",
         "paragraphs": [
           "Compare the questions asked by Scaling Laws for Neural Language Models and Training Compute-Optimal Large Language Models before comparing their fitted recommendations. Identify the loss being predicted, the range of model sizes, and how training-token budgets vary. An empirical allocation rule belongs to those assumptions; it should not be interpreted as a timeless ratio that every model or dataset must follow.",
-          "Draw a fixed-compute curve using the simplified relation ND = constant. Mark two candidate models on it, one larger and trained on fewer tokens. The equation fixes an approximate cost, not their relative loss. To choose between them, a fitted loss model or measurements are still needed. Then add a deployment scenario with millions of repeated queries: the preferred model can change even if training compute is identical. This reading exercise explains why training-optimal, data-limited, and inference-cost-constrained designs answer different optimization problems."
+          "Draw a fixed-compute curve using the simplified relation \\(ND=\\text{constant}\\). Mark two candidate models on it, one larger and trained on fewer tokens. The equation fixes an approximate cost, not their relative loss. To choose between them, a fitted loss model or measurements are still needed. Then add a deployment scenario with millions of repeated queries: the preferred model can change even if training compute is identical. This reading exercise explains why training-optimal, data-limited, and inference-cost-constrained designs answer different optimization problems."
         ]
       }
     ],
     "exercise": {
-      "prompt": "Under C ≈ 6ND, you double parameter count while holding total training compute fixed. How must token count change, and why might this still fail to preserve final loss?",
+      "prompt": "Under \\(C\\approx6ND\\), you double parameter count while holding total training compute fixed. How must token count change, and why might this still fail to preserve final loss?",
       "answer": "Token count must approximately halve. Final loss can change because larger capacity and reduced data exposure have different effects; the original allocation may already have been near its best balance, and the approximation omits other costs and training effects."
     },
     "takeaways": [
@@ -859,7 +859,7 @@
       }
     ],
     "exercise": {
-      "prompt": "Model A scores 80% on 100 questions and model B scores 81% on the same set. Why is the one-point difference insufficient by itself to establish a reliable improvement?",
+      "prompt": "Model A scores \\(80\\%\\) on 100 questions and model B scores \\(81\\%\\) on the same set. Why is the one-point difference insufficient by itself to establish a reliable improvement?",
       "answer": "It is a net difference of one correct answer, not necessarily one disagreement: B could answer 10 questions correctly that A misses, while A answers 9 correctly that B misses. Inspect paired disagreements, uncertainty, prompt and sampling variation, and whether either model used the test set for selection. A broader or repeated evaluation may show that the difference is unstable."
     },
     "takeaways": [

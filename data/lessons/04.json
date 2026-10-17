@@ -80,15 +80,15 @@
         "id": "mechanism",
         "title": "Project representations into three roles",
         "paragraphs": [
-          "For input X of shape [B, T, D], learned matrices produce Q = XW_Q, K = XW_K, and V = XW_V. Queries and keys must share their final width so their dot products are defined. Values may have a different final width. A query compares against all keys, softmax turns scores into weights, and those weights mix values. The output length follows the number of queries, not the number of stored keys."
+          "For input \\(X\\) of shape \\([B, T, D]\\), learned matrices produce \\(Q=XW_Q\\), \\(K=XW_K\\), and \\(V=XW_V\\). Queries and keys must share their final width so their dot products are defined. Values may have a different final width. A query compares against all keys, softmax turns scores into weights, and those weights mix values. The output length follows the number of queries, not the number of stored keys."
         ],
-        "formula": "Q: [B, T_q, d_k];  K: [B, T_k, d_k];  V: [B, T_k, d_v]"
+        "formula": "Q:\\ [B,T_q,d_k];\\qquad K:\\ [B,T_k,d_k];\\qquad V:\\ [B,T_k,d_v]"
       },
       {
         "id": "practice",
         "title": "Do not confuse source identity with parameter sharing",
         "paragraphs": [
-          "In self-attention, Q, K, and V originate from the same sequence, but usually use different projections. Their rows therefore need not be identical. In cross-attention, queries may come from a text decoder while keys and values come from image features. Keys and values must remain aligned by source position; permuting one without the other changes which content a match retrieves. A large attention weight also does not establish a complete causal explanation of the model's answer."
+          "In self-attention, \\(Q\\), \\(K\\), and \\(V\\) originate from the same sequence, but usually use different projections. Their rows therefore need not be identical. In cross-attention, queries may come from a text decoder while keys and values come from image features. Keys and values must remain aligned by source position; permuting one without the other changes which content a match retrieves. A large attention weight also does not establish a complete causal explanation of the model's answer."
         ]
       },
       {
@@ -102,7 +102,7 @@
     ],
     "exercise": {
       "prompt": "There are 6 queries, 10 keys, query/key width 8, and value width 12. What are the attention-score and output shapes without batch or head dimensions?",
-      "answer": "The score matrix is [6, 10], containing one score per query-key pair. Multiplying normalized scores by values [10, 12] produces [6, 12], one retrieved vector for each query."
+      "answer": "The score matrix is \\([6, 10]\\), containing one score per query-key pair. Multiplying normalized scores by values \\([10, 12]\\) produces \\([6, 12]\\), one retrieved vector for each query."
     },
     "takeaways": [
       "Queries and keys determine matching; values determine transmitted content.",
@@ -137,29 +137,29 @@
         "id": "shapes",
         "title": "Write the dimensions before the numbers",
         "paragraphs": [
-          "Ignore batches and heads for this example. Let Q and K each have shape [2, 2]: there are two queries, two source positions, and query/key width d_k = 2. Let V also be [2, 2], so each source contributes a two-feature value. QKᵀ has shape [2, 2], with rows indexing queries and columns indexing keys. Softmax acts across each row, and multiplying by V returns [2, 2]."
+          "Ignore batches and heads for this example. Let \\(Q\\) and \\(K\\) each have shape \\([2,2]\\): there are two queries, two source positions, and query/key width \\(d_k=2\\). Let \\(V\\) also be \\([2,2]\\), so each source contributes a two-feature value. \\(QK^{\\top}\\) has shape \\([2,2]\\), with rows indexing queries and columns indexing keys. Softmax acts across each row, and multiplying by \\(V\\) returns \\([2,2]\\)."
         ],
-        "formula": "Attention(Q, K, V) = softmax(QKᵀ/√d_k)V"
+        "formula": "\\operatorname{Attention}(Q,K,V)=\\operatorname{softmax}\\left(\\frac{QK^{\\top}}{\\sqrt{d_k}}\\right)V"
       },
       {
         "id": "example",
         "title": "Turn two scores into one retrieved vector",
         "paragraphs": [
-          "Choose Q = K = [[1, 0], [0, 1]] and V = [[2, 0], [0, 4]]. The first query has raw scores [1, 0]. Dividing by √2 gives [0.7071, 0]. Exponentiation gives approximately [2.0281, 1], and normalization produces approximately [0.66976155, 0.33023845]. Using unrounded weights, its output is approximately [1.33952310, 1.32095380]. The second query swaps the weights, producing approximately [0.66047690, 2.67904620]. Notice that the output mixes values, not keys."
+          "Choose \\(Q=K=\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}\\) and \\(V=\\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}\\). The first query has raw scores \\([1, 0]\\). Dividing by \\(\\sqrt2\\) gives \\([0.7071, 0]\\). Exponentiation gives approximately \\([2.0281, 1]\\), and normalization produces approximately \\([0.66976155, 0.33023845]\\). Using unrounded weights, its output is approximately \\([1.33952310, 1.32095380]\\). The second query swaps the weights, producing approximately \\([0.66047690, 2.67904620]\\). Notice that the output mixes values, not keys."
         ]
       },
       {
         "id": "scaling",
         "title": "Why divide by the square root of the width?",
         "paragraphs": [
-          "Under a simple model with independent, zero-mean, unit-variance query and key coordinates, a dot product sums d_k terms and has variance d_k. Dividing by √d_k keeps that variance near one. Without the scaling, wider heads tend to generate more extreme logits, which can make softmax sharply concentrated and its gradients less useful. Real learned features need not satisfy those assumptions exactly; the argument motivates the scale rather than proving attention weights always remain well behaved."
+          "Under a simple model with independent, zero-mean, unit-variance query and key coordinates, a dot product sums \\(d_k\\) terms and has variance \\(d_k\\). Dividing by \\(\\sqrt{d_k}\\) keeps that variance near one. Without the scaling, wider heads tend to generate more extreme logits, which can make softmax sharply concentrated and its gradients less useful. Real learned features need not satisfy those assumptions exactly; the argument motivates the scale rather than proving attention weights always remain well behaved."
         ]
       },
       {
         "id": "checks",
         "title": "Mask and normalize the intended axis",
         "paragraphs": [
-          "Subtracting the largest logit before exponentiation improves numerical stability without changing softmax. Apply an additive mask before softmax so forbidden positions receive zero probability. In this example, a causal mask removes the first query's access to the second source: its weights become [1, 0] and its output becomes [2, 0]. Check row sums and forbidden positions explicitly. An entirely masked row needs defined handling because naive softmax of all negative infinities is invalid."
+          "Subtracting the largest logit before exponentiation improves numerical stability without changing softmax. Apply an additive mask before softmax so forbidden positions receive zero probability. In this example, a causal mask removes the first query's access to the second source: its weights become \\([1, 0]\\) and its output becomes \\([2, 0]\\). Check row sums and forbidden positions explicitly. An entirely masked row needs defined handling because naive softmax of all negative infinities is invalid."
         ]
       },
       {
@@ -172,11 +172,11 @@
       }
     ],
     "exercise": {
-      "prompt": "In the unmasked example, replace both value vectors by [3, −1] while keeping Q and K unchanged. What does each output become, and why?",
-      "answer": "Both outputs become [3, −1]. Each row's attention weights sum to one, so any weighted mixture of identical value vectors equals that same vector. Scores may differ, but there is no content difference for them to select."
+      "prompt": "In the unmasked example, replace both value vectors by \\([3,-1]\\) while keeping \\(Q\\) and \\(K\\) unchanged. What does each output become, and why?",
+      "answer": "Both outputs become \\([3,-1]\\). Each row's attention weights sum to one, so any weighted mixture of identical value vectors equals that same vector. Scores may differ, but there is no content difference for them to select."
     },
     "takeaways": [
-      "Scores come from Q and K; output content comes from V.",
+      "Scores come from \\(Q\\) and \\(K\\); output content comes from \\(V\\).",
       "Softmax normalizes over source positions for each query.",
       "Scaling controls the typical logit magnitude as head width changes."
     ],
@@ -215,9 +215,9 @@
         "id": "mechanism",
         "title": "Output length follows the queries",
         "paragraphs": [
-          "Suppose a decoder has 5 token states and an image encoder produces 196 patch states. Cross-attention can project decoder states into Q [5, d_k], image states into K [196, d_k] and V [196, d_v], then produce 5 output vectors. Its score matrix is [5, 196], not square. The two streams can have different original feature widths because their learned projection matrices map them into compatible matching dimensions."
+          "Suppose a decoder has 5 token states and an image encoder produces 196 patch states. Cross-attention can project decoder states into \\(Q [5, d_k]\\), image states into \\(K [196, d_k]\\) and \\(V [196, d_v]\\), then produce 5 output vectors. Its score matrix is \\([5, 196]\\), not square. The two streams can have different original feature widths because their learned projection matrices map them into compatible matching dimensions."
         ],
-        "formula": "CrossAttn(X, S) = softmax((XW_Q)(SW_K)ᵀ/√d_k)(SW_V)"
+        "formula": "\\operatorname{CrossAttn}(X,S)=\\operatorname{softmax}\\left(\\frac{(XW_Q)(SW_K)^{\\top}}{\\sqrt{d_k}}\\right)(SW_V)"
       },
       {
         "id": "practice",
@@ -230,14 +230,14 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the Transformer architecture description by tracing separate data streams through each attention use. In cross-attention, a decoder query retrieves from a source whose length and original width can differ from the target's. Mark those dimensions on the projection matrices as well as on Q, K, and V. This prevents a common implementation shortcut from accidentally assuming identical source and target widths.",
+          "Read the Transformer architecture description by tracing separate data streams through each attention use. In cross-attention, a decoder query retrieves from a source whose length and original width can differ from the target's. Mark those dimensions on the projection matrices as well as on \\(Q\\), \\(K\\), and \\(V\\). This prevents a common implementation shortcut from accidentally assuming identical source and target widths.",
           "The masking policy follows what information is available, not the rectangular shape of the score matrix. A fully observed document can be visible to every summary position, while padded document slots remain invalid. For an online forecasting source, some observations might instead be unavailable at a particular prediction time. These are task-specific information constraints. Precomputing cross-attention keys and values is valid only while the encoded source and relevant model computation remain unchanged; a new source requires a new memory."
         ]
       }
     ],
     "exercise": {
       "prompt": "A text decoder has 8 queries and an audio encoder has 120 source frames. What score shape should cross-attention produce, and which length determines the number of output positions?",
-      "answer": "The score matrix is [8, 120], before batch and head axes. The output has 8 positions because each query receives one mixture of the 120 source values. The source length controls the number of retrieval candidates."
+      "answer": "The score matrix is \\([8, 120]\\), before batch and head axes. The output has 8 positions because each query receives one mixture of the 120 source values. The source length controls the number of retrieval candidates."
     },
     "takeaways": [
       "Self versus cross describes input origin, not a different softmax rule.",
@@ -272,15 +272,15 @@
         "id": "mechanism",
         "title": "Split width, then recombine",
         "paragraphs": [
-          "With model width D = 96 and H = 4 heads, a common design uses head width 24. Projected Q, K, and V are rearranged from [B, T, 96] to [B, 4, T, 24]. Each head computes its own [T, T] attention matrix. Concatenating the four [T, 24] outputs restores width 96, and an output projection mixes information across heads. Holding D fixed keeps many projection parameter counts unchanged when H changes."
+          "With model width \\(D = 96\\) and \\(H = 4\\) heads, a common design uses head width 24. Projected \\(Q\\), \\(K\\), and \\(V\\) are rearranged from \\([B, T, 96]\\) to \\([B, 4, T, 24]\\). Each head computes its own \\([T, T]\\) attention matrix. Concatenating the four \\([T, 24]\\) outputs restores width 96, and an output projection mixes information across heads. Holding \\(D\\) fixed keeps many projection parameter counts unchanged when \\(H\\) changes."
         ],
-        "formula": "MultiHead(X) = Concat(head₁, …, head_H)W_O"
+        "formula": "\\operatorname{MultiHead}(X)=\\operatorname{Concat}(\\text{head}_1,\\ldots,\\text{head}_H)W_O"
       },
       {
         "id": "practice",
         "title": "More heads are not free expressiveness",
         "paragraphs": [
-          "At fixed total width, adding heads makes each matching subspace narrower. It can also change kernel efficiency and attention-memory overhead. Some heads may become redundant, and good performance does not require every head to have a distinct interpretation. Check that D is divisible by H in a simple equal-width implementation, and transpose axes carefully when merging heads. Compare head counts under matched width and training budget to isolate the actual architectural change."
+          "At fixed total width, adding heads makes each matching subspace narrower. It can also change kernel efficiency and attention-memory overhead. Some heads may become redundant, and good performance does not require every head to have a distinct interpretation. Check that \\(D\\) is divisible by \\(H\\) in a simple equal-width implementation, and transpose axes carefully when merging heads. Compare head counts under matched width and training budget to isolate the actual architectural change."
         ]
       },
       {
@@ -329,9 +329,9 @@
         "id": "mechanism",
         "title": "Mask scores before normalization",
         "paragraphs": [
-          "For an additive mask, allowed query-key pairs receive zero and forbidden pairs receive negative infinity before softmax. A square causal mask permits key index j only when j ≤ i for query index i. A key-padding mask excludes padded source columns for every valid query. Padded query outputs may still exist, so exclude their targets from the loss separately. Cached decoding needs position-aware masks because query and key lengths may differ."
+          "For an additive mask, allowed query-key pairs receive zero and forbidden pairs receive negative infinity before softmax. A square causal mask permits key index \\(j\\) only when \\(j\\le i\\) for query index \\(i\\). A key-padding mask excludes padded source columns for every valid query. Padded query outputs may still exist, so exclude their targets from the loss separately. Cached decoding needs position-aware masks because query and key lengths may differ."
         ],
-        "formula": "weights = softmax(scores + mask);  maskᵢⱼ = 0 if allowed, otherwise −∞"
+        "formula": "\\text{weights}=\\operatorname{softmax}(\\text{scores}+\\text{mask});\\qquad \\text{mask}_{ij}=\\begin{cases}0,&\\text{if allowed}\\\\-\\infty,&\\text{otherwise}\\end{cases}"
       },
       {
         "id": "practice",
@@ -392,7 +392,7 @@
         "id": "mechanism",
         "title": "Trace a translation computation",
         "paragraphs": [
-          "An encoder converts a source sentence of length S into S contextual vectors. The decoder processes target-prefix states of length T with causal self-attention, then uses cross-attention over the encoded source. The target stream therefore has both a [T, T] masked interaction and a [T, S] source interaction. During teacher-forced training, all target positions are computed together; during generation, the target grows one token at a time."
+          "An encoder converts a source sentence of length \\(S\\) into \\(S\\) contextual vectors. The decoder processes target-prefix states of length \\(T\\) with causal self-attention, then uses cross-attention over the encoded source. The target stream therefore has both a \\([T, T]\\) masked interaction and a \\([T, S]\\) source interaction. During teacher-forced training, all target positions are computed together; during generation, the target grows one token at a time."
         ]
       },
       {
@@ -449,7 +449,7 @@
         "paragraphs": [
           "A learned absolute-position table stores one vector per supported position and adds it to the token embedding. Sinusoidal encoding instead fills paired coordinates with sine and cosine functions at different frequencies. The multiple frequencies provide both fast-changing local signals and slower-changing long-range signals. Addition preserves model width, but mixes position and content in the representation consumed by later projections."
         ],
-        "formula": "PE(pos, 2i) = sin(pos/10000^(2i/D));  PE(pos, 2i+1) = cos(pos/10000^(2i/D))"
+        "formula": "\\operatorname{PE}(\\text{pos},2i)=\\sin\\left(\\frac{\\text{pos}}{10000^{2i/D}}\\right);\\qquad \\operatorname{PE}(\\text{pos},2i+1)=\\cos\\left(\\frac{\\text{pos}}{10000^{2i/D}}\\right)"
       },
       {
         "id": "practice",
@@ -468,7 +468,7 @@
       }
     ],
     "exercise": {
-      "prompt": "A learned position table has shape [512, 64]. What fails when an unmodified model indexes position 600? Why does a sinusoidal formula avoid that specific failure without guaranteeing good predictions?",
+      "prompt": "A learned position table has shape \\([512, 64]\\). What fails when an unmodified model indexes position 600? Why does a sinusoidal formula avoid that specific failure without guaranteeing good predictions?",
       "answer": "The table has no row 600, so direct lookup is out of range. A sinusoidal formula can compute that position without a stored row, but the model may still behave poorly because it never learned to use such positions or distances."
     },
     "takeaways": [
@@ -504,9 +504,9 @@
         "id": "mechanism",
         "title": "Relative angles survive the dot product",
         "paragraphs": [
-          "For a two-dimensional pair, rotate x by angle θ using [x₁ cosθ − x₂ sinθ, x₁ sinθ + x₂ cosθ]. If query position m uses rotation R_m and key position n uses R_n, their dot product becomes qᵀR_mᵀR_nk = qᵀR_(n−m)k when the angles are linear in position. Different coordinate pairs use different frequencies, providing multiple distance scales. Values are typically left unrotated in the common formulation."
+          "For a two-dimensional pair, rotate \\(x\\) by angle \\(\\theta\\) using \\([x_1\\cos\\theta-x_2\\sin\\theta,\\ x_1\\sin\\theta+x_2\\cos\\theta]\\). If query position \\(m\\) uses rotation \\(R_m\\) and key position \\(n\\) uses \\(R_n\\), their dot product becomes \\(q^{\\top}R_m^{\\top}R_nk=q^{\\top}R_{n-m}k\\) when the angles are linear in position. Different coordinate pairs use different frequencies, providing multiple distance scales. Values are typically left unrotated in the common formulation."
         ],
-        "formula": "(R_m q)ᵀ(R_n k) = qᵀR_(n−m)k"
+        "formula": "(R_mq)^{\\top}(R_nk)=q^{\\top}R_{n-m}k"
       },
       {
         "id": "practice",
@@ -525,8 +525,8 @@
       }
     ],
     "exercise": {
-      "prompt": "Let q = k = [1, 0]. Rotate q by 0 degrees and k by 90 degrees. What is their dot product? What happens if both are rotated by 90 degrees?",
-      "answer": "With different rotations, the vectors are [1, 0] and [0, 1], so the dot product is zero. If both rotate by 90 degrees, both become [0, 1] and the dot product is one. The shared rotation cancels; the relative angle matters."
+      "prompt": "Let \\(q = k = [1, 0]\\). Rotate \\(q\\) by 0 degrees and \\(k\\) by 90 degrees. What is their dot product? What happens if both are rotated by 90 degrees?",
+      "answer": "With different rotations, the vectors are \\([1, 0]\\) and \\([0, 1]\\), so the dot product is zero. If both rotate by 90 degrees, both become \\([0, 1]\\) and the dot product is one. The shared rotation cancels; the relative angle matters."
     },
     "takeaways": [
       "RoPE rotates query and key coordinate pairs.",
@@ -561,9 +561,9 @@
         "id": "mechanism",
         "title": "Follow the identity route",
         "paragraphs": [
-          "In pre-norm, y = x + F(LN(x)), so x has a direct additive path to y. In post-norm, y = LN(x + F(x)), so the entire result passes through normalization. Their Jacobians therefore differ: the normalization derivative lies outside the addition in post-norm. Pre-norm stacks commonly use a final normalization after the blocks. The overall behavior also depends on initialization, residual scaling, depth, and optimizer schedule."
+          "In pre-norm, \\(y=x+F(\\operatorname{LN}(x))\\), so \\(x\\) has a direct additive path to \\(y\\). In post-norm, \\(y=\\operatorname{LN}(x+F(x))\\), so the entire result passes through normalization. Their Jacobians therefore differ: the normalization derivative lies outside the addition in post-norm. Pre-norm stacks commonly use a final normalization after the blocks. The overall behavior also depends on initialization, residual scaling, depth, and optimizer schedule."
         ],
-        "formula": "Pre-norm: y = x + F(LN(x));  Post-norm: y = LN(x + F(x))"
+        "formula": "\\text{Pre-norm:}\\quad y=x+F(\\operatorname{LN}(x));\\qquad \\text{Post-norm:}\\quad y=\\operatorname{LN}(x+F(x))"
       },
       {
         "id": "practice",
@@ -576,14 +576,14 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the pre-LN/post-LN paper with the residual sum highlighted. Moving normalization from after the sum to inside the branch changes which operations lie on the direct path. The zero-branch example here makes that distinction observable without training: x + 0 preserves the representation, whereas LN(x + 0) generally does not. This is a property of the written computation, not a claim about a particular optimizer.",
+          "Read the pre-LN/post-LN paper with the residual sum highlighted. Moving normalization from after the sum to inside the branch changes which operations lie on the direct path. The zero-branch example here makes that distinction observable without training: \\(x + 0\\) preserves the representation, whereas \\(\\operatorname{LN}(x+0)\\) generally does not. This is a property of the written computation, not a claim about a particular optimizer.",
           "The paper's optimization observations should be interpreted together with the tested architecture and initialization. A result showing that one setup trains without warmup does not imply that any pre-norm checkpoint can tolerate arbitrary learning rates or residual scales. When comparing implementations, inspect both sublayers and the final normalization outside the block stack. A seemingly minor mismatch there can change predictions even when every tensor loads successfully and all parameter names and shapes appear compatible."
         ]
       }
     ],
     "exercise": {
-      "prompt": "If the residual branch F returns zero, what does each block output? What does this reveal about the identity path?",
-      "answer": "Pre-norm returns x exactly. Post-norm returns LN(x), which generally differs from x. The zero-branch case exposes the direct identity path present in pre-norm and the normalization applied to that path in post-norm."
+      "prompt": "If the residual branch \\(F\\) returns zero, what does each block output? What does this reveal about the identity path?",
+      "answer": "Pre-norm returns \\(x\\) exactly. Post-norm returns \\(\\operatorname{LN}(x)\\), which generally differs from \\(x\\). The zero-branch case exposes the direct identity path present in pre-norm and the normalization applied to that path in post-norm."
     },
     "takeaways": [
       "Operation order determines gradient flow.",
@@ -618,29 +618,29 @@
         "id": "mechanism",
         "title": "Expand, activate, and project back",
         "paragraphs": [
-          "A common FFN maps model width D to hidden width F, applies a nonlinear activation, then maps back to D. With input [B, T, D], the intermediate is [B, T, F] and the output returns to [B, T, D], enabling a residual addition. Ignoring biases, the two matrices contain 2DF parameters. For D = 256 and F = 1024, that is 524,288 weights in one FFN."
+          "A common FFN maps model width \\(D\\) to hidden width \\(F\\), applies a nonlinear activation, then maps back to \\(D\\). With input \\([B, T, D]\\), the intermediate is \\([B, T, F]\\) and the output returns to \\([B, T, D]\\), enabling a residual addition. Ignoring biases, the two matrices contain \\(2DF\\) parameters. For \\(D = 256\\) and \\(F = 1024\\), that is 524,288 weights in one FFN."
         ],
-        "formula": "FFN(x) = φ(xW_up + b_up)W_down + b_down"
+        "formula": "\\operatorname{FFN}(x)=\\phi(xW_{\\text{up}}+b_{\\text{up}})W_{\\text{down}}+b_{\\text{down}}"
       },
       {
         "id": "practice",
         "title": "Positionwise does not mean context-free",
         "paragraphs": [
-          "The same FFN parameters are reused at every position, but different contextual inputs yield different activations. Increasing F adds representational capacity and substantial matrix-multiplication cost; attention is not automatically the dominant cost at short sequence lengths. When profiling, measure projections and FFNs separately from pairwise attention. Avoid accidentally flattening the token and feature axes into one dimension, which changes a shared positionwise network into a sequence-length-specific operation."
+          "The same FFN parameters are reused at every position, but different contextual inputs yield different activations. Increasing \\(F\\) adds representational capacity and substantial matrix-multiplication cost; attention is not automatically the dominant cost at short sequence lengths. When profiling, measure projections and FFNs separately from pairwise attention. Avoid accidentally flattening the token and feature axes into one dimension, which changes a shared positionwise network into a sequence-length-specific operation."
         ]
       },
       {
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the positionwise feed-forward description in the Transformer paper while keeping the token axis visible. The same two matrices are applied at every position; the hidden width expands features, not sequence length. The parameter count 2DF therefore does not include a factor of T, although the amount of computation does. This is a useful distinction when estimating the cost of processing a longer prompt.",
+          "Read the positionwise feed-forward description in the Transformer paper while keeping the token axis visible. The same two matrices are applied at every position; the hidden width expands features, not sequence length. The parameter count \\(2DF\\) therefore does not include a factor of \\(T\\), although the amount of computation does. This is a useful distinction when estimating the cost of processing a longer prompt.",
           "A contextual input can make an FFN's output depend indirectly on distant tokens even though the FFN itself never mixes positions. To isolate that fact, compare the same token representation before and after an attention layer has incorporated another token's information. The subsequent positionwise operation receives different inputs and can produce different features. When profiling a Transformer, keep the FFN and projection costs separate from pairwise attention; a long-context complexity argument does not establish which component dominates a short-sequence workload."
         ]
       }
     ],
     "exercise": {
-      "prompt": "An FFN maps width 64 to 256 and back to 64 with biases on both layers. How many parameters does it contain, and which dimensions change for input [2, 10, 64]?",
-      "answer": "The count is 64·256 + 256 + 256·64 + 64 = 33,088. The hidden tensor is [2, 10, 256], then the output is [2, 10, 64]. Batch size and sequence length do not change."
+      "prompt": "An FFN maps width 64 to 256 and back to 64 with biases on both layers. How many parameters does it contain, and which dimensions change for input \\([2, 10, 64]\\)?",
+      "answer": "The count is \\(64\\cdot256+256+256\\cdot64+64=33{,}088\\). The hidden tensor is \\([2, 10, 256]\\), then the output is \\([2, 10, 64]\\). Batch size and sequence length do not change."
     },
     "takeaways": [
       "Attention mixes positions; FFNs transform per-position features.",
@@ -675,15 +675,15 @@
         "id": "mechanism",
         "title": "Count three matrices instead of two",
         "paragraphs": [
-          "A common SwiGLU expression is [SiLU(xW_g) ⊙ xW_u]W_d, ignoring biases. Both expansion branches have width F, and the down projection returns to model width D. This uses roughly 3DF weights, compared with 2DF for a standard two-matrix FFN at the same F. To match parameter budgets, the gated hidden width must therefore be smaller than the ungated width. A fair comparison should state which quantity is held constant."
+          "A common SwiGLU expression is \\([\\operatorname{SiLU}(xW_g)\\odot xW_u]W_d\\), ignoring biases. Both expansion branches have width \\(F\\), and the down projection returns to model width \\(D\\). This uses roughly \\(3DF\\) weights, compared with \\(2DF\\) for a standard two-matrix FFN at the same \\(F\\). To match parameter budgets, the gated hidden width must therefore be smaller than the ungated width. A fair comparison should state which quantity is held constant."
         ],
-        "formula": "SwiGLU(x) = (SiLU(xW_g) ⊙ xW_u)W_d"
+        "formula": "\\operatorname{SwiGLU}(x)=\\left(\\operatorname{SiLU}(xW_g)\\odot xW_u\\right)W_d"
       },
       {
         "id": "practice",
         "title": "A gate need not lie between zero and one",
         "paragraphs": [
-          "SiLU(x) = xσ(x) can be negative and can exceed one, so a SwiGLU gate is not simply a Bernoulli-style probability. Its multiplicative interaction changes activation and gradient scales. Check initialization, normalization, and kernel support when replacing an FFN. Also verify which projection is gated: interchanging weights in a trained checkpoint changes the function, even though the multiplication itself is commutative after both branches have been computed."
+          "\\(\\operatorname{SiLU}(x)=x\\sigma(x)\\) can be negative and can exceed one, so a SwiGLU gate is not simply a Bernoulli-style probability. Its multiplicative interaction changes activation and gradient scales. Check initialization, normalization, and kernel support when replacing an FFN. Also verify which projection is gated: interchanging weights in a trained checkpoint changes the function, even though the multiplication itself is commutative after both branches have been computed."
         ]
       },
       {
@@ -696,8 +696,8 @@
       }
     ],
     "exercise": {
-      "prompt": "An ordinary FFN uses hidden width 1,536. Ignoring biases, what SwiGLU hidden width gives the same parameter count at a fixed model width D?",
-      "answer": "Equate 2D·1536 with 3D·F, giving F = 1024. Both then use 3,072D weights. Real architectures may round widths for hardware efficiency, so verify the actual configuration rather than assuming an exact ratio."
+      "prompt": "An ordinary FFN uses hidden width 1,536. Ignoring biases, what SwiGLU hidden width gives the same parameter count at a fixed model width \\(D\\)?",
+      "answer": "Equate \\(2D\\cdot1536\\) with \\(3D\\cdot F\\), giving \\(F = 1024\\). Both then use \\(3{,}072D\\) weights. Real architectures may round widths for hardware efficiency, so verify the actual configuration rather than assuming an exact ratio."
     },
     "takeaways": [
       "SwiGLU multiplies two input-dependent feature streams.",
@@ -732,9 +732,9 @@
         "id": "mechanism",
         "title": "Separate two head counts in the shapes",
         "paragraphs": [
-          "Let H_q = 16 and H_kv = 4. Queries have shape [B, 16, T_q, d], while keys and values use [B, 4, T_k, d]. Each group of four query heads attends to the same key-value head while retaining its own query projection. MHA corresponds to H_kv = H_q; MQA corresponds to H_kv = 1. At fixed lengths, layers, and dtype, cache size scales with H_kv."
+          "Let \\(H_q=16\\) and \\(H_{\\text{kv}}=4\\). Queries have shape \\([B,16,T_q,d]\\), while keys and values use \\([B,4,T_k,d]\\). Each group of four query heads attends to the same key-value head while retaining its own query projection. MHA corresponds to \\(H_{\\text{kv}}=H_q\\); MQA corresponds to \\(H_{\\text{kv}}=1\\). At fixed lengths, layers, and dtype, cache size scales with \\(H_{\\text{kv}}\\)."
         ],
-        "formula": "KV cache elements = 2 · layers · B · T · H_kv · d"
+        "formula": "\\text{KV cache elements}=2\\cdot\\text{layers}\\cdot B\\cdot T\\cdot H_{\\text{kv}}\\cdot d"
       },
       {
         "id": "practice",
@@ -747,14 +747,14 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Compare the multi-query decoding paper with GQA by counting query heads and key-value heads independently. The cache equation uses H_kv because future queries reuse stored keys and values, not old queries. In the sixteen-query-head, four-KV-head example, each group shares a source representation while retaining distinct query projections. This is a structural sharing choice rather than a reduction in the number of generated output positions.",
+          "Compare the multi-query decoding paper with GQA by counting query heads and key-value heads independently. The cache equation uses \\(H_{\\text{kv}}\\) because future queries reuse stored keys and values, not old queries. In the sixteen-query-head, four-KV-head example, each group shares a source representation while retaining distinct query projections. This is a structural sharing choice rather than a reduction in the number of generated output positions.",
           "The ideal cache ratio is only one component of an efficiency claim. Physically repeating KV tensors to imitate grouped heads can increase temporary memory or traffic, while specialized kernels may preserve the sharing more effectively. Query projections, output projections, and FFNs also remain. Read quality and runtime results as measurements under specified architecture and serving conditions. A fourfold reduction in cache elements does not establish a fourfold reduction in request latency, especially when weights or other operations dominate the workload."
         ]
       }
     ],
     "exercise": {
       "prompt": "A model switches from 32 key-value heads to 8 while keeping all other cache dimensions fixed. What is the ideal cache-size ratio? Does total model inference time necessarily improve by the same factor?",
-      "answer": "The cache becomes 8/32 = one quarter of its previous size. Total inference time need not fall fourfold because other computation, memory transfers, and kernel overhead remain, and the original workload may not have been cache-bandwidth limited."
+      "answer": "The cache becomes \\(\\frac8{32}=\\frac14\\), or one quarter of its previous size. Total inference time need not fall fourfold because other computation, memory transfers, and kernel overhead remain, and the original workload may not have been cache-bandwidth limited."
     },
     "takeaways": [
       "Query-head count and key-value-head count are distinct.",
@@ -795,9 +795,9 @@
         "id": "mechanism",
         "title": "Append memory at each layer",
         "paragraphs": [
-          "For one new token, Q has query length one, while the key-value sequence length is the existing context plus that token. Attention still compares the new query with all allowed cached keys and mixes the corresponding values. The cache stores keys and values rather than past queries because future steps need the former as retrieval memory. Cache storage grows linearly with sequence length, layer count, batch size, key-value heads, and head width."
+          "For one new token, \\(Q\\) has query length one, while the key-value sequence length is the existing context plus that token. Attention still compares the new query with all allowed cached keys and mixes the corresponding values. The cache stores keys and values rather than past queries because future steps need the former as retrieval memory. Cache storage grows linearly with sequence length, layer count, batch size, key-value heads, and head width."
         ],
-        "formula": "Cache bytes = 2 · L · B · T · H_kv · d_head · bytes_per_element"
+        "formula": "\\text{Cache bytes}=2\\cdot L\\cdot B\\cdot T\\cdot H_{\\text{kv}}\\cdot d_{\\text{head}}\\cdot\\text{bytes per element}"
       },
       {
         "id": "practice",
@@ -817,7 +817,7 @@
     ],
     "exercise": {
       "prompt": "A 2-layer model with batch 1, sequence length 100, 4 KV heads, head width 8, and 2-byte elements stores how many cache bytes? Ignore allocator overhead.",
-      "answer": "The cache stores 2·2·1·100·4·8 = 12,800 elements, counting keys and values. At 2 bytes each, that is 25,600 bytes. Doubling context length doubles this storage."
+      "answer": "The cache stores \\(2\\cdot2\\cdot1\\cdot100\\cdot4\\cdot8=12{,}800\\) elements, counting keys and values. At 2 bytes each, that is 25,600 bytes. Doubling context length doubles this storage."
     },
     "takeaways": [
       "Caching saves repeated prefix computation.",
@@ -872,7 +872,7 @@
         "title": "Reading the original source",
         "paragraphs": [
           "Read Efficiently Scaling Transformer Inference alongside the multi-query decoding cost analysis, keeping the number of simultaneous queries in mind. A prompt offers many known positions to process together, while one sequence's next generated token depends on the previous choice. The distinction changes matrix shapes and opportunities to reuse loaded data. FlashAttention provides a complementary perspective on attention's memory traffic, but an attention-kernel improvement alone is not a complete serving-system latency result.",
-          "For the timing example, explicitly define whether the first emitted token is included in startup time. With that convention, an N-token answer takes approximately 0.2 + (N − 1)/20 seconds on A and 1 + (N − 1)/50 seconds on B. Their crossover is between 27 and 28 tokens. This calculation illustrates why both time to first token and subsequent token rate matter. Real comparisons must also state concurrency, queueing, prompt lengths, output lengths, and any batching policy."
+          "For the timing example, explicitly define whether the first emitted token is included in startup time. With that convention, an \\(N\\)-token answer takes approximately \\(0.2+\\frac{N-1}{20}\\) seconds on A and \\(1+\\frac{N-1}{50}\\) seconds on B. Their crossover is between 27 and 28 tokens. This calculation illustrates why both time to first token and subsequent token rate matter. Real comparisons must also state concurrency, queueing, prompt lengths, output lengths, and any batching policy."
         ]
       }
     ],
@@ -939,7 +939,7 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the FlashAttention algorithm by tracking what crosses the boundary between fast on-chip storage and main GPU memory. The compact attention equation does not require a particular schedule of intermediate writes. Tiling changes that schedule, while online normalization preserves the required weighted sum. When a new tile raises a row's running maximum from m to m′, old exponential accumulations must be rescaled consistently by exp(m − m′).",
+          "Read the FlashAttention algorithm by tracking what crosses the boundary between fast on-chip storage and main GPU memory. The compact attention equation does not require a particular schedule of intermediate writes. Tiling changes that schedule, while online normalization preserves the required weighted sum. When a new tile raises a row's running maximum from \\(m\\) to \\(m'\\), old exponential accumulations must be rescaled consistently by \\(\\exp(m-m')\\).",
           "That accounting is the key distinction from approximations that remove token interactions. A dense tiled implementation still considers the relevant query-key pairs, so doubling sequence length does not remove the quadratic arithmetic growth. Numerical equality should also be interpreted carefully: changed operation ordering can affect floating-point results even when the real-arithmetic expression is the same. Use a small output-and-gradient comparison to investigate semantics, then measure memory and runtime on the actual supported hardware. The first check cannot establish a GPU speedup."
         ]
       }
@@ -988,9 +988,9 @@
         "id": "mechanism",
         "title": "Write the dominant terms",
         "paragraphs": [
-          "For sequence length T and model width D, standard projections cost roughly O(TD²). With total head width D, score computation and value mixing cost O(T²D). Naively storing attention weights requires O(BHT²) elements, while a KV cache is linear in T. For B = 2, H = 8, T = 1024, the full FP16 attention-weight tensor for one layer contains 16 matrices of size 1024 × 1024 and occupies 32 MiB. Each individual matrix occupies 2 MiB; these counts exclude logits, gradients, and every other layer."
+          "For sequence length \\(T\\) and model width \\(D\\), standard projections cost roughly \\(\\mathcal{O}(TD^2)\\). With total head width \\(D\\), score computation and value mixing cost \\(\\mathcal{O}(T^2D)\\). Naively storing attention weights requires \\(\\mathcal{O}(BHT^2)\\) elements, while a KV cache is linear in \\(T\\). For \\(B = 2\\), \\(H = 8\\), \\(T = 1024\\), the full FP16 attention-weight tensor for one layer contains 16 matrices of size \\(1024\\times1024\\) and occupies 32 MiB. Each individual matrix occupies 2 MiB; these counts exclude logits, gradients, and every other layer."
         ],
-        "formula": "Pairwise work: O(T²D);  naive score storage: O(BHT²)"
+        "formula": "\\text{Pairwise work: }\\mathcal{O}(T^2D);\\qquad \\text{naive score storage: }\\mathcal{O}(BHT^2)"
       },
       {
         "id": "practice",
@@ -1003,7 +1003,7 @@
         "id": "source-reading",
         "title": "Reading the original source",
         "paragraphs": [
-          "Read the Transformer complexity comparison and the FlashAttention memory discussion as statements about different resources. The pairwise O(T²D) term counts interactions, whereas O(BHT²) describes one explicitly stored attention tensor. Eliminating that tensor from memory does not eliminate the interactions. Conversely, a KV cache has a different purpose and grows linearly with retained context for a fixed architecture.",
+          "Read the Transformer complexity comparison and the FlashAttention memory discussion as statements about different resources. The pairwise \\(\\mathcal{O}(T^2D)\\) term counts interactions, whereas \\(\\mathcal{O}(BHT^2)\\) describes one explicitly stored attention tensor. Eliminating that tensor from memory does not eliminate the interactions. Conversely, a KV cache has a different purpose and grows linearly with retained context for a fixed architecture.",
           "Use the 32 MiB example as an accounting exercise rather than a prediction of total device memory. It includes the full batched, multi-head FP16 attention-weight tensor for one layer and excludes other layers, logits, saved activations, gradients, optimizer state, and allocator overhead. A training-memory estimate and a decoding-memory estimate should list different categories. For generation, also distinguish cost per step from cost over the whole continuation: one new query scans a growing context, and summing many such steps accumulates the work. Theoretical scaling becomes useful only after those boundaries are stated."
         ]
       }
@@ -1075,7 +1075,7 @@
     ],
     "exercise": {
       "prompt": "Why does matching input and output shapes fail to prove that a causal Transformer block is correct? Propose a stronger test.",
-      "answer": "A wrong mask or an incorrect axis permutation can preserve every shape while allowing future leakage. In evaluation mode, alter tokens after position k and verify that outputs through k stay unchanged within numerical tolerance. Also inspect that forbidden attention weights are zero."
+      "answer": "A wrong mask or an incorrect axis permutation can preserve every shape while allowing future leakage. In evaluation mode, alter tokens after position \\(k\\) and verify that outputs through \\(k\\) stay unchanged within numerical tolerance. Also inspect that forbidden attention weights are zero."
     },
     "takeaways": [
       "Preserve the residual stream's shape and meaning.",

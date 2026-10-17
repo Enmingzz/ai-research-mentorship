@@ -1,7 +1,8 @@
 import { readFile } from 'node:fs/promises';
+import {escapeHTML,renderMathText,renderFormula} from './math.mjs';
+export {escapeHTML} from './math.mjs';
 
 export const SITE_URL = 'https://enmingzz.github.io/vlm-project';
-export const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const e = escapeHTML;
 export function wordCount(lesson) {
   return [lesson.summary, ...lesson.sections.flatMap(s=>[...(s.paragraphs||[]), ...(s.bullets||[])]), lesson.exercise.prompt, lesson.exercise.answer, ...lesson.takeaways].join(' ').split(/\s+/).filter(Boolean).length;
@@ -45,7 +46,7 @@ export function lessonDocument(lesson,library) {
 <meta name="theme-color" content="#f6f5f0"><title>${e(lesson.title)} · enming group</title>
 <meta name="description" content="${e(lesson.summary)}"><link rel="canonical" href="${url}">
 <meta property="og:type" content="article"><meta property="og:title" content="${e(lesson.title)}"><meta property="og:description" content="${e(lesson.summary)}"><meta property="og:url" content="${url}">
-<link rel="stylesheet" href="../../style.css"><link rel="stylesheet" href="../../lesson.css"><script type="module" src="../../lesson.js"></script>
+<link rel="stylesheet" href="../../style.css"><link rel="stylesheet" href="../../vendor/katex/katex.min.css"><link rel="stylesheet" href="../../lesson.css"><script type="module" src="../../lesson.js"></script>
 <script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'TechArticle',headline:lesson.title,description:lesson.summary,inLanguage:'en',url,isPartOf:{'@type':'CollectionPage',name:'enming group · AI reference library',url:SITE_URL+'/library.html'}}).replace(/</g,'\\u003c')}</script>
 </head>
 <body class="lesson-page" data-topic-id="${e(lesson.topicId)}">
@@ -66,9 +67,9 @@ export function lessonDocument(lesson,library) {
 <div class="article-layout"><article class="article-body">
 ${lesson.prerequisites.length?`<aside class="related-concepts"><span class="eyebrow">RELATED CONCEPTS</span><p>Background on the ideas used in this article.</p><div>${lesson.prerequisites.map(linkedTopic).join('')}</div></aside>`:''}
 <details class="mobile-toc"><summary>On this page</summary><nav aria-label="Article sections on mobile">${toc}</nav></details>
-${lesson.sections.map((section,i)=>`<section class="article-section" id="section-${e(section.id)}"><div class="section-kicker">${String(i+1).padStart(2,'0')} / EXPLANATION</div><h2>${e(section.title)}</h2>${(section.paragraphs||[]).map(p=>`<p>${e(p)}</p>`).join('')}${section.formula?`<pre class="article-formula" aria-label="Formula">${e(section.formula)}</pre>`:''}${section.code?`<div class="article-code"><div>${e(section.language||'Example')}</div><pre><code>${e(section.code)}</code></pre></div>`:''}${section.bullets?.length?`<ul>${section.bullets.map(b=>`<li>${e(b)}</li>`).join('')}</ul>`:''}</section>`).join('')}
-<section class="article-section article-example" id="worked-example"><div class="eyebrow">EXAMPLE</div><h2>Worked example</h2><p>${e(lesson.exercise.prompt)}</p><details class="worked-answer" open><summary>Explanation <span aria-hidden="true">+</span></summary><div>${e(lesson.exercise.answer)}</div></details></section>
-<section class="article-section" id="takeaways"><div class="section-kicker">AT A GLANCE</div><h2>Key points</h2><ul class="takeaway-list">${lesson.takeaways.map(t=>`<li>${e(t)}</li>`).join('')}</ul></section>
+${lesson.sections.map((section,i)=>`<section class="article-section" id="section-${e(section.id)}"><div class="section-kicker">${String(i+1).padStart(2,'0')} / EXPLANATION</div><h2>${e(section.title)}</h2>${(section.paragraphs||[]).map(p=>`<p>${renderMathText(p)}</p>`).join('')}${section.formula?`<div class="article-formula" tabindex="0" role="region" aria-label="Mathematical formula">${renderFormula(section.formula,{displayMode:true})}</div>`:''}${section.code?`<div class="article-code"><div>${e(section.language||'Example')}</div><pre><code>${e(section.code)}</code></pre></div>`:''}${section.bullets?.length?`<ul>${section.bullets.map(b=>`<li>${renderMathText(b)}</li>`).join('')}</ul>`:''}</section>`).join('')}
+<section class="article-section article-example" id="worked-example"><div class="eyebrow">EXAMPLE</div><h2>Worked example</h2><p>${renderMathText(lesson.exercise.prompt)}</p><details class="worked-answer" open><summary>Explanation <span aria-hidden="true">+</span></summary><div>${renderMathText(lesson.exercise.answer)}</div></details></section>
+<section class="article-section" id="takeaways"><div class="section-kicker">AT A GLANCE</div><h2>Key points</h2><ul class="takeaway-list">${lesson.takeaways.map(t=>`<li>${renderMathText(t)}</li>`).join('')}</ul></section>
 <section class="article-section article-references" id="references"><div class="section-kicker">ORIGINAL SOURCES</div><h2>References & further reading</h2><p class="reference-intro">Original papers, books, and official documentation, with a suggested focus for each.</p><ol>${lesson.references.map(r=>`<li><span class="reference-kind">${e(r.kind.toUpperCase())}</span><h3>${external(r)}</h3><p>${e(r.note)}</p></li>`).join('')}</ol></section>
 <nav class="article-pagination" aria-label="Previous and next articles">${adjacent(previous,'← PREVIOUS ARTICLE')}${adjacent(next,'NEXT ARTICLE →')}</nav>
 </article><aside class="article-rail"><div class="article-rail-sticky"><div class="eyebrow">ON THIS PAGE</div><nav class="article-toc" aria-label="Article sections">${toc}</nav><div class="article-related-nav"><span class="eyebrow">REFERENCE NAVIGATION</span><a href="../../library.html#subject/${subject.id}">Browse ${e(subject.shortTitle)} ↗</a><a href="#references">Original sources ↓</a><a href="../../library.html#articles">All ${lessons.length} articles ↗</a></div></div></aside></div>

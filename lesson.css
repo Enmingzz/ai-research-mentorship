@@ -26,7 +26,14 @@
 .article-section h3{font-size:24px;line-height:1.4}
 .article-section ul{padding-left:28px;margin:22px 0}
 .article-section li{font-size:21px;line-height:1.75;color:#5b6752;padding:5px 0}
-.article-formula{padding:24px 26px;margin:28px 0;border:1px solid #dbe3d1;background:#edf2e4;border-radius:8px;font:22px/1.8 'Cambria Math',Georgia,serif;color:#486139;overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.article-formula{max-width:100%;padding:24px 26px;margin:28px 0;border:1px solid #dbe3d1;background:#edf2e4;border-radius:8px;font-size:22px;line-height:1.8;color:#486139;overflow-x:auto;overscroll-behavior-x:contain}
+.article-formula:focus-visible,.math-inline:focus-visible,.math-in-prose-display:focus-visible{outline:2px solid #718b5c;outline-offset:3px}
+.article-formula .katex-display{margin:0;text-align:left}
+.article-formula .katex-display>.katex{text-align:left}
+.article-body .katex{font-size:1.05em;text-indent:0}
+.math-inline{display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle;padding:.15em .03em;line-height:1.5;white-space:normal;overscroll-behavior-x:contain}
+.math-in-prose-display{display:block;max-width:100%;overflow-x:auto;padding:.45em 0;overscroll-behavior-x:contain}
+.worked-answer>div .katex{white-space:normal}
 .article-code{margin:28px 0;border:1px solid #dce2d3;background:#2b3229;border-radius:8px;overflow:hidden}
 .article-code>div{font:500 16px var(--font);letter-spacing:.8px;text-transform:uppercase;background:#363f32;color:#bac9a8;padding:11px 22px}
 .article-code pre{padding:22px;margin:0;overflow-x:auto;color:#ecf2e3;font:16px/1.75 Consolas,'Courier New',monospace;tab-size:4}

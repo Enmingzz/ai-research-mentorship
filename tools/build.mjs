@@ -9,6 +9,9 @@ try{if(await realpath(output)!==output)throw new Error('Build output cannot be a
 await rm(output,{recursive:true,force:true});
 await mkdir(output, { recursive: true });
 await cp('data', 'dist/data', { recursive: true, filter: source => basename(source) !== 'schedule.json' });
+await mkdir('dist/vendor/katex',{recursive:true});
+for(const file of ['katex.min.css','LICENSE'])await cp(`vendor/katex/${file}`,`dist/vendor/katex/${file}`);
+await cp('vendor/katex/fonts','dist/vendor/katex/fonts',{recursive:true});
 const course=await loadLessons();
 const index=makeTopicIndex(course);
 const expected=course.modules.reduce((total,m)=>total+m.topics.length,0);
@@ -16,7 +19,8 @@ if(course.lessons.length!==expected||Object.keys(index).length!==expected)throw 
 const files=['index.html','library.html','course.html','style.css','app.js','lesson.css','lesson.js','projects.css','projects.js'];
 const sources=await Promise.all(files.map(file=>readFile(file,'utf8')));
 const readingData=await Promise.all(['papers','projects'].map(name=>readFile(`data/${name}.json`,'utf8')));
-const version=createHash('sha256').update(JSON.stringify([course,sources,readingData])).digest('hex').slice(0,12);
+const mathAssets=await Promise.all(['tools/math.mjs','vendor/katex/VENDOR.json','vendor/katex/katex.min.css'].map(file=>readFile(file,'utf8')));
+const version=createHash('sha256').update(JSON.stringify([course,sources,readingData,mathAssets])).digest('hex').slice(0,12);
 const versionAssets=html=>html.replace(/((?:src|href)="[^"]+\.(?:css|js))"/g,`$1?v=${version}"`);
 for(let i=0;i<files.length;i++){
   let content=sources[i];
